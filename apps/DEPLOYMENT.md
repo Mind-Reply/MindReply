@@ -1,8 +1,8 @@
-# AgencyComm - Production Deployment Guide
+# MindReply - Production Deployment Guide
 
 ## Option 1: Vercel + Railway (Recommended for MVP)
 
-### Frontend (Vercel)
+### Frontend (Vercel) file:(index)
 
 1. **Connect Repository**
    - Go to https://vercel.com/new
