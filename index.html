@@ -414,105 +414,238 @@
         </div>
     </section>
 
-    <!-- Professional Lexicon Section (20+ Professionals) -->
-    <section id="professionals" class="py-20 bg-mr-cream">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16 fade-in-up">
-                <h2 class="text-4xl font-serif font-bold text-mr-navy mb-4">Specialised Professional Lexicons</h2>
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
-                    Subconscious communication frameworks for twenty+ professional categories—each with curated vocabulary, behavioral protocols, and expression standards that resonate intuitively with your audience.
-                </p>
+   <!-- Specialised Professional Lexicons Section -->
+<section id="professionals" class="py-20 bg-mr-cream">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 fade-in-up">
+            <h2 class="text-4xl font-serif font-bold text-mr-navy mb-4">Specialised Professional Lexicons Toolkit</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                Subconscious communication frameworks for twenty+ professional categories—each with curated vocabulary, behavioral protocols, and expression standards that resonate intuitively with your audience.
+                <span class="block mt-2 text-mr-gold font-medium italic">(All modified by your desires)</span>
+            </p>
+        </div>
+        
+        <!-- Professional Categories Grid (20+ Categories) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-12">
+            <!-- 1. Clinical Psychologist -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up">
+                <div class="w-10 h-10 bg-rose-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-user-md text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Clinical Psychologist</h4>
             </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-12">
-                <!-- 20 Professional Categories -->
-                ${[
-                    {name: 'Clinical Psychologist', icon: 'fa-user-md', color: 'bg-rose-500'},
-                    {name: 'Legal Counsel', icon: 'fa-gavel', color: 'bg-indigo-500'},
-                    {name: 'Financial Advisor', icon: 'fa-chart-line', color: 'bg-emerald-500'},
-                    {name: 'HR Director', icon: 'fa-users', color: 'bg-blue-500'},
-                    {name: 'Event Strategist', icon: 'fa-calendar-star', color: 'bg-purple-500'},
-                    {name: 'Compliance Officer', icon: 'fa-shield-alt', color: 'bg-slate-500'},
-                    {name: 'PR Specialist', icon: 'fa-bullhorn', color: 'bg-pink-500'},
-                    {name: 'Executive Coach', icon: 'fa-chess-knight', color: 'bg-amber-500'},
-                    {name: 'Mediator', icon: 'fa-handshake', color: 'bg-teal-500'},
-                    {name: 'Recruitment Lead', icon: 'fa-user-plus', color: 'bg-cyan-500'},
-                    {name: 'Training Facilitator', icon: 'fa-chalkboard-teacher', color: 'bg-orange-500'},
-                    {name: 'Risk Analyst', icon: 'fa-search-dollar', color: 'bg-gray-500'},
-                    {name: 'Brand Strategist', icon: 'fa-lightbulb', color: 'bg-yellow-500'},
-                    {name: 'Negotiation Expert', icon: 'fa-comments-dollar', color: 'bg-red-500'},
-                    {name: 'Organisational Developer', icon: 'fa-sitemap', color: 'bg-lime-500'},
-                    {name: 'Crisis Communicator', icon: 'fa-exclamation-triangle', color: 'bg-fuchsia-500'},
-                    {name: 'Stakeholder Manager', icon: 'fa-project-diagram', color: 'bg-sky-500'},
-                    {name: 'Ethics Advisor', icon: 'fa-balance-scale', color: 'bg-violet-500'},
-                    {name: 'Innovation Lead', icon: 'fa-rocket', color: 'bg-indigo-400'},
-                    {name: 'Executive Assistant', icon: 'fa-user-tie', color: 'bg-gray-600'}
-                ].map((pro, i) => `
-                    <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up" style="animation-delay: ${i * 0.05}s">
-                        <div class="w-10 h-10 ${pro.color} rounded-lg flex items-center justify-center mb-3">
-                            <i class="fas ${pro.icon} text-white text-sm"></i>
-                        </div>
-                        <h4 class="font-medium text-mr-navy text-sm">${pro.name}</h4>
-                    </div>
-                `).join('')}
+            <!-- 2. Legal Counsel -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-1">
+                <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-gavel text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Legal Counsel</h4>
             </div>
             
-            <!-- Featured Professional Detail -->
-            <div class="glass-card rounded-2xl p-8 border border-gray-100 fade-in-up delay-4">
-                <div class="flex flex-col md:flex-row gap-8 items-center">
-                    <div class="md:w-1/3">
-                        <div class="w-24 h-24 bg-mr-navy rounded-2xl flex items-center justify-center mb-6">
-                            <i class="fas fa-user-md text-mr-gold text-4xl"></i>
-                        </div>
-                        <h3 class="text-2xl font-serif font-bold text-mr-navy mb-2">Clinical Psychologist Lexicon</h3>
-                        <p class="text-gray-600 mb-4">
-                            Specialised vocabulary for therapeutic correspondence, boundary-setting communications, and interdisciplinary collaboration that resonates subconsciously with clients and colleagues.
-                        </p>
-                        <button class="text-mr-gold font-medium text-sm hover:underline flex items-center gap-1">
-                            Explore Full Lexicon <i class="fas fa-arrow-right text-xs"></i>
-                        </button>
+            <!-- 3. Financial Advisor -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-2">
+                <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-chart-line text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Financial Advisor</h4>
+            </div>
+            
+            <!-- 4. HR Director -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up">
+                <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-users text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">HR Director</h4>
+            </div>
+            
+            <!-- 5. Event Strategist -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-1">
+                <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-calendar-star text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Event Strategist</h4>
+            </div>
+            
+            <!-- 6. Compliance Officer -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-2">
+                <div class="w-10 h-10 bg-slate-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-shield-alt text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Compliance Officer</h4>
+            </div>
+            
+            <!-- 7. PR Specialist -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up">
+                <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-bullhorn text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">PR Specialist</h4>
+            </div>
+            
+            <!-- 8. Executive Coach -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-1">
+                <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-chess-knight text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Executive Coach</h4>
+            </div>
+            
+            <!-- 9. Mediator -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-2">
+                <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-handshake text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Mediator</h4>
+            </div>
+            
+            <!-- 10. Recruitment Lead -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up">
+                <div class="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-user-plus text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Recruitment Lead</h4>
+            </div>
+            
+            <!-- 11. Training Facilitator -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-1">
+                <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-chalkboard-teacher text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Training Facilitator</h4>
+            </div>
+            
+            <!-- 12. Risk Analyst -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-2">
+                <div class="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-search-dollar text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Risk Analyst</h4>
+            </div>
+            
+            <!-- 13. Brand Strategist -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up">
+                <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-lightbulb text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Brand Strategist</h4>
+            </div>
+            
+            <!-- 14. Negotiation Expert -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-1">
+                <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-comments-dollar text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Negotiation Expert</h4>
+            </div>
+            
+            <!-- 15. Organisational Developer -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-2">
+                <div class="w-10 h-10 bg-lime-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-sitemap text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Organisational Developer</h4>
+            </div>
+            
+            <!-- 16. Crisis Communicator -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up">
+                <div class="w-10 h-10 bg-fuchsia-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Crisis Communicator</h4>
+            </div>
+            
+            <!-- 17. Stakeholder Manager -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-1">
+                <div class="w-10 h-10 bg-sky-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-project-diagram text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Stakeholder Manager</h4>
+            </div>
+            
+            <!-- 18. Ethics Advisor -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-2">
+                <div class="w-10 h-10 bg-violet-500 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-balance-scale text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Ethics Advisor</h4>
+            </div>
+            
+            <!-- 19. Innovation Lead -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up">
+                <div class="w-10 h-10 bg-indigo-400 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-rocket text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Innovation Lead</h4>
+            </div>
+            
+            <!-- 20. Executive Assistant -->
+            <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up delay-1">
+                <div class="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center mb-3">
+                    <i class="fas fa-user-tie text-white text-sm"></i>
+                </div>
+                <h4 class="font-medium text-mr-navy text-sm">Executive Assistant</h4>
+            </div>
+        </div>
+        
+        <!-- Featured Lexicon Detail Example -->
+        <div class="glass-card rounded-2xl p-8 border border-gray-100 fade-in-up delay-3">
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <div class="md:w-1/3">
+                    <div class="w-24 h-24 bg-mr-navy rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-user-md text-mr-gold text-4xl"></i>
                     </div>
-                    <div class="md:w-2/3">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-4 bg-white rounded-xl border border-gray-100">
-                                <p class="text-xs font-medium text-gray-500 mb-2">Therapeutic Register</p>
-                                <ul class="space-y-1 text-sm text-gray-700">
-                                    <li>• "I notice you're describing..."</li>
-                                    <li>• "Would you be willing to explore..."</li>
-                                    <li>• "That sounds like a significant..."</li>
-                                </ul>
-                            </div>
-                            <div class="p-4 bg-white rounded-xl border border-gray-100">
-                                <p class="text-xs font-medium text-gray-500 mb-2">Boundary Language</p>
-                                <ul class="space-y-1 text-sm text-gray-700">
-                                    <li>• "My professional scope includes..."</li>
-                                    <li>• "I'm available for consultation during..."</li>
-                                    <li>• "For matters outside our agreement..."</li>
-                                </ul>
-                            </div>
-                            <div class="p-4 bg-white rounded-xl border border-gray-100">
-                                <p class="text-xs font-medium text-gray-500 mb-2">Collaborative Framing</p>
-                                <ul class="space-y-1 text-sm text-gray-700">
-                                    <li>• "In partnership with your care team..."</li>
-                                    <li>• "Building on our previous discussion..."</li>
-                                    <li>• "Integrating your insights with..."</li>
-                                </ul>
-                            </div>
-                            <div class="p-4 bg-white rounded-xl border border-gray-100">
-                                <p class="text-xs font-medium text-gray-500 mb-2">Crisis Communication</p>
-                                <ul class="space-y-1 text-sm text-gray-700">
-                                    <li>• "I'm here to support you through..."</li>
-                                    <li>• "Let's prioritise immediate safety by..."</li>
-                                    <li>• "Would it help to connect you with..."</li>
-                                </ul>
-                            </div>
+                    <h3 class="text-2xl font-serif font-bold text-mr-navy mb-2">Clinical Psychologist Lexicon</h3>
+                    <p class="text-gray-600 mb-4">
+                        Specialised vocabulary for therapeutic correspondence, boundary-setting communications, and interdisciplinary collaboration that resonates subconsciously with clients and colleagues.
+                    </p>
+                    <button class="text-mr-gold font-medium text-sm hover:underline flex items-center gap-1">
+                        Explore Full Lexicon <i class="fas fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+                <div class="md:w-2/3">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-white rounded-xl border border-gray-100">
+                            <p class="text-xs font-medium text-gray-500 mb-2">Therapeutic Register</p>
+                            <ul class="space-y-1 text-sm text-gray-700">
+                                <li>• "I notice you're describing..."</li>
+                                <li>• "Would you be willing to explore..."</li>
+                                <li>• "That sounds like a significant..."</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-white rounded-xl border border-gray-100">
+                            <p class="text-xs font-medium text-gray-500 mb-2">Boundary Language</p>
+                            <ul class="space-y-1 text-sm text-gray-700">
+                                <li>• "My professional scope includes..."</li>
+                                <li>• "I'm available for consultation during..."</li>
+                                <li>• "For matters outside our agreement..."</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-white rounded-xl border border-gray-100">
+                            <p class="text-xs font-medium text-gray-500 mb-2">Collaborative Framing</p>
+                            <ul class="space-y-1 text-sm text-gray-700">
+                                <li>• "In partnership with your care team..."</li>
+                                <li>• "Building on our previous discussion..."</li>
+                                <li>• "Integrating your insights with..."</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-white rounded-xl border border-gray-100">
+                            <p class="text-xs font-medium text-gray-500 mb-2">Crisis Communication</p>
+                            <ul class="space-y-1 text-sm text-gray-700">
+                                <li>• "I'm here to support you through..."</li>
+                                <li>• "Let's prioritise immediate safety by..."</li>
+                                <li>• "Would it help to connect you with..."</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-
+    </div>
+</section>
+                   
+                    <div class="professional-card glass-card rounded-xl p-5 border border-gray-100 hover:border-mr-gold/40 transition-all cursor-pointer fade-in-up" style="animation-delay: ${i * 0.05}s">
+                        <div 
     <!-- Micro-Tools Section (10+ One-Click Tools) -->
     <section id="tools" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
