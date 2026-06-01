@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
-  title: 'AgencyComm - Client Email Management',
-  description: 'AI-assisted email management for creative agencies',
+  title: 'MIND REPLY - Client Email Management',
+  description: 'latest AI-assisted email management for creative agencies',
 };
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
       <body className="bg-gray-50">
         <nav className="bg-white shadow">
           <div className="max-w-7xl mx-auto px-4 py-3">
-            <h1 className="text-2xl font-bold text-blue-600">AgencyComm</h1>
+            <h1 className="text-2xl font-bold text-blue-600">M R</h1>
           </div>
         </nav>
         <main className="max-w-7xl mx-auto p-4">
