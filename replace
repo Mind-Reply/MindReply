@@ -1,0 +1,10 @@
+Replace AgencyComm / agencycomm naming with MindReply / mindreply everywhere, preserving existing architecture and functionality.
+
+Rules:
+- Replace "AgencyComm" -> "MindReply"
+- Replace "agencycomm" -> "mindreply"
+- Replace "agencycomm-" prefixes with "mindreply-"
+- Do not rename values that are already correct, such as "mind-reply" in package metadata
+- Keep code, ports, logic, and structure unchanged
+- Update docs, container names, DB names, URLs, examples, and log group names consistently
+- Return only changed files and one-line summary per file
