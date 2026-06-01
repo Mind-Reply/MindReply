@@ -6,13 +6,13 @@
 
 1. **Connect Repository**
    - Go to https://vercel.com/new
-   - Select GitHub repo: `Mind-Reply/agencycomm`
+   - Select GitHub repo: `Mind-Reply/mindreply`
    - Framework: Next.js
    - Deploy
 
 2. **Environment Variables** (in Vercel dashboard)
    ```
-   NEXT_PUBLIC_API_URL=https://api.agencycomm.app
+   NEXT_PUBLIC_API_URL=https://mind-reply.com
    ```
 
 3. **Auto-Deploy**
@@ -24,7 +24,7 @@
 1. **Create Railway Project**
    - Go to https://railway.app/
    - New Project → GitHub
-   - Select `Mind-Reply/agencycomm`
+   - Select `Mind-Reply/mindreply`
    - Add services: PostgreSQL, Redis
 
 2. **Configure Backend Service**
@@ -44,7 +44,7 @@
 
 4. **Deploy**
    - Push to main → auto-deploy
-   - Railway generates domain: `https://agencycomm-api.up.railway.app`
+   - Railway generates domain: `https://mind-reply.up.railway.app`
 
 ### Database Setup
 
@@ -64,12 +64,12 @@ npx prisma db seed
 
 ```bash
 # Build image
-docker build -t agencycomm-backend:latest .
+docker build -t mindreply-backend:latest .
 
 # Push to AWS ECR
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789.dkr.ecr.us-east-1.amazonaws.com
-docker tag agencycomm-backend:latest 123456789.dkr.ecr.us-east-1.amazonaws.com/agencycomm-backend:latest
-docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/agencycomm-backend:latest
+docker tag mindreply-backend:latest 123456789.dkr.ecr.us-east-1.amazonaws.com/mindreply-backend:latest
+docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/mindreply-backend:latest
 ```
 
 ### Deploy to AWS ECS/Fargate
@@ -84,14 +84,14 @@ docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/agencycomm-backend:latest
 ```bash
 # Create RDS instance
 aws rds create-db-instance \
-  --db-instance-identifier agencycomm-db \
+  --db-instance-identifier mindreply \
   --db-instance-class db.t3.micro \
   --engine postgres \
-  --master-username agencycomm \
+  --master-username mindreply \
   --allocated-storage 20
 
 # Run migrations
-psql -h <rds-endpoint> -U agencycomm -d agencycomm < migrations.sql
+psql -h <rds-endpoint> -U mindreply -d mindreply < migrations.sql
 ```
 
 ## Monitoring & Logging
@@ -117,7 +117,7 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
     new winston.transports.CloudWatch({
-      logGroupName: '/agencycomm/backend',
+      logGroupName: '/mindreply/backend',
       logStreamName: `${Date.now()}`,
     }),
   ],
