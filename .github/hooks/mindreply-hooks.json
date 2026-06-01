@@ -1,0 +1,415 @@
+[
+  {
+    "id": "pretool-block-dangerous-commands",
+    "event": "PreToolUse",
+    "priority": 100,
+    "enabled": true,
+    "action": "block",
+    "description": "Block any tool invocation that would run shell commands, delete branches, or modify remote repos unless explicitly allowed by a Sovereign-level approval flag.",
+    "conditions": {
+      "tool_types": ["shell", "git", "exec"],
+      "allow_if_agent": ["sovereign-concierge", "admin-ops"],
+      "applyTo": ["**/*"]
+    },
+    "response_message": "Blocked: destructive tool use requires explicit Sovereign approval."
+  },
+  {
+    "id": "sessionstart-inject-mindreply-context",
+    "event": "SessionStart",
+    "priority": 90,
+    "enabled": true,
+    "action": "inject",
+    "description": "Inject MindReply product context, active membership tier, and current user preferences into agent context at session start.",
+    "payload": {
+      "context_keys": ["product_manifest", "membership_tier", "user_lexicons", "design_palette"],
+      "ttl_minutes": 60
+    },
+    "applyTo": ["**/*.agent.md", "**/*.instructions.md"]
+  },
+  {
+    "id": "pretool-validate-yaml-frontmatter",
+    "event": "PreToolUse",
+    "priority": 95,
+    "enabled": true,
+    "action": "warn",
+    "description": "Detect and warn on invalid YAML frontmatter in customization files before saving or applying.",
+    "conditions": {
+      "file_patterns": ["**/*.agent.md", "**/*.instructions.md", "**/*.prompt.md"],
+      "regex_errors": ["tabs\\t", "unescaped_colon", "missing_frontmatter"]
+    },
+    "response_message": "YAML frontmatter validation failed: please fix quoted descriptions and spacing."
+  },
+  {
+    "id": "precommit-auto-format-and-lint",
+    "event": "PreCommit",
+    "priority": 80,
+    "enabled": true,
+    "action": "run",
+    "description": "Run code formatters and linters for JS/TS/Python/Markdown before commit; fail commit on critical lint errors.",
+    "script": "./.github/hooks/scripts/precommit-format-lint.sh",
+    "applyTo": ["src/**", "packages/**", "*.md"]
+  },
+  {
+    "id": "posttool-analytics-track",
+    "event": "PostToolUse",
+    "priority": 70,
+    "enabled": true,
+    "action": "run",
+    "description": "Emit analytics events for tool usage, including agent id, user tier, feature used, and timestamp.",
+    "script": "./.github/hooks/scripts/emit-analytics.sh",
+    "applyTo": ["**/*"]
+  },
+  {
+    "id": "pretool-enforce-applyto-scope",
+    "event": "PreToolUse",
+    "priority": 85,
+    "enabled": true,
+    "action": "block",
+    "description": "Prevent instructions with overly-broad applyTo: \"**\" unless flagged 'global:true' in frontmatter and approved by admin.",
+    "conditions": {
+      "file_patterns": ["**/*.instructions.md", "**/*.agent.md"],
+      "frontmatter": {
+        "applyTo": "\\*\\*",
+        "global_flag_required": true
+      }
+    },
+    "response_message": "Disallowed: overly-broad applyTo detected. Add 'global: true' and obtain admin approval."
+  },
+  {
+    "id": "pretool-secrets-detection",
+    "event": "PreToolUse",
+    "priority": 110,
+    "enabled": true,
+    "action": "block",
+    "description": "Detect and block any attempt to commit or output secrets (API keys, private keys, passwords).",
+    "conditions": {
+      "patterns": ["AKIA[A-Z0-9]{16}", "-----BEGIN PRIVATE KEY-----", "password\\s*[:=]"],
+      "applyTo": ["**/*"]
+    },
+    "response_message": "Blocked: potential secret detected. Remove secrets and use env vars."
+  },
+  {
+    "id": "sessionend-auto-backup",
+    "event": "SessionEnd",
+    "priority": 60,
+    "enabled": true,
+    "action": "run",
+    "description": "Create a timestamped backup of modified agent customization files at session end for audit and rollback.",
+    "script": "./.github/hooks/scripts/session-backup.sh",
+    "applyTo": [".github/agents/**", ".github/instructions/**"]
+  },
+  {
+    "id": "pretool-enforce-membership-rules",
+    "event": "PreToolUse",
+    "priority": 100,
+    "enabled": true,
+    "action": "block",
+    "description": "Enforce membership rules: block access to Sovereign-only features unless user membership tier is Sovereign.",
+    "conditions": {
+      "feature_flags": ["sovereign_only"],
+      "user_tier_required": "Sovereign"
+    },
+    "response_message": "Access denied: feature reserved for Sovereign members."
+  },
+  {
+    "id": "postpurchase-trigger-marketing-offer",
+    "event": "PostPurchase",
+    "priority": 50,
+    "enabled": true,
+    "action": "run",
+    "description": "After first paid purchase, schedule a targeted marketing offer (e.g., $2 for 7 days) and create popup/email triggers.",
+    "script": "./.github/hooks/scripts/trigger-first-purchase-offer.sh",
+    "applyTo": ["billing/*"]
+  },
+  {
+    "id": "pretool-enforce-ai-usage-quota",
+    "event": "PreToolUse",
+    "priority": 105,
+    "enabled": true,
+    "action": "block",
+    "description": "Enforce AI agent usage quotas: block or throttle requests that exceed free quota; route to billing flow for top-ups.",
+    "conditions": {
+      "quota_key": "ai_free_quota",
+      "throttle_policy": {"burst": 5, "rate_per_min": 1},
+      "applyTo": ["MRagent/**"]
+    },
+    "response_message": "Quota exceeded: please upgrade or purchase additional usage."
+  },
+  {
+    "id": "pretool-validate-agent-file-schema",
+    "event": "PreToolUse",
+    "priority": 95,
+    "enabled": true,
+    "action": "warn",
+    "description": "Validate .agent.md schema against agents.md template; warn on missing required fields (name, description, applyTo, tools).",
+    "conditions": {
+      "file_patterns": [".github/agents/*.agent.md", "**/*.agent.md"]
+    },
+    "response_message": "Agent schema validation warning: missing required fields. See agents.md template."
+  },
+  {
+    "id": "pretool-enforce-booking-discounts",
+    "event": "PreToolUse",
+    "priority": 90,
+    "enabled": true,
+    "action": "run",
+    "description": "Automatically apply group booking discount rules (>=10 people => 10% off + configured bonus) at checkout.",
+    "script": "./.github/hooks/scripts/apply-group-booking-discount.sh",
+    "conditions": {
+      "checkout_type": "booking",
+      "group_threshold": 10
+    },
+    "applyTo": ["checkout/**"]
+  },
+  {
+    "id": "posttool-validate-deletion-intent",
+    "event": "PostToolUse",
+    "priority": 120,
+    "enabled": true,
+    "action": "warn",
+    "description": "After any deletion operation, create a review ticket and require a second confirmation for deletions of >5 files or >1MB of data.",
+    "conditions": {
+      "deleted_files_count_threshold": 5,
+      "deleted_size_threshold_bytes": 1048576
+    },
+    "response_message": "Deletion recorded: please confirm in the audit UI to finalize."
+  },
+  {
+    "id": "pretool-enforce-billing-webhook-auth",
+    "event": "PreToolUse",
+    "priority": 115,
+    "enabled": true,
+    "action": "block",
+    "description": "Block any webhook handler changes that would disable signature verification for Stripe or other billing providers.",
+    "conditions": {
+      "file_patterns": ["server/webhooks/**", "api/webhooks/**"],
+      "forbidden_changes": ["disable_signature_verification", "skip_auth"]
+    },
+    "response_message": "Blocked: webhook auth must remain enabled for billing security."
+  },
+  {
+    "id": "sessionstart-inject-design-tokens",
+    "event": "SessionStart",
+    "priority": 70,
+    "enabled": true,
+    "action": "inject",
+    "description": "Inject current design tokens (navy/gold/cream palette, typography) into UI agent context for consistent UI suggestions.",
+    "payload": {
+      "design_tokens": ["palette", "typography", "spacing", "component_variants"]
+    },
+    "applyTo": ["ui/**", "design/**"]
+  },
+  {
+    "id": "pretool-block-external-data-exfil",
+    "event": "PreToolUse",
+    "priority": 130,
+    "enabled": true,
+    "action": "block",
+    "description": "Prevent agents from sending user or repo data to external endpoints not on the approved allowlist.",
+    "conditions": {
+      "allowed_domains": ["mind-reply.com", "api.mind-reply.com", "stripe.com", "sendgrid.com"],
+      "applyTo": ["network/*"]
+    },
+    "response_message": "Blocked: external endpoint not on allowlist."
+  },
+  {
+    "id": "pretool-enforce-popup-and-notification-rules",
+    "event": "PreToolUse",
+    "priority": 75,
+    "enabled": true,
+    "action": "warn",
+    "description": "Ensure popups and in-app notifications follow UX rules (non-intrusive, dismissible, frequency caps).",
+    "conditions": {
+      "file_patterns": ["ui/popups/**", "ui/notifications/**"],
+      "frequency_cap_per_user_per_day": 5
+    },
+    "response_message": "Popup rule warning: exceeds frequency cap or missing dismiss option."
+  },
+  {
+    "id": "postpurchase-apply-pack-discount",
+    "event": "PostPurchase",
+    "priority": 55,
+    "enabled": true,
+    "action": "run",
+    "description": "When a pack of 5 tools/services is purchased, apply 30% discount and add 2 bonus days or extended limits.",
+    "script": "./.github/hooks/scripts/apply-pack-bonus.sh",
+    "conditions": {
+      "pack_size": 5,
+      "discount_percent": 30,
+      "bonus_days": 2
+    },
+    "applyTo": ["billing/purchases"]
+  },
+  {
+    "id": "pretool-enforce-email-send-gating",
+    "event": "PreToolUse",
+    "priority": 100,
+    "enabled": true,
+    "action": "block",
+    "description": "Gate any automated email sends through MReply: require composed email to pass tone/risk checks and membership eligibility before send.",
+    "conditions": {
+      "email_checks": ["tone_risk", "membership_access"],
+      "applyTo": ["mreply/send"]
+    },
+    "response_message": "Email blocked: tone or risk check failed or membership insufficient."
+  },
+  {
+    "id": "pretool-rate-limit-high-cost-ops",
+    "event": "PreToolUse",
+    "priority": 110,
+    "enabled": true,
+    "action": "throttle",
+    "description": "Rate-limit high-cost operations (large model calls, long-run generation) to protect quota and cost.",
+    "conditions": {
+      "operation_tags": ["long_generation", "high_token_usage"],
+      "rate_per_min": 2
+    },
+    "response_message": "Throttled: operation rate limit reached. Retry after cooldown."
+  },
+  {
+    "id": "pretool-enforce-professional-directory-schema",
+    "event": "PreToolUse",
+    "priority": 85,
+    "enabled": true,
+    "action": "warn",
+    "description": "Validate professional directory entries (name, rating, description, credentials, availability) before publishing.",
+    "conditions": {
+      "file_patterns": ["data/professionals/*.json", "content/professionals/*.md"],
+      "required_fields": ["name", "rating", "description", "expertise", "availability"]
+    },
+    "response_message": "Directory validation warning: missing required professional fields."
+  },
+  {
+    "id": "posttool-create-audit-log",
+    "event": "PostToolUse",
+    "priority": 65,
+    "enabled": true,
+    "action": "run",
+    "description": "Append a detailed audit log entry for any agent lifecycle event, including user, agent id, files changed, and diff summary.",
+    "script": "./.github/hooks/scripts/append-audit-log.sh",
+    "applyTo": ["**/*"]
+  },
+  {
+    "id": "pretool-enforce-marketing-offer-config",
+    "event": "PreToolUse",
+    "priority": 78,
+    "enabled": true,
+    "action": "warn",
+    "description": "Validate marketing offer configurations (discount windows, eligibility rules) to prevent overlapping or conflicting promos.",
+    "conditions": {
+      "file_patterns": ["marketing/offers/*.json", "marketing/config/*.yaml"]
+    },
+    "response_message": "Offer config warning: overlapping windows or conflicting eligibility detected."
+  },
+  {
+    "id": "pretool-auto-approve-minor-ui-tweaks",
+    "event": "PreToolUse",
+    "priority": 40,
+    "enabled": true,
+    "action": "run",
+    "description": "Auto-approve small UI tweaks (color brightness, spacing adjustments) that match approved design tokens and are low-risk.",
+    "conditions": {
+      "file_patterns": ["ui/components/**", "styles/**"],
+      "max_diff_lines": 20
+    },
+    "script": "./.github/hooks/scripts/auto-approve-ui-tweak.sh",
+    "response_message": "Auto-approved minor UI tweak."
+  },
+  {
+    "id": "pretool-enforce-privacy-and-pii-rules",
+    "event": "PreToolUse",
+    "priority": 125,
+    "enabled": true,
+    "action": "block",
+    "description": "Block any operation that attempts to expose or export PII without explicit consent and encryption.",
+    "conditions": {
+      "pii_patterns": ["\\bSSN\\b", "\\bpassport\\b", "personal_email"],
+      "applyTo": ["export/*", "network/*"]
+    },
+    "response_message": "Blocked: PII export requires consent and encryption."
+  }
+]
+{
+  "hooks": [
+    {
+      "name": "session-start-context",
+      "event": "SessionStart",
+      "action": "inject",
+      "inject": {
+        "context": "This system is MindReply: a human-supervised, agent-operated communication intelligence platform. Maintain premium positioning, secure operations, and monetizable architecture."
+      }
+    },
+    {
+      "name": "brand-language",
+      "event": "PreResponse",
+      "action": "inject",
+      "inject": {
+        "context": "Use MindReply brand language: 'trained specialist agents', 'communication intelligence', 'MR agents'. Avoid heavy technical AI phrasing in client-facing outputs."
+      }
+    },
+    {
+      "name": "approval-gate",
+      "event": "PreResponse",
+      "action": "inject",
+      "inject": {
+        "context": "Assume human oversight before any irreversible action, payment processing, deployment, or external communication."
+      }
+    },
+    {
+      "name": "pre-tool-use-protect",
+      "event": "PreToolUse",
+      "action": "block",
+      "match": {
+        "tool": ["shell", "filesystem"]
+      },
+      "conditions": [
+        { "type": "pattern", "value": "rm -rf" },
+        { "type": "pattern", "value": "DROP DATABASE" },
+        { "type": "pattern", "value": "process.env" }
+      ],
+      "message": "Blocked unsafe or destructive operation. Requires human approval."
+    },
+    {
+      "name": "payment-protection",
+      "event": "PreToolUse",
+      "action": "block",
+      "match": {
+        "tool": ["http", "api"]
+      },
+      "conditions": [
+        { "type": "pattern", "value": "stripe" }
+      ],
+      "requireApproval": true,
+      "message": "Payment-related action requires explicit human approval."
+    },
+    {
+      "name": "pre-deploy-validate",
+      "event": "PreToolUse",
+      "action": "warn",
+      "match": {
+        "tool": ["deployment", "azure"]
+      },
+      "conditions": [
+        {
+          "type": "missing_env",
+          "keys": [
+            "DATABASE_URL",
+            "OPENAI_API_KEY",
+            "JWT_SECRET"
+          ]
+        }
+      ],
+      "message": "Deployment attempted without required environment variables."
+    },
+    {
+      "name": "post-commit-cleanup",
+      "event": "PostToolUse",
+      "action": "run",
+      "when": {
+        "tool": "filesystem"
+      },
+      "script": "./scripts/cleanup-check.sh"
+    }
+  ]
+}
+
