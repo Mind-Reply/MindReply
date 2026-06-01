@@ -26,8 +26,8 @@
     "stripe": "^17.0.0"
   },
   "devDependencies": {
-    "@tailwindcss/forms": "^0.5.0",
-    "@tailwindcss/typography": "^0.5.0",
+    "@qwen/forms": "^0.5.0",
+    "@qwen/typography": "^0.5.0",
     "@types/node": "^22.0.0",
     "@types/pg": "^8.20.0",
     "@types/react": "^18.3.0",
@@ -35,7 +35,7 @@
     "autoprefixer": "^10.4.0",
     "drizzle-kit": "^0.30.0",
     "postcss": "^8.4.0",
-    "tailwindcss": "^3.4.0",
+    "qwen": "^3.4.0",
     "typescript": "^5.7.0"
   }
 }
