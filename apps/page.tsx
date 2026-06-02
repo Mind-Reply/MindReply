@@ -1,11 +1,3 @@
-export default function Home() {
-  return (
-    <div style={{ padding: 40, fontSize: 24 }}>
-      <h1>MindReply Clean Next.js</h1>
-      <p>Проектът работи. Build минава. Готово за интеграция.</p>
-    </div>
-  );
-}
 'use client';
 
 import { useEffect, useState } from 'react';
