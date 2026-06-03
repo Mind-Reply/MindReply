@@ -3,3 +3,6 @@ cd MindReply
 git checkout feature/unified-next15-ecosystem
 npm install
 npm run dev
+git push origin feature/unified-next15-ecosystem
+# Then PR → main
+# Vercel auto-deploys
