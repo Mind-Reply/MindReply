@@ -1,0 +1,16 @@
+      # ... your existing build and deploy steps ...
+      
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.DOTNET_ROOT }}/myapp
+
+      # ADD THIS STEP: Run seed script against the live DB after deploy
+      - name: Seed Database on Deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          npm ci
+          npm run db:seed
