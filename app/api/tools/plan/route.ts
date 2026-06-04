@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logMetric } from "@/lib/metrics";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,8 +17,12 @@ export async function POST(req: NextRequest) {
     ];
 
     const plan = `A structured ${tf} plan to achieve: ${goal}. ${constraints ? `Constraints considered: ${constraints}.` : ""} The approach focuses on measurable milestones, stakeholder alignment, and consistent review cycles.`;
+    const metric = await logMetric({
+      eventName: "tool.planning-assistant",
+      eventValue: { timeframe: tf, goalLength: String(goal).length, steps: steps.length },
+    });
 
-    return NextResponse.json({ plan, steps, timeframe: tf });
+    return NextResponse.json({ result: plan, plan, steps, timeframe: tf, creditCost: 1, metricLogged: metric.logged });
   } catch (err) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

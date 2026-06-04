@@ -1,48 +1,66 @@
 #!/bin/bash
+set -euo pipefail
 
-RG="<RESOURCE_GROUP>"
-PLAN="<APP_SERVICE_PLAN>"
-APP="<APP_NAME>"
-SUB="<SUBSCRIPTION_ID>"
-SEARCH="<SEARCH_NAME>"
-OPENAI="<OPENAI_RESOURCE>"
-DEPLOY="<DEPLOYMENT_NAME>"
-VNET="<VNET_NAME>"
-SUBNET="<SUBNET_NAME>"
-NAT="<NAT_NAME>"
-IP="<PUBLIC_IP_NAME>"
+: "${AZURE_RESOURCE_GROUP:?AZURE_RESOURCE_GROUP is required}"
+: "${AZURE_APP_SERVICE_PLAN:?AZURE_APP_SERVICE_PLAN is required}"
+: "${AZURE_WEBAPP_NAME:?AZURE_WEBAPP_NAME is required}"
+: "${AZURE_SUBSCRIPTION_ID:?AZURE_SUBSCRIPTION_ID is required}"
 
-echo "🔧 Updating App Service Plan to 2 instances..."
-az appservice plan update --name $PLAN --resource-group $RG --number-of-workers 2
+echo "Updating App Service Plan worker count..."
+az appservice plan update \
+  --name "$AZURE_APP_SERVICE_PLAN" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
+  --number-of-workers "${AZURE_WORKER_COUNT:-2}"
 
-echo "🔧 Enabling zone redundancy..."
-az appservice plan update --name $PLAN --resource-group $RG --sku P1v3 --zone-redundant true
+echo "Setting App Service Plan SKU..."
+az appservice plan update \
+  --name "$AZURE_APP_SERVICE_PLAN" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
+  --sku "${AZURE_APP_SERVICE_SKU:-P1v3}"
 
-echo "🔧 Enabling Health Check..."
-az webapp update --name $APP --resource-group $RG --set healthCheckPath="/health"
+echo "Enabling health check path..."
+az webapp update \
+  --name "$AZURE_WEBAPP_NAME" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
+  --set healthCheckPath="/api/health"
 
-echo "🔧 Upgrading to Standard tier..."
-az appservice plan update --name $PLAN --resource-group $RG --sku S1
-
-echo "🔧 Creating Service Health alert..."
+echo "Creating or updating Azure Service Health alert..."
 az monitor activity-log alert create \
-  --name "AzureServiceHealth" \
-  --resource-group $RG \
-  --scopes /subscriptions/$SUB \
-  --condition "category=ServiceHealth"
+  --name "${AZURE_SERVICE_HEALTH_ALERT_NAME:-MindReplyServiceHealth}" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
+  --scopes "/subscriptions/$AZURE_SUBSCRIPTION_ID" \
+  --condition "category=ServiceHealth" \
+  --description "MindReply Azure service health alert"
 
-echo "🔧 Updating Azure OpenAI deployment..."
-az cognitiveservices account deployment update \
-  --name $OPENAI --resource-group $RG \
-  --deployment-name $DEPLOY --model-version "latest"
+if [[ -n "${AZURE_OPENAI_RESOURCE:-}" && -n "${AZURE_OPENAI_DEPLOYMENT:-}" ]]; then
+  echo "Updating Azure OpenAI deployment model version..."
+  az cognitiveservices account deployment update \
+    --name "$AZURE_OPENAI_RESOURCE" \
+    --resource-group "$AZURE_RESOURCE_GROUP" \
+    --deployment-name "$AZURE_OPENAI_DEPLOYMENT" \
+    --model-version "${AZURE_OPENAI_MODEL_VERSION:-latest}"
+fi
 
-echo "🔧 Adding replica to Azure AI Search..."
-az search service update --name $SEARCH --resource-group $RG --replica-count 2
+if [[ -n "${AZURE_SEARCH_SERVICE:-}" ]]; then
+  echo "Updating Azure AI Search replica count..."
+  az search service update \
+    --name "$AZURE_SEARCH_SERVICE" \
+    --resource-group "$AZURE_RESOURCE_GROUP" \
+    --replica-count "${AZURE_SEARCH_REPLICA_COUNT:-2}"
+fi
 
-echo "🔧 Creating NAT Gateway..."
-az network nat gateway create --resource-group $RG --name $NAT --public-ip-addresses $IP
+if [[ -n "${AZURE_VNET_NAME:-}" && -n "${AZURE_SUBNET_NAME:-}" && -n "${AZURE_NAT_GATEWAY:-}" && -n "${AZURE_PUBLIC_IP_NAME:-}" ]]; then
+  echo "Creating NAT Gateway and attaching it to the subnet..."
+  az network nat gateway create \
+    --resource-group "$AZURE_RESOURCE_GROUP" \
+    --name "$AZURE_NAT_GATEWAY" \
+    --public-ip-addresses "$AZURE_PUBLIC_IP_NAME"
 
-echo "🔧 Attaching NAT Gateway to subnet..."
-az network vnet subnet update --resource-group $RG --vnet-name $VNET --name $SUBNET --nat-gateway $NAT
+  az network vnet subnet update \
+    --resource-group "$AZURE_RESOURCE_GROUP" \
+    --vnet-name "$AZURE_VNET_NAME" \
+    --name "$AZURE_SUBNET_NAME" \
+    --nat-gateway "$AZURE_NAT_GATEWAY"
+fi
 
-echo "🎉 All Azure reliability improvements applied!"
+echo "Azure reliability hardening completed."

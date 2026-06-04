@@ -1,17 +1,29 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, MessageSquare, Phone, Video, Clock, CheckCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle, Clock, MessageSquare, Phone, Video } from "lucide-react";
+import { createBookingAction } from "@/app/booking/actions";
 
-type Professional = { id: number; name: string; role: string; photoUrl: string; priceText: number; priceVoice: number; priceVideo: number; availabilityStatus: string };
+type Professional = {
+  id: number;
+  name: string;
+  role: string;
+  photoUrl: string;
+  priceText: number;
+  priceVoice: number;
+  priceVideo: number;
+  availabilityStatus: string;
+};
+
 type Slot = { date: string; time: string; available: boolean };
 type Mode = "text" | "voice" | "video";
 type Step = "mode" | "slot" | "details" | "confirm";
 
 export default function Book() {
   const { id } = useParams<{ id: string }>();
-  const [p, setP] = useState<Professional | null>(null);
+  const [professional, setProfessional] = useState<Professional | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [step, setStep] = useState<Step>("mode");
   const [mode, setMode] = useState<Mode>("video");
@@ -21,105 +33,141 @@ export default function Book() {
   const [clientEmail, setClientEmail] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [bookingId, setBookingId] = useState<number | null>(null);
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/professionals/${id}`).then((r) => r.json()),
-      fetch(`/api/professionals/slots?professionalId=${id}`).then((r) => r.json()),
-    ]).then(([prof, sl]) => { setP(prof); setSlots(sl); }).catch(() => {});
+      fetch(`/api/professionals/${id}`).then((response) => response.json()),
+      fetch(`/api/professionals/slots?professionalId=${id}`).then((response) => response.json()),
+    ])
+      .then(([profile, availability]) => {
+        setProfessional(profile);
+        setSlots(availability);
+      })
+      .catch(() => setError("Unable to load booking details. Please refresh and try again."));
   }, [id]);
 
-  if (!p) return <div className="pt-20 min-h-screen flex items-center justify-center"><div className="animate-pulse" style={{ color: "hsl(220 25% 45%)" }}>Loading...</div></div>;
+  if (!professional) {
+    return (
+      <main className="pt-20 min-h-screen flex items-center justify-center">
+        <div className="animate-pulse" style={{ color: "hsl(220 25% 45%)" }}>Loading booking flow...</div>
+      </main>
+    );
+  }
 
-  const pricePerHour = mode === "text" ? p.priceText : mode === "voice" ? p.priceVoice : p.priceVideo;
+  const pricePerHour = mode === "text" ? professional.priceText : mode === "voice" ? professional.priceVoice : professional.priceVideo;
   const totalPrice = pricePerHour * (duration / 60);
-  const availableSlots = slots.filter((s) => s.available);
-  const slotsByDate: Record<string, Slot[]> = {};
-  for (const s of availableSlots) { if (!slotsByDate[s.date]) slotsByDate[s.date] = []; slotsByDate[s.date].push(s); }
+  const availableSlots = slots.filter((slot) => slot.available);
+  const slotsByDate = availableSlots.reduce<Record<string, Slot[]>>((acc, slot) => {
+    acc[slot.date] = [...(acc[slot.date] ?? []), slot];
+    return acc;
+  }, {});
 
   const modes = [
-    { key: "text" as Mode, label: "Text / Chat", icon: <MessageSquare size={20} />, desc: `£${p.priceText}/hr — Async messaging, ideal for non-urgent guidance` },
-    { key: "voice" as Mode, label: "Voice Call", icon: <Phone size={20} />, desc: `£${p.priceVoice}/hr — Real-time voice, private and focused` },
-    { key: "video" as Mode, label: "Video Call", icon: <Video size={20} />, desc: `£${p.priceVideo}/hr — Full video session, most comprehensive` },
+    { key: "text" as Mode, label: "Text / Chat", icon: <MessageSquare size={20} />, desc: `GBP ${professional.priceText}/hr - async messaging for precise written guidance` },
+    { key: "voice" as Mode, label: "Voice Call", icon: <Phone size={20} />, desc: `GBP ${professional.priceVoice}/hr - private real-time advisory call` },
+    { key: "video" as Mode, label: "Video Call", icon: <Video size={20} />, desc: `GBP ${professional.priceVideo}/hr - full video consultation for complex issues` },
   ];
 
   async function handleConfirm() {
     if (!selectedSlot) return;
     setSubmitting(true);
+    setError("");
+
     try {
-      const r = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ professionalId: parseInt(id), mode, scheduledAt: `${selectedSlot.date}T${selectedSlot.time}:00Z`, durationMinutes: duration, clientName, clientEmail, notes: notes || null }),
+      const result = await createBookingAction({
+        professionalId: Number(id),
+        mode,
+        scheduledAt: `${selectedSlot.date}T${selectedSlot.time}:00Z`,
+        durationMinutes: duration,
+        clientName,
+        clientEmail,
+        notes: notes || null,
       });
-      if (r.ok) setStep("confirm");
-    } finally { setSubmitting(false); }
+
+      if (!result.ok) {
+        setError(result.error ?? "Unable to confirm booking.");
+        return;
+      }
+
+      setBookingId(result.booking.id);
+      setStep("confirm");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
-  if (step === "confirm") return (
-    <div className="pt-20 min-h-screen flex items-center justify-center px-4" style={{ background: "hsl(40 33% 97%)" }}>
-      <div className="bg-white border border-[hsl(40_25%_88%)] rounded-2xl p-10 max-w-md w-full text-center shadow-lg">
-        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: "#d1fae5" }}>
-          <CheckCircle size={32} style={{ color: "#065f46" }} />
-        </div>
-        <h2 className="font-serif text-2xl font-bold mb-2" style={{ color: "hsl(220 45% 13%)" }}>Booking Confirmed</h2>
-        <p className="text-sm mb-6 leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>
-          Your session with <strong style={{ color: "hsl(220 45% 13%)" }}>{p.name}</strong> has been confirmed. Confirmation sent to {clientEmail}.
-        </p>
-        <div className="rounded-xl p-4 text-left space-y-2 text-sm mb-6" style={{ background: "hsl(40 20% 92%)" }}>
-          <div className="flex justify-between"><span style={{ color: "hsl(220 25% 45%)" }}>Mode</span><span className="font-medium capitalize" style={{ color: "hsl(220 45% 13%)" }}>{mode}</span></div>
-          <div className="flex justify-between"><span style={{ color: "hsl(220 25% 45%)" }}>Date</span><span className="font-medium" style={{ color: "hsl(220 45% 13%)" }}>{selectedSlot?.date} at {selectedSlot?.time}</span></div>
-          <div className="flex justify-between border-t border-[hsl(40_25%_88%)] pt-2 mt-2">
-            <span className="font-semibold" style={{ color: "hsl(220 45% 13%)" }}>Total</span>
-            <span className="font-bold text-lg" style={{ color: "hsl(43 80% 60%)" }}>£{totalPrice.toFixed(2)}</span>
+  if (step === "confirm") {
+    return (
+      <main className="pt-20 min-h-screen flex items-center justify-center px-4" style={{ background: "hsl(40 33% 97%)" }}>
+        <section className="bg-white border border-[hsl(40_25%_88%)] rounded-2xl p-10 max-w-md w-full text-center shadow-lg">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: "#d1fae5" }}>
+            <CheckCircle size={32} style={{ color: "#065f46" }} />
           </div>
-        </div>
-        <Link href="/bookings" className="block font-medium py-3 rounded-lg hover:opacity-90 transition-opacity text-sm" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>View My Bookings</Link>
-      </div>
-    </div>
-  );
+          <h1 className="font-serif text-2xl font-bold mb-2" style={{ color: "hsl(220 45% 13%)" }}>Booking Confirmed</h1>
+          <p className="text-sm mb-6 leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>
+            Your session with <strong style={{ color: "hsl(220 45% 13%)" }}>{professional.name}</strong> has been confirmed. Confirmation sent to {clientEmail}.
+          </p>
+          <div className="rounded-xl p-4 text-left space-y-2 text-sm mb-6" style={{ background: "hsl(40 20% 92%)" }}>
+            <div className="flex justify-between"><span style={{ color: "hsl(220 25% 45%)" }}>Booking</span><span className="font-medium" style={{ color: "hsl(220 45% 13%)" }}>#{bookingId}</span></div>
+            <div className="flex justify-between"><span style={{ color: "hsl(220 25% 45%)" }}>Mode</span><span className="font-medium capitalize" style={{ color: "hsl(220 45% 13%)" }}>{mode}</span></div>
+            <div className="flex justify-between"><span style={{ color: "hsl(220 25% 45%)" }}>Date</span><span className="font-medium" style={{ color: "hsl(220 45% 13%)" }}>{selectedSlot?.date} at {selectedSlot?.time}</span></div>
+            <div className="flex justify-between border-t border-[hsl(40_25%_88%)] pt-2 mt-2">
+              <span className="font-semibold" style={{ color: "hsl(220 45% 13%)" }}>Total</span>
+              <span className="font-bold text-lg" style={{ color: "hsl(43 80% 60%)" }}>GBP {totalPrice.toFixed(2)}</span>
+            </div>
+          </div>
+          <Link href="/bookings" className="block font-medium py-3 rounded-lg hover:opacity-90 transition-opacity text-sm" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>View My Bookings</Link>
+        </section>
+      </main>
+    );
+  }
 
   return (
-    <div className="pt-20 min-h-screen" style={{ background: "hsl(40 33% 97%)" }}>
-      <div className="max-w-2xl mx-auto px-4 py-10">
+    <main className="pt-20 min-h-screen" style={{ background: "hsl(40 33% 97%)" }}>
+      <section className="max-w-2xl mx-auto px-4 py-10">
         <Link href={`/professionals/${id}`} className="inline-flex items-center gap-1.5 text-sm mb-8 hover:text-[hsl(220_55%_20%)] transition-colors" style={{ color: "hsl(220 25% 45%)" }}><ArrowLeft size={14} /> Back to Profile</Link>
+
         <div className="flex items-center gap-4 mb-8 pb-6 border-b border-[hsl(40_25%_88%)]">
-          <img src={p.photoUrl} alt={p.name} className="w-14 h-14 rounded-full object-cover border-2" style={{ borderColor: "rgba(201,169,97,0.3)" }} />
+          <img src={professional.photoUrl} alt={professional.name} className="w-14 h-14 rounded-full object-cover border-2" style={{ borderColor: "rgba(201,169,97,0.3)" }} />
           <div>
-            <h2 className="font-serif font-bold text-xl" style={{ color: "hsl(220 45% 13%)" }}>{p.name}</h2>
-            <p className="text-sm" style={{ color: "hsl(220 25% 45%)" }}>{p.role}</p>
+            <h1 className="font-serif font-bold text-xl" style={{ color: "hsl(220 45% 13%)" }}>{professional.name}</h1>
+            <p className="text-sm" style={{ color: "hsl(220 25% 45%)" }}>{professional.role}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 mb-8 text-xs">
-          {[["mode", "1. Session Mode"], ["slot", "2. Date & Time"], ["details", "3. Your Details"]].map(([s, l]) => (
-            <div key={s} className={`flex items-center gap-1 ${step === s ? "font-semibold" : ""}`} style={{ color: step === s ? "hsl(220 55% 20%)" : "hsl(220 25% 45%)" }}>
-              <span>{l}</span>{s !== "details" && <span style={{ color: "rgba(10,22,40,0.3)" }}>›</span>}
+          {[["mode", "1. Session Mode"], ["slot", "2. Date & Time"], ["details", "3. Your Details"]].map(([stepKey, label]) => (
+            <div key={stepKey} className={`flex items-center gap-1 ${step === stepKey ? "font-semibold" : ""}`} style={{ color: step === stepKey ? "hsl(220 55% 20%)" : "hsl(220 25% 45%)" }}>
+              <span>{label}</span>{stepKey !== "details" && <span style={{ color: "rgba(10,22,40,0.3)" }}>{">"}</span>}
             </div>
           ))}
         </div>
 
+        {error && <p className="mb-4 text-sm rounded-lg border px-3 py-2" style={{ color: "#991b1b", borderColor: "#fecaca", background: "#fef2f2" }}>{error}</p>}
+
         {step === "mode" && (
           <div>
-            <h3 className="font-serif text-xl font-bold mb-5" style={{ color: "hsl(220 45% 13%)" }}>Choose Your Session Mode</h3>
+            <h2 className="font-serif text-xl font-bold mb-5" style={{ color: "hsl(220 45% 13%)" }}>Choose Your Session Mode</h2>
             <div className="space-y-3">
-              {modes.map((m) => (
-                <button key={m.key} onClick={() => setMode(m.key)} className={`w-full flex items-start gap-4 p-4 rounded-xl border text-left transition-all ${mode === m.key ? "border-[hsl(43_80%_60%)] bg-[hsl(43_80%_60%_/_0.05)]" : "border-[hsl(40_25%_88%)] bg-white hover:border-[hsl(43_80%_60%_/_0.4)]"}`}>
-                  <span className="mt-0.5" style={{ color: mode === m.key ? "hsl(43 80% 60%)" : "hsl(220 25% 45%)" }}>{m.icon}</span>
+              {modes.map((sessionMode) => (
+                <button key={sessionMode.key} onClick={() => setMode(sessionMode.key)} className={`w-full flex items-start gap-4 p-4 rounded-xl border text-left transition-all ${mode === sessionMode.key ? "border-[hsl(43_80%_60%)] bg-[hsl(43_80%_60%_/_0.05)]" : "border-[hsl(40_25%_88%)] bg-white hover:border-[hsl(43_80%_60%_/_0.4)]"}`}>
+                  <span className="mt-0.5" style={{ color: mode === sessionMode.key ? "hsl(43 80% 60%)" : "hsl(220 25% 45%)" }}>{sessionMode.icon}</span>
                   <div>
-                    <p className="font-semibold text-sm" style={{ color: "hsl(220 45% 13%)" }}>{m.label}</p>
-                    <p className="text-xs mt-0.5" style={{ color: "hsl(220 25% 45%)" }}>{m.desc}</p>
+                    <p className="font-semibold text-sm" style={{ color: "hsl(220 45% 13%)" }}>{sessionMode.label}</p>
+                    <p className="text-xs mt-0.5" style={{ color: "hsl(220 25% 45%)" }}>{sessionMode.desc}</p>
                   </div>
-                  {mode === m.key && <div className="ml-auto w-4 h-4 rounded-full flex-shrink-0 mt-0.5" style={{ background: "hsl(43 80% 60%)" }} />}
+                  {mode === sessionMode.key && <div className="ml-auto w-4 h-4 rounded-full flex-shrink-0 mt-0.5" style={{ background: "hsl(43 80% 60%)" }} />}
                 </button>
               ))}
             </div>
             <div className="mt-6">
               <label className="block text-sm font-medium mb-2" style={{ color: "hsl(220 45% 13%)" }}>Duration</label>
-              <select value={duration} onChange={(e) => setDuration(Number(e.target.value))} className="w-full rounded-lg px-3 py-2.5 text-sm outline-none border border-[hsl(40_25%_88%)]" style={{ background: "hsl(40 20% 92%)", color: "hsl(220 45% 13%)" }}>
-                <option value={60}>60 minutes — £{pricePerHour.toFixed(0)}</option>
-                <option value={90}>90 minutes — £{(pricePerHour * 1.5).toFixed(0)}</option>
-                <option value={120}>120 minutes — £{(pricePerHour * 2).toFixed(0)}</option>
+              <select value={duration} onChange={(event) => setDuration(Number(event.target.value))} className="w-full rounded-lg px-3 py-2.5 text-sm outline-none border border-[hsl(40_25%_88%)]" style={{ background: "hsl(40 20% 92%)", color: "hsl(220 45% 13%)" }}>
+                <option value={60}>60 minutes - GBP {pricePerHour.toFixed(0)}</option>
+                <option value={90}>90 minutes - GBP {(pricePerHour * 1.5).toFixed(0)}</option>
+                <option value={120}>120 minutes - GBP {(pricePerHour * 2).toFixed(0)}</option>
               </select>
               <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color: "hsl(220 25% 45%)" }}><Clock size={11} /> Minimum session is 60 minutes</p>
             </div>
@@ -129,7 +177,7 @@ export default function Book() {
 
         {step === "slot" && (
           <div>
-            <h3 className="font-serif text-xl font-bold mb-5" style={{ color: "hsl(220 45% 13%)" }}>Select a Date & Time</h3>
+            <h2 className="font-serif text-xl font-bold mb-5" style={{ color: "hsl(220 45% 13%)" }}>Select a Date & Time</h2>
             {Object.keys(slotsByDate).length === 0 ? (
               <p className="text-sm py-8 text-center" style={{ color: "hsl(220 25% 45%)" }}>No available slots at this time.</p>
             ) : (
@@ -140,11 +188,9 @@ export default function Book() {
                       {new Date(date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
                     </p>
                     <div className="grid grid-cols-4 gap-2">
-                      {daySlots.map((s, i) => (
-                        <button key={i} onClick={() => setSelectedSlot({ date, time: s.time })}
-                          className={`py-2 text-xs rounded-lg border font-medium transition-all ${selectedSlot?.date === date && selectedSlot?.time === s.time ? "border-[hsl(43_80%_60%)] bg-[hsl(43_80%_60%_/_0.1)] text-[hsl(43_80%_60%)]" : "border-[hsl(40_25%_88%)]"}`}
-                          style={{ color: selectedSlot?.date === date && selectedSlot?.time === s.time ? "hsl(43 80% 60%)" : "hsl(220 45% 13%)" }}>
-                          {s.time}
+                      {daySlots.map((slot) => (
+                        <button key={`${slot.date}-${slot.time}`} onClick={() => setSelectedSlot({ date, time: slot.time })} className={`py-2 text-xs rounded-lg border font-medium transition-all ${selectedSlot?.date === date && selectedSlot?.time === slot.time ? "border-[hsl(43_80%_60%)] bg-[hsl(43_80%_60%_/_0.1)] text-[hsl(43_80%_60%)]" : "border-[hsl(40_25%_88%)]"}`} style={{ color: selectedSlot?.date === date && selectedSlot?.time === slot.time ? "hsl(43 80% 60%)" : "hsl(220 45% 13%)" }}>
+                          {slot.time}
                         </button>
                       ))}
                     </div>
@@ -161,39 +207,39 @@ export default function Book() {
 
         {step === "details" && (
           <div>
-            <h3 className="font-serif text-xl font-bold mb-5" style={{ color: "hsl(220 45% 13%)" }}>Your Details</h3>
+            <h2 className="font-serif text-xl font-bold mb-5" style={{ color: "hsl(220 45% 13%)" }}>Your Details</h2>
             <div className="space-y-4">
-              {[
-                { label: "Full Name", val: clientName, set: setClientName, type: "text", ph: "Your full name" },
-                { label: "Email Address", val: clientEmail, set: setClientEmail, type: "email", ph: "your@email.com" },
-              ].map(({ label, val, set, type, ph }) => (
-                <div key={label}>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(220 45% 13%)" }}>{label}</label>
-                  <input type={type} value={val} onChange={(e) => set(e.target.value)} placeholder={ph} className="w-full rounded-lg px-3 py-2.5 text-sm outline-none border border-[hsl(40_25%_88%)] focus:border-[hsl(43_80%_60%)] transition-colors" style={{ background: "hsl(40 20% 92%)", color: "hsl(220 45% 13%)" }} />
-                </div>
-              ))}
+              <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(220 45% 13%)" }}>Full Name</label>
+                <input value={clientName} onChange={(event) => setClientName(event.target.value)} placeholder="Your full name" className="w-full rounded-lg px-3 py-2.5 text-sm outline-none border border-[hsl(40_25%_88%)] focus:border-[hsl(43_80%_60%)] transition-colors" style={{ background: "hsl(40 20% 92%)", color: "hsl(220 45% 13%)" }} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(220 45% 13%)" }}>Email Address</label>
+                <input type="email" value={clientEmail} onChange={(event) => setClientEmail(event.target.value)} placeholder="your@email.com" className="w-full rounded-lg px-3 py-2.5 text-sm outline-none border border-[hsl(40_25%_88%)] focus:border-[hsl(43_80%_60%)] transition-colors" style={{ background: "hsl(40 20% 92%)", color: "hsl(220 45% 13%)" }} />
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1.5" style={{ color: "hsl(220 45% 13%)" }}>Notes <span style={{ color: "hsl(220 25% 45%)" }} className="font-normal">(optional)</span></label>
-                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Any specific topics..." className="w-full rounded-lg px-3 py-2.5 text-sm outline-none border border-[hsl(40_25%_88%)] focus:border-[hsl(43_80%_60%)] transition-colors resize-none" style={{ background: "hsl(40 20% 92%)", color: "hsl(220 45% 13%)" }} />
+                <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={3} placeholder="Any specific topics..." className="w-full rounded-lg px-3 py-2.5 text-sm outline-none border border-[hsl(40_25%_88%)] focus:border-[hsl(43_80%_60%)] transition-colors resize-none" style={{ background: "hsl(40 20% 92%)", color: "hsl(220 45% 13%)" }} />
               </div>
             </div>
+
             <div className="mt-6 rounded-xl p-4 text-sm space-y-2" style={{ background: "hsl(40 20% 92%)" }}>
               <div className="flex justify-between"><span style={{ color: "hsl(220 25% 45%)" }}>Mode</span><span className="capitalize font-medium" style={{ color: "hsl(220 45% 13%)" }}>{mode}</span></div>
               <div className="flex justify-between"><span style={{ color: "hsl(220 25% 45%)" }}>Date</span><span className="font-medium" style={{ color: "hsl(220 45% 13%)" }}>{selectedSlot?.date} at {selectedSlot?.time}</span></div>
               <div className="flex justify-between border-t border-[hsl(40_25%_88%)] pt-2 mt-1">
                 <span className="font-semibold" style={{ color: "hsl(220 45% 13%)" }}>Total</span>
-                <span className="font-bold text-lg" style={{ color: "hsl(43 80% 60%)" }}>£{totalPrice.toFixed(2)}</span>
+                <span className="font-bold text-lg" style={{ color: "hsl(43 80% 60%)" }}>GBP {totalPrice.toFixed(2)}</span>
               </div>
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setStep("slot")} className="flex-1 border border-[hsl(40_25%_88%)] font-medium py-3 rounded-lg hover:bg-[hsl(40_20%_92%)] transition-colors text-sm" style={{ color: "hsl(220 45% 13%)" }}>Back</button>
               <button onClick={handleConfirm} disabled={!clientName || !clientEmail || submitting} className="flex-1 font-medium py-3 rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity text-sm" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
-                {submitting ? "Confirming..." : `Confirm — £${totalPrice.toFixed(2)}`}
+                {submitting ? "Confirming..." : `Confirm - GBP ${totalPrice.toFixed(2)}`}
               </button>
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

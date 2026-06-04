@@ -9,15 +9,20 @@ export default function TextRefinerTool() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleRefine = () => {
+  const handleRefine = async () => {
     if (!input.trim()) return;
     setIsProcessing(true);
-    // Simulate AI processing delay
-    setTimeout(() => {
-      setOutput(`Thank you for your message. I have reviewed your request and would like to propose a refined approach that aligns with our strategic objectives. Please let me know if this revised direction meets your expectations, and I will be happy to proceed accordingly.`);
+    try {
+      const response = await fetch("/api/tools/text-refiner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: input }),
+      });
+      const data = await response.json();
+      setOutput(data.result ?? "");
+    } finally {
       setIsProcessing(false);
-    }, 1500);
-    // Deduct 1 credit (mock)
+    }
   };
 
   const copyToClipboard = () => {
@@ -52,7 +57,7 @@ export default function TextRefinerTool() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="e.g., hey, just checking in on that thing we talked about, let me know when you can chat."
               className="w-full h-64 p-4 rounded-lg border text-sm outline-none focus:ring-2 resize-none"
-              style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)", focusRing: "hsl(43 80% 60%)" }}
+              style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}
             />
             <button 
               onClick={handleRefine}

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { fallbackSlots } from "@/lib/fallback-data";
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,14 +17,14 @@ export async function GET(req: NextRequest) {
       const slotDate = new Date(baseDate);
       slotDate.setDate(slotDate.getDate() + d);
       const dateStr = slotDate.toISOString().split("T")[0];
-      for (const time of times) {
-        slots.push({ date: dateStr, time, available: Math.random() > 0.3 });
+      for (let i = 0; i < times.length; i++) {
+        slots.push({ date: dateStr, time: times[i], available: (professionalId + d + i) % 4 !== 0 });
       }
     }
 
     return NextResponse.json(slots);
   } catch (err) {
-    console.error("Error getting slots:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.warn("Using fallback slots:", err);
+    return NextResponse.json(fallbackSlots());
   }
 }

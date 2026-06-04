@@ -4,7 +4,7 @@ import { ArrowRight, Shield, Globe, Users, Zap, BookOpen, BarChart3, Brain, Mess
 import { useEffect, useState } from "react";
 import ProfessionalCard from "@/components/ProfessionalCard";
 
-type Professional = { id: number; name: string; role: string; niche: string; rating: number; reviewCount: number; priceVideo: number; availabilityStatus: string; photoUrl: string };
+type Professional = { id: number; name: string; role: string; niche: string; rating: number; reviewCount: number; priceVideo: number; availabilityStatus: string; languages: string[]; photoUrl: string };
 
 const lexicons = ["Clinical Psychologist", "Legal Counsel", "Financial Advisor", "HR Director", "Event Strategist", "Compliance Officer", "PR Specialist", "Executive Coach", "Mediator", "Recruitment Lead", "Training Facilitator", "Risk Analyst", "Brand Strategist", "Negotiation Expert", "Organisational Developer", "Crisis Communicator", "Stakeholder Manager", "Ethics Advisor", "Innovation Lead", "Executive Assistant"];
 
