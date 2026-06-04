@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-playfair: 'Playfair Display', serif;
+}
+
+body {
+  background: hsl(40 20% 96%);
+  color: hsl(220 45% 13%);
+}
+
+.font-serif {
+  font-family: var(--font-playfair);
+}
+
+.text-gold-gradient {
+  background: linear-gradient(to right, hsl(43 80% 60%), hsl(43 90% 70%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
