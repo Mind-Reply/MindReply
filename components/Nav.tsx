@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -12,6 +13,7 @@ const LINKS = [
   { href: "/lexicons", label: "Lexicons" },
   { href: "/analytics", label: "Intelligence" },
 ];
+const clerkEnabled = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
 export default function Nav() {
   const pathname = usePathname();
@@ -44,7 +46,27 @@ export default function Nav() {
             <select value={lang} onChange={(e) => setLang(e.target.value)} className="text-xs font-medium bg-transparent border border-[hsl(40_25%_88%)] rounded px-2 py-1 cursor-pointer text-[hsl(220_25%_45%)]">
               {LANGS.map((l) => <option key={l}>{l}</option>)}
             </select>
-            <Link href="/bookings" className="text-sm font-medium text-[hsl(220_25%_45%)] hover:text-[hsl(220_55%_20%)] transition-colors px-3 py-1.5">My Bookings</Link>
+            {clerkEnabled ? (
+              <>
+                <Show when="signed-in">
+                  <Link href="/bookings" prefetch={false} className="text-sm font-medium text-[hsl(220_25%_45%)] hover:text-[hsl(220_55%_20%)] transition-colors px-3 py-1.5">My Bookings</Link>
+                  <UserButton />
+                </Show>
+                <Show when="signed-out">
+                  <SignInButton mode="redirect">
+                    <button type="button" className="text-sm font-medium text-[hsl(220_25%_45%)] hover:text-[hsl(220_55%_20%)] transition-colors px-3 py-1.5">Member Login</button>
+                  </SignInButton>
+                  <SignUpButton mode="redirect">
+                    <button type="button" className="text-sm font-medium px-4 py-2 rounded hover:opacity-90 transition-opacity shadow-sm" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Create Account</button>
+                  </SignUpButton>
+                </Show>
+              </>
+            ) : (
+              <>
+                <Link href="/bookings" className="text-sm font-medium text-[hsl(220_25%_45%)] hover:text-[hsl(220_55%_20%)] transition-colors px-3 py-1.5">My Bookings</Link>
+                <Link href="/sign-in" className="text-sm font-medium text-[hsl(220_25%_45%)] hover:text-[hsl(220_55%_20%)] transition-colors px-3 py-1.5">Member Login</Link>
+              </>
+            )}
             <Link href="/professionals" className="text-sm font-medium px-4 py-2 rounded hover:opacity-90 transition-opacity shadow-sm" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
               Book a Session
             </Link>
@@ -61,6 +83,9 @@ export default function Nav() {
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="block py-2 text-sm font-medium" onClick={() => setOpen(false)}>{l.label}</Link>
           ))}
+          <Link href="/bookings" prefetch={false} className="block py-2 text-sm font-medium" onClick={() => setOpen(false)}>My Bookings</Link>
+          <Link href="/sign-in" className="block py-2 text-sm font-medium" onClick={() => setOpen(false)}>Member Login</Link>
+          <Link href="/sign-up" className="block py-2 text-sm font-medium" onClick={() => setOpen(false)}>Create Account</Link>
           <Link href="/professionals" className="block mt-3 text-sm font-medium text-center px-4 py-2.5 rounded" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }} onClick={() => setOpen(false)}>
             Book a Session
           </Link>

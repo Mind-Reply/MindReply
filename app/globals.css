@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.ts";
 
 :root {
   --font-inter: 'Inter', sans-serif;
@@ -10,6 +9,10 @@
 body {
   background: hsl(40 20% 96%);
   color: hsl(220 45% 13%);
+}
+
+@theme {
+  --color-mr-cream-light: hsl(40 20% 96%);
 }
 
 .font-serif {

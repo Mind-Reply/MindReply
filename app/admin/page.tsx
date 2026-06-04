@@ -1,7 +1,27 @@
 import { Activity, Briefcase, Network, Shield, Users } from "lucide-react";
 import Link from "next/link";
+import { isAdminUser, isClerkConfigured } from "@/lib/admin";
 
-export default function AdminPage() {
+function AccessDenied() {
+  return (
+    <main className="pt-24 min-h-screen px-4 pb-16" style={{ background: "hsl(40 33% 97%)" }}>
+      <section className="max-w-xl mx-auto bg-white border rounded-xl p-8 text-center" style={{ borderColor: "hsl(40 25% 88%)" }}>
+        <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "hsl(43 80% 45%)" }}>Admin Access</p>
+        <h1 className="font-serif text-3xl font-bold mb-3" style={{ color: "hsl(220 45% 13%)" }}>Access restricted</h1>
+        <p className="text-sm mb-6" style={{ color: "hsl(220 25% 45%)" }}>This dashboard is limited to configured MindReply administrators.</p>
+        <Link href="/dashboard" className="inline-flex px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Return to dashboard</Link>
+      </section>
+    </main>
+  );
+}
+
+export default async function AdminPage() {
+  if (isClerkConfigured()) {
+    const { auth } = await import("@clerk/nextjs/server");
+    const { userId } = await auth();
+    if (!isAdminUser(userId)) return <AccessDenied />;
+  }
+
   const stats = [
     { label: "Members", value: "1,240", icon: <Users size={18} /> },
     { label: "Professionals", value: "6", icon: <Briefcase size={18} /> },

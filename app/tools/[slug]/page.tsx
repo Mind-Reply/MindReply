@@ -20,14 +20,14 @@ const TOOL_CONFIGS: Record<string, { name: string; cost: number; description: st
   expander: { name: "Expander", cost: 1, description: "Expand terse notes into complete professional communication.", action: "Expand Text", apiSlug: "expander" },
   "professional-rewrite": { name: "Professional Rewrite", cost: 2, description: "Rewrite informal text into polished professional language.", action: "Rewrite Text", apiSlug: "professional-rewrite" },
   "clarity-booster": { name: "Clarity Booster", cost: 1, description: "Remove ambiguity and strengthen the action requested from the recipient.", action: "Boost Clarity", apiSlug: "clarity-booster" },
-  "call-scripter": { name: "Call Scripter", cost: 2, description: "Generate a focused call script with opening, discovery, objection handling, and close.", action: "Generate Script" },
-  "planning-assistant": { name: "Planning Assistant", cost: 1, description: "Turn a goal into a practical plan with milestones and communication checkpoints.", action: "Create Plan" },
-  "correction-engine": { name: "Correction Engine", cost: 1, description: "Identify weak phrasing, ambiguity, and authority leaks in professional text.", action: "Correct Text", apiSlug: "clarity-booster" },
-  "teaching-optimizer": { name: "Teaching Optimizer", cost: 2, description: "Restructure instructional content so it is easier to understand and retain.", action: "Optimize Teaching", apiSlug: "professional-rewrite" },
-  "lexicon-refiner": { name: "Lexicon Refiner", cost: 3, description: "Adapt language to professional vocabulary and discipline-specific standards.", action: "Refine Lexicon", apiSlug: "professional-rewrite" },
-  "tone-calibrator": { name: "Tone Calibrator", cost: 2, description: "Adjust emotional valence, directness, and professional register.", action: "Calibrate Tone", apiSlug: "tone-adjuster" },
-  "structure-architect": { name: "Structure Architect", cost: 3, description: "Rebuild message flow for clarity, decision speed, and recipient confidence.", action: "Structure Message", apiSlug: "clarity-booster" },
-  "cultural-adapter": { name: "Cultural Adapter", cost: 2, description: "Adapt phrasing for cross-cultural clarity, indirectness, and relationship context.", action: "Adapt Message", apiSlug: "professional-rewrite" },
+  "call-scripter": { name: "Call Scripter", cost: 2, description: "Generate a focused call script with opening, discovery, objection handling, and close.", action: "Generate Script", apiSlug: "call-scripter" },
+  "planning-assistant": { name: "Planning Assistant", cost: 1, description: "Turn a goal into a practical plan with milestones and communication checkpoints.", action: "Create Plan", apiSlug: "planning-assistant" },
+  "correction-engine": { name: "Correction Engine", cost: 1, description: "Identify weak phrasing, ambiguity, and authority leaks in professional text.", action: "Correct Text", apiSlug: "correction-engine" },
+  "teaching-optimizer": { name: "Teaching Optimizer", cost: 2, description: "Restructure instructional content so it is easier to understand and retain.", action: "Optimize Teaching", apiSlug: "teaching-optimizer" },
+  "lexicon-refiner": { name: "Lexicon Refiner", cost: 3, description: "Adapt language to professional vocabulary and discipline-specific standards.", action: "Refine Lexicon", apiSlug: "lexicon-refiner" },
+  "tone-calibrator": { name: "Tone Calibrator", cost: 2, description: "Adjust emotional valence, directness, and professional register.", action: "Calibrate Tone", apiSlug: "tone-calibrator" },
+  "structure-architect": { name: "Structure Architect", cost: 3, description: "Rebuild message flow for clarity, decision speed, and recipient confidence.", action: "Structure Message", apiSlug: "structure-architect" },
+  "cultural-adapter": { name: "Cultural Adapter", cost: 2, description: "Adapt phrasing for cross-cultural clarity, indirectness, and relationship context.", action: "Adapt Message", apiSlug: "cultural-adapter" },
 };
 
 function titleFromSlug(slug: string) {
@@ -65,7 +65,8 @@ export default function DynamicToolPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: input, tone: "professional" }),
         });
-        setOutput(await response.json());
+        const payload = await response.json();
+        setOutput(response.ok ? payload : { result: payload.error ?? "The tool could not process this request.", creditCost: config.cost });
       } else {
         setOutput({
           result: fallbackProcess(slug, input),

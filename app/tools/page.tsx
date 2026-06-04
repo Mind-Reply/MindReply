@@ -1,9 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Copy, FileText, Mail, Maximize2, Minimize2, RotateCcw, SlidersHorizontal, Sparkles, Wand2 } from "lucide-react";
+import { BookOpen, CheckCircle2, Copy, FileText, Globe2, GraduationCap, Mail, Maximize2, MessageSquare, Minimize2, PhoneCall, RotateCcw, SlidersHorizontal, Sparkles, Target, Wand2 } from "lucide-react";
 
-type ToolSlug = "text-refiner" | "email-polisher" | "tone-adjuster" | "shortener" | "expander" | "professional-rewrite" | "clarity-booster";
+type ToolSlug =
+  | "text-refiner"
+  | "email-polisher"
+  | "call-scripter"
+  | "planning-assistant"
+  | "correction-engine"
+  | "teaching-optimizer"
+  | "lexicon-refiner"
+  | "tone-adjuster"
+  | "tone-calibrator"
+  | "shortener"
+  | "expander"
+  | "professional-rewrite"
+  | "clarity-booster"
+  | "structure-architect"
+  | "cultural-adapter";
 type ToolResponse = {
   result?: string;
   suggestions?: string[];
@@ -17,11 +32,19 @@ const TONES = ["professional", "warm", "assertive", "empathetic", "concise", "di
 const TOOLS: Array<{ id: ToolSlug; icon: React.ReactNode; title: string; desc: string; placeholder: string }> = [
   { id: "text-refiner", icon: <Wand2 size={18} />, title: "Text Refiner", desc: "Refine casual text into polished professional language.", placeholder: "Paste a rough message or informal note..." },
   { id: "email-polisher", icon: <Mail size={18} />, title: "Email Polisher", desc: "Transform draft emails into executive correspondence.", placeholder: "Paste your email draft..." },
+  { id: "call-scripter", icon: <PhoneCall size={18} />, title: "Call Scripter", desc: "Generate focused call openings, discovery prompts, objections, and closes.", placeholder: "Describe the call goal, recipient, and desired outcome..." },
+  { id: "planning-assistant", icon: <Target size={18} />, title: "Planning Assistant", desc: "Turn a goal into milestones and communication checkpoints.", placeholder: "Describe the goal, timeframe, and constraints..." },
+  { id: "correction-engine", icon: <CheckCircle2 size={18} />, title: "Correction Engine", desc: "Find weak phrasing, ambiguity, and authority leaks.", placeholder: "Paste text that needs correction..." },
+  { id: "teaching-optimizer", icon: <GraduationCap size={18} />, title: "Teaching Optimizer", desc: "Restructure instructional content for understanding and retention.", placeholder: "Paste training, teaching, or explanatory content..." },
+  { id: "lexicon-refiner", icon: <BookOpen size={18} />, title: "Lexicon Refiner", desc: "Adapt language to discipline-specific professional vocabulary.", placeholder: "Paste text that needs professional lexicon alignment..." },
   { id: "tone-adjuster", icon: <SlidersHorizontal size={18} />, title: "Tone Adjuster", desc: "Shift a message into a precise communication register.", placeholder: "Paste text that needs a different tone..." },
+  { id: "tone-calibrator", icon: <MessageSquare size={18} />, title: "Tone Calibrator", desc: "Tune emotional valence, directness, and professional register.", placeholder: "Paste text that needs tone calibration..." },
   { id: "shortener", icon: <Minimize2 size={18} />, title: "Shortener", desc: "Compress communication without losing intent.", placeholder: "Paste text that should be shorter..." },
   { id: "expander", icon: <Maximize2 size={18} />, title: "Expander", desc: "Expand terse notes into complete professional wording.", placeholder: "Paste terse notes or a short instruction..." },
   { id: "professional-rewrite", icon: <FileText size={18} />, title: "Professional Rewrite", desc: "Rewrite informal phrasing for high-trust settings.", placeholder: "Paste text that needs a professional rewrite..." },
   { id: "clarity-booster", icon: <CheckCircle2 size={18} />, title: "Clarity Booster", desc: "Remove ambiguity and strengthen the next action.", placeholder: "Paste text with unclear ownership or next steps..." },
+  { id: "structure-architect", icon: <FileText size={18} />, title: "Structure Architect", desc: "Rebuild message flow for clarity, decision speed, and recipient confidence.", placeholder: "Paste text that needs stronger structure..." },
+  { id: "cultural-adapter", icon: <Globe2 size={18} />, title: "Cultural Adapter", desc: "Adapt phrasing for cross-cultural clarity and relationship context.", placeholder: "Paste text and describe the cultural or relationship context..." },
 ];
 
 export default function Tools() {
@@ -33,7 +56,7 @@ export default function Tools() {
   const [copied, setCopied] = useState(false);
 
   const current = TOOLS.find((tool) => tool.id === active) ?? TOOLS[0];
-  const showTone = active === "email-polisher" || active === "tone-adjuster";
+  const showTone = active === "email-polisher" || active === "tone-adjuster" || active === "tone-calibrator";
 
   function reset() {
     setInput("");
@@ -68,7 +91,7 @@ export default function Tools() {
         <div className="max-w-6xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "hsl(43 80% 60%)" }}>Intelligence Suite</p>
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-3" style={{ color: "hsl(43 70% 88%)" }}>Behavioral AI Tools</h1>
-          <p className="text-sm max-w-2xl" style={{ color: "rgba(248,245,240,0.7)" }}>Seven focused tools for refining, compressing, expanding, and clarifying professional communication.</p>
+          <p className="text-sm max-w-2xl" style={{ color: "rgba(248,245,240,0.7)" }}>Fifteen focused tools for refining, compressing, expanding, planning, and clarifying professional communication.</p>
         </div>
       </section>
 

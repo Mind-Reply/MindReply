@@ -7,6 +7,8 @@ type Membership = { id: number; tier: string; name: string; price: number; descr
 export default function Memberships() {
   const [tiers, setTiers] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
+  const [checkoutTier, setCheckoutTier] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState("");
 
   useEffect(() => {
     fetch("/api/memberships").then((r) => r.json()).then((d) => {
@@ -15,6 +17,31 @@ export default function Memberships() {
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
+
+  async function startCheckout(tier: string) {
+    setCheckoutTier(tier);
+    setCheckoutError("");
+
+    try {
+      const response = await fetch("/api/checkout/membership", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier }),
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.url) {
+        setCheckoutError(data.error ?? "Checkout is not available yet. Please contact MindReply for access.");
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch {
+      setCheckoutError("Checkout is not available right now. Please contact MindReply for access.");
+    } finally {
+      setCheckoutTier(null);
+    }
+  }
 
   return (
     <div className="pt-20 min-h-screen" style={{ background: "hsl(40 33% 97%)" }}>
@@ -47,7 +74,7 @@ export default function Memberships() {
                   <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${m.highlighted ? "text-[hsl(43_80%_60%)]" : "text-[hsl(220_25%_45%)]"}`}>{m.tier}</p>
                   <h3 className={`font-serif text-2xl font-bold ${m.highlighted ? "text-[hsl(43_70%_88%)]" : "text-[hsl(220_45%_13%)]"}`}>{m.name}</h3>
                   <div className="my-5">
-                    <span className={`font-serif text-5xl font-bold ${m.highlighted ? "text-[hsl(43_70%_88%)]" : "text-[hsl(220_45%_13%)]"}`}>£{m.price}</span>
+                    <span className={`font-serif text-5xl font-bold ${m.highlighted ? "text-[hsl(43_70%_88%)]" : "text-[hsl(220_45%_13%)]"}`}>&pound;{m.price}</span>
                     <span className={`text-sm ml-1 ${m.highlighted ? "text-[rgba(248,245,240,0.6)]" : "text-[hsl(220_25%_45%)]"}`}>/month</span>
                   </div>
                   <p className={`text-sm leading-relaxed mb-6 ${m.highlighted ? "text-[rgba(248,245,240,0.7)]" : "text-[hsl(220_25%_45%)]"}`}>{m.description}</p>
@@ -59,14 +86,20 @@ export default function Memberships() {
                       </li>
                     ))}
                   </ul>
-                  <button className={`w-full font-semibold py-3.5 rounded-xl text-sm transition-all ${m.highlighted ? "hover:opacity-90" : "border-2 hover:text-[hsl(43_70%_88%)] transition-colors"}`}
+                  <button onClick={() => startCheckout(m.tier)} disabled={checkoutTier === m.tier} className={`w-full font-semibold py-3.5 rounded-xl text-sm transition-all disabled:opacity-50 ${m.highlighted ? "hover:opacity-90" : "border-2 hover:text-[hsl(43_70%_88%)] transition-colors"}`}
                     style={m.highlighted ? { background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" } : { borderColor: "hsl(220 55% 20%)", color: "hsl(220 55% 20%)" }}>
-                    {m.tier === "sovereign" ? "Apply for Sovereign" : `Join as ${m.name}`}
+                    {checkoutTier === m.tier ? "Opening checkout..." : m.tier === "sovereign" ? "Apply for Sovereign" : `Join as ${m.name}`}
                   </button>
                 </div>
               </div>
             ))}
           </div>
+        )}
+
+        {checkoutError && (
+          <p className="mt-6 rounded-lg border px-4 py-3 text-center text-sm" style={{ borderColor: "#fecaca", background: "#fef2f2", color: "#991b1b" }}>
+            {checkoutError}
+          </p>
         )}
 
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">

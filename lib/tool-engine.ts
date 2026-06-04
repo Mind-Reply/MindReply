@@ -3,11 +3,19 @@ import { logMetric } from "@/lib/metrics";
 export type ToolSlug =
   | "text-refiner"
   | "email-polisher"
+  | "call-scripter"
+  | "planning-assistant"
+  | "correction-engine"
+  | "teaching-optimizer"
+  | "lexicon-refiner"
   | "tone-adjuster"
+  | "tone-calibrator"
   | "shortener"
   | "expander"
   | "professional-rewrite"
-  | "clarity-booster";
+  | "clarity-booster"
+  | "structure-architect"
+  | "cultural-adapter";
 
 export type ToolResult = {
   tool: ToolSlug;
@@ -38,11 +46,47 @@ export const toolCatalog: Record<ToolSlug, { name: string; creditCost: number; d
     description: "Transform draft emails into executive-grade correspondence.",
     action: "Polish Email",
   },
+  "call-scripter": {
+    name: "Call Scripter",
+    creditCost: 2,
+    description: "Generate a focused call script with opening, discovery, objection handling, and close.",
+    action: "Generate Script",
+  },
+  "planning-assistant": {
+    name: "Planning Assistant",
+    creditCost: 1,
+    description: "Turn a goal into a practical plan with milestones and communication checkpoints.",
+    action: "Create Plan",
+  },
+  "correction-engine": {
+    name: "Correction Engine",
+    creditCost: 1,
+    description: "Identify weak phrasing, ambiguity, and authority leaks in professional text.",
+    action: "Correct Text",
+  },
+  "teaching-optimizer": {
+    name: "Teaching Optimizer",
+    creditCost: 2,
+    description: "Restructure instructional content so it is easier to understand and retain.",
+    action: "Optimize Teaching",
+  },
+  "lexicon-refiner": {
+    name: "Lexicon Refiner",
+    creditCost: 3,
+    description: "Adapt language to professional vocabulary and discipline-specific standards.",
+    action: "Refine Lexicon",
+  },
   "tone-adjuster": {
     name: "Tone Adjuster",
     creditCost: 1,
     description: "Shift a message into a precise communication register.",
     action: "Adjust Tone",
+  },
+  "tone-calibrator": {
+    name: "Tone Calibrator",
+    creditCost: 2,
+    description: "Adjust emotional valence, directness, and professional register.",
+    action: "Calibrate Tone",
   },
   shortener: {
     name: "Shortener",
@@ -67,6 +111,18 @@ export const toolCatalog: Record<ToolSlug, { name: string; creditCost: number; d
     creditCost: 1,
     description: "Remove ambiguity and strengthen the next action.",
     action: "Boost Clarity",
+  },
+  "structure-architect": {
+    name: "Structure Architect",
+    creditCost: 3,
+    description: "Rebuild message flow for clarity, decision speed, and recipient confidence.",
+    action: "Structure Message",
+  },
+  "cultural-adapter": {
+    name: "Cultural Adapter",
+    creditCost: 2,
+    description: "Adapt phrasing for cross-cultural clarity, indirectness, and relationship context.",
+    action: "Adapt Message",
   },
 };
 
@@ -154,6 +210,114 @@ function clarityBoost(text: string) {
   return `Context: ${sentenceCase(text)}\n\nDecision needed: Confirm the intended outcome.\n\nNext action: Assign an owner, deadline, and response format.\n\nSuggested wording: Please confirm the preferred next step and the date by which you need it completed.`;
 }
 
+function callScripter(text: string) {
+  const base = sentenceCase(text);
+  return [
+    "Opening: Thank you for making time today. I want to make this conversation useful, specific, and easy to act on.",
+    "",
+    `Objective: ${base}`,
+    "",
+    "Discovery: What outcome would make this discussion worthwhile for you, and what constraint should we respect first?",
+    "",
+    "Objection handling: I understand the concern. The practical way forward is to separate risk, timing, and ownership so the decision stays clear.",
+    "",
+    "Close: Shall we confirm the next action, owner, and date now?",
+  ].join("\n");
+}
+
+function planningAssistant(text: string) {
+  const base = sentenceCase(text);
+  return [
+    `Objective: ${base}`,
+    "",
+    "1. Define the exact result and decision owner.",
+    "2. Identify stakeholders, constraints, and success signals.",
+    "3. Set three milestones with one accountable owner per milestone.",
+    "4. Confirm the communication cadence and escalation path.",
+    "5. Review progress weekly and adjust only from evidence.",
+  ].join("\n");
+}
+
+function correctionEngine(text: string) {
+  const base = sentenceCase(text)
+    .replace(/\bjust\b/gi, "")
+    .replace(/\bmaybe\b/gi, "a practical option is")
+    .replace(/\bI think\b/gi, "my assessment is")
+    .replace(/\bsorry\b/gi, "thank you for your patience")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return [
+    "Correction review:",
+    "",
+    "Authority leaks: Remove hesitant qualifiers and indirect requests.",
+    "Ambiguity risk: State the decision, owner, and timing explicitly.",
+    "Tone risk: Keep the message calm, specific, and outcome-led.",
+    "",
+    `Corrected version: ${base}`,
+  ].join("\n");
+}
+
+function teachingOptimizer(text: string) {
+  const base = sentenceCase(text);
+  return [
+    `Learning objective: ${base}`,
+    "",
+    "Core idea: State the principle in one sentence before adding detail.",
+    "Sequence: Begin with context, show the action, then explain the reason.",
+    "Retention cue: End with one practical checkpoint the learner can apply immediately.",
+    "",
+    "Optimized instruction: Explain the concept, demonstrate the step, ask the learner to apply it, then confirm what changed.",
+  ].join("\n");
+}
+
+function lexiconRefiner(text: string) {
+  return [
+    "Professional lexicon version:",
+    "",
+    professionalRewrite(text),
+    "",
+    "Vocabulary upgrade: Use terms that signal evidence, constraints, ownership, risk, and measurable outcomes.",
+  ].join("\n");
+}
+
+function toneCalibrator(text: string, tone = "professional") {
+  const descriptor = toneDescriptors[tone] ?? toneDescriptors.professional;
+  return [
+    `Tone calibration: ${descriptor}.`,
+    "",
+    adjustTone(text, tone),
+    "",
+    "Calibration note: Keep warmth in the opening, authority in the request, and precision in the close.",
+  ].join("\n");
+}
+
+function structureArchitect(text: string) {
+  const base = sentenceCase(text);
+  return [
+    "Executive structure:",
+    "",
+    `1. Context: ${base}`,
+    "2. Decision: State the choice or approval needed.",
+    "3. Evidence: Add the strongest supporting reason.",
+    "4. Risk: Name the main constraint without overexplaining.",
+    "5. Close: Confirm owner, action, and deadline.",
+  ].join("\n");
+}
+
+function culturalAdapter(text: string) {
+  const base = sentenceCase(text);
+  return [
+    "Cross-cultural adaptation:",
+    "",
+    base,
+    "",
+    "Relationship framing: Lead with respect and context before the request.",
+    "Directness level: Use clear action language while avoiding unnecessary pressure.",
+    "Confirmation: Ask for alignment, timing, and preferred next step.",
+  ].join("\n");
+}
+
 export function isToolSlug(value: string): value is ToolSlug {
   return value in toolCatalog;
 }
@@ -169,10 +333,18 @@ export async function runTool(slug: ToolSlug, input: { text: string; tone?: stri
 
   if (slug === "text-refiner") result = refineText(text);
   else if (slug === "email-polisher") result = polishEmail(text, input.tone);
+  else if (slug === "call-scripter") result = callScripter(text);
+  else if (slug === "planning-assistant") result = planningAssistant(text);
+  else if (slug === "correction-engine") result = correctionEngine(text);
+  else if (slug === "teaching-optimizer") result = teachingOptimizer(text);
+  else if (slug === "lexicon-refiner") result = lexiconRefiner(text);
   else if (slug === "tone-adjuster") result = adjustTone(text, input.tone);
+  else if (slug === "tone-calibrator") result = toneCalibrator(text, input.tone);
   else if (slug === "shortener") result = shorten(text);
   else if (slug === "expander") result = expand(text);
   else if (slug === "professional-rewrite") result = professionalRewrite(text);
+  else if (slug === "structure-architect") result = structureArchitect(text);
+  else if (slug === "cultural-adapter") result = culturalAdapter(text);
   else result = clarityBoost(text);
 
   const analysis = score(text, result);

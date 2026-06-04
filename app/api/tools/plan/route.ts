@@ -1,28 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { logMetric } from "@/lib/metrics";
+import { runTool } from "@/lib/tool-engine";
 
 export async function POST(req: NextRequest) {
   try {
-    const { goal, timeframe, constraints } = await req.json();
-    if (!goal) return NextResponse.json({ error: "goal is required" }, { status: 400 });
+    const { goal, text, timeframe, constraints, tone, userId } = await req.json();
+    const objective = String(goal ?? text ?? "").trim();
+    if (!objective) return NextResponse.json({ error: "goal is required" }, { status: 400 });
 
     const tf = timeframe ?? "30 days";
-    const steps = [
-      `Define success metrics for: ${goal}`,
-      "Identify key stakeholders and decision-makers",
-      "Break the goal into 3 actionable milestones",
-      "Schedule weekly check-ins to monitor progress",
-      "Review and adjust the plan at the midpoint",
-      "Document learnings and results upon completion",
-    ];
+    const input = [
+      `Objective: ${objective}`,
+      `Timeframe: ${tf}`,
+      constraints ? `Constraints: ${constraints}` : "",
+    ].filter(Boolean).join("\n");
+    const response = await runTool("planning-assistant", { text: input, tone, userId: userId ?? null });
 
-    const plan = `A structured ${tf} plan to achieve: ${goal}. ${constraints ? `Constraints considered: ${constraints}.` : ""} The approach focuses on measurable milestones, stakeholder alignment, and consistent review cycles.`;
-    const metric = await logMetric({
-      eventName: "tool.planning-assistant",
-      eventValue: { timeframe: tf, goalLength: String(goal).length, steps: steps.length },
+    return NextResponse.json({
+      ...response,
+      plan: response.result,
+      steps: response.suggestions,
+      timeframe: tf,
     });
-
-    return NextResponse.json({ result: plan, plan, steps, timeframe: tf, creditCost: 1, metricLogged: metric.logged });
   } catch (err) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

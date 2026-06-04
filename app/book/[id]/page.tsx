@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { ArrowLeft, CheckCircle, Clock, MessageSquare, Phone, Video } from "lucide-react";
 import { createBookingAction } from "@/app/booking/actions";
 
@@ -23,8 +23,11 @@ type Step = "mode" | "slot" | "details" | "confirm";
 
 export default function Book() {
   const { id } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
   const [professional, setProfessional] = useState<Professional | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [step, setStep] = useState<Step>("mode");
   const [mode, setMode] = useState<Mode>("video");
   const [selectedSlot, setSelectedSlot] = useState<{ date: string; time: string } | null>(null);
@@ -37,21 +40,71 @@ export default function Book() {
   const [bookingId, setBookingId] = useState<number | null>(null);
 
   useEffect(() => {
+    const requestedMode = searchParams.get("mode");
+    if (requestedMode === "text" || requestedMode === "voice" || requestedMode === "video") {
+      setMode(requestedMode);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError("");
+    setNotFound(false);
+
     Promise.all([
-      fetch(`/api/professionals/${id}`).then((response) => response.json()),
-      fetch(`/api/professionals/slots?professionalId=${id}`).then((response) => response.json()),
+      fetch(`/api/professionals/${id}`).then(async (response) => {
+        const profile = await response.json();
+        if (!response.ok || profile?.error) {
+          throw new Error("not-found");
+        }
+        return profile as Professional;
+      }),
+      fetch(`/api/professionals/slots?professionalId=${id}`).then(async (response) => {
+        if (!response.ok) return [] as Slot[];
+        const availability = await response.json();
+        return Array.isArray(availability) ? availability as Slot[] : [];
+      }),
     ])
       .then(([profile, availability]) => {
+        if (!active) return;
         setProfessional(profile);
         setSlots(availability);
+        setLoading(false);
       })
-      .catch(() => setError("Unable to load booking details. Please refresh and try again."));
+      .catch((loadError) => {
+        if (!active) return;
+        if (loadError instanceof Error && loadError.message === "not-found") {
+          setNotFound(true);
+        } else {
+          setError("Unable to load booking details. Please refresh and try again.");
+        }
+        setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [id]);
 
-  if (!professional) {
+  if (loading) {
     return (
       <main className="pt-20 min-h-screen flex items-center justify-center">
         <div className="animate-pulse" style={{ color: "hsl(220 25% 45%)" }}>Loading booking flow...</div>
+      </main>
+    );
+  }
+
+  if (notFound || !professional) {
+    return (
+      <main className="pt-20 min-h-screen flex items-center justify-center px-4" style={{ background: "hsl(40 33% 97%)" }}>
+        <section className="bg-white border border-[hsl(40_25%_88%)] rounded-2xl p-8 max-w-md w-full text-center shadow-sm">
+          <h1 className="font-serif text-2xl font-bold mb-2" style={{ color: "hsl(220 45% 13%)" }}>Professional Not Found</h1>
+          <p className="text-sm mb-6" style={{ color: "hsl(220 25% 45%)" }}>This booking page cannot be loaded because the selected professional is not available.</p>
+          <Link href="/professionals" className="inline-flex justify-center font-medium px-5 py-3 rounded-lg hover:opacity-90 transition-opacity text-sm" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
+            Browse Professionals
+          </Link>
+        </section>
       </main>
     );
   }

@@ -5,11 +5,19 @@ const PROVIDER = (process.env.LLM_PROVIDER as Provider | undefined) ?? "azure-op
 export type ToolKind =
   | "text-refiner"
   | "email-polisher"
+  | "call-scripter"
+  | "planning-assistant"
+  | "correction-engine"
+  | "teaching-optimizer"
+  | "lexicon-refiner"
   | "tone-adjuster"
+  | "tone-calibrator"
   | "shortener"
   | "expander"
   | "professional-rewrite"
-  | "clarity-booster";
+  | "clarity-booster"
+  | "structure-architect"
+  | "cultural-adapter";
 
 export type LlmParams = {
   tool: ToolKind;
@@ -50,12 +58,44 @@ function deterministicTransform(params: LlmParams): string {
     return `Calm, direct version: ${text}`;
   }
 
+  if (params.tool === "tone-calibrator") {
+    return `Calibrated tone version: ${text}\n\nTone note: keep warmth in the opening, authority in the request, and precision in the close.`;
+  }
+
+  if (params.tool === "call-scripter") {
+    return `Opening: Thank you for making time today.\n\nObjective: ${text}\n\nDiscovery: What outcome would make this conversation useful for you?\n\nClose: Shall we confirm the next action and date now?`;
+  }
+
+  if (params.tool === "planning-assistant") {
+    return `Objective: ${text}\n\n1. Define the result.\n2. Identify owner and stakeholders.\n3. Set three milestones.\n4. Confirm communication cadence.\n5. Review weekly.`;
+  }
+
+  if (params.tool === "correction-engine") {
+    return `Corrected version: ${text}\n\nCorrection notes: remove weak qualifiers, clarify the owner, and state the next action.`;
+  }
+
+  if (params.tool === "teaching-optimizer") {
+    return `Learning objective: ${text}\n\nTeach it by stating the principle, showing the step, asking for application, and confirming what changed.`;
+  }
+
+  if (params.tool === "lexicon-refiner") {
+    return `Professional lexicon version: ${text}\n\nVocabulary note: use evidence, constraints, ownership, risk, and measurable outcomes.`;
+  }
+
   if (params.tool === "professional-rewrite") {
     return `Professional rewrite: ${text}`;
   }
 
   if (params.tool === "clarity-booster") {
     return `Clear version: ${text}`;
+  }
+
+  if (params.tool === "structure-architect") {
+    return `Executive structure:\n\n1. Context: ${text}\n2. Decision: state the choice or approval needed.\n3. Evidence: add the strongest reason.\n4. Close: confirm owner, action, and deadline.`;
+  }
+
+  if (params.tool === "cultural-adapter") {
+    return `Cross-cultural adaptation: ${text}\n\nLead with respect and context, then make the request clear without unnecessary pressure.`;
   }
 
   return `Refined version: ${text}`;

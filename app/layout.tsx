@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import AuthProvider from "@/components/AuthProvider";
 import Nav from "@/components/Nav";
 import MRAgent from "@/components/MRAgent";
 import "./globals.css";
@@ -17,10 +18,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} scroll-smooth`}>
       <body className="antialiased bg-mr-cream-light text-gray-900" style={{ fontFamily: "var(--font-inter)" }}>
-        <Nav />
-        {children}
-        <MRAgent />
-        <SpeedInsights />
+        <AuthProvider>
+          <Nav />
+          {children}
+          <MRAgent />
+          <SpeedInsights />
+        </AuthProvider>
       </body>
     </html>
   );

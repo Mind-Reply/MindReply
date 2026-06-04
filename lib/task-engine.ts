@@ -41,6 +41,7 @@ const requiredRoutes = [
   "/",
   "/professionals",
   "/bookings",
+  "/book/[id]",
   "/booking/[id]",
   "/tools",
   "/agent",
