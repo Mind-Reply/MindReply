@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, lexiconsTable } from "@/lib/db";
+import { fallbackLexicons } from "@/lib/fallback-data";
 import { eq } from "drizzle-orm";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -14,7 +15,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       terms: typeof row.terms === "string" ? JSON.parse(row.terms) : row.terms,
     });
   } catch (err) {
-    console.error("Error getting lexicon:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.warn("Using fallback lexicon:", err);
+    const { id: rawId } = await params;
+    const id = parseInt(rawId);
+    const row = fallbackLexicons.find((l) => l.id === id);
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(row);
   }
 }

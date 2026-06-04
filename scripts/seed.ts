@@ -1,198 +1,118 @@
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-import {
-  professionals,
-  bookings,
-  memberships,
-  lexicons,
-} from '../lib/schema';
+import { count } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import { lexiconsTable, membershipsTable, metricsTable, professionalsTable, usersTable } from "../lib/schema";
+import { fallbackLexicons, fallbackMemberships, fallbackProfessionals } from "../lib/fallback-data";
+
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  console.error("DATABASE_URL is required to seed MindReply.");
+  process.exit(1);
+}
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
 });
 
 const db = drizzle(pool);
 
-async function main() {
-  console.log('🌱 Seeding MindReply database...');
-
-  // Clear existing (optional, comment out if you want to keep data)
-  await db.delete(bookings);
-  await db.delete(lexicons);
-  await db.delete(memberships);
-  await db.delete(professionals);
-
-  // Memberships
-  await db.insert(memberships).values([
-    {
-      id: 'curator',
-      name: 'Curator',
-      priceMonthly: 19,
-      description: 'For individuals who want refined, guided communication support.',
-    },
-    {
-      id: 'strategist',
-      name: 'Strategist',
-      priceMonthly: 49,
-      description: 'For professionals and founders who need consistent strategic clarity.',
-    },
-    {
-      id: 'sovereign',
-      name: 'Sovereign',
-      priceMonthly: 129,
-      description: 'For leaders who want a fully tailored behavioral intelligence layer.',
-    },
-  ]);
-
-  // Professionals
-  await db.insert(professionals).values([
-    {
-      id: 'child-psychologist',
-      name: 'Child Psychologist',
-      title: 'PC/phone addiction, school stress, emotional regulation',
-      pricePerHour: 80,
-      rating: 4.9,
-      isAvailable: true,
-      languages: ['en', 'bg'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'adult-mental-health',
-      name: 'Adult Mental Health Support',
-      title: 'Burnout, anxiety, emotional overload',
-      pricePerHour: 90,
-      rating: 4.8,
-      isAvailable: true,
-      languages: ['en', 'bg', 'de'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'relationship-coach',
-      name: 'Relationship & Communication Coach',
-      title: 'Conflict de-escalation, honest conversations, boundaries',
-      pricePerHour: 85,
-      rating: 4.7,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'accountant-tax',
-      name: 'Accountant / Tax Advisor',
-      title: 'Small business, freelancers, international structure basics',
-      pricePerHour: 110,
-      rating: 4.6,
-      isAvailable: true,
-      languages: ['en', 'bg'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: false,
-    },
-    {
-      id: 'lawyer-legal',
-      name: 'Lawyer / Legal Advisor',
-      title: 'Contracts, risk, basic compliance orientation',
-      pricePerHour: 140,
-      rating: 4.7,
-      isAvailable: false, // fully booked example
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'financial-advisor',
-      name: 'Financial Advisor',
-      title: 'Personal finance structure, runway, basic allocation thinking',
-      pricePerHour: 120,
-      rating: 4.5,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'hr-leader-pa',
-      name: 'HR Leader with PA',
-      title: 'Hiring, feedback, people systems, executive support',
-      pricePerHour: 95,
-      rating: 4.6,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'executive-assistant',
-      name: 'Executive Assistant / Ops',
-      title: 'Calendar, ops, follow-through, friction removal',
-      pricePerHour: 70,
-      rating: 4.8,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: false,
-    },
-    {
-      id: 'event-manager',
-      name: 'Event Manager',
-      title: 'Launches, retreats, private events, logistics',
-      pricePerHour: 85,
-      rating: 4.4,
-      isAvailable: true,
-      languages: ['en', 'bg'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'business-consultant',
-      name: 'Business Consultant / Strategy',
-      title: 'Positioning, offers, funnels, behavioral communication strategy',
-      pricePerHour: 150,
-      rating: 4.9,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-  ]);
-
-  // Lexicons
-  await db.insert(lexicons).values([
-    {
-      id: 'founder-clarity',
-      name: 'Founder Clarity Lexicon',
-      description: 'Language patterns for founders under pressure: calm, precise, decisive.',
-    },
-    {
-      id: 'parent-soft-power',
-      name: 'Parent Soft Power Lexicon',
-      description: 'Gentle but firm language for parents with overwhelmed kids.',
-    },
-    {
-      id: 'executive-ops',
-      name: 'Executive Ops Lexicon',
-      description: 'Operational clarity, delegation, and follow-up language.',
-    },
-  ]);
-
-  console.log('✅ Seed complete.');
-  await pool.end();
+async function tableCount(table: typeof professionalsTable | typeof membershipsTable | typeof lexiconsTable | typeof usersTable | typeof metricsTable) {
+  const [result] = await db.select({ value: count() }).from(table);
+  return result?.value ?? 0;
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+async function main() {
+  console.log("Seeding MindReply database...");
+
+  if ((await tableCount(professionalsTable)) === 0) {
+    await db.insert(professionalsTable).values(
+      fallbackProfessionals.map((p) => ({
+        name: p.name,
+        role: p.role,
+        niche: p.niche,
+        bio: p.bio,
+        rating: p.rating,
+        reviewCount: p.reviewCount,
+        priceText: p.priceText,
+        priceVoice: p.priceVoice,
+        priceVideo: p.priceVideo,
+        availabilityStatus: p.availabilityStatus,
+        languages: p.languages.join(", "),
+        photoUrl: p.photoUrl,
+        specializations: p.specializations?.join(", ") ?? null,
+        yearsExperience: p.yearsExperience,
+      })),
+    );
+    console.log(`Inserted ${fallbackProfessionals.length} professionals.`);
+  } else {
+    console.log("Professionals already seeded; skipping.");
+  }
+
+  if ((await tableCount(membershipsTable)) === 0) {
+    await db.insert(membershipsTable).values(
+      fallbackMemberships.map((m) => ({
+        tier: m.tier,
+        name: m.name,
+        price: m.price,
+        description: m.description,
+        features: JSON.stringify(m.features),
+        highlighted: m.highlighted,
+      })),
+    );
+    console.log(`Inserted ${fallbackMemberships.length} memberships.`);
+  } else {
+    console.log("Memberships already seeded; skipping.");
+  }
+
+  if ((await tableCount(lexiconsTable)) === 0) {
+    await db.insert(lexiconsTable).values(
+      fallbackLexicons.map((l) => ({
+        name: l.name,
+        category: l.category,
+        description: l.description,
+        terms: JSON.stringify(l.terms),
+        professionalId: null,
+      })),
+    );
+    console.log(`Inserted ${fallbackLexicons.length} lexicons.`);
+  } else {
+    console.log("Lexicons already seeded; skipping.");
+  }
+
+  if ((await tableCount(usersTable)) === 0) {
+    await db.insert(usersTable).values([
+      { name: "Director Strategist", email: "director@mind-reply.com", membershipTier: "strategist" },
+      { name: "Clinical Lead", email: "clinical@mind-reply.com", membershipTier: "curator" },
+      { name: "Founder Operator", email: "founder@mind-reply.com", membershipTier: "sovereign" },
+    ]);
+    console.log("Inserted 3 users.");
+  } else {
+    console.log("Users already seeded; skipping.");
+  }
+
+  if ((await tableCount(metricsTable)) === 0) {
+    await db.insert(metricsTable).values([
+      { userId: null, eventName: "tool.text-refiner", eventValue: JSON.stringify({ creditCost: 1, seed: true }) },
+      { userId: null, eventName: "tool.email-polisher", eventValue: JSON.stringify({ creditCost: 2, seed: true }) },
+      { userId: null, eventName: "agent.message", eventValue: JSON.stringify({ source: "local", seed: true }) },
+      { userId: null, eventName: "orchestration.run", eventValue: JSON.stringify({ risk: "controlled", seed: true }) },
+      { userId: null, eventName: "background.reasoning_loop", eventValue: JSON.stringify({ cycles: 4, seed: true }) },
+    ]);
+    console.log("Inserted 5 metrics.");
+  } else {
+    console.log("Metrics already seeded; skipping.");
+  }
+
+  console.log("Seed complete.");
+}
+
+main()
+  .catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await pool.end();
+  });

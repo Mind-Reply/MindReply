@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, professionalsTable } from "@/lib/db";
+import { fallbackProfessionals } from "@/lib/fallback-data";
 import { eq } from "drizzle-orm";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -22,7 +23,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       yearsExperience: row.yearsExperience,
     });
   } catch (err) {
-    console.error("Error getting professional:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.warn("Using fallback professional:", err);
+    const { id: rawId } = await params;
+    const id = parseInt(rawId);
+    const row = fallbackProfessionals.find((p) => p.id === id);
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(row);
   }
 }

@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "hsl(220 55% 20%)" }}>
       <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-2xl">
@@ -9,7 +14,7 @@ export default function LoginPage() {
           <p className="text-sm" style={{ color: "hsl(220 25% 45%)" }}>Access your communication intelligence dashboard.</p>
         </div>
         
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); window.location.href = '/dashboard'; }}>
+        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); router.push("/dashboard"); }}>
           <div>
             <label className="text-xs font-bold uppercase tracking-wider mb-1 block" style={{ color: "hsl(220 25% 45%)" }}>Email Address</label>
             <input type="email" required className="w-full px-4 py-3 rounded-lg border text-sm outline-none focus:ring-2" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }} placeholder="you@organisation.com" />

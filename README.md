@@ -1,83 +1,106 @@
 # MindReply
 
-> The N1 worldwide behavioral communication intelligence ecosystem — connecting professionals with elite advisors and AI-powered tools that sharpen how people communicate.
+MindReply is a Next.js App Router application for behavioral communication intelligence, professional discovery, bookings, micro-tools, memberships, lexicons, dashboards, and operations health checks.
 
-## Tech Stack
+## Stack
 
-- **Next.js 15** — App Router, Server Components, Route Handlers
-- **TypeScript** — strict mode
-- **TailwindCSS v4** — navy/gold/cream design system (Playfair Display + Inter)
-- **Drizzle ORM** — PostgreSQL with type-safe queries
-- **Docker** — standalone output for Azure deployment
+- Next.js 15 App Router
+- TypeScript
+- Tailwind CSS v4
+- Drizzle ORM with PostgreSQL
+- Docker standalone output for Azure App Service
+- Vercel Speed Insights
 
-## Quick Start
+## Local Setup
 
 ```bash
 cp .env.example .env.local
-# Set DATABASE_URL in .env.local
-
-npm install
+npm ci
 npm run dev
-# → http://localhost:3000
 ```
 
-## Environment Variables
+The app renders with typed fallback data when `DATABASE_URL` is not configured. Set `DATABASE_URL` to use live PostgreSQL-backed routes.
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
+## Required Environment
 
-## Pages
+| Name | Where | Purpose |
+| --- | --- | --- |
+| `DATABASE_URL` | local, Vercel, GitHub Actions, Azure runtime | PostgreSQL connection string |
+| `AZURE_OPENAI_ENDPOINT` | local, Vercel, Azure runtime | Optional Azure OpenAI endpoint for MR Agent |
+| `AZURE_OPENAI_API_KEY` | local, Vercel, Azure runtime | Optional Azure OpenAI API key |
+| `AZURE_OPENAI_DEPLOYMENT` | local, Vercel, Azure runtime | Optional Azure OpenAI deployment name |
+| `AZURE_OPENAI_API_VERSION` | local, Vercel, Azure runtime | Azure OpenAI API version |
+| `AZURE_WEBAPP_NAME` | GitHub Actions secret | Azure App Service name |
+| `AZURE_WEBAPP_PUBLISH_PROFILE` | GitHub Actions secret | Azure publish profile for deployment |
 
-| Route | Description |
-|---|---|
-| `/` | Home — hero, featured professionals, AI tools, membership |
-| `/professionals` | Filterable marketplace of elite advisors |
-| `/professionals/[id]` | Professional profile + availability |
-| `/book/[id]` | 3-step booking flow |
-| `/tools` | AI tools — Email Refiner, Tone Adjuster, Note Clarifier, Planner |
-| `/memberships` | Tier comparison — Curator / Strategist / Sovereign |
-| `/lexicons` | Professional vocabulary library |
-| `/bookings` | Session history |
-| `/analytics` | Platform intelligence dashboard |
+Vercel settings:
 
-## API Routes
+- Framework Preset: `Next.js`
+- Root Directory: `.`
+- Build Command: `npm run build`
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/professionals` | GET | Filterable list (role, language, available, maxPrice) |
-| `/api/professionals/featured` | GET | Top 6 available professionals |
-| `/api/professionals/[id]` | GET | Single professional |
-| `/api/professionals/slots` | GET | 7-day availability slots |
-| `/api/bookings` | GET, POST | List / create bookings |
-| `/api/bookings/[id]` | GET, PATCH | Get / update status |
-| `/api/tools/refine-email` | POST | Email Refiner |
-| `/api/tools/adjust-tone` | POST | Tone Adjuster (6 modes) |
-| `/api/tools/clarify-note` | POST | Note Clarifier |
-| `/api/tools/plan` | POST | Mini-Planner |
-| `/api/memberships` | GET | All membership tiers |
-| `/api/lexicons` | GET | All lexicons |
-| `/api/lexicons/[id]` | GET | Single lexicon |
-| `/api/analytics/summary` | GET | Platform metrics |
+## Routes
 
-## Azure Deployment
+| Route | Purpose |
+| --- | --- |
+| `/` | Public MindReply site |
+| `/professionals` and `/professionals/[id]` | Professional marketplace and profiles |
+| `/book/[id]` and `/booking/[id]` | Booking flow |
+| `/bookings` | Booking list |
+| `/tools` | Tool suite |
+| `/tools/text-refiner` | Text refiner |
+| `/tools/email-polisher` | Email polisher |
+| `/tools/[slug]` | Dynamic micro-tool pages |
+| `/agent` | MR Agent page |
+| `/orchestrator` | MR-Core multi-agent operator surface |
+| `/tasks` | Autonomous production task execution surface |
+| `/login` and `/signup` | Account entry |
+| `/dashboard` and `/dashboard/analytics` | Member workspace |
+| `/admin` | Operations overview |
+| `/memberships` | Membership tiers |
+| `/lexicons` and `/lexicons/clinical-psychologist` | Professional lexicons |
+| `/case-studies`, `/subconscious`, `/premium`, `/enterprise` | Public content pages |
+| `/privacy`, `/terms`, `/ethics` | Policy pages |
 
-Automated via `.github/workflows/azure.yml` — push to `main` triggers:
-1. Docker build → push to GitHub Container Registry
-2. Deploy to Azure App Service
+## API
 
-**Required GitHub Secrets:**
+| Endpoint | Method | Purpose |
+| --- | --- | --- |
+| `/api/health` | GET | `{ status, service, timestamp, checks }` |
+| `/api/agent` | POST | MR Agent response with intent, valence, and power-distance analysis |
+| `/api/orchestrate` | GET, POST | Multi-agent orchestration across architecture, integration, research, marketing, and deployment |
+| `/api/background` | GET, POST | Bounded background reasoning loop execution |
+| `/api/tasks` | GET, POST | Bounded autonomous route, health, orchestration, reasoning, and deployment tasks |
+| `/api/professionals` | GET | Filterable professionals |
+| `/api/professionals/featured` | GET | Featured professionals |
+| `/api/professionals/[id]` | GET | Professional detail |
+| `/api/professionals/slots` | GET | Availability slots |
+| `/api/bookings` | GET, POST | List and create bookings |
+| `/api/bookings/[id]` | GET, PATCH | Booking detail and status update |
+| `/api/memberships` | GET | Membership tiers |
+| `/api/lexicons` | GET | Lexicon list |
+| `/api/lexicons/[id]` | GET | Lexicon detail |
+| `/api/analytics/summary` | GET | Dashboard metrics |
+| `/api/tools/[slug]` | POST | Text Refiner, Email Polisher, Tone Adjuster, Shortener, Expander, Professional Rewrite, Clarity Booster |
+| `/api/tools/refine-email` | POST | Backward-compatible email refinement alias |
+| `/api/tools/adjust-tone` | POST | Backward-compatible tone adjustment alias |
+| `/api/tools/clarify-note` | POST | Note clarification |
+| `/api/tools/plan` | POST | Planning assistant |
 
-| Secret | Source |
-|---|---|
-| `DATABASE_URL` | Your PostgreSQL connection string |
-| `AZURE_WEBAPP_PUBLISH_PROFILE` | Azure Portal → App Service → Get Publish Profile |
+## Database
 
-## Database Schema
-
-Four tables: `professionals`, `bookings`, `memberships`, `lexicons`
-
-Run migrations with [Drizzle Kit](https://orm.drizzle.team/docs/migrations):
 ```bash
-npx drizzle-kit push
+npm run db:push
+npm run db:generate
+npm run db:migrate
+npm run db:seed
 ```
+
+`npm run db:seed` uses fallback production data and is idempotent by table. It seeds professionals, memberships, lexicons, users, and baseline metrics. It requires `DATABASE_URL`.
+
+## Deployment
+
+- `.github/workflows/ci.yml` runs `npm ci`, `npm run typecheck`, and `npm run build`.
+- `.github/workflows/azure.yml` builds the Next.js app, pushes a Docker image to GHCR, deploys it to Azure Web App, and seeds the database.
+- The previous broad multi-provider deployment workflow has been removed to avoid unrelated secrets and automatic version bumps.
+- `scripts/azure-hardening.sh` applies Azure App Service health checks and optional Azure OpenAI, Search, and NAT hardening from environment variables.
