@@ -151,6 +151,23 @@ export const fallbackProfessionals: ProfessionalDto[] = [
     specializations: ["Positioning", "Operations", "Growth strategy"],
     yearsExperience: 15,
   },
+  {
+    id: 7,
+    name: "Amelia Brooks",
+    role: "HR Leader & Executive PA",
+    niche: "Talent communication, executive coordination, sensitive internal messaging, and leadership cadence.",
+    bio: "Amelia supports founders, chiefs of staff, and people leaders who need composed internal communication under pressure. Her work turns sensitive updates, talent decisions, and leadership requests into clear language that protects trust and momentum.",
+    rating: 4.8,
+    reviewCount: 94,
+    priceText: 90,
+    priceVoice: 145,
+    priceVideo: 205,
+    availabilityStatus: "available",
+    languages: ["English", "French"],
+    photoUrl: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=400&h=400&fit=crop",
+    specializations: ["Talent communication", "Executive coordination", "Internal messaging"],
+    yearsExperience: 13,
+  },
 ];
 
 export const fallbackMemberships: MembershipDto[] = [
