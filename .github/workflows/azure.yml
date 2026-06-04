@@ -8,6 +8,9 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: mind-reply/mindreply
+  AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
+  AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 permissions:
   contents: read
@@ -38,8 +41,6 @@ jobs:
 
       - name: Build Next.js app
         run: npm run build
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -62,14 +63,26 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Azure deployment prerequisites
+        run: |
+          if [ -z "$AZURE_WEBAPP_NAME" ] || [ -z "$AZURE_WEBAPP_PUBLISH_PROFILE" ]; then
+            echo "::notice::Azure deployment skipped because AZURE_WEBAPP_NAME or AZURE_WEBAPP_PUBLISH_PROFILE is not configured."
+          else
+            echo "Azure deployment secrets are configured."
+          fi
+
       - name: Deploy to Azure Web App
+        if: env.AZURE_WEBAPP_NAME != '' && env.AZURE_WEBAPP_PUBLISH_PROFILE != ''
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Seed database
+        if: env.AZURE_WEBAPP_NAME != '' && env.AZURE_WEBAPP_PUBLISH_PROFILE != '' && env.DATABASE_URL != ''
         run: npm run db:seed
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Database seed prerequisites
+        if: env.DATABASE_URL == ''
+        run: echo "::notice::Database seed skipped because DATABASE_URL is not configured."
