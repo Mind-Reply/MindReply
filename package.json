@@ -35,4 +35,11 @@
   "start": "next start",
   "db:seed": "ts-node --transpile-only scripts/seed.ts"
 }
-
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "db:seed": "tsx scripts/seed.ts",
+  "db:push": "drizzle-kit push",
+  "db:studio": "drizzle-kit studio"
+}
