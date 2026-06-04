@@ -7,26 +7,18 @@ on:
 
 jobs:
 
-  # ---------------------------------------------------------
-  # 1) BUILD JOB
-  # ---------------------------------------------------------
   build:
     name: Build app
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
-
       - run: npm install
       - run: npm run build
 
-  # ---------------------------------------------------------
-  # 2) DOCKER → GHCR
-  # ---------------------------------------------------------
   docker_ghcr:
     name: Docker build & push to GHCR
     runs-on: ubuntu-latest
@@ -34,19 +26,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - run: docker build -t ghcr.io/mind-reply/mindreply:latest .
       - run: docker push ghcr.io/mind-reply/mindreply:latest
 
-  # ---------------------------------------------------------
-  # 3) VPS DEPLOY (ZERO-DOWNTIME)
-  # ---------------------------------------------------------
   deploy_vps:
     name: Deploy to VPS
     runs-on: ubuntu-latest
@@ -66,9 +53,6 @@ jobs:
             docker rm mindreply || true
             docker rename mindreply_new mindreply
 
-  # ---------------------------------------------------------
-  # 4) VERCEL DEPLOY (PRIMARY)
-  # ---------------------------------------------------------
   deploy_vercel:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
@@ -76,16 +60,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - run: |
           npm i -g vercel
           vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
           vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
           vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-  # ---------------------------------------------------------
-  # 5) DOMAIN HEALTH CHECK
-  # ---------------------------------------------------------
   ping_pro_domain:
     name: Check pro.mind-reply.com
     runs-on: ubuntu-latest
@@ -94,9 +74,6 @@ jobs:
     steps:
       - run: curl -I https://pro.mind-reply.com || exit 1
 
-  # ---------------------------------------------------------
-  # 6) AZURE DEPLOY
-  # ---------------------------------------------------------
   deploy_azure:
     name: Deploy to Azure App Service
     runs-on: ubuntu-latest
@@ -105,16 +82,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: .
 
-  # ---------------------------------------------------------
-  # 7) IONOS DEPLOY NOW SYNC
-  # ---------------------------------------------------------
   ionos_sync:
     name: Sync to IONOS Deploy Now
     runs-on: ubuntu-latest
@@ -125,9 +98,6 @@ jobs:
       - run: echo "Triggering IONOS Deploy Now webhook"
       - run: curl -X POST ${{ secrets.IONOS_WEBHOOK }}
 
-  # ---------------------------------------------------------
-  # 8) LIGHTHOUSE PERFORMANCE TEST
-  # ---------------------------------------------------------
   lighthouse:
     name: Lighthouse Performance Audit
     runs-on: ubuntu-latest
@@ -139,9 +109,6 @@ jobs:
         with:
           urls: https://pro.mind-reply.com
 
-  # ---------------------------------------------------------
-  # 9) SEO ANALYSIS
-  # ---------------------------------------------------------
   seo_audit:
     name: SEO Audit
     runs-on: ubuntu-latest
@@ -150,9 +117,6 @@ jobs:
     steps:
       - run: npx @stefanjudis/seo-audit https://pro.mind-reply.com
 
-  # ---------------------------------------------------------
-  # 10) SCREENSHOT CAPTURE
-  # ---------------------------------------------------------
   screenshot:
     name: Screenshot of Production
     runs-on: ubuntu-latest
@@ -164,9 +128,6 @@ jobs:
           source: https://pro.mind-reply.com
           destination: screenshot.png
 
-  # ---------------------------------------------------------
-  # 11) VPS BACKUP
-  # ---------------------------------------------------------
   backup_vps:
     name: Backup VPS
     runs-on: ubuntu-latest
@@ -181,9 +142,6 @@ jobs:
           script: |
             tar -czf backup_$(date +%F).tar.gz /var/www || true
 
-  # ---------------------------------------------------------
-  # 12) VERSION BUMP
-  # ---------------------------------------------------------
   version_bump:
     name: Auto Version Bump
     runs-on: ubuntu-latest
@@ -195,9 +153,6 @@ jobs:
           npm version patch
           git push --follow-tags
 
-  # ---------------------------------------------------------
-  # 13) NOTIFICATIONS
-  # ---------------------------------------------------------
   notify:
     name: Notify Slack/Discord
     runs-on: ubuntu-latest
@@ -208,23 +163,3 @@ jobs:
           curl -X POST -H "Content-Type: application/json" \
           -d '{"text":"MindReply deployed successfully 🚀"}' \
           ${{ secrets.DISCORD_WEBHOOK }}
-            - name: Cache
-  uses: actions/cache@v5.0.5
-  with:
-    # A list of files, directories, and wildcard patterns to cache and restore
-    path: 
-    # An explicit key for restoring and saving the cache
-    key: 
-    # An ordered multiline string listing the prefix-matched keys, that are used for restoring stale cache if no cache hit occurred for key. Note `cache-hit` returns false in this case.
-    restore-keys: # optional
-    # The chunk size used to split up large files during upload, in bytes
-    upload-chunk-size: # optional
-    # An optional boolean when enabled, allows windows runners to save or restore caches that can be restored or saved respectively on other platforms
-    enableCrossOsArchive: # optional, default is false
-    # Fail the workflow if cache entry is not found
-    fail-on-cache-miss: # optional, default is false
-    # Check if a cache entry exists for the given input(s) (key, restore-keys) without downloading the cache
-    lookup-only: # optional, default is false
-    # Run the post step to save the cache even if another step before fails
-    save-always: # optional, default is false
-          
