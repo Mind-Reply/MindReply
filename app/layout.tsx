@@ -1,6 +1,3 @@
-// ============================================================================
-// FILE: app/layout.tsx
-// ============================================================================
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
@@ -744,43 +741,3 @@ export default function TextRefinerTool() {
     </div>
   );
 }
-
-// ============================================================================
-// FILE: app/login/page.tsx
-// ============================================================================
-import Link from "next/link";
-
-export default function LoginPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-mr-navy">
-      <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-2xl">
-        <div className="text-center mb-8">
-          <h1 className="font-serif text-2xl font-bold mb-2 text-mr-navy">Sign In to MindReply</h1>
-          <p className="text-sm text-mr-slate">Access your communication intelligence dashboard and micro-tools.</p>
-        </div>
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); window.location.href = '/'; }}>
-          <div>
-            <label className="block text-sm font-medium text-mr-slate mb-1">Email Address</label>
-            <input type="email" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-mr-gold focus:border-transparent outline-none" placeholder="you@organisation.com" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-mr-slate mb-1">Password</label>
-            <input type="password" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-mr-gold focus:border-transparent outline-none" placeholder="••••••••" />
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 text-mr-slate">
-              <input type="checkbox" className="rounded border-gray-300 text-mr-gold focus:ring-mr-gold" /> Remember me
-            </label>
-            <Link href="#" className="text-mr-gold font-medium hover:underline">Forgot password?</Link>
-          </div>
-          <button type="submit" className="w-full bg-mr-navy hover:bg-mr-accent text-white py-3 rounded-xl font-medium transition-colors mt-2">Sign In</button>
-        </form>
-        <div className="mt-6 text-center">
-          <p className="text-sm text-mr-slate">Don't have an account? <Link href="/signup" className="text-mr-gold font-medium hover:underline">Create one</Link></p>
-          <p className="text-xs text-gray-500 mt-2">By signing in, you agree to our <Link href="/privacy" className="text-mr-gold hover:underline">Confidentiality Protocol</Link>.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
