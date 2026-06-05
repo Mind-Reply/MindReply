@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { agentRosterSummary } from "@/lib/agent-roster";
 import { isOpsReportingConfigured } from "@/lib/ops-report-config";
 import { isProductionRequirementConfigured, summarizeProductionRequirements } from "@/lib/production-requirements";
+import { isSlackConfigured } from "@/lib/slack";
 
 export async function GET() {
   const siteUrlConfigured = isProductionRequirementConfigured("siteUrl");
@@ -12,6 +13,7 @@ export async function GET() {
   const bookingPaymentsConfigured = isProductionRequirementConfigured("bookingPayments");
   const analyticsConfigured = isProductionRequirementConfigured("analytics");
   const monitoringConfigured = isProductionRequirementConfigured("monitoring");
+  const slackConfigured = isSlackConfigured();
   const opsReportsConfigured = isOpsReportingConfigured();
   const azureOpenAIConfigured = isProductionRequirementConfigured("azureOpenAI");
   const agentSummary = agentRosterSummary();
@@ -32,6 +34,8 @@ export async function GET() {
     analyticsConfigured,
     monitoring: monitoringConfigured ? "configured" : "fallback",
     monitoringConfigured,
+    slack: slackConfigured ? "configured" : "fallback",
+    slackConfigured,
     opsReports: opsReportsConfigured ? "configured" : "fallback",
     opsReportsConfigured,
     siteUrl: siteUrlConfigured ? "configured" : "fallback",

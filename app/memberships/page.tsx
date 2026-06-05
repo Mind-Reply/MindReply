@@ -54,6 +54,26 @@ export default function Memberships() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-16">
+        <div className="mb-10 rounded-2xl border bg-white p-5 shadow-sm" style={{ borderColor: "hsl(40 25% 88%)" }}>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {[
+              { title: "Stripe checkout", desc: "Membership payment opens securely from each tier once live Stripe env vars are set." },
+              { title: "Fast sign-in", desc: "Email plus Google, Apple, and Facebook access appear automatically through Clerk providers." },
+              { title: "Instant delivery", desc: "Successful payment returns to the dashboard with membership access and product entitlements confirmed." },
+            ].map((item) => (
+              <div key={item.title} className="flex gap-3 rounded-xl p-3" style={{ background: "hsl(40 33% 97%)" }}>
+                <span className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" }}>
+                  <Check size={16} />
+                </span>
+                <div className="text-left">
+                  <h2 className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>{item.title}</h2>
+                  <p className="mt-1 text-xs leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => <div key={i} className="bg-white border border-[hsl(40_25%_88%)] rounded-2xl p-8 animate-pulse h-96" />)}

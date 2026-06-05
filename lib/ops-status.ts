@@ -1,6 +1,7 @@
 import { activeAgentRoster, type ActiveAgentEntry } from "@/lib/agent-roster";
 import { isOpsReportingConfigured } from "@/lib/ops-report-config";
 import { isProductionRequirementConfigured, productionRequirements } from "@/lib/production-requirements";
+import { isSlackConfigured } from "@/lib/slack";
 
 type ServiceCheck = {
   service: string;
@@ -22,6 +23,7 @@ function configuredChecks() {
     bookingPayments: isProductionRequirementConfigured("bookingPayments"),
     analytics: isProductionRequirementConfigured("analytics"),
     monitoring: isProductionRequirementConfigured("monitoring"),
+    slack: isSlackConfigured(),
     opsReports: isOpsReportingConfigured(),
     azureOpenAI: isProductionRequirementConfigured("azureOpenAI"),
   } as Record<string, boolean>;
@@ -37,6 +39,7 @@ function ownerFor(requirement: string) {
   if (requirement === "bookingPayments") return byRole(/Stripe Checkout|Webhook Delivery|Membership Activation/i);
   if (requirement === "analytics") return byRole(/Google Ads|Meta Pixel|Landing Page Conversion/i);
   if (requirement === "monitoring") return byRole(/Incident Commander|Vercel Deployment/i);
+  if (requirement === "slack") return byRole(/Incident Commander|Vercel Deployment/i);
   if (requirement === "opsReports") return byRole(/Daily Executive Reporter|Incident Commander/i);
   if (requirement === "azureOpenAI") return byRole(/MRagent Quality|Dashboard Metrics/i);
   if (requirement === "siteUrl") return byRole(/Vercel Deployment|Search Console/i);
@@ -53,7 +56,8 @@ function nextActionFor(status: ServiceCheck["status"], requirement: string) {
   if (requirement === "bookingPayments") return "Set DATABASE_URL, STRIPE_SECRET_KEY, and STRIPE_WEBHOOK_SECRET; run db:migrate; then verify a paid booking checkout.";
   if (requirement === "analytics") return "Set GTM, Google Ads, checkout conversion, and Meta Pixel IDs, then verify events.";
   if (requirement === "monitoring") return "Set SENTRY_DSN and trigger /api/monitoring/test.";
-  if (requirement === "opsReports") return "Set RESEND_API_KEY, OPS_REPORT_TO, OPS_REPORT_FROM, and CRON_SECRET; then verify /api/cron/ops-report sends twice-daily reports.";
+  if (requirement === "slack") return "Set SLACK_WEBHOOK_URL and trigger owner-authorized POST /api/slack/test.";
+  if (requirement === "opsReports") return "Set RESEND_API_KEY, OPS_REPORT_FROM, CRON_SECRET, and REVENUE_OWNER_SECRET; then verify /api/cron/ops-report sends twice-daily owner reports.";
   if (requirement === "azureOpenAI") return "Set Azure OpenAI endpoint, key, deployment, and API version.";
   return "Configure required provider environment and rerun production audit.";
 }

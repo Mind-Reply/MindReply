@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runAgent } from "@/lib/agent-engine";
 
+export async function GET() {
+  return NextResponse.json({
+    status: "ready",
+    service: "mr-agent",
+    modes: ["local-fallback", "azure-openai-when-configured"],
+    accepts: "POST { message }",
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { message, userId } = await req.json();

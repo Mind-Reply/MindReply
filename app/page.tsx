@@ -22,6 +22,14 @@ const microTools = [
   { name: "Cultural Adapter", credits: 2, desc: "Automatically adjust phrasing and indirectness for cross-cultural communication." }
 ];
 
+const launchStatus = [
+  { icon: Bot, title: "MRagent active", detail: "Floating assistant and /agent are live with browser fallback plus Azure OpenAI when configured." },
+  { icon: Shield, title: "Social login ready", detail: "Clerk renders email, Google, Apple, and Facebook access as soon as providers are enabled." },
+  { icon: Globe, title: "Auto language", detail: "Browser locale, timezone, and ?lang= links select the best language without blocking manual choice." },
+  { icon: CheckCircle2, title: "Paid delivery", detail: "Stripe checkout and booking return routes confirm access immediately after successful payment." },
+  { icon: Zap, title: "Ops alerts", detail: "Sentry and Slack readiness endpoints are deployed for owner-authorized production checks." },
+];
+
 export default function Home() {
   const [featured, setFeatured] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,6 +73,30 @@ export default function Home() {
           </div>
           </div>
           <OperationsHeroVisual />
+        </div>
+      </section>
+
+      {/* 2. Production Status */}
+      <section className="px-4 py-10 border-y" style={{ background: "hsl(218 38% 12%)", borderColor: "rgba(201,169,97,0.22)" }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col gap-3 mb-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "hsl(43 80% 60%)" }}>Production Command Layer</p>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold mt-2" style={{ color: "hsl(43 70% 88%)" }}>Visible systems now wired for launch</h2>
+            </div>
+            <Link href="/health" className="inline-flex items-center gap-2 self-start rounded-lg border px-4 py-2 text-sm font-semibold transition-colors hover:text-[hsl(43_80%_60%)]" style={{ borderColor: "rgba(248,245,240,0.2)", color: "hsl(43 70% 88%)" }}>
+              View live health <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+            {launchStatus.map((item) => (
+              <div key={item.title} className="rounded-xl border p-4" style={{ borderColor: "rgba(248,245,240,0.12)", background: "rgba(248,245,240,0.055)" }}>
+                <item.icon size={20} style={{ color: "hsl(43 80% 60%)" }} />
+                <h3 className="mt-3 text-sm font-bold" style={{ color: "hsl(43 70% 88%)" }}>{item.title}</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "rgba(248,245,240,0.68)" }}>{item.detail}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

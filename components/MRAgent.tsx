@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronRight, MessageCircle, Send, X } from "lucide-react";
+import { ChevronRight, MessageCircle, Send, Sparkles, X } from "lucide-react";
 
-type Msg = { role: "agent" | "user"; text: string };
+type Msg = { role: "agent" | "user"; text: string; source?: string };
 
 const GREET: Msg = {
   role: "agent",
@@ -18,6 +18,7 @@ export default function MRAgent() {
   const [messages, setMessages] = useState<Msg[]>([GREET]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [lastSource, setLastSource] = useState("local-ready");
 
   async function send(text: string) {
     const message = text.trim();
@@ -33,10 +34,20 @@ export default function MRAgent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message }),
       });
+      if (!response.ok) {
+        throw new Error(`MR Agent failed with ${response.status}`);
+      }
       const data = await response.json();
-      setMessages((current) => [...current, { role: "agent", text: data.reply ?? "I have the context. Clarify the desired outcome and I will shape the next move." }]);
-    } catch {
-      setMessages((current) => [...current, { role: "agent", text: "I have the context. State the desired outcome, recipient, and time sensitivity, then I will refine the communication path." }]);
+      setLastSource(data.source ?? "local");
+      setMessages((current) => [...current, { role: "agent", text: data.reply ?? "I have the context. Clarify the desired outcome and I will shape the next move.", source: data.source ?? "local" }]);
+    } catch (error) {
+      setLastSource("browser-fallback");
+      const fallback = message.toLowerCase().includes("login")
+        ? "For login, use Member Login. If Clerk is not connected yet, continue through the demo workspace while the provider keys and Google, Apple, and Facebook OAuth are configured."
+        : message.toLowerCase().includes("book") || message.toLowerCase().includes("payment")
+          ? "For booking or payment, choose a professional or membership tier. Stripe checkout opens when STRIPE_SECRET_KEY and the relevant price IDs are configured."
+          : "I am still active locally. State the desired outcome, recipient, and time sensitivity, then I will refine the communication path.";
+      setMessages((current) => [...current, { role: "agent", text: fallback, source: "browser-fallback" }]);
     } finally {
       setTyping(false);
     }
@@ -44,7 +55,7 @@ export default function MRAgent() {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center hover:opacity-90 transition-all ${open ? "hidden" : "flex"}`} style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
+      <button onClick={() => setOpen(true)} className={`fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full shadow-xl transition-all hover:opacity-90 ${open ? "hidden" : ""}`} style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }} aria-label="Open MR Agent">
         <MessageCircle size={24} />
         <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-white animate-pulse" style={{ background: "hsl(43 80% 60%)" }} />
       </button>
@@ -59,7 +70,7 @@ export default function MRAgent() {
               <div>
                 <p className="font-semibold text-sm" style={{ color: "hsl(43 70% 88%)" }}>MR Agent</p>
                 <p className="text-xs flex items-center gap-1" style={{ color: "hsl(43 80% 60%)" }}>
-                  <span className="w-1.5 h-1.5 rounded-full inline-block animate-pulse" style={{ background: "#34d399" }} /> Online
+                  <span className="w-1.5 h-1.5 rounded-full inline-block animate-pulse" style={{ background: "#34d399" }} /> Online - {lastSource}
                 </p>
               </div>
             </div>
@@ -86,14 +97,15 @@ export default function MRAgent() {
           </div>
 
           {messages.length <= 1 && (
-            <div className="px-3 pt-1 flex flex-wrap gap-1.5">
+            <div className="px-3 pt-2 flex flex-wrap gap-1.5">
               {SUGGESTIONS.map((suggestion) => (
                 <button key={suggestion} onClick={() => send(suggestion)} className="text-xs px-2.5 py-1 rounded-full border hover:border-[hsl(43_80%_60%)] hover:text-[hsl(43_80%_60%)] transition-colors" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}>{suggestion}</button>
               ))}
             </div>
           )}
 
-          <div className="px-3 py-1.5 border-t border-[hsl(40_25%_88%)] flex gap-2 text-xs">
+          <div className="px-3 py-2 border-t border-[hsl(40_25%_88%)] flex flex-wrap gap-2 text-xs">
+            <span className="flex items-center gap-1 rounded-full bg-[hsl(43_80%_60%_/_0.16)] px-2 py-1 font-semibold text-[hsl(220_55%_20%)]"><Sparkles size={11} /> Live fallback</span>
             {[["Professionals", "/professionals"], ["Tools", "/tools"], ["Membership", "/memberships"]].map(([label, href]) => (
               <Link key={href} href={href} className="flex items-center gap-0.5 text-[hsl(220_25%_45%)] hover:text-[hsl(220_55%_20%)] transition-colors">{label} <ChevronRight size={10} /></Link>
             ))}

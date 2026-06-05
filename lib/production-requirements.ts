@@ -64,6 +64,13 @@ export const productionRequirements: ProductionRequirement[] = [
     unlocks: "Production monitoring test events, alert routing, and Sentry issue verification.",
   },
   {
+    service: "Slack Ops Alerts",
+    keys: ["SLACK_WEBHOOK_URL"],
+    healthCheck: "slack",
+    publicValue: false,
+    unlocks: "Slack production notifications for MRagent, revenue, deployment, and operator incidents.",
+  },
+  {
     service: "Twice-Daily Ops Reports",
     keys: ["RESEND_API_KEY", "OPS_REPORT_FROM", "CRON_SECRET", "REVENUE_OWNER_SECRET"],
     healthCheck: "opsReports",

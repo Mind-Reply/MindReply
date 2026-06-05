@@ -155,13 +155,30 @@ function applyDocumentLanguage(language: LanguageCode) {
 }
 
 function detectBrowserLanguage(): LanguageCode {
-  const language = navigator.language.toLowerCase();
-  if (language.startsWith("fr")) return "FR";
-  if (language.startsWith("de")) return "DE";
-  if (language.startsWith("es")) return "ES";
-  if (language.startsWith("bg")) return "BG";
-  if (language.startsWith("it")) return "IT";
-  if (language.startsWith("pt")) return "PT";
+  const urlLanguage = new URLSearchParams(window.location.search).get("lang")?.toUpperCase() ?? null;
+  if (isLanguageCode(urlLanguage)) return urlLanguage;
+
+  const candidates = [
+    ...navigator.languages,
+    navigator.language,
+    Intl.DateTimeFormat().resolvedOptions().locale,
+  ].filter(Boolean).map((value) => value.toLowerCase());
+
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone.toLowerCase();
+  if (timezone.includes("sofia")) return "BG";
+  if (timezone.includes("berlin")) return "DE";
+  if (timezone.includes("paris")) return "FR";
+  if (timezone.includes("madrid")) return "ES";
+  if (timezone.includes("rome")) return "IT";
+  if (timezone.includes("lisbon")) return "PT";
+
+  const language = candidates.join(" ");
+  if (/\bfr|fr-/.test(language)) return "FR";
+  if (/\bde|de-/.test(language)) return "DE";
+  if (/\bes|es-/.test(language)) return "ES";
+  if (/\bbg|bg-/.test(language)) return "BG";
+  if (/\bit|it-/.test(language)) return "IT";
+  if (/\bpt|pt-/.test(language)) return "PT";
   return "EN";
 }
 
@@ -169,8 +186,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<LanguageCode>("EN");
 
   useEffect(() => {
+    const mode = window.localStorage.getItem("mindreply.languageMode");
     const saved = window.localStorage.getItem("mindreply.language");
-    if (isLanguageCode(saved)) {
+    if (mode === "manual" && isLanguageCode(saved)) {
       setLanguageState(saved);
       applyDocumentLanguage(saved);
       return;
@@ -178,11 +196,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const detected = detectBrowserLanguage();
     setLanguageState(detected);
     applyDocumentLanguage(detected);
+    window.localStorage.setItem("mindreply.language", detected);
+    window.localStorage.setItem("mindreply.languageMode", "auto");
   }, []);
 
   const setLanguage = (nextLanguage: LanguageCode) => {
     setLanguageState(nextLanguage);
     window.localStorage.setItem("mindreply.language", nextLanguage);
+    window.localStorage.setItem("mindreply.languageMode", "manual");
     applyDocumentLanguage(nextLanguage);
   };
 

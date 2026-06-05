@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Apple, Facebook, Mail, Search } from "lucide-react";
 
 const clerkAppearance = {
   variables: {
@@ -50,7 +51,7 @@ export function AuthShell({ children, subtitle }: { children: React.ReactNode; s
             Continue to tools, professional booking, lexicons, analytics, and executive communication workflows.
           </p>
           <div className="mt-8 grid max-w-lg gap-3 sm:grid-cols-3">
-            {["Secure access", "Private tools", "Premium network"].map((item) => (
+            {["Google ready", "Apple ready", "Facebook ready"].map((item) => (
               <div key={item} className="rounded-lg border border-white/10 bg-white/5 p-4 text-xs font-semibold text-[hsl(43_70%_88%)]">
                 {item}
               </div>
@@ -70,10 +71,26 @@ export function AuthNotConfigured({ label }: { label: string }) {
   return (
     <div className="w-full rounded-2xl border bg-white p-5 text-center shadow-2xl sm:p-8" style={{ borderColor: "rgba(201,169,97,0.22)" }}>
       <h1 className="font-serif text-2xl font-bold mb-3" style={{ color: "hsl(220 45% 13%)" }}>{label}</h1>
-      <p className="text-sm leading-relaxed mb-6" style={{ color: "hsl(220 25% 45%)" }}>
-        Authentication is not configured yet. Add Clerk publishable and secret keys to enable secure MindReply account access.
+      <p className="text-sm leading-relaxed mb-5" style={{ color: "hsl(220 25% 45%)" }}>
+        Clerk provider keys are not live yet. Google, Apple, Facebook, and email access will appear here as soon as Clerk OAuth providers are enabled in production.
       </p>
+      <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {[
+          { label: "Google", icon: <Search size={14} /> },
+          { label: "Apple", icon: <Apple size={14} /> },
+          { label: "Facebook", icon: <Facebook size={14} /> },
+          { label: "Email", icon: <Mail size={14} /> },
+        ].map((item) => (
+          <div key={item.label} className="flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-semibold" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}>
+            {item.icon}
+            {item.label}
+          </div>
+        ))}
+      </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <Link href="/dashboard" className="inline-flex justify-center rounded-lg px-5 py-3 text-sm font-semibold hover:opacity-90" style={{ background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" }}>
+          Continue Demo Workspace
+        </Link>
         <Link href="/memberships" className="inline-flex justify-center rounded-lg px-5 py-3 text-sm font-semibold hover:opacity-90" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
           View Memberships
         </Link>

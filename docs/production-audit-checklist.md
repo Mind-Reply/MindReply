@@ -37,6 +37,7 @@ Payments:
 
 Monitoring:
 - `SENTRY_DSN`
+- `SLACK_WEBHOOK_URL`
 
 Permanent ops reports:
 - `RESEND_API_KEY`
@@ -78,6 +79,7 @@ vercel env add NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL production
 vercel env add NEXT_PUBLIC_GOOGLE_ADS_CHECKOUT_CONVERSION_LABEL production
 vercel env add NEXT_PUBLIC_META_PIXEL_ID production
 vercel env add SENTRY_DSN production
+vercel env add SLACK_WEBHOOK_URL production
 vercel env add RESEND_API_KEY production
 vercel env add OPS_REPORT_FROM production
 vercel env add OPS_REPORT_SALES_TARGET production
@@ -103,9 +105,9 @@ Route availability:
 
 Production env readiness:
 - Command: `PRODUCTION_BASE_URL=https://www.mind-reply.com npm run audit:production`
-- Expected: `database`, `auth`, `stripe`, `stripeWebhook`, `analytics`, `monitoring`, `opsReports`, and `siteUrl` are `configured`.
+- Expected: `database`, `auth`, `stripe`, `stripeWebhook`, `analytics`, `monitoring`, `slack`, `opsReports`, and `siteUrl` are `configured`.
 - Until encrypted provider env vars are added, this command is expected to fail and list the fallback checks.
-- Current production status on June 5, 2026: route health is online, but `database`, `auth`, `stripe`, `stripeWebhook`, `bookingPayments`, `analytics`, `monitoring`, and `siteUrl` are still reporting `fallback` until production env vars are set in the active hosting project.
+- Current production status on June 5, 2026: route health is online, but provider-backed checks such as `database`, `auth`, `stripe`, `stripeWebhook`, `bookingPayments`, `analytics`, `monitoring`, `slack`, and `siteUrl` report `fallback` until production env vars are set in the active hosting project.
 - Requirements API: `https://www.mind-reply.com/api/config/requirements`
 - Health API includes a `requirements` array that maps each fallback service to exact env var names and what that service unlocks.
 - Entitlement API: `https://www.mind-reply.com/api/entitlements` returns the tier delivery catalog that checkout verification and Stripe webhooks use for product access.
@@ -162,17 +164,37 @@ Checkout event:
    - `/dashboard`
 4. Test login, logout, refresh, and direct navigation to `/dashboard`.
 5. Add admin Clerk user IDs to `ADMIN_CLERK_IDS`.
+6. Enable social providers in Clerk:
+   - Google OAuth.
+   - Apple Sign in.
+   - Facebook Login.
+7. Confirm each social provider redirects back to `/dashboard` after signup and sign-in.
 
 ## Sentry Verification
 
 1. Add `SENTRY_DSN` to Vercel production env.
-2. Redeploy.
-3. Sign in as an authorized operator and send `POST https://www.mind-reply.com/api/monitoring/test`.
-4. Confirm a `MindReply production monitoring test` event appears in Sentry.
-5. Add alert rules:
+2. If official Sentry Next.js instrumentation is needed, run this locally in the repo root after Sentry auth is available:
+
+```bash
+npx @sentry/wizard@latest -i nextjs --saas --org mind-reply --project mind-reply
+```
+
+3. Redeploy.
+4. Sign in as an authorized operator and send `POST https://www.mind-reply.com/api/monitoring/test`.
+5. Confirm a `MindReply production monitoring test` event appears in Sentry.
+6. Add alert rules:
    - High error rate.
    - New issue in production.
    - Deployment failure notification through Vercel or GitHub Actions.
+
+## Slack Verification
+
+1. Revoke any Slack token pasted into chat or logs.
+2. Create a Slack incoming webhook for the private MindReply ops channel.
+3. Add only the webhook URL to `SLACK_WEBHOOK_URL` in Vercel production env.
+4. Redeploy.
+5. Send owner-authorized `POST https://www.mind-reply.com/api/slack/test`.
+6. Confirm the Slack channel receives the MindReply test notification.
 
 ## SEO Verification
 
