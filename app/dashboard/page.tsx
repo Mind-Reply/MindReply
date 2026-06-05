@@ -17,6 +17,7 @@ export default function UserDashboard() {
     { href: "/tools/email-polisher", title: "Email Polisher", body: "Transform drafts to executive-grade." },
     { href: "/dashboard/analytics", title: "Behavioral Analytics", body: "View communication impact scores." },
     { href: "/lexicons", title: "Specialist Lexicons", body: "Choose words that lower resistance." },
+    { href: "/integrations", title: "Pro Integrations", body: "Connect Slack, Gmail, and Notion." },
     { href: "/orchestrator", title: "MR-Core Orchestrator", body: "Coordinate autonomous execution agents." },
   ];
 

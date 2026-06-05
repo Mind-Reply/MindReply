@@ -19,6 +19,7 @@ type TranslationKey =
   | "tools"
   | "membership"
   | "lexicons"
+  | "integrations"
   | "intelligence"
   | "language"
   | "myBookings"
@@ -35,6 +36,7 @@ const dictionary: Record<LanguageCode, Record<TranslationKey, string>> = {
     tools: "Tools",
     membership: "Membership",
     lexicons: "Lexicons",
+    integrations: "Integrations",
     intelligence: "Intelligence",
     language: "Language",
     myBookings: "My Bookings",
@@ -50,6 +52,7 @@ const dictionary: Record<LanguageCode, Record<TranslationKey, string>> = {
     tools: "Outils",
     membership: "Adhesion",
     lexicons: "Lexiques",
+    integrations: "Integrations",
     intelligence: "Intelligence",
     language: "Langue",
     myBookings: "Mes reservations",
@@ -65,6 +68,7 @@ const dictionary: Record<LanguageCode, Record<TranslationKey, string>> = {
     tools: "Werkzeuge",
     membership: "Mitgliedschaft",
     lexicons: "Lexika",
+    integrations: "Integrationen",
     intelligence: "Intelligenz",
     language: "Sprache",
     myBookings: "Meine Buchungen",
@@ -80,6 +84,7 @@ const dictionary: Record<LanguageCode, Record<TranslationKey, string>> = {
     tools: "Herramientas",
     membership: "Membresia",
     lexicons: "Lexicos",
+    integrations: "Integraciones",
     intelligence: "Inteligencia",
     language: "Idioma",
     myBookings: "Mis reservas",
@@ -95,6 +100,7 @@ const dictionary: Record<LanguageCode, Record<TranslationKey, string>> = {
     tools: "Instrumenti",
     membership: "Chlenstvo",
     lexicons: "Leksikoni",
+    integrations: "Integracii",
     intelligence: "Inteligentnost",
     language: "Ezik",
     myBookings: "Moite rezervacii",
@@ -110,6 +116,7 @@ const dictionary: Record<LanguageCode, Record<TranslationKey, string>> = {
     tools: "Strumenti",
     membership: "Membership",
     lexicons: "Lessici",
+    integrations: "Integrazioni",
     intelligence: "Intelligenza",
     language: "Lingua",
     myBookings: "Prenotazioni",
@@ -125,6 +132,7 @@ const dictionary: Record<LanguageCode, Record<TranslationKey, string>> = {
     tools: "Ferramentas",
     membership: "Assinatura",
     lexicons: "Lexicos",
+    integrations: "Integracoes",
     intelligence: "Inteligencia",
     language: "Idioma",
     myBookings: "Reservas",
