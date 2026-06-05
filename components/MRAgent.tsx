@@ -8,10 +8,10 @@ type Msg = { role: "agent" | "user"; text: string; source?: string };
 
 const GREET: Msg = {
   role: "agent",
-  text: "Good day. I am MR Agent, your behavioral intelligence concierge. How can I assist you today?",
+  text: "Hi, I am MRagent. Ask me anything - a message, a decision, a booking, credits, or which plan fits your work. I will keep it practical and point you to the fastest useful next step.",
 };
 
-const SUGGESTIONS = ["Find me a communication coach", "What tools do you offer?", "Tell me about membership", "Book a legal consultation"];
+const SUGGESTIONS = ["Help me buy credits", "Book a video session", "Which plan should I choose?", "Can we talk about another topic?"];
 
 export default function MRAgent() {
   const [open, setOpen] = useState(false);
@@ -43,10 +43,10 @@ export default function MRAgent() {
     } catch (error) {
       setLastSource("browser-fallback");
       const fallback = message.toLowerCase().includes("login")
-        ? "For login, use Member Login. If Clerk is not connected yet, continue through the demo workspace while the provider keys and Google, Apple, and Facebook OAuth are configured."
+        ? "For login, use Member Login or Sign Up. Google, Apple, Facebook, and email appear through Clerk when production OAuth is enabled. You can still enter the demo workspace now."
         : message.toLowerCase().includes("book") || message.toLowerCase().includes("payment")
-          ? "For booking or payment, choose a professional or membership tier. Stripe checkout opens when STRIPE_SECRET_KEY and the relevant price IDs are configured."
-          : "I am still active locally. State the desired outcome, recipient, and time sensitivity, then I will refine the communication path.";
+          ? "For booking or payment, choose a professional, buy credits, or upgrade to Growth/Pro. Once Stripe is configured, checkout confirms access and opens the right dashboard or session room immediately."
+          : "I am still active locally. Ask me about the situation in plain language. If there is a paid path that will genuinely save time, I will make it clear without pushing.";
       setMessages((current) => [...current, { role: "agent", text: fallback, source: "browser-fallback" }]);
     } finally {
       setTyping(false);
@@ -68,7 +68,7 @@ export default function MRAgent() {
                 <span className="font-serif font-bold text-sm" style={{ color: "hsl(43 80% 60%)" }}>MR</span>
               </div>
               <div>
-                <p className="font-semibold text-sm" style={{ color: "hsl(43 70% 88%)" }}>MR Agent</p>
+                <p className="font-semibold text-sm" style={{ color: "hsl(43 70% 88%)" }}>MRagent</p>
                 <p className="text-xs flex items-center gap-1" style={{ color: "hsl(43 80% 60%)" }}>
                   <span className="w-1.5 h-1.5 rounded-full inline-block animate-pulse" style={{ background: "#34d399" }} /> Online - {lastSource}
                 </p>
@@ -113,7 +113,7 @@ export default function MRAgent() {
 
           <div className="p-3 border-t border-[hsl(40_25%_88%)]">
             <div className="flex gap-2">
-              <input value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => event.key === "Enter" && send(input)} placeholder="Ask MR Agent..." className="flex-1 text-sm rounded-lg px-3 py-2 outline-none border border-[hsl(40_25%_88%)] focus:border-[hsl(43_80%_60%)] transition-colors" style={{ background: "hsl(40 20% 92%)" }} />
+              <input value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => event.key === "Enter" && send(input)} placeholder="Ask MRagent anything..." className="flex-1 text-sm rounded-lg px-3 py-2 outline-none border border-[hsl(40_25%_88%)] focus:border-[hsl(43_80%_60%)] transition-colors" style={{ background: "hsl(40 20% 92%)" }} />
               <button onClick={() => send(input)} disabled={!input.trim() || typing} className="px-3 py-2 rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
                 <Send size={15} />
               </button>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bot, Send, Sparkles } from "lucide-react";
+import { Bot, CalendarDays, CreditCard, Send, Sparkles, TrendingUp } from "lucide-react";
 
 type Message = { role: "agent" | "user"; text: string };
 type AgentAnalysis = {
@@ -14,8 +14,14 @@ type AgentAnalysis = {
 
 const starter: Message = {
   role: "agent",
-  text: "I am MR Agent. Share the outcome you need, the audience, and the draft you are working with. I will shape it into clear professional communication.",
+  text: "Hi, I am MRagent. Ask me anything - a message, decision, booking, credits, or plan choice. I will answer naturally and show the fastest useful next step.",
 };
+
+const quickPrompts = [
+  { icon: CreditCard, label: "Buy credits", prompt: "I want to buy credits for the tools. Which pack should I use?" },
+  { icon: CalendarDays, label: "Book video", prompt: "I need to book a video session with the right professional. What is the best route?" },
+  { icon: TrendingUp, label: "Pick plan", prompt: "Should I use Signal, Growth, or Pro for daily work?" },
+];
 
 export default function AgentPage() {
   const [messages, setMessages] = useState<Message[]>([starter]);
@@ -23,8 +29,8 @@ export default function AgentPage() {
   const [analysis, setAnalysis] = useState<AgentAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function send() {
-    const text = input.trim();
+  async function sendText(rawText: string) {
+    const text = rawText.trim();
     if (!text || loading) return;
 
     setMessages((current) => [...current, { role: "user", text }]);
@@ -45,13 +51,17 @@ export default function AgentPage() {
     }
   }
 
+  async function send() {
+    await sendText(input);
+  }
+
   return (
     <main className="pt-20 min-h-screen" style={{ background: "hsl(40 33% 97%)" }}>
       <section className="py-14 px-4" style={{ background: "hsl(220 55% 20%)" }}>
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "hsl(43 80% 60%)" }}>MR Agent</p>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-3" style={{ color: "hsl(43 70% 88%)" }}>Communication Intelligence Assistant</h1>
-          <p className="text-sm max-w-2xl leading-relaxed" style={{ color: "rgba(248,245,240,0.72)" }}>Draft, refine, and structure high-stakes messages with subconscious analysis, power-distance awareness, and clear behavioral intent.</p>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "hsl(43 80% 60%)" }}>MRagent</p>
+          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-3" style={{ color: "hsl(43 70% 88%)" }}>Human-feeling sales and communication assistant</h1>
+          <p className="text-sm max-w-2xl leading-relaxed" style={{ color: "rgba(248,245,240,0.72)" }}>Ask broad questions, refine sensitive messages, book professionals, buy credits, or choose the right Signal, Growth, or Pro path without losing momentum.</p>
         </div>
       </section>
 
@@ -62,11 +72,26 @@ export default function AgentPage() {
               <div className="flex items-center gap-3">
                 <span className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}><Bot size={20} /></span>
                 <div>
-                  <p className="font-semibold text-sm" style={{ color: "hsl(220 45% 13%)" }}>MR Agent</p>
-                  <p className="text-xs" style={{ color: "hsl(220 25% 45%)" }}>Online with production fallback intelligence</p>
+                  <p className="font-semibold text-sm" style={{ color: "hsl(220 45% 13%)" }}>MRagent</p>
+                  <p className="text-xs" style={{ color: "hsl(220 25% 45%)" }}>Online for chat, credits, bookings, and plan routing</p>
                 </div>
               </div>
               <Link href="/professionals" className="hidden sm:inline-flex text-xs font-semibold px-3 py-2 rounded-lg border" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 55% 20%)" }}>Find a professional</Link>
+            </div>
+            <div className="flex flex-wrap gap-2 border-b px-5 py-3" style={{ borderColor: "hsl(40 25% 88%)" }}>
+              {quickPrompts.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => sendText(item.prompt)}
+                  disabled={loading}
+                  className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition hover:border-[hsl(43_80%_60%)] disabled:opacity-50"
+                  style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}
+                >
+                  <item.icon size={13} />
+                  {item.label}
+                </button>
+              ))}
             </div>
 
             <div className="h-[460px] overflow-y-auto p-5 space-y-4" style={{ background: "hsl(40 20% 96%)" }}>
@@ -77,12 +102,12 @@ export default function AgentPage() {
                   </div>
                 </div>
               ))}
-              {loading && <div className="text-sm" style={{ color: "hsl(220 25% 45%)" }}>MR Agent is analyzing intent, valence, and power distance...</div>}
+              {loading && <div className="text-sm" style={{ color: "hsl(220 25% 45%)" }}>MRagent is thinking through the useful next step...</div>}
             </div>
 
             <div className="p-4 border-t" style={{ borderColor: "hsl(40 25% 88%)" }}>
               <div className="flex gap-2">
-                <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Ask for help with an email, booking, or message..." className="flex-1 rounded-lg border px-3 py-3 text-sm outline-none focus:border-[hsl(43_80%_60%)]" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }} />
+                <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Ask about anything - messages, credits, bookings, plans..." className="flex-1 rounded-lg border px-3 py-3 text-sm outline-none focus:border-[hsl(43_80%_60%)]" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }} />
                 <button onClick={send} disabled={loading || !input.trim()} className="px-4 rounded-lg flex items-center gap-2 text-sm font-semibold hover:opacity-90 disabled:opacity-40" style={{ background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" }}><Send size={16} /> Send</button>
               </div>
             </div>
@@ -112,7 +137,7 @@ export default function AgentPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>Send a message to surface intent, emotional valence, power distance, and the communication framework.</p>
+              <p className="text-sm leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>Send a message to surface intent, emotional valence, power distance, and the best paid or free route when it helps.</p>
             )}
           </aside>
         </div>

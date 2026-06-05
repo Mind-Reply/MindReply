@@ -85,7 +85,7 @@ export default function Home() {
             Subconscious Communication <span className="italic" style={{ color: "hsl(43 80% 60%)" }}>Intelligence</span>
           </h1>
           <p className="text-lg md:text-xl max-w-3xl mx-auto lg:mx-0 mb-10 leading-relaxed" style={{ color: "rgba(248,245,240,0.75)" }}>
-            MindReply empowers professionals with behavioral intelligence for email composition, expression refinement, and strategic dialogue—curated for psychologists, legal counsel, financial advisors, and C-suite executives worldwide.
+            MindReply empowers professionals with behavioral intelligence for email composition, expression refinement, and strategic dialogue - curated for psychologists, legal counsel, financial advisors, and C-suite executives worldwide.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link href="/agent" className="inline-flex items-center justify-center gap-2 font-semibold px-8 py-4 rounded-lg hover:opacity-90 transition-all shadow-lg" style={{ background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" }}>
@@ -137,21 +137,21 @@ export default function Home() {
             </div>
             <div>
               <p className="font-semibold" style={{ color: "hsl(43 70% 88%)" }}>MRagent</p>
-              <p className="text-xs" style={{ color: "rgba(248,245,240,0.6)" }}>Online • Subconscious Intelligence Active • Credits: 5</p>
+              <p className="text-xs" style={{ color: "rgba(248,245,240,0.6)" }}>Online - human-feeling guidance - Credits: 5</p>
             </div>
           </div>
           <div className="space-y-4">
             <div className="max-w-[85%] p-4 rounded-2xl rounded-tl-none text-sm leading-relaxed" style={{ background: "rgba(248,245,240,0.1)", color: "hsl(43 70% 88%)" }}>
-              Good afternoon. I am MRagent, your executive communication intelligence partner. I observe you seek to refine professional correspondence with subconscious behavioral precision. How may I assist your communication objectives today?
+              Hi, I am MRagent. Ask me about the message, the decision, or the outcome you need. I will keep it calm, practical, and point you to the fastest useful path.
             </div>
             <div className="max-w-[85%] ml-auto p-4 rounded-2xl rounded-tr-none text-sm leading-relaxed" style={{ background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" }}>
               I need to send a sensitive email to my team about restructuring. How should I phrase it?
             </div>
             <div className="max-w-[85%] p-4 rounded-2xl rounded-tl-none text-sm leading-relaxed" style={{ background: "rgba(248,245,240,0.1)", color: "hsl(43 70% 88%)" }}>
-              An exquisite question. For restructuring communications, I recommend a framework of transparent intention, empathetic validation, and future-oriented reassurance. Would you like me to refine a draft with these principles?
+              Use a clear structure: name what is changing, protect what is stable, and give the team the next step. If this is sensitive, use credits for the draft and book a professional review before sending.
             </div>
           </div>
-          <p className="text-[10px] text-center mt-6" style={{ color: "rgba(248,245,240,0.4)" }}>MRagent learns from your preferences • Subconscious behavior analysis active</p>
+          <p className="text-[10px] text-center mt-6" style={{ color: "rgba(248,245,240,0.4)" }}>MRagent keeps the conversation human while guiding users toward useful paid outcomes</p>
         </div>
       </section>
 

@@ -139,7 +139,9 @@ const dictionary: Record<LanguageCode, Record<TranslationKey, string>> = {
 
 type LanguageContextValue = {
   language: LanguageCode;
+  languageMode: "auto" | "manual";
   setLanguage: (language: LanguageCode) => void;
+  resetLanguage: () => void;
   t: (key: TranslationKey) => string;
 };
 
@@ -184,17 +186,20 @@ function detectBrowserLanguage(): LanguageCode {
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<LanguageCode>("EN");
+  const [languageMode, setLanguageMode] = useState<"auto" | "manual">("auto");
 
   useEffect(() => {
     const mode = window.localStorage.getItem("mindreply.languageMode");
     const saved = window.localStorage.getItem("mindreply.language");
     if (mode === "manual" && isLanguageCode(saved)) {
       setLanguageState(saved);
+      setLanguageMode("manual");
       applyDocumentLanguage(saved);
       return;
     }
     const detected = detectBrowserLanguage();
     setLanguageState(detected);
+    setLanguageMode("auto");
     applyDocumentLanguage(detected);
     window.localStorage.setItem("mindreply.language", detected);
     window.localStorage.setItem("mindreply.languageMode", "auto");
@@ -202,16 +207,28 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const setLanguage = (nextLanguage: LanguageCode) => {
     setLanguageState(nextLanguage);
+    setLanguageMode("manual");
     window.localStorage.setItem("mindreply.language", nextLanguage);
     window.localStorage.setItem("mindreply.languageMode", "manual");
     applyDocumentLanguage(nextLanguage);
   };
 
+  const resetLanguage = () => {
+    const detected = detectBrowserLanguage();
+    setLanguageState(detected);
+    setLanguageMode("auto");
+    window.localStorage.setItem("mindreply.language", detected);
+    window.localStorage.setItem("mindreply.languageMode", "auto");
+    applyDocumentLanguage(detected);
+  };
+
   const value = useMemo<LanguageContextValue>(() => ({
     language,
+    languageMode,
     setLanguage,
+    resetLanguage,
     t: (key) => dictionary[language][key] ?? dictionary.EN[key],
-  }), [language]);
+  }), [language, languageMode]);
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
