@@ -67,3 +67,5 @@ Operators use:
 - `docs/production-runbook.md`
 - `docs/production-audit-checklist.md`
 - `docs/background-agent-hiring-brief.md`
+- `docs/revenue-agent-additional-instructions.md`
+- `docs/blackbox-growth-operator-prompt.md`
