@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Activity, BrainCircuit, Copy, Network, Play } from "lucide-react";
 
 type OrchestrationResult = {
@@ -24,6 +25,14 @@ type ActiveAgentStatus = {
   totalActiveAgents: number;
   byLane: Record<string, number>;
   accelerationTarget: string;
+  acceleration?: {
+    mode: string;
+    multiplier: number;
+    command: string;
+    target: string;
+    directActions: Array<{ label: string; href: string; owner: string; outcome: string }>;
+    laneObjectives: Array<{ lane: string; priority: string; targetMinutes: number; directive: string }>;
+  };
 };
 
 export default function OrchestratorPage() {
@@ -98,6 +107,42 @@ export default function OrchestratorPage() {
         <div className="mb-6 rounded-2xl border p-5" style={{ borderColor: "rgba(201,169,97,0.35)", background: "hsl(43 80% 60% / 0.12)" }}>
           <p className="text-sm font-semibold" style={{ color: "hsl(220 45% 13%)" }}>{agentStatus?.accelerationTarget ?? "82x faster triage through visible owner, evidence, and handoff routing."}</p>
         </div>
+
+        <section className="mb-6 rounded-2xl border bg-white p-5" style={{ borderColor: "hsl(40 25% 88%)" }}>
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(43 80% 45%)" }}>Acceleration Command</p>
+              <h2 className="mt-1 font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>{agentStatus?.acceleration?.mode ?? "x66 acceleration"}</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>
+                {agentStatus?.acceleration?.command ?? "Collapse observation to action: every desk must report owner, route, evidence, and next revenue move."}
+              </p>
+            </div>
+            <div className="rounded-2xl px-5 py-4 text-center" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-widest">Mode</p>
+              <p className="font-serif text-4xl font-bold">x{agentStatus?.acceleration?.multiplier ?? 66}</p>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-4">
+            {(agentStatus?.acceleration?.laneObjectives ?? []).map((item) => (
+              <div key={item.lane} className="rounded-xl border p-4" style={{ borderColor: "hsl(40 25% 88%)" }}>
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(43 80% 45%)" }}>{item.lane} - {item.priority}</p>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>{item.directive}</p>
+                <p className="mt-3 text-xs font-semibold" style={{ color: "hsl(220 45% 13%)" }}>Target: {item.targetMinutes} min</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {(agentStatus?.acceleration?.directActions ?? []).map((action) => (
+              <Link key={action.href} href={action.href} className="rounded-xl border p-4 transition hover:-translate-y-0.5 hover:border-[hsl(43_80%_60%)]" style={{ borderColor: "hsl(40 25% 88%)" }}>
+                <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>{action.label}</p>
+                <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide" style={{ color: "hsl(43 80% 38%)" }}>{action.owner}</p>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>{action.outcome}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <div className="bg-white border rounded-2xl p-6 mb-6" style={{ borderColor: "hsl(40 25% 88%)" }}>
           <label className="text-xs font-bold uppercase tracking-wider mb-2 block" style={{ color: "hsl(220 25% 45%)" }}>Objective</label>
