@@ -1,7 +1,8 @@
-import { Activity, Briefcase, CheckCircle2, Database, Network, PencilRuler, Shield, Users } from "lucide-react";
+import { Activity, Briefcase, CheckCircle2, Database, GraduationCap, Mail, Network, PencilRuler, Shield, Target, Users } from "lucide-react";
 import Link from "next/link";
 import { isAdminUser, isClerkConfigured } from "@/lib/admin";
 import { agentRosterSummary } from "@/lib/agent-roster";
+import { getPermanentOpsCommand } from "@/lib/permanent-ops-command";
 
 function AccessDenied() {
   return (
@@ -24,6 +25,9 @@ export default async function AdminPage() {
   }
 
   const agentSummary = agentRosterSummary();
+  const permanentOps = await getPermanentOpsCommand();
+  const salesToday = permanentOps.revenueTarget.todaySales ?? "Unmeasured";
+  const firstWeekGap = permanentOps.revenueTarget.firstWeekGap ?? "Unmeasured";
 
   const stats = [
     { label: "Members", value: "1,240", icon: <Users size={18} /> },
@@ -31,6 +35,7 @@ export default async function AdminPage() {
     { label: "Open Bookings", value: "18", icon: <Activity size={18} /> },
     { label: "Orchestrator", value: "Ready", icon: <Network size={18} /> },
     { label: "Agent Roles", value: String(agentSummary.totalRoles), icon: <Shield size={18} /> },
+    { label: "Sales Today", value: String(salesToday), icon: <Target size={18} /> },
   ];
 
   const members = [
@@ -74,7 +79,7 @@ export default async function AdminPage() {
           <Link href="/api/health" className="inline-flex px-4 py-2 rounded-lg text-sm font-semibold border" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 55% 20%)" }}>View Health JSON</Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           {stats.map((stat) => (
             <article key={stat.label} className="bg-white border rounded-xl p-5" style={{ borderColor: "hsl(40 25% 88%)" }}>
               <div className="flex items-center justify-between mb-3">
@@ -85,6 +90,79 @@ export default async function AdminPage() {
             </article>
           ))}
         </div>
+
+        <section className="mb-8 overflow-hidden rounded-xl border bg-white" style={{ borderColor: "hsl(40 25% 88%)" }}>
+          <div className="grid gap-0 lg:grid-cols-[1fr_0.95fr]">
+            <div className="border-b p-5 lg:border-b-0 lg:border-r" style={{ borderColor: "hsl(40 25% 88%)" }}>
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "hsl(43 80% 45%)" }}>Permanent Ops</p>
+                  <h2 className="font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>Agent Command Center</h2>
+                </div>
+                <GraduationCap size={21} style={{ color: "hsl(43 80% 45%)" }} />
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {[
+                  { label: "Permanent roles", value: permanentOps.staffing.totalPermanentRoles },
+                  { label: "Active desks", value: permanentOps.staffing.activeAutomationDesks },
+                  { label: "Hiring gap", value: permanentOps.staffing.departmentPlan.reduce((sum, item) => sum + item.hiringGap, 0) },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-xl border p-4" style={{ borderColor: "hsl(40 25% 88%)" }}>
+                    <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "hsl(220 25% 45%)" }}>{item.label}</p>
+                    <p className="mt-2 font-serif text-3xl font-bold" style={{ color: "hsl(220 55% 20%)" }}>{item.value}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 grid gap-2">
+                {permanentOps.staffing.departmentPlan.slice(0, 6).map((department) => (
+                  <div key={department.name} className="grid gap-2 rounded-xl border px-4 py-3 text-sm sm:grid-cols-[0.9fr_0.45fr_1.2fr]" style={{ borderColor: "hsl(40 25% 88%)" }}>
+                    <strong style={{ color: "hsl(220 45% 13%)" }}>{department.name}</strong>
+                    <span style={{ color: "hsl(43 80% 38%)" }}>{department.activeNow}/{department.targetRoles}</span>
+                    <span style={{ color: "hsl(220 25% 45%)" }}>{department.recruiterAction}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <aside className="p-5">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "hsl(43 80% 45%)" }}>Revenue Watch</p>
+                  <h2 className="font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>10 Sales / Day Observer</h2>
+                </div>
+                <Mail size={21} style={{ color: "hsl(43 80% 45%)" }} />
+              </div>
+              <div className="rounded-xl border p-4" style={{ borderColor: "hsl(40 25% 88%)", background: "hsl(40 33% 97%)" }}>
+                <p className="text-sm" style={{ color: "hsl(220 25% 45%)" }}>Reports go to</p>
+                <p className="mt-1 break-all font-semibold" style={{ color: "hsl(220 45% 13%)" }}>{permanentOps.reportRecipient}</p>
+                <p className="mt-3 text-sm" style={{ color: "hsl(220 25% 45%)" }}>Cadence</p>
+                <p className="mt-1 font-semibold" style={{ color: "hsl(220 45% 13%)" }}>{permanentOps.reportCadence}</p>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border p-4" style={{ borderColor: "hsl(40 25% 88%)" }}>
+                  <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "hsl(220 25% 45%)" }}>Today</p>
+                  <p className="mt-2 font-serif text-3xl font-bold" style={{ color: "hsl(220 55% 20%)" }}>{salesToday}</p>
+                </div>
+                <div className="rounded-xl border p-4" style={{ borderColor: "hsl(40 25% 88%)" }}>
+                  <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "hsl(220 25% 45%)" }}>Week gap</p>
+                  <p className="mt-2 font-serif text-3xl font-bold" style={{ color: "hsl(220 55% 20%)" }}>{firstWeekGap}</p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {[
+                  { href: "/api/ops/report", label: "Ops report" },
+                  { href: "/api/revenue/observer", label: "Revenue observer" },
+                  { href: "/api/agents/permanent", label: "Permanent agents" },
+                  { href: "/api/agents/learning", label: "Learning loop" },
+                ].map((item) => (
+                  <Link key={item.href} href={item.href} className="rounded-lg border px-3 py-2 text-center text-xs font-semibold" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 55% 20%)" }}>
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </aside>
+          </div>
+        </section>
 
         <div className="bg-white border rounded-xl overflow-hidden" style={{ borderColor: "hsl(40 25% 88%)" }}>
           <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(40 25% 88%)" }}>
@@ -172,6 +250,10 @@ export default async function AdminPage() {
             { title: "Ops Status", href: "/api/ops/status", body: "Inspect provider readiness, fallback services, and active-agent ownership." },
             { title: "30 Active Agents", href: "/api/agents/active", body: "Inspect active acceleration desks for production, growth, trust, and intelligence." },
             { title: "60-Role Roster", href: "/api/agents/roster", body: "Inspect the permanent operator and professional-desk staffing map." },
+            { title: "Permanent Ops", href: "/api/agents/permanent", body: "Inspect hiring backlog, learning cadence, satisfaction guardrails, and sales target ownership." },
+            { title: "Learning Loop", href: "/api/agents/learning", body: "Inspect the permanent-agent learning modules and secure handoff recording contract." },
+            { title: "Revenue Observer", href: "/api/revenue/observer", body: "Inspect the 10-sales/day and first-week sales target observer." },
+            { title: "Ops Report", href: "/api/ops/report", body: "Preview the twice-daily executive email report sent after provider env setup." },
             { title: "Growth Engine", href: "/api/growth/plan", body: "Inspect market expansion, visitor growth, ads, and conversion actions." },
             { title: "Env Requirements", href: "/api/config/requirements", body: "Inspect required production provider variables and what each service unlocks." },
             { title: "Entitlements", href: "/api/entitlements", body: "Inspect membership tier delivery, credits, access level, and fulfillment products." },

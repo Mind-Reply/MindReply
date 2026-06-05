@@ -1,12 +1,11 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { isRevenueOwnerAuthorized } from "@/lib/owner-auth";
-import { getRevenueObservation } from "@/lib/revenue-observer";
+import { getPermanentOpsCommand } from "@/lib/permanent-ops-command";
 
 export async function GET(req: NextRequest) {
   if (!isRevenueOwnerAuthorized(req)) {
     return NextResponse.json({ error: "Owner authorization required" }, { status: 401 });
   }
 
-  return NextResponse.json(await getRevenueObservation());
+  return NextResponse.json(await getPermanentOpsCommand());
 }

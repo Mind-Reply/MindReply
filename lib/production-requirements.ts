@@ -65,7 +65,7 @@ export const productionRequirements: ProductionRequirement[] = [
   },
   {
     service: "Twice-Daily Ops Reports",
-    keys: ["RESEND_API_KEY", "OPS_REPORT_TO", "OPS_REPORT_FROM", "CRON_SECRET"],
+    keys: ["RESEND_API_KEY", "OPS_REPORT_FROM", "CRON_SECRET", "REVENUE_OWNER_SECRET"],
     healthCheck: "opsReports",
     publicValue: false,
     unlocks: "Permanent-agent reporting, 10-sales/day observer emails, recruiter handoffs, and twice-daily executive updates.",

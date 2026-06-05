@@ -40,11 +40,11 @@ Monitoring:
 
 Permanent ops reports:
 - `RESEND_API_KEY`
-- `OPS_REPORT_TO=angelllkr@gmail.com`
 - `OPS_REPORT_FROM`
 - `OPS_REPORT_SALES_TARGET=10`
 - `OPS_REVENUE_WEEK_START`
 - `CRON_SECRET`
+- `REVENUE_OWNER_SECRET`
 - `AZURE_OPS_REPORT_WEBHOOK_URL` optional
 - `AZURE_OPS_REPORT_WEBHOOK_KEY` optional
 
@@ -79,11 +79,11 @@ vercel env add NEXT_PUBLIC_GOOGLE_ADS_CHECKOUT_CONVERSION_LABEL production
 vercel env add NEXT_PUBLIC_META_PIXEL_ID production
 vercel env add SENTRY_DSN production
 vercel env add RESEND_API_KEY production
-vercel env add OPS_REPORT_TO production
 vercel env add OPS_REPORT_FROM production
 vercel env add OPS_REPORT_SALES_TARGET production
 vercel env add OPS_REVENUE_WEEK_START production
 vercel env add CRON_SECRET production
+vercel env add REVENUE_OWNER_SECRET production
 vercel env add AZURE_OPENAI_ENDPOINT production
 vercel env add AZURE_OPENAI_API_KEY production
 vercel env add AZURE_OPENAI_DEPLOYMENT production
@@ -111,8 +111,8 @@ Production env readiness:
 - Entitlement API: `https://www.mind-reply.com/api/entitlements` returns the tier delivery catalog that checkout verification and Stripe webhooks use for product access.
 - Intelligence API: `https://www.mind-reply.com/api/intelligence/analyze` reports readiness for MR intent, emotional-valence, power-distance, clarity, and persuasion-frame analysis. POST `{ "text": "..." }` to receive the full analysis payload.
 - Ops Status API: `https://www.mind-reply.com/api/ops/status` maps each configured/fallback provider service to the active owner, required env var names, and next production action.
-- Ops Report API: `https://www.mind-reply.com/api/ops/report` previews the twice-daily report sent to `angelllkr@gmail.com`.
-- Revenue Observer API: `https://www.mind-reply.com/api/revenue/observer` tracks the 10-sales/day target and first-week sales gap.
+- Ops Report API: `https://www.mind-reply.com/api/ops/report` previews the owner-only twice-daily report sent to `angelllkr@gmail.com`; requires `Bearer REVENUE_OWNER_SECRET`.
+- Revenue Observer API: `https://www.mind-reply.com/api/revenue/observer` tracks the owner-only 10-sales/day target, first-week sales gap, and forecast; requires `Bearer REVENUE_OWNER_SECRET`.
 - Booking checkout API: `https://www.mind-reply.com/api/checkout/booking-session` verifies paid professional-session checkout returns. Run `npm run db:migrate` after deploy so `bookings.payment_status`, `bookings.stripe_session_id`, and `bookings.stripe_payment_intent_id` exist before enabling live booking checkout.
 
 ## Analytics Verification

@@ -14,6 +14,11 @@ export type RevenueObservation = {
     actualSales: number | null;
     gap: number | null;
   };
+  forecast: {
+    nextSevenDaysSales: number | null;
+    confidence: "low" | "medium" | "high";
+    reason: string;
+  };
   measurement: {
     source: "database" | "fallback";
     salesSignals: string[];
@@ -119,6 +124,11 @@ export async function getRevenueObservation(now = new Date()): Promise<RevenueOb
         actualSales: null,
         gap: null,
       },
+      forecast: {
+        nextSevenDaysSales: null,
+        confidence: "low",
+        reason: "Cannot forecast verified sales until DATABASE_URL, Stripe fulfillment, and revenue metrics are configured.",
+      },
       measurement: {
         source: "fallback",
         salesSignals: ["membership.fulfilled", "booking.fulfilled", "confirmed paid bookings"],
@@ -141,6 +151,7 @@ export async function getRevenueObservation(now = new Date()): Promise<RevenueOb
     const todaySales = countSalesBetween(metrics, bookings, todayStart, now);
     const weekSales = countSalesBetween(metrics, bookings, weekStart, now);
     const gap = Math.max(0, targetPerDay * 7 - weekSales);
+    const projectedWeeklySales = Math.round((weekSales / daysElapsed) * 7);
 
     return {
       status: statusFor(todaySales, targetPerDay),
@@ -154,6 +165,13 @@ export async function getRevenueObservation(now = new Date()): Promise<RevenueOb
         targetSales: targetPerDay * 7,
         actualSales: weekSales,
         gap,
+      },
+      forecast: {
+        nextSevenDaysSales: projectedWeeklySales,
+        confidence: weekSales > 0 ? "medium" : "low",
+        reason: weekSales > 0
+          ? "Projection is based on fulfilled membership and booking signals captured so far."
+          : "No verified sales signals are present yet, so the forecast remains below target until checkout and campaigns produce confirmed sales.",
       },
       measurement: {
         source: "database",
@@ -185,6 +203,11 @@ export async function getRevenueObservation(now = new Date()): Promise<RevenueOb
         targetSales: targetPerDay * 7,
         actualSales: null,
         gap: null,
+      },
+      forecast: {
+        nextSevenDaysSales: null,
+        confidence: "low",
+        reason: "Revenue observer could not query metrics/bookings, so no reliable sales forecast is available.",
       },
       measurement: {
         source: "fallback",

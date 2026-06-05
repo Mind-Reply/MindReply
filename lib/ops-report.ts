@@ -127,6 +127,7 @@ export function renderOpsReportText(report: OpsReport) {
     "",
     `Sales today: ${report.salesObserver.todaySales ?? "unmeasured"} / ${report.salesObserver.targetPerDay}`,
     `First-week sales: ${report.salesObserver.firstWeek.actualSales ?? "unmeasured"} / ${report.salesObserver.firstWeek.targetSales}`,
+    `Forecast: ${report.salesObserver.forecast.nextSevenDaysSales ?? "unmeasured"} next-seven-day sales (${report.salesObserver.forecast.confidence} confidence)`,
     `Production fallback checks: ${report.operations.fallbackCount}`,
     `Permanent roles: ${report.agents.totalPermanentRoles}`,
     `Active automation desks: ${report.agents.activeAutomationDesks}`,
@@ -154,6 +155,8 @@ export function renderOpsReportHtml(report: OpsReport) {
         <h2 style="margin:0 0 12px;">Revenue Observer</h2>
         <p style="font-size:18px;margin:0 0 8px;">Today: <strong>${report.salesObserver.todaySales ?? "unmeasured"}</strong> / ${report.salesObserver.targetPerDay} sales</p>
         <p style="margin:0;">First week: <strong>${report.salesObserver.firstWeek.actualSales ?? "unmeasured"}</strong> / ${report.salesObserver.firstWeek.targetSales}; gap: ${report.salesObserver.firstWeek.gap ?? "unmeasured"}</p>
+        <p style="margin:12px 0 0;">Forecast: <strong>${report.salesObserver.forecast.nextSevenDaysSales ?? "unmeasured"}</strong> next-seven-day sales; confidence: ${escapeHtml(report.salesObserver.forecast.confidence)}</p>
+        <p style="margin:8px 0 0;color:rgba(255,246,223,0.74);">${escapeHtml(report.salesObserver.forecast.reason)}</p>
       </section>
       <section style="background:#fff;border-radius:14px;padding:20px;margin-bottom:18px;">
         <h2 style="margin:0 0 12px;">Agents And Hiring</h2>

@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isRevenueOwnerAuthorized } from "@/lib/owner-auth";
 import { buildOpsReport, relayOpsReportToAzure, sendOpsReportEmail } from "@/lib/ops-report";
 
 function isAuthorized(req: NextRequest) {
-  const secret = process.env.CRON_SECRET;
-  return Boolean(secret && req.headers.get("authorization") === `Bearer ${secret}`);
+  return isRevenueOwnerAuthorized(req);
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAuthorized(req)) {
+    return NextResponse.json({ error: "Owner authorization required" }, { status: 401 });
+  }
+
   return NextResponse.json(await buildOpsReport());
 }
 

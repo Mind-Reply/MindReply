@@ -1,7 +1,7 @@
-const defaultRecipient = "angelllkr@gmail.com";
+import { revenueOwnerEmail } from "@/lib/owner-auth";
 
 export function getOpsReportRecipient() {
-  return process.env.OPS_REPORT_TO?.trim() || defaultRecipient;
+  return revenueOwnerEmail;
 }
 
 export function getOpsReportFrom() {
@@ -9,5 +9,5 @@ export function getOpsReportFrom() {
 }
 
 export function isOpsReportingConfigured() {
-  return Boolean(process.env.RESEND_API_KEY && process.env.CRON_SECRET && getOpsReportRecipient() && getOpsReportFrom());
+  return Boolean(process.env.RESEND_API_KEY && process.env.CRON_SECRET && process.env.REVENUE_OWNER_SECRET && getOpsReportFrom());
 }

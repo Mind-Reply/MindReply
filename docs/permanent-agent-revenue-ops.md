@@ -10,9 +10,9 @@ This is automation infrastructure. Human hiring is only complete after real oper
 
 - `GET /api/agents/roster` - 60 permanent roles.
 - `GET /api/agents/active` - active operating desks by lane.
-- `GET /api/revenue/observer` - 10-sales/day watcher and first-week gap.
-- `GET /api/ops/report` - report preview for agents and operators.
-- `POST /api/ops/report` - sends the report when authorized with `Bearer CRON_SECRET`.
+- `GET /api/revenue/observer` - owner-only 10-sales/day watcher, first-week gap, and forecast.
+- `GET /api/ops/report` - owner-only report preview.
+- `POST /api/ops/report` - owner-only manual report send.
 - `GET /api/cron/ops-report` - Vercel Cron entrypoint for twice-daily reports.
 - `GET /api/ops/status` - provider owners, fallback checks, next actions.
 
@@ -21,11 +21,11 @@ This is automation infrastructure. Human hiring is only complete after real oper
 Email and cron:
 
 - `RESEND_API_KEY`
-- `OPS_REPORT_TO=angelllkr@gmail.com`
 - `OPS_REPORT_FROM`
 - `OPS_REPORT_SALES_TARGET=10`
 - `OPS_REVENUE_WEEK_START`
 - `CRON_SECRET`
+- `REVENUE_OWNER_SECRET`
 
 Optional Azure Functions relay:
 
@@ -33,6 +33,8 @@ Optional Azure Functions relay:
 - `AZURE_OPS_REPORT_WEBHOOK_KEY`
 
 The Azure relay is optional. When configured, the same report payload is posted to the Azure Function with `x-functions-key`.
+
+Revenue/report ownership is locked to `angelllkr@gmail.com` in code. Do not add other revenue report recipients.
 
 ## Schedule
 
@@ -67,11 +69,11 @@ The observer requires `DATABASE_URL` and Stripe webhook fulfillment. Stripe Dash
 
 ```bash
 curl -X POST https://www.mind-reply.com/api/ops/report \
-  -H "Authorization: Bearer $CRON_SECRET"
+  -H "Authorization: Bearer $REVENUE_OWNER_SECRET"
 ```
 
 5. Confirm the email arrives at `angelllkr@gmail.com`.
-6. Confirm `GET /api/revenue/observer` shows database measurement, not fallback.
+6. Confirm `GET /api/revenue/observer` with `Bearer REVENUE_OWNER_SECRET` shows database measurement, not fallback.
 7. File the first handoff with sales gap, provider fallbacks, active agents, and next actions.
 
 ## Hiring And Learning Loop

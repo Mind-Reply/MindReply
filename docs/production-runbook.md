@@ -40,9 +40,9 @@ Run these checks at shift start, mid-shift, and shift close.
    - Confirm alert rules cover high error rate and deploy failure notifications.
 7. Confirm twice-daily reports.
    - Open `/api/ops/report` and verify report status.
-   - Open `/api/revenue/observer` and confirm sales are measured from the database.
-   - Confirm `OPS_REPORT_TO` points to `angelllkr@gmail.com`.
-   - Manually trigger `POST /api/ops/report` with `Bearer CRON_SECRET` after env setup.
+   - Open `/api/revenue/observer` with `Bearer REVENUE_OWNER_SECRET` and confirm sales are measured from the database.
+   - Confirm revenue reports are only sent to `angelllkr@gmail.com`.
+   - Manually trigger `POST /api/ops/report` with `Bearer REVENUE_OWNER_SECRET` after env setup.
    - Confirm the email arrives and the report includes the 10-sales/day gap.
 
 ## First 48-Hour Remediation Sprint
@@ -51,7 +51,7 @@ Hour 0-1:
 - Add production env vars in Vercel.
 - Redeploy production.
 - Attach `curl -I https://www.mind-reply.com/health` and `curl https://www.mind-reply.com/api/health` output.
-- Attach `curl https://www.mind-reply.com/api/revenue/observer` output.
+- Attach owner-authorized `curl https://www.mind-reply.com/api/revenue/observer` output.
 
 Hour 1-2:
 - Confirm Clerk production origins and redirect URLs.
