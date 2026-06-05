@@ -27,6 +27,7 @@ const launchStatus = [
   { icon: Shield, title: "Social login ready", detail: "Clerk renders email, Google, Apple, and Facebook access as soon as providers are enabled." },
   { icon: Globe, title: "Auto language", detail: "Browser locale, timezone, and ?lang= links select the best language without blocking manual choice." },
   { icon: CheckCircle2, title: "Paid delivery", detail: "Stripe checkout and booking return routes confirm access immediately after successful payment." },
+  { icon: Users, title: "60 active desks", detail: "Revenue, platform, trust, intelligence, SEO, payments, auth, and support roles are exposed through live agent APIs." },
   { icon: Zap, title: "Ops alerts", detail: "Sentry and Slack readiness endpoints are deployed for owner-authorized production checks." },
 ];
 
@@ -88,7 +89,7 @@ export default function Home() {
               View live health <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-6">
             {launchStatus.map((item) => (
               <div key={item.title} className="rounded-xl border p-4" style={{ borderColor: "rgba(248,245,240,0.12)", background: "rgba(248,245,240,0.055)" }}>
                 <item.icon size={20} style={{ color: "hsl(43 80% 60%)" }} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Activity, BrainCircuit, Copy, Network, Play } from "lucide-react";
 
 type OrchestrationResult = {
@@ -20,11 +20,25 @@ type LoopResult = {
   metricLogged: boolean;
 };
 
+type ActiveAgentStatus = {
+  totalActiveAgents: number;
+  byLane: Record<string, number>;
+  accelerationTarget: string;
+};
+
 export default function OrchestratorPage() {
   const [objective, setObjective] = useState("Stabilize MindReply production deployment across Vercel and Azure while preserving the premium communication intelligence experience.");
   const [orchestration, setOrchestration] = useState<OrchestrationResult | null>(null);
   const [loop, setLoop] = useState<LoopResult | null>(null);
+  const [agentStatus, setAgentStatus] = useState<ActiveAgentStatus | null>(null);
   const [loading, setLoading] = useState<"orchestrate" | "loop" | null>(null);
+
+  useEffect(() => {
+    fetch("/api/agents/active")
+      .then((response) => response.json())
+      .then((data) => setAgentStatus(data))
+      .catch(() => setAgentStatus(null));
+  }, []);
 
   async function runOrchestrator() {
     if (!objective.trim()) return;
@@ -67,6 +81,24 @@ export default function OrchestratorPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-4 py-10">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-6">
+          <div className="rounded-2xl border bg-white p-5 md:col-span-2" style={{ borderColor: "hsl(40 25% 88%)" }}>
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(43 80% 45%)" }}>Active Staff Layer</p>
+            <p className="mt-2 font-serif text-4xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>{agentStatus?.totalActiveAgents ?? 60}</p>
+            <p className="mt-1 text-sm" style={{ color: "hsl(220 25% 45%)" }}>operating desks across revenue, platform, trust, and intelligence.</p>
+          </div>
+          {["revenue", "platform", "trust", "intelligence"].map((lane) => (
+            <div key={lane} className="rounded-2xl border bg-white p-5" style={{ borderColor: "hsl(40 25% 88%)" }}>
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(220 25% 45%)" }}>{lane}</p>
+              <p className="mt-3 font-serif text-3xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>{agentStatus?.byLane?.[lane] ?? "-"}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mb-6 rounded-2xl border p-5" style={{ borderColor: "rgba(201,169,97,0.35)", background: "hsl(43 80% 60% / 0.12)" }}>
+          <p className="text-sm font-semibold" style={{ color: "hsl(220 45% 13%)" }}>{agentStatus?.accelerationTarget ?? "82x faster triage through visible owner, evidence, and handoff routing."}</p>
+        </div>
+
         <div className="bg-white border rounded-2xl p-6 mb-6" style={{ borderColor: "hsl(40 25% 88%)" }}>
           <label className="text-xs font-bold uppercase tracking-wider mb-2 block" style={{ color: "hsl(220 25% 45%)" }}>Objective</label>
           <textarea value={objective} onChange={(event) => setObjective(event.target.value)} rows={4} className="w-full rounded-lg border px-4 py-3 text-sm outline-none focus:border-[hsl(43_80%_60%)] resize-none" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)", background: "hsl(40 20% 96%)" }} />
@@ -99,7 +131,7 @@ export default function OrchestratorPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>Run orchestration to assign the objective across the five MindReply execution agents.</p>
+              <p className="text-sm leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>Run orchestration to assign the objective across the MindReply execution desks.</p>
             )}
           </section>
 

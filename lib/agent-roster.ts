@@ -172,7 +172,6 @@ function activeObjective(agent: AgentRosterEntry) {
 }
 
 export const activeAgentRoster: ActiveAgentEntry[] = agentRoster
-  .filter((agent) => Number(agent.id.slice(-2)) % 6 <= 3 && Number(agent.id.slice(-2)) % 6 !== 0)
   .map((agent) => ({
     ...agent,
     activation: "active",

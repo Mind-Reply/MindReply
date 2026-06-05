@@ -9,7 +9,8 @@ export async function GET() {
 
   return NextResponse.json({
     status: "ready",
-    objective: "30 active operating desks for production, revenue, trust, and intelligence acceleration.",
+    objective: "60 active operating desks for production, revenue, trust, and intelligence acceleration.",
+    accelerationTarget: "82x faster triage through visible owner, evidence, and handoff routing.",
     totalActiveAgents: activeAgentRoster.length,
     byLane,
     agents: activeAgentRoster,
