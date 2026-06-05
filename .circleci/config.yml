@@ -22,8 +22,28 @@ jobs:
       - run:
           name: Build
           command: npm run build
+  production_smoke:
+    docker:
+      - image: cimg/node:20.19
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - npm-v1-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - run:
+          name: Live route smoke
+          command: SMOKE_BASE_URL=https://www.mind-reply.com npm run smoke
 
 workflows:
   ci:
     jobs:
       - build
+      - production_smoke:
+          requires:
+            - build
+          filters:
+            branches:
+              only: main

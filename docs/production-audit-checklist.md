@@ -49,6 +49,19 @@ Monitoring:
 7. Open `https://www.mind-reply.com/api/health`.
 8. Confirm these checks are `configured`: database, auth, stripe, stripeWebhook, analytics, monitoring, siteUrl.
 
+## Automated Checks
+
+Route availability:
+- Command: `SMOKE_BASE_URL=https://www.mind-reply.com npm run smoke`
+- Expected: all public pages, solution pages, and readiness APIs return 2xx/3xx.
+- GitHub workflow: `.github/workflows/production-smoke.yml`
+- CircleCI job: `production_smoke`
+
+Production env readiness:
+- Command: `PRODUCTION_BASE_URL=https://www.mind-reply.com npm run audit:production`
+- Expected: `database`, `auth`, `stripe`, `stripeWebhook`, `analytics`, `monitoring`, and `siteUrl` are `configured`.
+- Until encrypted provider env vars are added, this command is expected to fail and list the fallback checks.
+
 ## Analytics Verification
 
 Target pages:
