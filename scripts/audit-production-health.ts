@@ -5,6 +5,13 @@ type HealthResponse = {
   service: string;
   timestamp: string;
   checks: Record<string, unknown>;
+  requirements?: Array<{
+    service: string;
+    keys: string[];
+    healthCheck: string;
+    status: string;
+    unlocks: string;
+  }>;
 };
 
 const requiredConfiguredChecks = [
@@ -35,6 +42,12 @@ async function main() {
 
   if (fallbackChecks.length > 0) {
     console.error(`Production env audit failed. Fallback checks: ${fallbackChecks.join(", ")}`);
+    if (health.requirements?.length) {
+      console.error("Missing service requirements:");
+      for (const requirement of health.requirements.filter((item) => item.status !== "configured")) {
+        console.error(`- ${requirement.service}: ${requirement.keys.join(", ")} -> ${requirement.unlocks}`);
+      }
+    }
     process.exitCode = 1;
     return;
   }

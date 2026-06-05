@@ -61,6 +61,8 @@ Production env readiness:
 - Command: `PRODUCTION_BASE_URL=https://www.mind-reply.com npm run audit:production`
 - Expected: `database`, `auth`, `stripe`, `stripeWebhook`, `analytics`, `monitoring`, and `siteUrl` are `configured`.
 - Until encrypted provider env vars are added, this command is expected to fail and list the fallback checks.
+- Requirements API: `https://www.mind-reply.com/api/config/requirements`
+- Health API includes a `requirements` array that maps each fallback service to exact env var names and what that service unlocks.
 
 ## Analytics Verification
 

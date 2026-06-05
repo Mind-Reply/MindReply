@@ -23,6 +23,7 @@ const routes = [
   "/api/health",
   "/api/agents/roster",
   "/api/growth/plan",
+  "/api/config/requirements",
   "/api/professionals",
   "/api/memberships",
   "/api/lexicons",

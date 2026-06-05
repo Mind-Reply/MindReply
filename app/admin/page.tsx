@@ -163,7 +163,7 @@ export default async function AdminPage() {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
           {[
             { title: "Run Orchestrator", href: "/orchestrator", body: "Coordinate architecture, integration, research, marketing, and deployment agents." },
             { title: "Execute Tasks", href: "/tasks", body: "Run bounded route, health, reasoning, and deployment readiness tasks." },
@@ -171,6 +171,7 @@ export default async function AdminPage() {
             { title: "Background API", href: "/api/background", body: "Inspect the bounded reasoning-loop execution service readiness contract." },
             { title: "60-Role Roster", href: "/api/agents/roster", body: "Inspect the permanent operator and professional-desk staffing map." },
             { title: "Growth Engine", href: "/api/growth/plan", body: "Inspect market expansion, visitor growth, ads, and conversion actions." },
+            { title: "Env Requirements", href: "/api/config/requirements", body: "Inspect required production provider variables and what each service unlocks." },
           ].map((item) => (
             <Link key={item.href} href={item.href} className="bg-white border rounded-xl p-5 hover:shadow-md transition-all" style={{ borderColor: "hsl(40 25% 88%)" }}>
               <h3 className="font-semibold mb-2" style={{ color: "hsl(220 45% 13%)" }}>{item.title}</h3>

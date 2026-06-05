@@ -3,6 +3,7 @@ import { hasDatabaseUrl } from "@/lib/db";
 import { isClerkConfigured } from "@/lib/admin";
 import { isMonitoringConfigured } from "@/lib/monitoring";
 import { agentRosterSummary } from "@/lib/agent-roster";
+import { summarizeProductionRequirements } from "@/lib/production-requirements";
 
 export async function GET() {
   const databaseConfigured = hasDatabaseUrl();
@@ -13,32 +14,35 @@ export async function GET() {
   const siteUrlConfigured = Boolean(process.env.NEXT_PUBLIC_SITE_URL);
   const agentSummary = agentRosterSummary();
 
+  const checks = {
+    app: "ok",
+    database: databaseConfigured ? "configured" : "fallback",
+    databaseConfigured,
+    auth: authConfigured ? "configured" : "fallback",
+    authConfigured,
+    stripe: stripeConfigured ? "configured" : "fallback",
+    stripeConfigured,
+    stripeWebhook: stripeWebhookConfigured ? "configured" : "fallback",
+    stripeWebhookConfigured,
+    analytics: analyticsConfigured ? "configured" : "fallback",
+    analyticsConfigured,
+    monitoring: isMonitoringConfigured() ? "configured" : "fallback",
+    monitoringConfigured: isMonitoringConfigured(),
+    siteUrl: siteUrlConfigured ? "configured" : "fallback",
+    siteUrlConfigured,
+    azureOpenAI: process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_DEPLOYMENT ? "configured" : "fallback",
+    orchestrator: "ready",
+    backgroundReasoning: "ready",
+    agentRoster: "ready",
+    agentRosterRoles: agentSummary.totalRoles,
+    nodeEnv: process.env.NODE_ENV ?? "development",
+  };
+
   return NextResponse.json({
     status: "ok",
     service: "mindreply",
     timestamp: new Date().toISOString(),
-    checks: {
-      app: "ok",
-      database: databaseConfigured ? "configured" : "fallback",
-      databaseConfigured,
-      auth: authConfigured ? "configured" : "fallback",
-      authConfigured,
-      stripe: stripeConfigured ? "configured" : "fallback",
-      stripeConfigured,
-      stripeWebhook: stripeWebhookConfigured ? "configured" : "fallback",
-      stripeWebhookConfigured,
-      analytics: analyticsConfigured ? "configured" : "fallback",
-      analyticsConfigured,
-      monitoring: isMonitoringConfigured() ? "configured" : "fallback",
-      monitoringConfigured: isMonitoringConfigured(),
-      siteUrl: siteUrlConfigured ? "configured" : "fallback",
-      siteUrlConfigured,
-      azureOpenAI: process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_DEPLOYMENT ? "configured" : "fallback",
-      orchestrator: "ready",
-      backgroundReasoning: "ready",
-      agentRoster: "ready",
-      agentRosterRoles: agentSummary.totalRoles,
-      nodeEnv: process.env.NODE_ENV ?? "development",
-    },
+    checks,
+    requirements: summarizeProductionRequirements(checks),
   });
 }
