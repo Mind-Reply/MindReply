@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Star, Globe, Video, Phone, MessageSquare, ArrowLeft, Clock, Award } from "lucide-react";
+import SessionDeliveryPreview from "@/components/SessionDeliveryPreview";
 
 type Professional = { id: number; name: string; role: string; niche: string; bio: string; rating: number; reviewCount: number; priceText: number; priceVoice: number; priceVideo: number; availabilityStatus: string; languages: string[]; photoUrl: string; specializations: string[] | null; yearsExperience: number | null };
 type Slot = { date: string; time: string; available: boolean };
@@ -88,7 +89,7 @@ export default function ProfessionalDetail() {
                     <span style={{ color: "hsl(220 25% 45%)" }}>{m.icon}</span>{m.label}
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold" style={{ color: "hsl(220 45% 13%)" }}>£{m.price}<span className="text-xs font-normal" style={{ color: "hsl(220 25% 45%)" }}>/hr</span></span>
+                    <span className="text-sm font-semibold" style={{ color: "hsl(220 45% 13%)" }}>GBP {m.price}<span className="text-xs font-normal" style={{ color: "hsl(220 25% 45%)" }}>/hr</span></span>
                     {p.availabilityStatus !== "fully_booked" && (
                       <Link href={`/book/${p.id}?mode=${m.key}`} className="text-xs px-3 py-1.5 rounded font-medium hover:opacity-90 transition-opacity" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Book</Link>
                     )}
@@ -119,6 +120,10 @@ export default function ProfessionalDetail() {
               </Link>
             )}
           </div>
+        </div>
+
+        <div className="mt-6">
+          <SessionDeliveryPreview mode="video" professionalName={p.name} />
         </div>
       </div>
     </div>

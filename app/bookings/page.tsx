@@ -98,7 +98,7 @@ export default function Bookings() {
                     </Link>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-bold" style={{ color: "hsl(220 45% 13%)" }}>£{b.totalPrice.toFixed(2)}</p>
+                    <p className="font-bold" style={{ color: "hsl(220 45% 13%)" }}>GBP {b.totalPrice.toFixed(2)}</p>
                     <p className="text-xs mt-0.5" style={{ color: "hsl(220 25% 45%)" }}>#{b.id}</p>
                   </div>
                 </div>

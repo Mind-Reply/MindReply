@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { ArrowLeft, CheckCircle, Clock, MessageSquare, Phone, Video } from "lucide-react";
 import { createBookingAction } from "@/app/booking/actions";
+import SessionDeliveryPreview from "@/components/SessionDeliveryPreview";
 
 type Professional = {
   id: number;
@@ -232,6 +233,10 @@ export default function Book() {
           </div>
         </div>
 
+        <div className="mb-8">
+          <SessionDeliveryPreview mode={mode} professionalName={professional.name} compact />
+        </div>
+
         <div className="flex items-center gap-2 mb-8 text-xs">
           {[["mode", "1. Session Mode"], ["slot", "2. Date & Time"], ["details", "3. Your Details"]].map(([stepKey, label]) => (
             <div key={stepKey} className={`flex items-center gap-1 ${step === stepKey ? "font-semibold" : ""}`} style={{ color: step === stepKey ? "hsl(220 55% 20%)" : "hsl(220 25% 45%)" }}>
@@ -329,7 +334,7 @@ export default function Book() {
             <div className="flex gap-3 mt-6">
               <button onClick={() => setStep("slot")} className="flex-1 border border-[hsl(40_25%_88%)] font-medium py-3 rounded-lg hover:bg-[hsl(40_20%_92%)] transition-colors text-sm" style={{ color: "hsl(220 45% 13%)" }}>Back</button>
               <button onClick={handleConfirm} disabled={!clientName || !clientEmail || submitting} className="flex-1 font-medium py-3 rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity text-sm" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
-                {submitting ? "Confirming..." : `Confirm - GBP ${totalPrice.toFixed(2)}`}
+                {submitting ? "Confirming..." : `Confirm / Pay - GBP ${totalPrice.toFixed(2)}`}
               </button>
             </div>
           </div>
