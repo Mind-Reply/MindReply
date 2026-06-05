@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Wand2, Copy, Check } from "lucide-react";
+import CreditPurchasePanel from "@/components/CreditPurchasePanel";
 
 export default function TextRefinerTool() {
   const [input, setInput] = useState("");
@@ -46,6 +47,10 @@ export default function TextRefinerTool() {
           <div className="px-4 py-2 rounded-lg text-sm font-bold" style={{ background: "hsl(43 80% 60% / 0.2)", color: "hsl(43 80% 40%)" }}>
             Credits Remaining: 4
           </div>
+        </div>
+
+        <div className="mb-6">
+          <CreditPurchasePanel currentCost={1} compact context="Text Refiner" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -94,6 +99,17 @@ export default function TextRefinerTool() {
             )}
           </div>
         </div>
+
+        {output && (
+          <div className="mt-6 rounded-2xl border bg-white p-5" style={{ borderColor: "hsl(40 25% 88%)" }}>
+            <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>Do not lose this momentum.</p>
+            <p className="mt-1 text-sm" style={{ color: "hsl(220 25% 45%)" }}>Buy credits for repeated refinements, or upgrade to Growth when you want 30 days of memory instead of rebuilding context every time.</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link href="/tools" className="rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Buy credits on Tools</Link>
+              <Link href="/memberships" className="rounded-lg border px-3 py-2 text-xs font-semibold" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}>Compare Growth and Pro</Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

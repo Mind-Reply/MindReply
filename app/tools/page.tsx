@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { BookOpen, CheckCircle2, Copy, FileText, Globe2, GraduationCap, Mail, Maximize2, MessageSquare, Minimize2, PhoneCall, RotateCcw, SlidersHorizontal, Sparkles, Target, Wand2 } from "lucide-react";
+import Link from "next/link";
+import CreditPurchasePanel from "@/components/CreditPurchasePanel";
 import DiagnosticTools from "@/components/DiagnosticTools";
 
 type ToolSlug =
@@ -100,6 +102,9 @@ export default function Tools() {
       <DiagnosticTools />
 
       <section className="max-w-6xl mx-auto px-4 py-10">
+        <div className="mb-6">
+          <CreditPurchasePanel currentCost={result?.creditCost ?? 1} context="tool" />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
           <aside className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:block lg:space-y-2 lg:overflow-visible lg:px-0 lg:pb-0">
             {TOOLS.map((tool) => (
@@ -191,6 +196,17 @@ export default function Tools() {
                       </ul>
                     </div>
                   )}
+
+                  <div className="rounded-xl border p-4" style={{ borderColor: "hsl(40 25% 88%)", background: "hsl(43 80% 60% / 0.08)" }}>
+                    <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>Value moment unlocked</p>
+                    <p className="mt-1 text-xs leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>
+                      If this saved time, buy credits for the next task or upgrade to Growth for 50 monthly credits. Pro is for unlimited memory, Slack, Gmail, Notion, Character Profiles, and Momentum Clarity.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Link href="/memberships" className="rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Upgrade memory</Link>
+                      <Link href="/professionals" className="rounded-lg border px-3 py-2 text-xs font-semibold" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}>Book expert review</Link>
+                    </div>
+                  </div>
                 </div>
               )}
             </section>

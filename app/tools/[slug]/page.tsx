@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Copy, Wand2 } from "lucide-react";
+import CreditPurchasePanel from "@/components/CreditPurchasePanel";
 
 type ToolResponse = {
   result?: string;
@@ -97,6 +98,10 @@ export default function DynamicToolPage() {
           </span>
         </div>
 
+        <div className="mb-6">
+          <CreditPurchasePanel currentCost={output?.creditCost ?? config.cost} compact context={config.name} />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <section className="bg-white border rounded-xl p-6 shadow-sm" style={{ borderColor: "hsl(40 25% 88%)" }}>
             <label className="text-xs font-bold uppercase tracking-wider mb-2 block" style={{ color: "hsl(220 25% 45%)" }}>Input</label>
@@ -118,6 +123,17 @@ export default function DynamicToolPage() {
             )}
           </section>
         </div>
+
+        {output?.result && (
+          <div className="mt-6 rounded-2xl border bg-white p-5" style={{ borderColor: "hsl(40 25% 88%)" }}>
+            <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>Keep the operating memory.</p>
+            <p className="mt-1 text-sm" style={{ color: "hsl(220 25% 45%)" }}>Signal gives a useful single output. Growth keeps 30 days of context. Pro turns this into a permanent operational brain with integrations and executive continuity.</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link href="/tools" className="rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Buy more credits</Link>
+              <Link href="/memberships" className="rounded-lg border px-3 py-2 text-xs font-semibold" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}>Unlock Growth or Pro</Link>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

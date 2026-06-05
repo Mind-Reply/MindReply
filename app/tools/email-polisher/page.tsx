@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Copy, Mail, Send } from "lucide-react";
+import CreditPurchasePanel from "@/components/CreditPurchasePanel";
 
 export default function EmailPolisherPage() {
   const [text, setText] = useState("");
@@ -40,6 +41,10 @@ export default function EmailPolisherPage() {
           <span className="hidden sm:flex w-12 h-12 rounded-xl items-center justify-center" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}><Mail size={20} /></span>
         </div>
 
+        <div className="mb-6">
+          <CreditPurchasePanel currentCost={2} compact context="Email Polisher" />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <section className="bg-white border rounded-xl p-6 shadow-sm" style={{ borderColor: "hsl(40 25% 88%)" }}>
             <label className="text-xs font-bold uppercase tracking-wider mb-2 block" style={{ color: "hsl(220 25% 45%)" }}>Draft Email</label>
@@ -66,6 +71,17 @@ export default function EmailPolisherPage() {
             )}
           </section>
         </div>
+
+        {result && (
+          <div className="mt-6 rounded-2xl border bg-white p-5" style={{ borderColor: "hsl(40 25% 88%)" }}>
+            <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>This is the upgrade moment.</p>
+            <p className="mt-1 text-sm" style={{ color: "hsl(220 25% 45%)" }}>If polished email saves a senior conversation, Growth gives repeat credits and memory. Pro adds unlimited memory plus Slack, Gmail, and Notion so this becomes daily workflow, not a one-off tool.</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link href="/tools" className="rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Buy credits on Tools</Link>
+              <Link href="/memberships" className="rounded-lg border px-3 py-2 text-xs font-semibold" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}>Upgrade to Growth or Pro</Link>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
