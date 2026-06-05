@@ -12,12 +12,24 @@ type SessionState = {
   paymentStatus: string;
   tier: string;
   customerEmail?: string | null;
+  entitlement?: {
+    tier: string;
+    name: string;
+    creditsMonthly: number | "unlimited";
+    deliveredProducts: string[];
+  };
+  fulfillment?: {
+    persisted: boolean;
+    reason?: string | null;
+  };
 };
 
 type StoredMembership = {
   tier: string;
   confirmed: boolean;
   activatedAt: string;
+  entitlement?: SessionState["entitlement"];
+  serverPersisted?: boolean;
 };
 
 const tierLabels: Record<string, string> = {
@@ -82,6 +94,8 @@ export default function PurchaseSuccessPanel() {
             tier: data.tier,
             confirmed: true,
             activatedAt: new Date().toISOString(),
+            entitlement: data.entitlement,
+            serverPersisted: Boolean(data.fulfillment?.persisted),
           };
           window.localStorage.setItem("mindreply.membership", JSON.stringify(membership));
           setStoredMembership(membership);
@@ -111,6 +125,8 @@ export default function PurchaseSuccessPanel() {
   const referralLink = "https://www.mind-reply.com/?ref=member-signal";
   const activeTier = tierLabels[activeMembership?.tier ?? requestedTier] ?? "Strategist";
   const isCheckoutReturn = checkout === "success";
+  const serverPersisted = Boolean(session?.fulfillment?.persisted || storedMembership?.serverPersisted);
+  const deliveryStatus = serverPersisted ? "Server entitlement recorded" : "Access active in this dashboard";
 
   if (!isCheckoutReturn && !activeMembership) return null;
 
@@ -136,6 +152,11 @@ export default function PurchaseSuccessPanel() {
               ? "Your product path is ready now: refine the message, choose the right behavioral frame, and turn the next conversation into a trust signal."
               : "Stripe verification is running. Once the checkout session is confirmed, your product access activates in this dashboard."}
           </p>
+          {activeMembership && (
+            <p className="mt-3 inline-flex rounded-full border border-[rgba(248,245,240,0.14)] px-3 py-1.5 text-xs font-semibold text-[rgba(248,245,240,0.7)]">
+              {deliveryStatus}
+            </p>
+          )}
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {productAccess.map((item) => (

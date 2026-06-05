@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { db, metricsTable } from "@/lib/db";
+import { fulfillMembershipPurchase } from "@/lib/fulfillment";
 
 const handledEvents = new Set([
   "checkout.session.completed",
@@ -25,6 +26,30 @@ async function recordStripeEvent(event: Stripe.Event) {
   } catch (error) {
     console.warn("Stripe event metric fallback:", error);
   }
+}
+
+function stripeId(value: string | { id?: string } | null) {
+  return typeof value === "string" ? value : value?.id ?? null;
+}
+
+async function fulfillStripeEvent(event: Stripe.Event) {
+  if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") {
+    return null;
+  }
+
+  const session = event.data.object as Stripe.Checkout.Session;
+  const confirmed = session.status === "complete" || session.payment_status === "paid" || session.payment_status === "no_payment_required";
+  if (!confirmed) return null;
+
+  return fulfillMembershipPurchase({
+    tier: session.metadata?.tier,
+    email: session.customer_details?.email ?? null,
+    name: session.customer_details?.name ?? null,
+    source: "stripe_webhook",
+    stripeCustomerId: stripeId(session.customer),
+    stripeSessionId: session.id,
+    stripeSubscriptionId: stripeId(session.subscription),
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -57,10 +82,18 @@ export async function POST(req: NextRequest) {
   if (handledEvents.has(event.type)) {
     await recordStripeEvent(event);
   }
+  const fulfillment = await fulfillStripeEvent(event);
 
   return NextResponse.json({
     received: true,
     handled: handledEvents.has(event.type),
     type: event.type,
+    fulfillment: fulfillment
+      ? {
+          persisted: fulfillment.persisted,
+          tier: fulfillment.entitlement.tier,
+          reason: fulfillment.reason ?? null,
+        }
+      : null,
   });
 }

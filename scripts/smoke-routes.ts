@@ -24,6 +24,7 @@ const routes = [
   "/api/agents/roster",
   "/api/growth/plan",
   "/api/config/requirements",
+  "/api/entitlements",
   "/api/professionals",
   "/api/memberships",
   "/api/lexicons",
