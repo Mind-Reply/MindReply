@@ -1,19 +1,17 @@
 import { NextResponse } from "next/server";
-import { hasDatabaseUrl } from "@/lib/db";
-import { isClerkConfigured } from "@/lib/admin";
-import { isMonitoringConfigured } from "@/lib/monitoring";
 import { agentRosterSummary } from "@/lib/agent-roster";
-import { summarizeProductionRequirements } from "@/lib/production-requirements";
-import { isAzureOpenAIConfigured } from "@/lib/azure-openai";
+import { isProductionRequirementConfigured, summarizeProductionRequirements } from "@/lib/production-requirements";
 
 export async function GET() {
-  const databaseConfigured = hasDatabaseUrl();
-  const authConfigured = isClerkConfigured();
-  const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY && (process.env.STRIPE_PRICE_CURATOR || process.env.STRIPE_PRICE_STRATEGIST));
-  const stripeWebhookConfigured = Boolean(process.env.STRIPE_WEBHOOK_SECRET);
-  const bookingPaymentsConfigured = Boolean(databaseConfigured && process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
-  const analyticsConfigured = Boolean(process.env.NEXT_PUBLIC_GTM_ID || process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID);
-  const siteUrlConfigured = Boolean(process.env.NEXT_PUBLIC_SITE_URL);
+  const siteUrlConfigured = isProductionRequirementConfigured("siteUrl");
+  const databaseConfigured = isProductionRequirementConfigured("database");
+  const authConfigured = isProductionRequirementConfigured("auth");
+  const stripeConfigured = isProductionRequirementConfigured("stripe");
+  const stripeWebhookConfigured = isProductionRequirementConfigured("stripeWebhook");
+  const bookingPaymentsConfigured = isProductionRequirementConfigured("bookingPayments");
+  const analyticsConfigured = isProductionRequirementConfigured("analytics");
+  const monitoringConfigured = isProductionRequirementConfigured("monitoring");
+  const azureOpenAIConfigured = isProductionRequirementConfigured("azureOpenAI");
   const agentSummary = agentRosterSummary();
 
   const checks = {
@@ -30,11 +28,11 @@ export async function GET() {
     bookingPaymentsConfigured,
     analytics: analyticsConfigured ? "configured" : "fallback",
     analyticsConfigured,
-    monitoring: isMonitoringConfigured() ? "configured" : "fallback",
-    monitoringConfigured: isMonitoringConfigured(),
+    monitoring: monitoringConfigured ? "configured" : "fallback",
+    monitoringConfigured,
     siteUrl: siteUrlConfigured ? "configured" : "fallback",
     siteUrlConfigured,
-    azureOpenAI: isAzureOpenAIConfigured() ? "configured" : "fallback",
+    azureOpenAI: azureOpenAIConfigured ? "configured" : "fallback",
     orchestrator: "ready",
     backgroundReasoning: "ready",
     agentRoster: "ready",

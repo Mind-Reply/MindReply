@@ -72,6 +72,15 @@ export const productionRequirements: ProductionRequirement[] = [
   },
 ];
 
+function hasEnvValue(key: string) {
+  return Boolean(process.env[key]?.trim());
+}
+
+export function isProductionRequirementConfigured(healthCheck: string) {
+  const requirement = productionRequirements.find((item) => item.healthCheck === healthCheck);
+  return Boolean(requirement && requirement.keys.every(hasEnvValue));
+}
+
 export function summarizeProductionRequirements(checks: Record<string, unknown>) {
   return productionRequirements.map((requirement) => ({
     ...requirement,

@@ -15,7 +15,6 @@ declare global {
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 const googleAdsConversionLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
-const googleAdsCheckoutConversionLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CHECKOUT_CONVERSION_LABEL;
 const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 const solutionLandingPaths = new Set([
   "/solutions/psychologists",
@@ -66,28 +65,6 @@ export default function MarketingPixels() {
         window.fbq("track", "ViewContent", {
           content_name: `MindReply ${audience} solution`,
           content_category: "solution_landing",
-        });
-      }
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("checkout") === "success") {
-      window.dataLayer.push({
-        event: "membership_checkout_success",
-        membership_tier: params.get("tier") || "unknown",
-      });
-
-      if (googleAdsId && googleAdsCheckoutConversionLabel && window.gtag) {
-        window.gtag("event", "conversion", {
-          send_to: `${googleAdsId}/${googleAdsCheckoutConversionLabel}`,
-          membership_tier: params.get("tier") || "unknown",
-        });
-      }
-
-      if (metaPixelId && window.fbq) {
-        window.fbq("track", "Subscribe", {
-          content_name: "MindReply Membership",
-          content_category: params.get("tier") || "membership",
         });
       }
     }

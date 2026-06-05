@@ -5,7 +5,7 @@
 Add these to the active production hosting project for `mind-reply.com`.
 
 Core:
-- `NEXT_PUBLIC_SITE_URL=https://mind-reply.com`
+- `NEXT_PUBLIC_SITE_URL=https://www.mind-reply.com`
 - `DATABASE_URL`
 - `AZURE_OPENAI_ENDPOINT`
 - `AZURE_OPENAI_API_KEY`
@@ -46,14 +46,42 @@ Monitoring:
 4. Confirm Build Command is `npm run build`.
 5. Add production env vars above in Settings -> Environment Variables.
 6. Redeploy the latest production deployment.
-7. Open `https://www.mind-reply.com/api/health`.
+7. Open `https://www.mind-reply.com/health` and `https://www.mind-reply.com/api/health`.
 8. Confirm these checks are `configured`: database, auth, stripe, stripeWebhook, analytics, monitoring, siteUrl.
+
+CLI alternative for operators with Vercel access:
+
+```bash
+vercel env add NEXT_PUBLIC_SITE_URL production
+vercel env add DATABASE_URL production
+vercel env add NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY production
+vercel env add CLERK_SECRET_KEY production
+vercel env add ADMIN_CLERK_IDS production
+vercel env add STRIPE_SECRET_KEY production
+vercel env add STRIPE_PRICE_CURATOR production
+vercel env add STRIPE_PRICE_STRATEGIST production
+vercel env add STRIPE_PRICE_SOVEREIGN production
+vercel env add STRIPE_WEBHOOK_SECRET production
+vercel env add NEXT_PUBLIC_GTM_ID production
+vercel env add NEXT_PUBLIC_GOOGLE_ADS_ID production
+vercel env add NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL production
+vercel env add NEXT_PUBLIC_GOOGLE_ADS_CHECKOUT_CONVERSION_LABEL production
+vercel env add NEXT_PUBLIC_META_PIXEL_ID production
+vercel env add SENTRY_DSN production
+vercel env add AZURE_OPENAI_ENDPOINT production
+vercel env add AZURE_OPENAI_API_KEY production
+vercel env add AZURE_OPENAI_DEPLOYMENT production
+vercel env add AZURE_OPENAI_API_VERSION production
+vercel --prod
+```
+
+Do not paste secret values into chat, tickets, source files, or shell history. Use the Vercel dashboard, a vault, or an approved secure secret entry process.
 
 ## Automated Checks
 
 Route availability:
 - Command: `SMOKE_BASE_URL=https://www.mind-reply.com npm run smoke`
-- Expected: all public pages, solution pages, and readiness APIs return 2xx/3xx.
+- Expected: all public pages, solution pages, `/health`, `/api/health`, and readiness APIs return 2xx/3xx.
 - GitHub workflow: `.github/workflows/production-smoke.yml`
 - CircleCI job: `production_smoke`
 
@@ -61,6 +89,7 @@ Production env readiness:
 - Command: `PRODUCTION_BASE_URL=https://www.mind-reply.com npm run audit:production`
 - Expected: `database`, `auth`, `stripe`, `stripeWebhook`, `analytics`, `monitoring`, and `siteUrl` are `configured`.
 - Until encrypted provider env vars are added, this command is expected to fail and list the fallback checks.
+- Current production status on June 5, 2026: route health is online, but `database`, `auth`, `stripe`, `stripeWebhook`, `bookingPayments`, `analytics`, `monitoring`, and `siteUrl` are still reporting `fallback` until production env vars are set in the active hosting project.
 - Requirements API: `https://www.mind-reply.com/api/config/requirements`
 - Health API includes a `requirements` array that maps each fallback service to exact env var names and what that service unlocks.
 - Entitlement API: `https://www.mind-reply.com/api/entitlements` returns the tier delivery catalog that checkout verification and Stripe webhooks use for product access.

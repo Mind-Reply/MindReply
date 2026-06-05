@@ -20,6 +20,7 @@ const routes = [
   "/solutions/executives",
   "/solutions/legal-counsel",
   "/solutions/financial-advisors",
+  "/health",
   "/api/health",
   "/api/checkout/booking-session",
   "/api/agents/active",

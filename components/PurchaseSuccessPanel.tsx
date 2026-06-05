@@ -38,6 +38,10 @@ const tierLabels: Record<string, string> = {
   sovereign: "Sovereign",
 };
 
+const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+const googleAdsCheckoutConversionLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CHECKOUT_CONVERSION_LABEL;
+const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+
 const productAccess = [
   { href: "/tools/email-polisher", title: "Email Polisher", body: "Send high-trust messages with calmer executive language." },
   { href: "/tools/text-refiner", title: "Text Refiner", body: "Shape notes into composed, intentional communication." },
@@ -48,6 +52,36 @@ const productAccess = [
 function normalizeTier(value: string | null) {
   const tier = String(value ?? "").toLowerCase();
   return tierLabels[tier] ? tier : "strategist";
+}
+
+function emitConfirmedCheckoutConversion(data: SessionState) {
+  const browser = window as Window & {
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+    fbq?: (...args: unknown[]) => void;
+  };
+
+  browser.dataLayer = browser.dataLayer || [];
+  browser.dataLayer.push({
+    event: "membership_checkout_success",
+    membership_tier: data.tier,
+    payment_status: data.paymentStatus,
+    server_persisted: Boolean(data.fulfillment?.persisted),
+  });
+
+  if (googleAdsId && googleAdsCheckoutConversionLabel && browser.gtag) {
+    browser.gtag("event", "conversion", {
+      send_to: `${googleAdsId}/${googleAdsCheckoutConversionLabel}`,
+      membership_tier: data.tier,
+    });
+  }
+
+  if (metaPixelId && browser.fbq) {
+    browser.fbq("track", "Subscribe", {
+      content_name: "MindReply Membership",
+      content_category: data.tier,
+    });
+  }
 }
 
 export default function PurchaseSuccessPanel() {
@@ -90,6 +124,7 @@ export default function PurchaseSuccessPanel() {
       .then((data: SessionState) => {
         setSession(data);
         if (data.confirmed) {
+          emitConfirmedCheckoutConversion(data);
           const membership = {
             tier: data.tier,
             confirmed: true,

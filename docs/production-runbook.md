@@ -39,6 +39,40 @@ Run these checks at shift start, mid-shift, and shift close.
    - Confirm the event appears in Sentry.
    - Confirm alert rules cover high error rate and deploy failure notifications.
 
+## First 48-Hour Remediation Sprint
+
+Hour 0-1:
+- Add production env vars in Vercel.
+- Redeploy production.
+- Attach `curl -I https://www.mind-reply.com/health` and `curl https://www.mind-reply.com/api/health` output.
+
+Hour 1-2:
+- Confirm Clerk production origins and redirect URLs.
+- Test `/sign-in`, `/sign-up`, `/dashboard`, `/admin`, logout, and refresh persistence.
+
+Hour 2-4:
+- Configure Stripe webhook endpoint: `https://www.mind-reply.com/api/webhooks/stripe`.
+- Test membership checkout and booking checkout.
+- Attach Stripe webhook delivery evidence.
+
+Hour 4-6:
+- Confirm GTM, Google Ads, and Meta Pixel env vars are active.
+- Verify only the four `/solutions/*` pages emit `solution_landing_conversion_intent`.
+- Attach Tag Assistant and Pixel Helper evidence.
+
+Hour 6-12:
+- Confirm Sentry test event and alert rules.
+- Submit `https://www.mind-reply.com/sitemap.xml` in Search Console.
+- Confirm `robots.txt` references the sitemap.
+
+Hour 12-24:
+- Run Lighthouse on `/`, `/memberships`, and `/solutions/*`.
+- Patch only the top three material performance issues.
+
+Day 2:
+- Re-run `npm run smoke` and `npm run audit:production` against production.
+- File the remediation report with evidence, remaining risks, and next owners.
+
 ## Escalation Paths
 
 - P0: Site unavailable, checkout broken, auth broken, Stripe webhooks failing for live payments.
@@ -72,6 +106,18 @@ Week 2:
 - Agent 1: EU/UK business hours, health checks, Sentry, release verification.
 - Agent 2: US business hours, ad tracking, Stripe, Search Console, daily handoff.
 - Agent 3: Overnight/on-call, uptime, payment failure triage, P0 escalation.
+
+## Six-Hour Status Format
+
+Every status update during the first 48 hours must include:
+- Health: `/health` and `/api/health` status plus fallback checks.
+- Deployment: latest production deployment URL or commit.
+- Auth: Clerk login/logout/session result.
+- Payments: Stripe checkout and webhook result.
+- Analytics: GTM, Google Ads, Meta Pixel evidence on target pages.
+- Monitoring: Sentry event and alert status.
+- SEO: sitemap/Search Console status.
+- Risks: unresolved blockers, owner, next action, ETA.
 
 ## Required Access
 

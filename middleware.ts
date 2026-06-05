@@ -19,6 +19,13 @@ const authMiddleware = clerkMiddleware(async (auth, req) => {
 });
 
 export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  const host = req.headers.get("host")?.toLowerCase();
+  if (host === "mind-reply.com") {
+    const url = req.nextUrl.clone();
+    url.hostname = "www.mind-reply.com";
+    return NextResponse.redirect(url, 308);
+  }
+
   if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || !process.env.CLERK_SECRET_KEY) {
     return NextResponse.next();
   }

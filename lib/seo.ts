@@ -34,7 +34,6 @@ export const publicRoutes = [
   "/",
   "/agent",
   "/professionals",
-  "/bookings",
   "/tools",
   "/tools/text-refiner",
   "/tools/email-polisher",

@@ -1,9 +1,5 @@
-import { isClerkConfigured } from "@/lib/admin";
 import { activeAgentRoster, type ActiveAgentEntry } from "@/lib/agent-roster";
-import { isAzureOpenAIConfigured } from "@/lib/azure-openai";
-import { hasDatabaseUrl } from "@/lib/db";
-import { isMonitoringConfigured } from "@/lib/monitoring";
-import { productionRequirements } from "@/lib/production-requirements";
+import { isProductionRequirementConfigured, productionRequirements } from "@/lib/production-requirements";
 
 type ServiceCheck = {
   service: string;
@@ -17,15 +13,15 @@ type ServiceCheck = {
 
 function configuredChecks() {
   return {
-    siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
-    database: hasDatabaseUrl(),
-    auth: isClerkConfigured(),
-    stripe: Boolean(process.env.STRIPE_SECRET_KEY && (process.env.STRIPE_PRICE_CURATOR || process.env.STRIPE_PRICE_STRATEGIST)),
-    stripeWebhook: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
-    bookingPayments: Boolean(hasDatabaseUrl() && process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET),
-    analytics: Boolean(process.env.NEXT_PUBLIC_GTM_ID || process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID),
-    monitoring: isMonitoringConfigured(),
-    azureOpenAI: isAzureOpenAIConfigured(),
+    siteUrl: isProductionRequirementConfigured("siteUrl"),
+    database: isProductionRequirementConfigured("database"),
+    auth: isProductionRequirementConfigured("auth"),
+    stripe: isProductionRequirementConfigured("stripe"),
+    stripeWebhook: isProductionRequirementConfigured("stripeWebhook"),
+    bookingPayments: isProductionRequirementConfigured("bookingPayments"),
+    analytics: isProductionRequirementConfigured("analytics"),
+    monitoring: isProductionRequirementConfigured("monitoring"),
+    azureOpenAI: isProductionRequirementConfigured("azureOpenAI"),
   } as Record<string, boolean>;
 }
 

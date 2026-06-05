@@ -6,16 +6,12 @@ This model defines 60 permanent operating roles for MindReply across professiona
 
 ## Field Coverage
 
-- Clinical Communication: 6 roles
-- Executive Advisory: 6 roles
-- Legal Communication: 6 roles
-- Finance And Advisory: 6 roles
-- Growth And Sales: 6 roles
-- Platform Operations: 6 roles
-- Payments And Membership: 6 roles
-- Auth And Security: 6 roles
-- Content And SEO: 6 roles
-- Data And Intelligence: 6 roles
+- Engineering Ops: 20 roles
+- Advertising And Paid Growth: 12 roles
+- SEO And Content: 10 roles
+- Engagement And Community: 8 roles
+- Ad Ops And Analytics QA: 6 roles
+- Security And Compliance: 4 roles
 
 Total: 60 roles.
 
@@ -32,10 +28,14 @@ Total: 60 roles.
 Phase 1:
 - Vercel Deployment Watch
 - Stripe Checkout Monitor
+- Stripe Webhook Verifier
 - Clerk Session Auditor
-- Google Ads Monitor
+- Google Ads Conversion Monitor
+- GTM And Meta Pixel QA
 - Sentry/Monitoring Operator
+- Search Console Operator
 - Incident Commander
+- Security Access Auditor
 
 Phase 2:
 - Clinical Boundary Reviewer

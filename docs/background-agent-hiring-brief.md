@@ -37,6 +37,24 @@ Keep `mind-reply.com` healthy, measurable, monetized, and responsive. Operators 
 - Agent 2 owns ads, analytics, and payment checks.
 - Agent 3 owns overnight incident triage and daily summaries.
 
+## Rapid 60-Agent Surge Plan
+
+Use this only when funding, access controls, and contractor management are ready. It is a staffing plan, not a claim that the agents are already hired.
+
+- Engineering Ops: 20 agents for env setup, deploys, runtime errors, Sentry, webhooks, CI, and hotfixes.
+- Advertising And Paid Growth: 12 agents for Google Ads, budgets, auto-tagging, landing-page CRO, and daily ROAS reporting.
+- SEO And Content: 10 agents for sitemap submission, structured data, technical SEO, and content calendar execution.
+- Engagement And Community: 8 agents for onboarding sequences, support triage, payment/auth issue follow-up, and retention.
+- Ad Ops And Analytics QA: 6 agents for GTM containers, Tag Assistant QA, conversion reconciliation, and event diagnostics.
+- Security And Compliance: 4 agents for TLS, headers, CSP, secret rotation, access reviews, and least-privilege audits.
+
+First 12 assignments for Day 0:
+- 4 Engineering Ops: production env vars, redeploy, health, Sentry, Stripe webhook.
+- 4 Advertising: Google Ads conversion setup, auto-tagging, launch guardrails, spend pause rules.
+- 2 SEO: sitemap, robots, Search Console, priority metadata checks.
+- 1 Engagement: checkout and onboarding handoff flow.
+- 1 Ad Ops QA: Tag Assistant, Meta Pixel Helper, conversion event evidence.
+
 ## Interview Scorecard
 
 - Can explain how to verify a Stripe webhook signature delivery.
@@ -64,3 +82,4 @@ Keep `mind-reply.com` healthy, measurable, monetized, and responsive. Operators 
 - First Stripe webhook verification report.
 - First Search Console sitemap/indexing status report.
 - List of top five conversion or reliability risks.
+- Six-hour status reports for the first 48 hours if the rapid surge plan is active.
