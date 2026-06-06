@@ -14,6 +14,25 @@ type HealthResponse = {
   }>;
 };
 
+type RequirementsResponse = {
+  status: string;
+  configuredCount: number;
+  fallbackCount: number;
+  services: Array<{
+    service: string;
+    key: string;
+    status: "configured" | "fallback";
+    requirementKeys: string[];
+    nextAction: string;
+    owner: {
+      id: string;
+      role: string;
+      lane: string;
+      escalation: string;
+    } | null;
+  }>;
+};
+
 const requiredConfiguredChecks = [
   "database",
   "auth",
@@ -26,18 +45,32 @@ const requiredConfiguredChecks = [
   "coreIntegrations",
   "opsReports",
   "siteUrl",
+  "azureOpenAI",
 ] as const;
 
-async function main() {
-  const response = await fetch(`${baseUrl}/api/health`);
+async function getJson<T>(path: string) {
+  const response = await fetch(`${baseUrl}${path}`);
   if (!response.ok) {
-    console.error(`Health endpoint failed: ${response.status} ${response.statusText}`);
+    throw new Error(`${path} failed: ${response.status} ${response.statusText}`);
+  }
+  return await response.json() as T;
+}
+
+async function main() {
+  let health: HealthResponse;
+  let requirements: RequirementsResponse | null = null;
+
+  try {
+    health = await getJson<HealthResponse>("/api/health");
+    requirements = await getJson<RequirementsResponse>("/api/config/requirements");
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;
     return;
   }
 
-  const health = await response.json() as HealthResponse;
   console.log(`Health ${health.status} for ${health.service} at ${health.timestamp}`);
+  console.log(`Provider readiness: ${requirements.configuredCount} configured / ${requirements.fallbackCount} fallback`);
 
   const fallbackChecks = requiredConfiguredChecks.filter((key) => health.checks[key] !== "configured");
   for (const key of requiredConfiguredChecks) {
@@ -50,6 +83,13 @@ async function main() {
       console.error("Missing service requirements:");
       for (const requirement of health.requirements.filter((item) => item.status !== "configured")) {
         console.error(`- ${requirement.service}: ${requirement.keys.join(", ")} -> ${requirement.unlocks}`);
+      }
+    }
+    if (requirements?.services.length) {
+      console.error("Operator next actions:");
+      for (const service of requirements.services.filter((item) => item.status !== "configured")) {
+        const owner = service.owner ? `${service.owner.id} ${service.owner.role}` : "MR-Core Operator";
+        console.error(`- ${service.service} (${owner}): ${service.nextAction}`);
       }
     }
     process.exitCode = 1;
