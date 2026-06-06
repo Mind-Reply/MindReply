@@ -44,6 +44,14 @@ assert(
   "Message Rescue verification must check the offer slug.",
 );
 assert(
+  /eventName:\s*"message_rescue\.fulfilled"/.test(sessionRoute),
+  "Confirmed Message Rescue purchases must be logged for backend fulfillment evidence.",
+);
+assert(
+  /persisted:\s*metric\.logged/.test(sessionRoute),
+  "Message Rescue verification must return whether backend fulfillment evidence was persisted.",
+);
+assert(
   /\/api\/checkout\/rescue/.test(rescuePage),
   "Message Rescue page must start checkout through /api/checkout/rescue.",
 );

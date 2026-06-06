@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getMessageRescueCatalog, messageRescueOffer } from "@/lib/rescue-offer";
+import { logMetric } from "@/lib/metrics";
 
 function isConfirmedRescuePayment(session: Stripe.Checkout.Session) {
   return session.status === "complete" && (session.payment_status === "paid" || session.payment_status === "no_payment_required");
@@ -11,6 +12,7 @@ function rescueVerificationResponse(input: {
   confirmed: boolean;
   status: string;
   paymentStatus: string;
+  persisted?: boolean;
   reason?: string | null;
 }) {
   return NextResponse.json({
@@ -20,7 +22,7 @@ function rescueVerificationResponse(input: {
     paymentStatus: input.paymentStatus,
     offer: getMessageRescueCatalog(),
     fulfillment: {
-      persisted: false,
+      persisted: input.persisted ?? false,
       reason: input.reason ?? null,
     },
   });
@@ -91,12 +93,27 @@ export async function GET(req: NextRequest) {
     }
 
     const confirmed = isConfirmedRescuePayment(session);
+    const metric = confirmed
+      ? await logMetric({
+          eventName: "message_rescue.fulfilled",
+          eventValue: {
+            sessionId: session.id,
+            customerEmail: session.customer_details?.email ?? session.customer_email ?? null,
+            paymentStatus: session.payment_status,
+            offer: messageRescueOffer.slug,
+            messages: messageRescueOffer.messages,
+            deliveryMinutes: messageRescueOffer.deliveryMinutes,
+          },
+        })
+      : { logged: false as const, reason: "payment_not_confirmed" as const };
+
     return rescueVerificationResponse({
       configured: true,
       confirmed,
       status: session.status ?? "unknown",
       paymentStatus: session.payment_status ?? "unknown",
-      reason: confirmed ? "client_rescue_delivery" : "payment_not_confirmed",
+      persisted: metric.logged,
+      reason: confirmed ? (metric.logged ? "server_rescue_metric" : "client_rescue_delivery") : "payment_not_confirmed",
     });
   } catch (error) {
     console.error("Message Rescue session verification failed:", error);
