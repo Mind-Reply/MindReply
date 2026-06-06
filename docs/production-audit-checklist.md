@@ -115,6 +115,13 @@ Do not paste secret values into chat, tickets, source files, or shell history. U
 
 Use `npm run env:vercel-plan` before entering values. It reads `https://www.mind-reply.com/api/config/requirements`, prints only fallback services, and generates the current `vercel env add ... production` queue without exposing secret values.
 
+After pulling Vercel envs locally, verify that required groups are present without printing values:
+
+```bash
+vercel env pull .env.production.local --environment=production --yes
+npm run env:verify -- --file=.env.production.local
+```
+
 ## Automated Checks
 
 Route availability:
@@ -126,6 +133,7 @@ Route availability:
 Production env readiness:
 - Command: `PRODUCTION_BASE_URL=https://www.mind-reply.com npm run audit:production`
 - Env setup queue: `npm run env:vercel-plan`
+- Local env verifier: `npm run env:verify -- --file=.env.production.local`
 - Expected: `database`, `auth`, `stripe`, `stripeWebhook`, `bookingPayments`, `analytics`, `monitoring`, `slack`, `coreIntegrations`, `opsReports`, `siteUrl`, and `azureOpenAI` are `configured`.
 - Until encrypted provider env vars are added, this command is expected to fail and list the fallback checks.
 - Current production status on June 6, 2026: route health is online, but the 12 provider-backed checks report `fallback` until production env vars are set in the active hosting project.
