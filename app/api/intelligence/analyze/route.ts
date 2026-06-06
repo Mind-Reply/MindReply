@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeCommunication } from "@/lib/agent-engine";
-import { isAzureOpenAIConfigured } from "@/lib/azure-openai";
+import { isAIProviderConfigured } from "@/lib/azure-openai";
 import { logMetric } from "@/lib/metrics";
 
 function subconsciousSignals(analysis: ReturnType<typeof analyzeCommunication>) {
@@ -26,7 +26,7 @@ export async function GET() {
   return NextResponse.json({
     status: "ready",
     service: "mindreply-intelligence",
-    azureOpenAI: isAzureOpenAIConfigured() ? "configured" : "fallback",
+    aiProvider: isAIProviderConfigured() ? "configured" : "fallback",
     frameworks: ["intent", "emotional_valence", "power_distance", "clarity_framework", "persuasion_frame"],
   });
 }
@@ -48,14 +48,14 @@ export async function POST(req: NextRequest) {
       intent: analysis.intent,
       emotionalValence: analysis.emotionalValence,
       powerDistance: analysis.powerDistance,
-      azureOpenAI: isAzureOpenAIConfigured() ? "configured" : "fallback",
+      aiProvider: isAIProviderConfigured() ? "configured" : "fallback",
     },
   });
 
   return NextResponse.json({
     status: "ready",
     source: "local-analysis",
-    azureOpenAI: isAzureOpenAIConfigured() ? "configured" : "fallback",
+    aiProvider: isAIProviderConfigured() ? "configured" : "fallback",
     analysis,
     subconsciousSignals: subconsciousSignals(analysis),
     metricLogged: metric.logged,

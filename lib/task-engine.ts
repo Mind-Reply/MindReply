@@ -1,5 +1,6 @@
 import { runBackgroundReasoningLoop, runOrchestration } from "@/lib/orchestration";
 import { logMetric } from "@/lib/metrics";
+import { isAIProviderConfigured } from "@/lib/azure-openai";
 
 export type TaskKind = "route-audit" | "health-audit" | "orchestrate" | "reasoning-loop" | "deployment-brief";
 
@@ -18,7 +19,7 @@ export const taskCatalog: Array<{ kind: TaskKind; title: string; description: st
   {
     kind: "health-audit",
     title: "Health Audit",
-    description: "Summarize runtime readiness signals for database fallback, Azure OpenAI fallback, orchestration, and background reasoning.",
+    description: "Summarize runtime readiness signals for database fallback, AI provider fallback, orchestration, and background reasoning.",
   },
   {
     kind: "orchestrate",
@@ -77,11 +78,11 @@ export async function executeTask(input: ExecuteTaskInput) {
       summary: "Runtime health signals are exposed through /api/health.",
       checks: {
         database: process.env.DATABASE_URL ? "configured" : "fallback",
-        azureOpenAI: process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_DEPLOYMENT ? "configured" : "fallback",
+        aiProvider: isAIProviderConfigured() ? "configured" : "fallback",
         orchestrator: "ready",
         backgroundReasoning: "ready",
       },
-      nextAction: "Configure production DATABASE_URL and Azure OpenAI secrets to move from fallback to live mode.",
+      nextAction: "Configure production DATABASE_URL and either Azure OpenAI or OpenAI provider secrets to move from fallback to live mode.",
     };
   } else if (kind === "orchestrate") {
     result = await runOrchestration({ objective, context: input.context, urgency: "high" });

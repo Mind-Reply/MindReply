@@ -2,6 +2,7 @@ import { Activity, Briefcase, CheckCircle2, Database, GraduationCap, Mail, Netwo
 import Link from "next/link";
 import { isAdminUser, isClerkConfigured } from "@/lib/admin";
 import { agentRosterSummary } from "@/lib/agent-roster";
+import { isAIProviderConfigured } from "@/lib/azure-openai";
 import { getPermanentOpsCommand } from "@/lib/permanent-ops-command";
 
 function AccessDenied() {
@@ -48,7 +49,7 @@ export default async function AdminPage() {
     { name: "Stripe", status: process.env.STRIPE_SECRET_KEY ? "Configured" : "Needs env", detail: "Membership checkout and session confirmation", env: "STRIPE_SECRET_KEY + STRIPE_PRICE_*" },
     { name: "Clerk", status: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? "Configured" : "Needs env", detail: "Login, signup, protected dashboard", env: "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY + CLERK_SECRET_KEY" },
     { name: "Database", status: process.env.DATABASE_URL ? "Configured" : "Fallback active", detail: "Professionals, bookings, lexicons, metrics", env: "DATABASE_URL" },
-    { name: "Azure OpenAI", status: process.env.AZURE_OPENAI_API_KEY ? "Configured" : "Fallback active", detail: "MRagent and advanced tool intelligence", env: "AZURE_OPENAI_API_KEY" },
+    { name: "AI Provider", status: isAIProviderConfigured() ? "Configured" : "Fallback active", detail: "MRagent and advanced tool intelligence", env: "Azure OpenAI env group or OPENAI_API_KEY" },
   ];
 
   const contentMap = [

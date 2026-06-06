@@ -1,5 +1,5 @@
 import { logMetric } from "@/lib/metrics";
-import { runAzureChatCompletion } from "@/lib/azure-openai";
+import { runConfiguredChatCompletion, type AIProviderSource } from "@/lib/azure-openai";
 
 type AgentReply = {
   reply: string;
@@ -9,7 +9,7 @@ type AgentReply = {
     powerDistance: "peer" | "upward" | "downward" | "external";
     clarityFramework: string[];
   };
-  source: "azure-openai" | "local";
+  source: AIProviderSource | "local";
   metricLogged: boolean;
 };
 
@@ -92,8 +92,8 @@ export function buildLocalAgentReply(message: string, analysis: AgentReply["anal
   return "I can help with that. Give me the situation, who it involves, and what outcome you want. I will answer practically first, then suggest the best MindReply path only if it helps: a tool for fast wording, a professional session for specialist guidance, Growth for memory, or Pro for ongoing operating leverage.";
 }
 
-async function callAzureOpenAI(message: string, analysis: AgentReply["analysis"]) {
-  return runAzureChatCompletion({
+async function callAIProvider(message: string, analysis: AgentReply["analysis"]) {
+  return runConfiguredChatCompletion({
     temperature: 0.35,
     maxTokens: 450,
     messages: [
@@ -118,10 +118,10 @@ export async function runAgent(message: string, userId?: number | null): Promise
   let source: AgentReply["source"] = "local";
 
   try {
-    const azureReply = await callAzureOpenAI(text, analysis);
-    if (azureReply) {
-      reply = azureReply;
-      source = "azure-openai";
+    const providerReply = await callAIProvider(text, analysis);
+    if (providerReply) {
+      reply = providerReply.content;
+      source = providerReply.source;
     }
   } catch (error) {
     console.warn("MR Agent using local intelligence:", error);

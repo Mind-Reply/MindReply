@@ -23,7 +23,7 @@ const microTools = [
 ];
 
 const launchStatus = [
-  { icon: Bot, title: "MRagent active", detail: "Floating assistant and /agent are live with browser fallback plus Azure OpenAI when configured." },
+  { icon: Bot, title: "MRagent active", detail: "Floating assistant and /agent are live with browser fallback plus OpenAI or Azure OpenAI when configured." },
   { icon: Shield, title: "Social login ready", detail: "Clerk renders email, Google, Apple, and Facebook access as soon as providers are enabled." },
   { icon: Globe, title: "Auto language", detail: "Browser locale, timezone, and ?lang= links select the best language without blocking manual choice." },
   { icon: CheckCircle2, title: "Paid delivery", detail: "Stripe checkout and booking return routes confirm access immediately after successful payment." },

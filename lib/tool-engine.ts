@@ -1,5 +1,5 @@
 import { logMetric } from "@/lib/metrics";
-import { runAzureChatCompletion } from "@/lib/azure-openai";
+import { runConfiguredChatCompletion, type AIProviderSource } from "@/lib/azure-openai";
 
 export type ToolSlug =
   | "text-refiner"
@@ -31,7 +31,7 @@ export type ToolResult = {
     warmth: number;
     brevity: number;
   };
-  source: "azure-openai" | "local";
+  source: AIProviderSource | "local";
   metricLogged: boolean;
 };
 
@@ -340,7 +340,7 @@ function localToolResult(slug: ToolSlug, text: string, tone?: string) {
 
 async function azureToolResult(slug: ToolSlug, text: string, tone?: string) {
   const catalog = toolCatalog[slug];
-  return runAzureChatCompletion({
+  return runConfiguredChatCompletion({
     temperature: 0.28,
     maxTokens: 520,
     messages: [
@@ -382,10 +382,10 @@ export async function runTool(slug: ToolSlug, input: { text: string; tone?: stri
   let source: ToolResult["source"] = "local";
 
   try {
-    const azureResult = await azureToolResult(slug, text, input.tone);
-    if (azureResult) {
-      result = azureResult;
-      source = "azure-openai";
+    const providerResult = await azureToolResult(slug, text, input.tone);
+    if (providerResult) {
+      result = providerResult.content;
+      source = providerResult.source;
     }
   } catch (error) {
     console.warn(`Tool ${slug} using local intelligence:`, error);

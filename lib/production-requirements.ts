@@ -90,11 +90,15 @@ export const productionRequirements: ProductionRequirement[] = [
     unlocks: "Permanent-agent reporting, 10-sales/day observer emails, recruiter handoffs, and twice-daily executive updates.",
   },
   {
-    service: "Azure OpenAI",
+    service: "AI Provider",
     keys: ["AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_API_KEY", "AZURE_OPENAI_DEPLOYMENT", "AZURE_OPENAI_API_VERSION"],
+    alternativeKeyGroups: [
+      ["AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_API_KEY", "AZURE_OPENAI_DEPLOYMENT", "AZURE_OPENAI_API_VERSION"],
+      ["OPENAI_API_KEY"],
+    ],
     healthCheck: "azureOpenAI",
     publicValue: false,
-    unlocks: "Advanced MRagent intelligence, micro-tool processing, and background reasoning expansion.",
+    unlocks: "Advanced MRagent intelligence, micro-tool processing, and background reasoning expansion through Azure OpenAI or OpenAI.",
   },
 ];
 
