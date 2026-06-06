@@ -38,12 +38,41 @@ type StoredCredits = {
   lastSessionId?: string | null;
 };
 
+type StoredRescue = {
+  confirmed: boolean;
+  activatedAt: string;
+  lastSessionId?: string | null;
+  messages: number;
+  deliveryMinutes: number;
+};
+
 type CreditSessionState = {
   configured: boolean;
   confirmed: boolean;
   status: string;
   paymentStatus: string;
   credits: number | null;
+  fulfillment?: {
+    persisted: boolean;
+    reason?: string | null;
+  };
+};
+
+type RescueSessionState = {
+  configured: boolean;
+  confirmed: boolean;
+  status: string;
+  paymentStatus: string;
+  offer: {
+    slug: string;
+    name: string;
+    shortName: string;
+    price: number;
+    amount: number;
+    currency: string;
+    messages: number;
+    deliveryMinutes: number;
+  };
   fulfillment?: {
     persisted: boolean;
     reason?: string | null;
@@ -127,6 +156,31 @@ function emitCreditCheckoutConversion(credits: number) {
   }
 }
 
+function emitRescueCheckoutConversion(data: RescueSessionState) {
+  const browser = window as Window & {
+    dataLayer?: unknown[];
+    fbq?: (...args: unknown[]) => void;
+  };
+
+  browser.dataLayer = browser.dataLayer || [];
+  browser.dataLayer.push({
+    event: "message_rescue_checkout_success",
+    offer: data.offer.slug,
+    messages: data.offer.messages,
+    delivery_minutes: data.offer.deliveryMinutes,
+    value: data.offer.price,
+  });
+
+  if (metaPixelId && browser.fbq) {
+    browser.fbq("track", "Purchase", {
+      content_name: data.offer.name,
+      content_category: "Message rescue",
+      value: data.offer.price,
+      currency: data.offer.currency.toUpperCase(),
+    });
+  }
+}
+
 export default function PurchaseSuccessPanel() {
   const params = useSearchParams();
   const checkout = params.get("checkout");
@@ -135,8 +189,10 @@ export default function PurchaseSuccessPanel() {
   const requestedCredits = Number(params.get("credits") || 0);
   const [session, setSession] = useState<SessionState | null>(null);
   const [creditSession, setCreditSession] = useState<CreditSessionState | null>(null);
+  const [rescueSession, setRescueSession] = useState<RescueSessionState | null>(null);
   const [storedMembership, setStoredMembership] = useState<StoredMembership | null>(null);
   const [storedCredits, setStoredCredits] = useState<StoredCredits | null>(null);
+  const [storedRescue, setStoredRescue] = useState<StoredRescue | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -155,6 +211,15 @@ export default function PurchaseSuccessPanel() {
         setStoredCredits(JSON.parse(creditState) as StoredCredits);
       } catch {
         window.localStorage.removeItem("mindreply.credits");
+      }
+    }
+
+    const rescueState = window.localStorage.getItem("mindreply.rescue");
+    if (rescueState) {
+      try {
+        setStoredRescue(JSON.parse(rescueState) as StoredRescue);
+      } catch {
+        window.localStorage.removeItem("mindreply.rescue");
       }
     }
   }, []);
@@ -233,6 +298,106 @@ export default function PurchaseSuccessPanel() {
   }, [checkout, requestedCredits, sessionId]);
 
   useEffect(() => {
+    if (checkout !== "rescue_success") return;
+
+    if (!sessionId) {
+      setRescueSession({
+        configured: true,
+        confirmed: false,
+        status: "missing_session_id",
+        paymentStatus: "unknown",
+        offer: {
+          slug: "message-overload-rescue",
+          name: "Message Overload Rescue",
+          shortName: "Message Rescue",
+          price: 49,
+          amount: 4900,
+          currency: "gbp",
+          messages: 3,
+          deliveryMinutes: 15,
+        },
+        fulfillment: { persisted: false, reason: "missing_session_id" },
+      });
+      return;
+    }
+
+    const saved = window.localStorage.getItem("mindreply.rescue");
+    let prior: StoredRescue | null = null;
+    if (saved) {
+      try {
+        prior = JSON.parse(saved) as StoredRescue;
+      } catch {
+        window.localStorage.removeItem("mindreply.rescue");
+      }
+    }
+    if (sessionId && prior?.lastSessionId === sessionId && prior.confirmed) {
+      setStoredRescue(prior);
+      return;
+    }
+
+    const controller = new AbortController();
+    const search = new URLSearchParams({ session_id: sessionId });
+
+    setRescueSession({
+      configured: true,
+      confirmed: false,
+      status: "checking",
+      paymentStatus: "checking",
+      offer: {
+        slug: "message-overload-rescue",
+        name: "Message Overload Rescue",
+        shortName: "Message Rescue",
+        price: 49,
+        amount: 4900,
+        currency: "gbp",
+        messages: 3,
+        deliveryMinutes: 15,
+      },
+    });
+
+    fetch(`/api/checkout/rescue-session?${search.toString()}`, { signal: controller.signal })
+      .then((response) => response.json())
+      .then((data: RescueSessionState) => {
+        setRescueSession(data);
+        if (!data.confirmed) return;
+
+        const rescue = {
+          confirmed: true,
+          activatedAt: new Date().toISOString(),
+          lastSessionId: sessionId,
+          messages: data.offer.messages,
+          deliveryMinutes: data.offer.deliveryMinutes,
+        };
+        window.localStorage.setItem("mindreply.rescue", JSON.stringify(rescue));
+        setStoredRescue(rescue);
+        emitRescueCheckoutConversion(data);
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          setRescueSession({
+            configured: true,
+            confirmed: false,
+            status: "lookup_failed",
+            paymentStatus: "unknown",
+            offer: {
+              slug: "message-overload-rescue",
+              name: "Message Overload Rescue",
+              shortName: "Message Rescue",
+              price: 49,
+              amount: 4900,
+              currency: "gbp",
+              messages: 3,
+              deliveryMinutes: 15,
+            },
+            fulfillment: { persisted: false, reason: "lookup_failed" },
+          });
+        }
+      });
+
+    return () => controller.abort();
+  }, [checkout, sessionId]);
+
+  useEffect(() => {
     if (checkout !== "success") return;
 
     const controller = new AbortController();
@@ -289,17 +454,24 @@ export default function PurchaseSuccessPanel() {
   const activeTier = tierLabels[activeMembership?.tier ?? requestedTier] ?? "Strategist";
   const isCheckoutReturn = checkout === "success";
   const isCreditReturn = checkout === "credits_success";
+  const isRescueReturn = checkout === "rescue_success";
   const activeCredits = Boolean(storedCredits?.balance);
+  const activeRescue = Boolean(storedRescue?.confirmed);
+  const activeProduct = Boolean(activeMembership || activeCredits || activeRescue);
   const serverPersisted = Boolean(session?.fulfillment?.persisted || storedMembership?.serverPersisted);
-  const deliveryStatus = activeCredits
-    ? "Stripe-verified tool credits active in this dashboard"
+  const deliveryStatus = activeRescue
+    ? `${storedRescue?.messages ?? 3} payment-verified Message Rescue slots active in this dashboard`
+    : activeCredits
+    ? "Payment-verified tool credits active in this dashboard"
+    : isRescueReturn
+    ? `Message Rescue verification: ${rescueSession?.status ?? "checking"}`
     : isCreditReturn
     ? `Credit verification: ${creditSession?.status ?? "checking"}`
     : serverPersisted
     ? "Server entitlement recorded"
     : "Access active in this dashboard";
 
-  if (!isCheckoutReturn && !isCreditReturn && !activeMembership && !activeCredits) return null;
+  if (!isCheckoutReturn && !isCreditReturn && !isRescueReturn && !activeMembership && !activeCredits && !activeRescue) return null;
 
   const copyReferral = async () => {
     await navigator.clipboard.writeText(referralLink);
@@ -313,21 +485,25 @@ export default function PurchaseSuccessPanel() {
         <div className="p-6 sm:p-7">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[rgba(248,245,240,0.18)] px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-[hsl(43_80%_60%)]">
             <CheckCircle2 size={15} />
-            {activeCredits ? "Tool credits activated" : isCreditReturn ? "Credit payment verification" : activeMembership ? "Access activated" : "Payment check in progress"}
+            {activeRescue ? "Message Rescue unlocked" : activeCredits ? "Tool credits activated" : isRescueReturn ? "Message Rescue verification" : isCreditReturn ? "Credit payment verification" : activeMembership ? "Access activated" : "Payment check in progress"}
           </div>
           <h2 className="font-serif text-2xl font-bold sm:text-3xl">
-            {activeCredits ? `${storedCredits?.balance ?? requestedCredits} credits ready` : isCreditReturn ? "Confirming your credits" : activeMembership ? `${activeTier} membership confirmed` : "Confirming your membership"}
+            {activeRescue ? `${storedRescue?.messages ?? 3} messages ready to handle` : activeCredits ? `${storedCredits?.balance ?? requestedCredits} credits ready` : isRescueReturn ? "Confirming your Message Rescue" : isCreditReturn ? "Confirming your credits" : activeMembership ? `${activeTier} membership confirmed` : "Confirming your membership"}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[rgba(248,245,240,0.72)]">
-            {activeCredits
+            {activeRescue
+              ? `Your Message Rescue is active. Open a writing tool or MRagent, paste the stuck message, and turn pressure into send-ready wording within ${storedRescue?.deliveryMinutes ?? 15} minutes.`
+              : activeCredits
               ? "Your micro-tool credits are ready now. Open a tool, refine the message, and turn the next sensitive communication into a prepared professional signal."
+              : isRescueReturn
+              ? "Payment verification is running. Once the checkout session is confirmed, your Message Rescue activates in this dashboard."
               : isCreditReturn
-              ? "Stripe verification is running. Once the credit checkout session is confirmed, your credits activate in this dashboard."
+              ? "Payment verification is running. Once the credit checkout session is confirmed, your credits activate in this dashboard."
               : activeMembership
               ? "Your product path is ready now: refine the message, choose the right behavioral frame, and turn the next conversation into a trust signal."
-              : "Stripe verification is running. Once the checkout session is confirmed, your product access activates in this dashboard."}
+              : "Payment verification is running. Once the checkout session is confirmed, your product access activates in this dashboard."}
           </p>
-          {(activeMembership || activeCredits || isCreditReturn) && (
+          {(activeMembership || activeCredits || activeRescue || isCreditReturn || isRescueReturn) && (
             <p className="mt-3 inline-flex rounded-full border border-[rgba(248,245,240,0.14)] px-3 py-1.5 text-xs font-semibold text-[rgba(248,245,240,0.7)]">
               {deliveryStatus}
             </p>
@@ -335,7 +511,7 @@ export default function PurchaseSuccessPanel() {
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {productAccess.map((item) => (
-              <Link key={item.href} href={activeMembership || activeCredits ? item.href : "/memberships"} className={`rounded-xl border border-[rgba(248,245,240,0.12)] bg-white/[0.04] p-4 transition hover:border-[hsl(43_80%_60%)] hover:bg-white/[0.07] ${activeMembership || activeCredits ? "" : "opacity-70"}`}>
+              <Link key={item.href} href={activeProduct ? item.href : "/memberships"} className={`rounded-xl border border-[rgba(248,245,240,0.12)] bg-white/[0.04] p-4 transition hover:border-[hsl(43_80%_60%)] hover:bg-white/[0.07] ${activeProduct ? "" : "opacity-70"}`}>
                 <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[hsl(43_70%_88%)]">
                   <Wand2 size={15} />
                   {item.title}
@@ -350,13 +526,13 @@ export default function PurchaseSuccessPanel() {
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-[hsl(43_80%_60%)] text-[hsl(220_45%_13%)]">
             <Gift size={20} />
           </div>
-          <h3 className="font-serif text-xl font-bold">{activeMembership || activeCredits ? "Bring the next high-trust mind in" : "Verification checkpoint"}</h3>
+          <h3 className="font-serif text-xl font-bold">{activeProduct ? "Bring the next high-trust mind in" : "Verification checkpoint"}</h3>
           <p className="mt-2 text-sm leading-6 text-[rgba(248,245,240,0.68)]">
-            {activeMembership || activeCredits
+            {activeProduct
               ? "People copy calm authority. Share MindReply with one colleague who handles sensitive decisions and let the network compound."
-              : "If this state stays visible, confirm the Stripe session in the dashboard or return to memberships to restart checkout."}
+              : "If this state stays visible, return to memberships or the rescue offer to restart checkout."}
           </p>
-          {activeMembership || activeCredits ? (
+          {activeProduct ? (
             <>
               <button
                 type="button"

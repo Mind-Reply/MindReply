@@ -13,6 +13,7 @@
     "agents:queue:verify": "tsx scripts/verify-agent-execution-queue.ts",
     "marketing:verify": "tsx scripts/verify-marketing-events.ts",
     "payments:verify": "tsx scripts/verify-payment-delivery.ts",
+    "rescue:verify": "tsx scripts/verify-rescue-offer.ts",
     "ai:verify": "tsx scripts/verify-ai-provider.ts",
     "audit:production": "tsx scripts/audit-production-health.ts",
     "evidence:production": "tsx scripts/collect-production-evidence.ts",

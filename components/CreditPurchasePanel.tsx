@@ -109,7 +109,7 @@ export default function CreditPurchasePanel({ currentCost = 1, compact = false, 
             <Zap size={12} /> Peak-value upgrade prompt active
           </span>
           <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold" style={{ background: "hsl(220 55% 20% / 0.08)", color: "hsl(220 45% 13%)" }}>
-            <CreditCard size={12} /> Stripe checkout route ready
+            <CreditCard size={12} /> Secure checkout ready
           </span>
         </div>
         <Link href="/memberships" className="inline-flex items-center gap-2 text-sm font-semibold hover:opacity-80" style={{ color: "hsl(220 55% 20%)" }}>
@@ -119,7 +119,7 @@ export default function CreditPurchasePanel({ currentCost = 1, compact = false, 
 
       {error && (
         <p className="mt-3 rounded-lg border px-3 py-2 text-xs" style={{ borderColor: "hsl(43 80% 60% / 0.35)", color: "hsl(220 45% 13%)", background: "hsl(43 80% 60% / 0.12)" }}>
-          {error} Production payment keys must be active before live charges can complete.
+          {error} Use memberships or Message Rescue while checkout access refreshes.
         </p>
       )}
     </section>

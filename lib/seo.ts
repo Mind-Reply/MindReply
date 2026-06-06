@@ -38,6 +38,7 @@ export const publicRoutes = [
   "/tools/text-refiner",
   "/tools/email-polisher",
   "/memberships",
+  "/rescue",
   "/premium",
   "/enterprise",
   "/lexicons",

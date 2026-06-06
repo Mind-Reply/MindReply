@@ -38,6 +38,9 @@ jobs:
       - name: Verify payment delivery
         run: npm run payments:verify
 
+      - name: Verify Message Rescue offer
+        run: npm run rescue:verify
+
       - name: Verify AI provider readiness
         run: npm run ai:verify
 

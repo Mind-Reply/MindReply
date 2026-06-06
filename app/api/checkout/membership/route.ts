@@ -57,9 +57,8 @@ export async function POST(req: NextRequest) {
 
     if (!secretKey || !priceId) {
       return NextResponse.json({
-        error: "Stripe checkout is not configured yet.",
+        error: "Membership checkout is not available right now.",
         configured: false,
-        missing: [!secretKey ? "STRIPE_SECRET_KEY" : "", !priceId ? envNames.join(" or ") : ""].filter(Boolean),
       }, { status: 501 });
     }
 
@@ -77,6 +76,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ id: session.id, url: session.url, configured: true });
   } catch (error) {
     console.error("Stripe checkout failed:", error);
-    return NextResponse.json({ error: "Stripe checkout failed" }, { status: 500 });
+    return NextResponse.json({ error: "Membership checkout failed" }, { status: 500 });
   }
 }

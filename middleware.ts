@@ -6,6 +6,7 @@ const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/bookings(.*)",
   "/orchestrator(.*)",
+  "/tasks(.*)",
   "/api/background(.*)",
   "/api/bookings(.*)",
   "/api/agents/execution-queue(.*)",

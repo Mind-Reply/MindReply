@@ -23,9 +23,8 @@ export async function POST(req: NextRequest) {
     const secretKey = process.env.STRIPE_SECRET_KEY;
     if (!secretKey) {
       return NextResponse.json({
-        error: "Stripe credit checkout is not configured yet.",
+        error: "Credit checkout is not available right now.",
         configured: false,
-        missing: ["STRIPE_SECRET_KEY"],
       }, { status: 501 });
     }
 
@@ -62,6 +61,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ id: session.id, url: session.url, configured: true });
   } catch (error) {
     console.error("Stripe credit checkout failed:", error);
-    return NextResponse.json({ error: "Stripe credit checkout failed" }, { status: 500 });
+    return NextResponse.json({ error: "Credit checkout failed" }, { status: 500 });
   }
 }

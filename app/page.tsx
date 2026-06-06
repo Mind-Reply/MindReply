@@ -88,11 +88,11 @@ export default function Home() {
             MindReply empowers professionals with behavioral intelligence for email composition, expression refinement, and strategic dialogue - curated for psychologists, legal counsel, financial advisors, and C-suite executives worldwide.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <Link href="/agent" className="inline-flex items-center justify-center gap-2 font-semibold px-8 py-4 rounded-lg hover:opacity-90 transition-all shadow-lg" style={{ background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" }}>
-              Begin Conversation <ArrowRight size={16} />
+            <Link href="/rescue" className="inline-flex items-center justify-center gap-2 font-semibold px-8 py-4 rounded-lg hover:opacity-90 transition-all shadow-lg" style={{ background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" }}>
+              Get 3 Messages Handled <ArrowRight size={16} />
             </Link>
-            <Link href="/tools" className="inline-flex items-center justify-center gap-2 font-medium px-8 py-4 rounded-lg border hover:text-[hsl(43_80%_60%)] transition-all" style={{ borderColor: "rgba(248,245,240,0.3)", color: "hsl(43 70% 88%)" }}>
-              Explore Micro-Tools
+            <Link href="/agent" className="inline-flex items-center justify-center gap-2 font-medium px-8 py-4 rounded-lg border hover:text-[hsl(43_80%_60%)] transition-all" style={{ borderColor: "rgba(248,245,240,0.3)", color: "hsl(43 70% 88%)" }}>
+              Ask MRagent
             </Link>
           </div>
           <div className="mt-12 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs font-medium" style={{ color: "rgba(248,245,240,0.6)" }}>
