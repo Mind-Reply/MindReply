@@ -40,12 +40,21 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Production env audit
-        continue-on-error: true
         env:
           PRODUCTION_BASE_URL: https://www.mind-reply.com
         run: |
-          set -o pipefail
+          set +e
           npm run audit:production 2>&1 | tee production-env-audit.txt
+          audit_status=${PIPESTATUS[0]}
+          set -e
+          {
+            echo "## Production Env Audit"
+            echo
+            echo '```'
+            cat production-env-audit.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$audit_status"
 
       - name: Upload production evidence
         if: always()

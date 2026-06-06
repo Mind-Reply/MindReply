@@ -76,6 +76,19 @@ jobs:
           publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
+      - name: Production evidence after deploy
+        if: env.AZURE_WEBAPP_NAME != '' && env.AZURE_WEBAPP_PUBLISH_PROFILE != ''
+        env:
+          PRODUCTION_BASE_URL: https://www.mind-reply.com
+          ALLOW_FALLBACK: "1"
+        run: |
+          npm run evidence:production | tee production-evidence.txt
+          {
+            echo "## Production Evidence"
+            echo
+            cat production-evidence.txt
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Seed database
         if: env.AZURE_WEBAPP_NAME != '' && env.AZURE_WEBAPP_PUBLISH_PROFILE != '' && env.DATABASE_URL != ''
         run: npm run db:seed
