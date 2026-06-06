@@ -19,6 +19,7 @@ export function analyzeCommunication(message: string): AgentReply["analysis"] {
   const wantsCredits = /\b(credit|credits|buy|purchase|tool|tools|checkout|payment)\b/i.test(message);
   const wantsMembership = /\b(signal|growth|pro|membership|upgrade|price|pricing|plan|subscribe|subscription)\b/i.test(message);
   const wantsGeneralChat = /\b(hello|hi|hey|how are you|what can you do|help|question|talk|chat)\b/i.test(message);
+  const asksBroadQuestion = /[?]$|^\s*(what|how|why|where|when|who|can|could|should|do|does|is|are|am)\b/i.test(message);
   const intent = wantsBooking && wantsCredits
     ? "booking_and_credits"
     : wantsMembership
@@ -31,7 +32,9 @@ export function analyzeCommunication(message: string): AgentReply["analysis"] {
           ? "message_refinement"
           : lower.includes("team")
             ? "leadership_alignment"
-            : wantsGeneralChat
+            : asksBroadQuestion && !wantsGeneralChat
+              ? "broad_question"
+              : wantsGeneralChat
               ? "general_assistant"
               : "communication_strategy";
   const emotionalValence = /\burgent|angry|frustrated|worried|sensitive\b/i.test(message) ? "pressured" : /\bmaybe|unsure|confused|not sure\b/i.test(message) ? "uncertain" : /\bmust|need|decide|confirm\b/i.test(message) ? "directive" : "calm";
@@ -45,8 +48,14 @@ export function analyzeCommunication(message: string): AgentReply["analysis"] {
   };
 }
 
-function localReply(message: string) {
-  const analysis = analyzeCommunication(message);
+function summarizeTopic(message: string) {
+  const cleaned = message.replace(/\s+/g, " ").trim();
+  if (cleaned.length <= 90) return cleaned;
+  return `${cleaned.slice(0, 87).trim()}...`;
+}
+
+export function buildLocalAgentReply(message: string, analysis: AgentReply["analysis"] = analyzeCommunication(message)) {
+  const topic = summarizeTopic(message);
 
   if (analysis.intent === "booking_and_credits") {
     return "Absolutely. The clean path is: buy a credit pack for tools, then book the right professional session. Use video for complex or sensitive situations, voice for fast advisory support, and text when you want careful written review. After payment, your dashboard confirms access and the booking opens the session room. If you want the strongest setup, Growth gives you continuity and Pro gives you the permanent memory plus integrations.";
@@ -73,10 +82,14 @@ function localReply(message: string) {
   }
 
   if (analysis.intent === "general_assistant") {
-    return "I am here. You can ask me about messages, decisions, bookings, tools, memberships, or anything you are trying to think through. I will keep it practical and calm. If the situation matters, the fastest value is usually to refine the message with credits, then use Growth or Pro when you need memory and continuity.";
+    return "I am here. You can ask me normal questions, think through a situation, refine a message, choose a plan, or prepare for a conversation. I will answer like a person first, then point to MindReply only when it saves time: credits for one-off wording, a professional session for specialist help, Growth for memory, or Pro for ongoing workflow.";
   }
 
-  return "I can help with that. Give me the situation, who it involves, and what outcome you want. I will make the answer practical first, then suggest the best MindReply path only if it helps: a tool for fast wording, a professional session for specialist guidance, Growth for memory, or Pro for ongoing operating leverage.";
+  if (analysis.intent === "broad_question") {
+    return `Yes. On "${topic}", start practical: name the real pressure, choose the first useful action, and make the next step small enough to do today. If this connects to work communication, paste the exact message or situation and I can turn it into a calm first draft. For one-off wording, credits are enough. If this keeps coming back, Growth or Pro is the better route because memory and continuity save more time than repeating context.`;
+  }
+
+  return "I can help with that. Give me the situation, who it involves, and what outcome you want. I will answer practically first, then suggest the best MindReply path only if it helps: a tool for fast wording, a professional session for specialist guidance, Growth for memory, or Pro for ongoing operating leverage.";
 }
 
 async function callAzureOpenAI(message: string, analysis: AgentReply["analysis"]) {
@@ -86,7 +99,7 @@ async function callAzureOpenAI(message: string, analysis: AgentReply["analysis"]
     messages: [
       {
         role: "system",
-        content: "You are MRagent for MindReply: a warm, human, commercially aware assistant. Answer a broad range of user questions naturally and helpfully. Stay calm, concise, confident, and practical. Discreetly guide users toward the right MindReply value path when relevant: credits for tools, professional bookings for specialist help, Growth for 30-day memory, and Pro for unlimited memory plus Slack, Gmail, Notion, Character Profiles, and Momentum Clarity. Never sound pushy; behave like a trusted consultative salesperson.",
+        content: "You are MRagent for MindReply: a warm, human, commercially aware assistant. Answer ordinary questions and professional questions naturally, safely, and helpfully before selling. Stay calm, concise, confident, and practical. Discreetly guide users toward the right MindReply value path only when it saves time: credits for tools, professional bookings for specialist help, Growth for 30-day memory, and Pro for unlimited memory plus Slack, Gmail, Notion, Character Profiles, and Momentum Clarity. Never sound pushy, never guarantee outcomes, and behave like a trusted consultative salesperson.",
       },
       {
         role: "user",
@@ -101,7 +114,7 @@ export async function runAgent(message: string, userId?: number | null): Promise
   if (!text) throw new Error("message is required");
 
   const analysis = analyzeCommunication(text);
-  let reply = localReply(text);
+  let reply = buildLocalAgentReply(text, analysis);
   let source: AgentReply["source"] = "local";
 
   try {
