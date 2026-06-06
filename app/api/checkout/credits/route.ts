@@ -1,22 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-
-const creditPacks = {
-  "5": { credits: 5, amount: 900, label: "MindReply 5 credit pack" },
-  "20": { credits: 20, amount: 2900, label: "MindReply 20 credit pack" },
-} as const;
-
-type CreditPack = keyof typeof creditPacks;
-
-function isCreditPack(value: string): value is CreditPack {
-  return value in creditPacks;
-}
+import { creditPacks, getCreditPackCatalog, isCreditPack } from "@/lib/credit-packs";
 
 export async function GET() {
   return NextResponse.json({
     status: process.env.STRIPE_SECRET_KEY ? "configured" : "fallback",
     configured: Boolean(process.env.STRIPE_SECRET_KEY),
-    packs: Object.values(creditPacks).map(({ credits, amount, label }) => ({ credits, amount, label })),
+    packs: getCreditPackCatalog(),
     requiredEnv: ["STRIPE_SECRET_KEY", "NEXT_PUBLIC_SITE_URL"],
   });
 }

@@ -38,6 +38,18 @@ type StoredCredits = {
   lastSessionId?: string | null;
 };
 
+type CreditSessionState = {
+  configured: boolean;
+  confirmed: boolean;
+  status: string;
+  paymentStatus: string;
+  credits: number | null;
+  fulfillment?: {
+    persisted: boolean;
+    reason?: string | null;
+  };
+};
+
 const tierLabels: Record<string, string> = {
   signal: "Signal",
   growth: "Growth",
@@ -122,6 +134,7 @@ export default function PurchaseSuccessPanel() {
   const requestedTier = normalizeTier(params.get("tier"));
   const requestedCredits = Number(params.get("credits") || 0);
   const [session, setSession] = useState<SessionState | null>(null);
+  const [creditSession, setCreditSession] = useState<CreditSessionState | null>(null);
   const [storedMembership, setStoredMembership] = useState<StoredMembership | null>(null);
   const [storedCredits, setStoredCredits] = useState<StoredCredits | null>(null);
   const [copied, setCopied] = useState(false);
@@ -147,7 +160,19 @@ export default function PurchaseSuccessPanel() {
   }, []);
 
   useEffect(() => {
-    if (checkout !== "credits_success" || !requestedCredits) return;
+    if (checkout !== "credits_success") return;
+
+    if (!sessionId) {
+      setCreditSession({
+        configured: true,
+        confirmed: false,
+        status: "missing_session_id",
+        paymentStatus: "unknown",
+        credits: requestedCredits || null,
+        fulfillment: { persisted: false, reason: "missing_session_id" },
+      });
+      return;
+    }
 
     const saved = window.localStorage.getItem("mindreply.credits");
     let prior: StoredCredits | null = null;
@@ -163,15 +188,48 @@ export default function PurchaseSuccessPanel() {
       return;
     }
 
-    const current = Number(prior?.balance ?? 0);
-    const nextCredits = {
-      balance: current + requestedCredits,
-      activatedAt: new Date().toISOString(),
-      lastSessionId: sessionId,
-    };
-    window.localStorage.setItem("mindreply.credits", JSON.stringify(nextCredits));
-    setStoredCredits(nextCredits);
-    emitCreditCheckoutConversion(requestedCredits);
+    const controller = new AbortController();
+    const search = new URLSearchParams({ session_id: sessionId });
+    if (requestedCredits) search.set("credits", String(requestedCredits));
+
+    setCreditSession({
+      configured: true,
+      confirmed: false,
+      status: "checking",
+      paymentStatus: "checking",
+      credits: requestedCredits || null,
+    });
+
+    fetch(`/api/checkout/credits-session?${search.toString()}`, { signal: controller.signal })
+      .then((response) => response.json())
+      .then((data: CreditSessionState) => {
+        setCreditSession(data);
+        if (!data.confirmed || !data.credits) return;
+
+        const current = Number(prior?.balance ?? 0);
+        const nextCredits = {
+          balance: current + data.credits,
+          activatedAt: new Date().toISOString(),
+          lastSessionId: sessionId,
+        };
+        window.localStorage.setItem("mindreply.credits", JSON.stringify(nextCredits));
+        setStoredCredits(nextCredits);
+        emitCreditCheckoutConversion(data.credits);
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          setCreditSession({
+            configured: true,
+            confirmed: false,
+            status: "lookup_failed",
+            paymentStatus: "unknown",
+            credits: requestedCredits || null,
+            fulfillment: { persisted: false, reason: "lookup_failed" },
+          });
+        }
+      });
+
+    return () => controller.abort();
   }, [checkout, requestedCredits, sessionId]);
 
   useEffect(() => {
@@ -231,11 +289,17 @@ export default function PurchaseSuccessPanel() {
   const activeTier = tierLabels[activeMembership?.tier ?? requestedTier] ?? "Strategist";
   const isCheckoutReturn = checkout === "success";
   const isCreditReturn = checkout === "credits_success";
-  const activeCredits = isCreditReturn || Boolean(storedCredits?.balance);
+  const activeCredits = Boolean(storedCredits?.balance);
   const serverPersisted = Boolean(session?.fulfillment?.persisted || storedMembership?.serverPersisted);
-  const deliveryStatus = activeCredits ? "Tool credits active in this dashboard" : serverPersisted ? "Server entitlement recorded" : "Access active in this dashboard";
+  const deliveryStatus = activeCredits
+    ? "Stripe-verified tool credits active in this dashboard"
+    : isCreditReturn
+    ? `Credit verification: ${creditSession?.status ?? "checking"}`
+    : serverPersisted
+    ? "Server entitlement recorded"
+    : "Access active in this dashboard";
 
-  if (!isCheckoutReturn && !activeMembership && !activeCredits) return null;
+  if (!isCheckoutReturn && !isCreditReturn && !activeMembership && !activeCredits) return null;
 
   const copyReferral = async () => {
     await navigator.clipboard.writeText(referralLink);
@@ -249,19 +313,21 @@ export default function PurchaseSuccessPanel() {
         <div className="p-6 sm:p-7">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[rgba(248,245,240,0.18)] px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-[hsl(43_80%_60%)]">
             <CheckCircle2 size={15} />
-            {activeCredits ? "Tool credits activated" : activeMembership ? "Access activated" : "Payment check in progress"}
+            {activeCredits ? "Tool credits activated" : isCreditReturn ? "Credit payment verification" : activeMembership ? "Access activated" : "Payment check in progress"}
           </div>
           <h2 className="font-serif text-2xl font-bold sm:text-3xl">
-            {activeCredits ? `${storedCredits?.balance ?? requestedCredits} credits ready` : activeMembership ? `${activeTier} membership confirmed` : "Confirming your membership"}
+            {activeCredits ? `${storedCredits?.balance ?? requestedCredits} credits ready` : isCreditReturn ? "Confirming your credits" : activeMembership ? `${activeTier} membership confirmed` : "Confirming your membership"}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[rgba(248,245,240,0.72)]">
             {activeCredits
               ? "Your micro-tool credits are ready now. Open a tool, refine the message, and turn the next sensitive communication into a prepared professional signal."
+              : isCreditReturn
+              ? "Stripe verification is running. Once the credit checkout session is confirmed, your credits activate in this dashboard."
               : activeMembership
               ? "Your product path is ready now: refine the message, choose the right behavioral frame, and turn the next conversation into a trust signal."
               : "Stripe verification is running. Once the checkout session is confirmed, your product access activates in this dashboard."}
           </p>
-          {(activeMembership || activeCredits) && (
+          {(activeMembership || activeCredits || isCreditReturn) && (
             <p className="mt-3 inline-flex rounded-full border border-[rgba(248,245,240,0.14)] px-3 py-1.5 text-xs font-semibold text-[rgba(248,245,240,0.7)]">
               {deliveryStatus}
             </p>
@@ -284,7 +350,7 @@ export default function PurchaseSuccessPanel() {
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-[hsl(43_80%_60%)] text-[hsl(220_45%_13%)]">
             <Gift size={20} />
           </div>
-          <h3 className="font-serif text-xl font-bold">{activeMembership ? "Bring the next high-trust mind in" : "Verification checkpoint"}</h3>
+          <h3 className="font-serif text-xl font-bold">{activeMembership || activeCredits ? "Bring the next high-trust mind in" : "Verification checkpoint"}</h3>
           <p className="mt-2 text-sm leading-6 text-[rgba(248,245,240,0.68)]">
             {activeMembership || activeCredits
               ? "People copy calm authority. Share MindReply with one colleague who handles sensitive decisions and let the network compound."

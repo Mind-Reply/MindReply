@@ -32,6 +32,9 @@ jobs:
       - name: Verify marketing events
         run: npm run marketing:verify
 
+      - name: Verify payment delivery
+        run: npm run payments:verify
+
       - name: Verify AI provider readiness
         run: npm run ai:verify
 
