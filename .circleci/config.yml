@@ -23,6 +23,12 @@ jobs:
           name: Verify language routing
           command: npm run language:verify
       - run:
+          name: Verify ops overload analyzer
+          command: npm run ops:verify
+      - run:
+          name: Verify prospect reply analyzer
+          command: npm run prospect:verify
+      - run:
           name: Build
           command: npm run build
   production_smoke:
