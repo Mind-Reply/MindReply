@@ -77,7 +77,7 @@ export default function CreditPurchasePanel({ currentCost = 1, compact = false, 
             {credits?.balance ? `${credits.balance} credits ready` : "Signal preview is limited"}
           </h2>
           <p className="mt-2 text-sm leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>
-            This {context} action uses {currentCost} credit{currentCost === 1 ? "" : "s"}. Buy credits for immediate overload processing, use Growth for 50 monthly credits, or move to Pro when daily communication needs long-term context and integrations.
+            This {context} action uses {currentCost} credit{currentCost === 1 ? "" : "s"}. Buy credits for immediate overload processing, use Growth for 50 monthly credits, or move to Pro when daily communication needs long-term context, lexicons, and priority support.
           </p>
         </div>
 
