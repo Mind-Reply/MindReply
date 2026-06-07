@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Star, Globe, Video } from "lucide-react";
+import { Bot, Star, Globe, Video } from "lucide-react";
 
 interface Professional {
   id: number; name: string; role: string; niche: string;
@@ -15,6 +15,8 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 
 export default function ProfessionalCard({ p }: { p: Professional }) {
   const s = STATUS[p.availabilityStatus] ?? STATUS.available;
+  const expertChatHref = `/agent?expert=${encodeURIComponent(p.role)}&professional=${encodeURIComponent(p.name)}`;
+
   return (
     <div className="rounded-xl overflow-hidden border border-[hsl(40_25%_88%)] bg-white hover:-translate-y-1 hover:shadow-lg hover:border-[hsl(43_80%_60%_/_0.4)] transition-all duration-300">
       <div className="p-5">
@@ -44,15 +46,20 @@ export default function ProfessionalCard({ p }: { p: Professional }) {
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-1 text-xs" style={{ color: "hsl(220 25% 45%)" }}>
             <Video size={11} />
-            <span className="font-semibold" style={{ color: "hsl(220 45% 13%)" }}>£{p.priceVideo}</span>
+            <span className="font-semibold" style={{ color: "hsl(220 45% 13%)" }}>GBP {p.priceVideo}</span>
             <span>/hr</span>
           </div>
-          <div className="flex gap-2">
-            <Link href={`/professionals/${p.id}`} className="text-xs font-medium hover:text-[hsl(43_80%_60%)] transition-colors" style={{ color: "hsl(220 55% 20%)" }}>View Profile</Link>
-            {p.availabilityStatus !== "fully_booked" && (
-              <Link href={`/book/${p.id}`} className="text-xs font-medium px-3 py-1 rounded hover:opacity-90 transition-opacity" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Book</Link>
-            )}
-          </div>
+          <Link href={`/professionals/${p.id}`} className="text-xs font-medium hover:text-[hsl(43_80%_60%)] transition-colors" style={{ color: "hsl(220 55% 20%)" }}>View Profile</Link>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <Link href={expertChatHref} className="inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition hover:border-[hsl(43_80%_60%)]" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 55% 20%)" }}>
+            <Bot size={13} /> Ask expert AI
+          </Link>
+          {p.availabilityStatus !== "fully_booked" ? (
+            <Link href={`/book/${p.id}`} className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-semibold hover:opacity-90 transition-opacity" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Book</Link>
+          ) : (
+            <Link href={expertChatHref} className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-semibold hover:opacity-90 transition-opacity" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Chat first</Link>
+          )}
         </div>
       </div>
     </div>
