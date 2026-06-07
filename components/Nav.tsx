@@ -12,7 +12,6 @@ const LINKS = [
   { href: "/tools", labelKey: "tools" },
   { href: "/memberships", labelKey: "membership" },
   { href: "/lexicons", labelKey: "lexicons" },
-  { href: "/integrations", labelKey: "integrations" },
   { href: "/analytics", labelKey: "intelligence" },
 ] as const;
 
