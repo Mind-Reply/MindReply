@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runAgent } from "@/lib/agent-engine";
+import { normalizeLanguage } from "@/lib/language";
 
 export async function GET() {
   return NextResponse.json({
@@ -12,10 +13,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, userId } = await req.json();
+    const { message, userId, language } = await req.json();
     if (!message) return NextResponse.json({ error: "message is required" }, { status: 400 });
 
-    const response = await runAgent(message, userId ?? null);
+    const requestLanguage = normalizeLanguage(language) ?? normalizeLanguage(req.headers.get("x-mr-language")) ?? "EN";
+    const response = await runAgent(message, userId ?? null, requestLanguage);
     return NextResponse.json(response);
   } catch (error) {
     console.error("MR Agent request failed:", error);
