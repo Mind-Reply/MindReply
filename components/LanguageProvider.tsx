@@ -1,18 +1,9 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { LANG_OPTIONS, normalizeLanguage, type LanguageCode, type LanguageSource } from "@/lib/language";
 
-export const LANG_OPTIONS = [
-  { code: "EN", name: "English" },
-  { code: "FR", name: "Francais" },
-  { code: "DE", name: "Deutsch" },
-  { code: "ES", name: "Espanol" },
-  { code: "BG", name: "Bulgarian" },
-  { code: "IT", name: "Italiano" },
-  { code: "PT", name: "Portugues" },
-] as const;
-
-export type LanguageCode = (typeof LANG_OPTIONS)[number]["code"];
+export { LANG_OPTIONS, type LanguageCode };
 
 type TranslationKey =
   | "professionals"
@@ -148,6 +139,8 @@ const dictionary: Record<LanguageCode, Record<TranslationKey, string>> = {
 type LanguageContextValue = {
   language: LanguageCode;
   languageMode: "auto" | "manual";
+  languageSource: LanguageSource;
+  country: string | null;
   setLanguage: (language: LanguageCode) => void;
   resetLanguage: () => void;
   t: (key: TranslationKey) => string;
@@ -156,7 +149,7 @@ type LanguageContextValue = {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 function isLanguageCode(value: string | null): value is LanguageCode {
-  return LANG_OPTIONS.some((option) => option.code === value);
+  return Boolean(normalizeLanguage(value));
 }
 
 function applyDocumentLanguage(language: LanguageCode) {
@@ -196,17 +189,22 @@ type LanguageProviderProps = {
   children: React.ReactNode;
   initialLanguage?: LanguageCode;
   initialLanguageMode?: "auto" | "manual";
+  initialLanguageSource?: LanguageSource;
+  initialCountry?: string | null;
 };
 
-export function LanguageProvider({ children, initialLanguage = "EN", initialLanguageMode = "auto" }: LanguageProviderProps) {
+export function LanguageProvider({ children, initialLanguage = "EN", initialLanguageMode = "auto", initialLanguageSource = "fallback", initialCountry = null }: LanguageProviderProps) {
   const [language, setLanguageState] = useState<LanguageCode>(initialLanguage);
   const [languageMode, setLanguageMode] = useState<"auto" | "manual">(initialLanguageMode);
+  const [languageSource, setLanguageSource] = useState<LanguageSource>(initialLanguageSource);
+  const [country] = useState<string | null>(initialCountry?.toUpperCase() ?? null);
 
   useEffect(() => {
     const urlLanguage = new URLSearchParams(window.location.search).get("lang")?.toUpperCase() ?? null;
     if (isLanguageCode(urlLanguage)) {
       setLanguageState(urlLanguage);
       setLanguageMode("auto");
+      setLanguageSource("url");
       applyDocumentLanguage(urlLanguage);
       window.localStorage.setItem("mindreply.language", urlLanguage);
       window.localStorage.setItem("mindreply.languageMode", "auto");
@@ -218,29 +216,33 @@ export function LanguageProvider({ children, initialLanguage = "EN", initialLang
     if (mode === "manual" && isLanguageCode(saved)) {
       setLanguageState(saved);
       setLanguageMode("manual");
+      setLanguageSource("manual");
       applyDocumentLanguage(saved);
       return;
     }
-    const detected = detectBrowserLanguage();
+    const detected = initialLanguageSource === "fallback" ? detectBrowserLanguage() : initialLanguage;
     setLanguageState(detected);
     setLanguageMode("auto");
+    setLanguageSource(initialLanguageSource === "fallback" ? "browser" : initialLanguageSource);
     applyDocumentLanguage(detected);
     window.localStorage.setItem("mindreply.language", detected);
     window.localStorage.setItem("mindreply.languageMode", "auto");
-  }, []);
+  }, [initialLanguage, initialLanguageSource]);
 
   const setLanguage = (nextLanguage: LanguageCode) => {
     setLanguageState(nextLanguage);
     setLanguageMode("manual");
+    setLanguageSource("manual");
     window.localStorage.setItem("mindreply.language", nextLanguage);
     window.localStorage.setItem("mindreply.languageMode", "manual");
     applyDocumentLanguage(nextLanguage);
   };
 
   const resetLanguage = () => {
-    const detected = detectBrowserLanguage();
+    const detected = initialLanguageSource === "fallback" ? detectBrowserLanguage() : initialLanguage;
     setLanguageState(detected);
     setLanguageMode("auto");
+    setLanguageSource(initialLanguageSource === "fallback" ? "browser" : initialLanguageSource);
     window.localStorage.setItem("mindreply.language", detected);
     window.localStorage.setItem("mindreply.languageMode", "auto");
     applyDocumentLanguage(detected);
@@ -249,10 +251,12 @@ export function LanguageProvider({ children, initialLanguage = "EN", initialLang
   const value = useMemo<LanguageContextValue>(() => ({
     language,
     languageMode,
+    languageSource,
+    country,
     setLanguage,
     resetLanguage,
     t: (key) => dictionary[language][key] ?? dictionary.EN[key],
-  }), [language, languageMode]);
+  }), [country, language, languageMode, languageSource]);
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
