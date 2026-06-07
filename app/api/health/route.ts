@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { agentRosterSummary } from "@/lib/agent-roster";
-import { isOpsReportingConfigured } from "@/lib/ops-report-config";
-import { isProductionRequirementConfigured, summarizeProductionRequirements } from "@/lib/production-requirements";
-import { isSlackConfigured } from "@/lib/slack";
-import { areCoreIntegrationsConfigured } from "@/lib/integrations";
+import { isProductionRequirementConfigured } from "@/lib/production-requirements";
+
+function checkStatus(configured: boolean) {
+  return configured ? "configured" : "not_configured";
+}
 
 export async function GET() {
   const siteUrlConfigured = isProductionRequirementConfigured("siteUrl");
@@ -14,42 +14,18 @@ export async function GET() {
   const bookingPaymentsConfigured = isProductionRequirementConfigured("bookingPayments");
   const analyticsConfigured = isProductionRequirementConfigured("analytics");
   const monitoringConfigured = isProductionRequirementConfigured("monitoring");
-  const slackConfigured = isSlackConfigured();
-  const coreIntegrationsConfigured = areCoreIntegrationsConfigured();
-  const opsReportsConfigured = isOpsReportingConfigured();
-  const azureOpenAIConfigured = isProductionRequirementConfigured("azureOpenAI");
-  const agentSummary = agentRosterSummary();
+  const aiProviderConfigured = isProductionRequirementConfigured("azureOpenAI");
 
   const checks = {
-    app: "ok",
-    database: databaseConfigured ? "configured" : "fallback",
-    databaseConfigured,
-    auth: authConfigured ? "configured" : "fallback",
-    authConfigured,
-    stripe: stripeConfigured ? "configured" : "fallback",
-    stripeConfigured,
-    stripeWebhook: stripeWebhookConfigured ? "configured" : "fallback",
-    stripeWebhookConfigured,
-    bookingPayments: bookingPaymentsConfigured ? "configured" : "fallback",
-    bookingPaymentsConfigured,
-    analytics: analyticsConfigured ? "configured" : "fallback",
-    analyticsConfigured,
-    monitoring: monitoringConfigured ? "configured" : "fallback",
-    monitoringConfigured,
-    slack: slackConfigured ? "configured" : "fallback",
-    slackConfigured,
-    coreIntegrations: coreIntegrationsConfigured ? "configured" : "fallback",
-    coreIntegrationsConfigured,
-    opsReports: opsReportsConfigured ? "configured" : "fallback",
-    opsReportsConfigured,
-    siteUrl: siteUrlConfigured ? "configured" : "fallback",
-    siteUrlConfigured,
-    azureOpenAI: azureOpenAIConfigured ? "configured" : "fallback",
-    orchestrator: "ready",
-    backgroundReasoning: "ready",
-    agentRoster: "ready",
-    agentRosterRoles: agentSummary.totalRoles,
-    nodeEnv: process.env.NODE_ENV ?? "development",
+    app: { status: "ok" },
+    siteUrl: { status: checkStatus(siteUrlConfigured) },
+    database: { status: checkStatus(databaseConfigured) },
+    auth: { status: checkStatus(authConfigured) },
+    payments: { status: checkStatus(stripeConfigured && stripeWebhookConfigured) },
+    bookingPayments: { status: checkStatus(bookingPaymentsConfigured) },
+    analytics: { status: checkStatus(analyticsConfigured) },
+    monitoring: { status: checkStatus(monitoringConfigured) },
+    aiProvider: { status: checkStatus(aiProviderConfigured) },
   };
 
   return NextResponse.json({
@@ -57,6 +33,5 @@ export async function GET() {
     service: "mindreply",
     timestamp: new Date().toISOString(),
     checks,
-    requirements: summarizeProductionRequirements(checks),
   });
 }
