@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bot, CalendarDays, CreditCard, MessageSquare, Send, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, Bot, CalendarDays, CreditCard, MessageSquare, Send, Sparkles, TrendingUp } from "lucide-react";
 
 type Message = { role: "agent" | "user"; text: string };
 type AgentAnalysis = {
@@ -24,11 +24,54 @@ const quickPrompts = [
   { icon: TrendingUp, label: "Pick plan", prompt: "Should I use Signal, Growth, or Pro for daily work?" },
 ];
 
+function getNextAction(analysis: AgentAnalysis | null) {
+  if (!analysis) return null;
+
+  if (analysis.intent === "message_rescue") {
+    return {
+      href: "/rescue",
+      label: "Open Message Rescue",
+      text: "Clear 3 stuck replies today instead of carrying them into tomorrow.",
+    };
+  }
+
+  if (analysis.intent === "booking_and_credits" || analysis.intent === "professional_booking") {
+    return {
+      href: "/professionals",
+      label: "Book a professional",
+      text: "Use video, voice, or text review when the situation is high-stakes.",
+    };
+  }
+
+  if (analysis.intent === "credit_purchase") {
+    return {
+      href: "/tools",
+      label: "Open tools",
+      text: "Use credits for fast rewrites, tone fixes, and message polishing.",
+    };
+  }
+
+  if (analysis.intent === "membership_upgrade") {
+    return {
+      href: "/memberships",
+      label: "Compare plans",
+      text: "Choose Growth or Pro when repeating context is costing time.",
+    };
+  }
+
+  return {
+    href: "/rescue",
+    label: "Start Message Rescue",
+    text: "If one reply is slowing your day, paste it and get moving now.",
+  };
+}
+
 export default function AgentPage() {
   const [messages, setMessages] = useState<Message[]>([starter]);
   const [input, setInput] = useState("");
   const [analysis, setAnalysis] = useState<AgentAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
+  const nextAction = getNextAction(analysis);
 
   async function sendText(rawText: string) {
     const text = rawText.trim();
@@ -115,6 +158,16 @@ export default function AgentPage() {
           </div>
 
           <aside className="bg-white border rounded-2xl p-5 h-fit" style={{ borderColor: "hsl(40 25% 88%)" }}>
+            {nextAction && (
+              <div className="border-b pb-4 mb-4" style={{ borderColor: "hsl(40 25% 88%)" }}>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "hsl(43 80% 45%)" }}>Fastest Next Step</p>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: "hsl(220 45% 13%)" }}>{nextAction.text}</p>
+                <Link href={nextAction.href} className="inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition hover:opacity-90" style={{ background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" }}>
+                  {nextAction.label}
+                  <ArrowRight size={13} />
+                </Link>
+              </div>
+            )}
             <p className="text-xs font-semibold uppercase tracking-widest mb-3 flex items-center gap-2" style={{ color: "hsl(43 80% 45%)" }}><Sparkles size={13} /> Live Analysis</p>
             {analysis ? (
               <div className="space-y-4">
