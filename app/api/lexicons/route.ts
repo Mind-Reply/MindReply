@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db, lexiconsTable } from "@/lib/db";
+import { fallbackLexicons } from "@/lib/fallback-data";
 
 export async function GET() {
   try {
@@ -9,7 +10,13 @@ export async function GET() {
       terms: typeof l.terms === "string" ? JSON.parse(l.terms) : l.terms,
     })));
   } catch (err) {
-    console.error("Error listing lexicons:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.warn("Using fallback lexicons:", err instanceof Error ? err.message : err);
+    return NextResponse.json(fallbackLexicons.map((l) => ({
+      id: l.id,
+      name: l.name,
+      category: l.category,
+      description: l.description,
+      terms: JSON.parse(l.terms),
+    })));
   }
 }

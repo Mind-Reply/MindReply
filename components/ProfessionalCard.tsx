@@ -4,7 +4,7 @@ import { Star, Globe, Video } from "lucide-react";
 interface Professional {
   id: number; name: string; role: string; niche: string;
   rating: number; reviewCount: number; priceVideo: number;
-  availabilityStatus: string; languages: string[]; photoUrl: string;
+  availabilityStatus: string; languages?: string[] | string; photoUrl: string;
 }
 
 const STATUS: Record<string, { label: string; cls: string }> = {
@@ -15,6 +15,12 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 
 export default function ProfessionalCard({ p }: { p: Professional }) {
   const s = STATUS[p.availabilityStatus] ?? STATUS.available;
+  const languages = Array.isArray(p.languages)
+    ? p.languages
+    : p.languages
+      ? p.languages.split(",").map((language) => language.trim())
+      : ["English"];
+
   return (
     <div className="rounded-xl overflow-hidden border border-[hsl(40_25%_88%)] bg-white hover:-translate-y-1 hover:shadow-lg hover:border-[hsl(43_80%_60%_/_0.4)] transition-all duration-300">
       <div className="p-5">
@@ -38,7 +44,7 @@ export default function ProfessionalCard({ p }: { p: Professional }) {
             <span className="text-xs" style={{ color: "hsl(220 25% 45%)" }}>({p.reviewCount})</span>
           </div>
           <div className="flex items-center gap-1 text-xs" style={{ color: "hsl(220 25% 45%)" }}>
-            <Globe size={11} /><span>{p.languages.slice(0, 2).join(", ")}</span>
+            <Globe size={11} /><span>{languages.slice(0, 2).join(", ")}</span>
           </div>
         </div>
         <div className="flex items-center justify-between mt-3">

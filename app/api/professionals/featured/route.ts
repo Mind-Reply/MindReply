@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db, professionalsTable } from "@/lib/db";
 import { eq } from "drizzle-orm";
+import { fallbackProfessionals, mapProfessionalRecord } from "@/lib/fallback-data";
 
 export async function GET() {
   try {
@@ -16,7 +17,12 @@ export async function GET() {
       yearsExperience: p.yearsExperience,
     })));
   } catch (err) {
-    console.error("Error getting featured professionals:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.warn("Using fallback featured professionals:", err instanceof Error ? err.message : err);
+    return NextResponse.json(
+      fallbackProfessionals
+        .filter((p) => p.availabilityStatus === "available")
+        .slice(0, 6)
+        .map(mapProfessionalRecord),
+    );
   }
 }

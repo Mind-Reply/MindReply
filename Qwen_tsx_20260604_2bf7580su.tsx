@@ -52,7 +52,7 @@ export default function TextRefinerTool() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="e.g., hey, just checking in on that thing we talked about, let me know when you can chat."
               className="w-full h-64 p-4 rounded-lg border text-sm outline-none focus:ring-2 resize-none"
-              style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)", focusRing: "hsl(43 80% 60%)" }}
+              style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}
             />
             <button 
               onClick={handleRefine}

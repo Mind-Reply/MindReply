@@ -1,10 +1,19 @@
-name: Build and Deploy MindReply to Azure
-npm run db:seed
+name: Azure Container Deploy
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
-  workflow_dispatch:
+    paths:
+      - "Dockerfile"
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "scripts/**"
+      - "package.json"
+      - "package-lock.json"
+      - "next.config.*"
+      - ".github/workflows/azure.yml"
 
 env:
   REGISTRY: ghcr.io
@@ -13,7 +22,10 @@ env:
 
 jobs:
   build-and-deploy:
+    name: Build container and deploy to Azure
     runs-on: ubuntu-latest
+    env:
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
     permissions:
       contents: read
       packages: write
@@ -33,7 +45,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
@@ -44,8 +56,9 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Deploy to Azure Web App
+        if: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE != '' }}
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest

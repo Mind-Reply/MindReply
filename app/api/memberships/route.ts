@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db, membershipsTable } from "@/lib/db";
+import { fallbackMemberships } from "@/lib/fallback-data";
 
 export async function GET() {
   try {
@@ -10,7 +11,10 @@ export async function GET() {
       features: typeof m.features === "string" ? JSON.parse(m.features) : m.features,
     })));
   } catch (err) {
-    console.error("Error listing memberships:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.warn("Using fallback memberships:", err instanceof Error ? err.message : err);
+    return NextResponse.json(fallbackMemberships.map((m) => ({
+      ...m,
+      features: JSON.parse(m.features),
+    })));
   }
 }

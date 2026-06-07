@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildFallbackSlots } from "@/lib/fallback-data";
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,18 +9,8 @@ export async function GET(req: NextRequest) {
 
     if (isNaN(professionalId)) return NextResponse.json({ error: "professionalId is required" }, { status: 400 });
 
-    const baseDate = date ? new Date(date) : new Date();
-    const times = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
-    const slots = [];
-
-    for (let d = 0; d < 7; d++) {
-      const slotDate = new Date(baseDate);
-      slotDate.setDate(slotDate.getDate() + d);
-      const dateStr = slotDate.toISOString().split("T")[0];
-      for (const time of times) {
-        slots.push({ date: dateStr, time, available: Math.random() > 0.3 });
-      }
-    }
+    const slots = buildFallbackSlots();
+    if (date) return NextResponse.json(slots.filter((slot) => slot.date >= date));
 
     return NextResponse.json(slots);
   } catch (err) {

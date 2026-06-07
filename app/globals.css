@@ -1,6 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-mr-cream-light: #f5f7fb;
+  --color-mr-graphite: #111827;
+  --color-mr-silver: #d7dde8;
+  --color-mr-cold-blue: #386fae;
+}
 
 :root {
   --font-inter: 'Inter', sans-serif;
@@ -20,4 +25,29 @@ body {
   background: linear-gradient(to right, hsl(43 80% 60%), hsl(43 90% 70%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.nav-underline {
+  position: relative;
+}
+
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: hsl(43 80% 60%);
+  transition: width 0.3s ease;
+}
+
+.nav-underline:hover::after {
+  width: 100%;
 }

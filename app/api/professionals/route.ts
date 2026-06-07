@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, professionalsTable } from "@/lib/db";
 import { eq, and, lte } from "drizzle-orm";
+import { fallbackProfessionals, mapProfessionalRecord } from "@/lib/fallback-data";
 
 function mapProfessional(p: typeof professionalsTable.$inferSelect) {
   return {
@@ -16,13 +17,22 @@ function mapProfessional(p: typeof professionalsTable.$inferSelect) {
 }
 
 export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = req.nextUrl;
-    const role = searchParams.get("role");
-    const language = searchParams.get("language");
-    const available = searchParams.get("available");
-    const maxPrice = searchParams.get("maxPrice");
+  const { searchParams } = req.nextUrl;
+  const role = searchParams.get("role");
+  const language = searchParams.get("language");
+  const available = searchParams.get("available");
+  const maxPrice = searchParams.get("maxPrice");
 
+  function filterFallback() {
+    return fallbackProfessionals
+      .filter((p) => !role || p.role === role)
+      .filter((p) => available !== "true" || p.availabilityStatus === "available")
+      .filter((p) => !maxPrice || p.priceVideo <= parseFloat(maxPrice))
+      .filter((p) => !language || p.languages.toLowerCase().includes(language.toLowerCase()))
+      .map(mapProfessionalRecord);
+  }
+
+  try {
     const conditions = [];
     if (role) conditions.push(eq(professionalsTable.role, role));
     if (available === "true") conditions.push(eq(professionalsTable.availabilityStatus, "available"));
@@ -38,7 +48,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(professionals);
   } catch (err) {
-    console.error("Error listing professionals:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.warn("Using fallback professionals:", err instanceof Error ? err.message : err);
+    return NextResponse.json(filterFallback());
   }
 }

@@ -1,12 +1,12 @@
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
+import "dotenv/config";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import {
-  professionals,
-  bookings,
-  memberships,
-  lexicons,
-} from '../lib/schema';
+  bookingsTable,
+  lexiconsTable,
+  membershipsTable,
+  professionalsTable,
+} from "../lib/schema";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -15,184 +15,118 @@ const pool = new Pool({
 const db = drizzle(pool);
 
 async function main() {
-  console.log('🌱 Seeding MindReply database...');
+  console.log("Seeding MindReply database...");
 
-  // Clear existing (optional, comment out if you want to keep data)
-  await db.delete(bookings);
-  await db.delete(lexicons);
-  await db.delete(memberships);
-  await db.delete(professionals);
+  await db.delete(bookingsTable);
+  await db.delete(lexiconsTable);
+  await db.delete(membershipsTable);
+  await db.delete(professionalsTable);
 
-  // Memberships
-  await db.insert(memberships).values([
+  await db.insert(membershipsTable).values([
     {
-      id: 'curator',
-      name: 'Curator',
-      priceMonthly: 19,
-      description: 'For individuals who want refined, guided communication support.',
+      tier: "curator",
+      name: "Curator",
+      price: 49,
+      description: "For emerging professionals refining their communication presence.",
+      features: "5 professional lexicons, 3 micro-tools, monthly behavioral insights, community access, 50 monthly credits",
+      highlighted: false,
     },
     {
-      id: 'strategist',
-      name: 'Strategist',
-      priceMonthly: 49,
-      description: 'For professionals and founders who need consistent strategic clarity.',
+      tier: "strategist",
+      name: "Strategist",
+      price: 149,
+      description: "For established professionals leading teams and client relationships.",
+      features: "20+ lexicons, full micro-tool suite, analytics dashboard, priority concierge support, unlimited credits",
+      highlighted: true,
     },
     {
-      id: 'sovereign',
-      name: 'Sovereign',
-      priceMonthly: 129,
-      description: 'For leaders who want a fully tailored behavioral intelligence layer.',
+      tier: "sovereign",
+      name: "Sovereign",
+      price: 499,
+      description: "For executive leadership and organizational transformation.",
+      features: "Dedicated communication architect, organization lexicons, predictive modeling, crisis protocol development",
+      highlighted: false,
     },
   ]);
 
-  // Professionals
-  await db.insert(professionals).values([
+  await db.insert(professionalsTable).values([
     {
-      id: 'child-psychologist',
-      name: 'Child Psychologist',
-      title: 'PC/phone addiction, school stress, emotional regulation',
-      pricePerHour: 80,
+      name: "Dr. Sarah Jenkins",
+      role: "Clinical Psychologist",
+      niche: "CBT, trauma, and executive resilience",
+      bio: "Clinical psychologist helping leaders communicate through pressure, conflict, and sensitive change.",
       rating: 4.9,
-      isAvailable: true,
-      languages: ['en', 'bg'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
+      reviewCount: 124,
+      priceText: 80,
+      priceVoice: 120,
+      priceVideo: 150,
+      availabilityStatus: "available",
+      languages: "English, Bulgarian",
+      photoUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop",
+      specializations: "Restructuring communication, emotional regulation, trust repair",
+      yearsExperience: 15,
     },
     {
-      id: 'adult-mental-health',
-      name: 'Adult Mental Health Support',
-      title: 'Burnout, anxiety, emotional overload',
-      pricePerHour: 90,
-      rating: 4.8,
-      isAvailable: true,
-      languages: ['en', 'bg', 'de'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'relationship-coach',
-      name: 'Relationship & Communication Coach',
-      title: 'Conflict de-escalation, honest conversations, boundaries',
-      pricePerHour: 85,
-      rating: 4.7,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'accountant-tax',
-      name: 'Accountant / Tax Advisor',
-      title: 'Small business, freelancers, international structure basics',
-      pricePerHour: 110,
-      rating: 4.6,
-      isAvailable: true,
-      languages: ['en', 'bg'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: false,
-    },
-    {
-      id: 'lawyer-legal',
-      name: 'Lawyer / Legal Advisor',
-      title: 'Contracts, risk, basic compliance orientation',
-      pricePerHour: 140,
-      rating: 4.7,
-      isAvailable: false, // fully booked example
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'financial-advisor',
-      name: 'Financial Advisor',
-      title: 'Personal finance structure, runway, basic allocation thinking',
-      pricePerHour: 120,
-      rating: 4.5,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'hr-leader-pa',
-      name: 'HR Leader with PA',
-      title: 'Hiring, feedback, people systems, executive support',
-      pricePerHour: 95,
-      rating: 4.6,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'executive-assistant',
-      name: 'Executive Assistant / Ops',
-      title: 'Calendar, ops, follow-through, friction removal',
-      pricePerHour: 70,
-      rating: 4.8,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: false,
-    },
-    {
-      id: 'event-manager',
-      name: 'Event Manager',
-      title: 'Launches, retreats, private events, logistics',
-      pricePerHour: 85,
-      rating: 4.4,
-      isAvailable: true,
-      languages: ['en', 'bg'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
-    },
-    {
-      id: 'business-consultant',
-      name: 'Business Consultant / Strategy',
-      title: 'Positioning, offers, funnels, behavioral communication strategy',
-      pricePerHour: 150,
+      name: "Aisha Khan",
+      role: "Legal Counsel",
+      niche: "Corporate law, employment risk, compliance",
+      bio: "Corporate counsel focused on clear, defensible language for high-stakes professional decisions.",
       rating: 4.9,
-      isAvailable: true,
-      languages: ['en'],
-      modeText: true,
-      modeVoice: true,
-      modeVideo: true,
+      reviewCount: 145,
+      priceText: 120,
+      priceVoice: 210,
+      priceVideo: 300,
+      availabilityStatus: "available",
+      languages: "English",
+      photoUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop",
+      specializations: "Contracts, employment communication, compliance positioning",
+      yearsExperience: 18,
+    },
+    {
+      name: "James Chen",
+      role: "Financial Advisor",
+      niche: "Wealth strategy and business planning",
+      bio: "Advisor helping founders and executives align financial decisions with calm stakeholder communication.",
+      rating: 4.7,
+      reviewCount: 210,
+      priceText: 100,
+      priceVoice: 180,
+      priceVideo: 250,
+      availabilityStatus: "busy",
+      languages: "English, Mandarin",
+      photoUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
+      specializations: "Founder finance, runway planning, board communication",
+      yearsExperience: 16,
     },
   ]);
 
-  // Lexicons
-  await db.insert(lexicons).values([
+  await db.insert(lexiconsTable).values([
     {
-      id: 'founder-clarity',
-      name: 'Founder Clarity Lexicon',
-      description: 'Language patterns for founders under pressure: calm, precise, decisive.',
+      name: "Founder Clarity Lexicon",
+      description: "Language patterns for founders under pressure: calm, precise, decisive.",
+      terms: "decision memo, runway clarity, stakeholder confidence, risk framing",
+      category: "Leadership",
     },
     {
-      id: 'parent-soft-power',
-      name: 'Parent Soft Power Lexicon',
-      description: 'Gentle but firm language for parents with overwhelmed kids.',
+      name: "Clinical Psychologist Lexicon",
+      description: "Therapeutic, boundary-aware language for sensitive professional correspondence.",
+      terms: "validation, safety planning, collaborative framing, scope boundaries",
+      category: "Clinical",
     },
     {
-      id: 'executive-ops',
-      name: 'Executive Ops Lexicon',
-      description: 'Operational clarity, delegation, and follow-up language.',
+      name: "Legal Counsel Lexicon",
+      description: "Clear and defensible phrasing for legal, HR, and compliance contexts.",
+      terms: "without prejudice, documented basis, risk exposure, compliance posture",
+      category: "Legal",
     },
   ]);
 
-  console.log('✅ Seed complete.');
+  console.log("Seed complete.");
   await pool.end();
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error(err);
+  await pool.end();
   process.exit(1);
 });

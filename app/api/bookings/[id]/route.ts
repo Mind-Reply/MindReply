@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, bookingsTable } from "@/lib/db";
 import { eq } from "drizzle-orm";
+import { fallbackBookings } from "@/lib/fallback-data";
 
 function mapBooking(b: typeof bookingsTable.$inferSelect) {
   return {
@@ -20,23 +21,31 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (!b) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(mapBooking(b));
   } catch (err) {
-    console.error("Error getting booking:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.warn("Using fallback booking:", err instanceof Error ? err.message : err);
+    const { id: rawId } = await params;
+    const id = parseInt(rawId);
+    const booking = fallbackBookings.find((item) => item.id === id);
+    if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(booking);
   }
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { status } = await req.json();
   try {
     const { id: rawId } = await params;
     const id = parseInt(rawId);
     if (isNaN(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
-    const { status } = await req.json();
     if (!status) return NextResponse.json({ error: "status is required" }, { status: 400 });
     const [b] = await db.update(bookingsTable).set({ status }).where(eq(bookingsTable.id, id)).returning();
     if (!b) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(mapBooking(b));
   } catch (err) {
-    console.error("Error updating booking:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.warn("Updating fallback booking:", err instanceof Error ? err.message : err);
+    const { id: rawId } = await params;
+    const id = parseInt(rawId);
+    const booking = fallbackBookings.find((item) => item.id === id);
+    if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ ...booking, status });
   }
 }

@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 
 const LANGS = ["EN", "FR", "DE", "ES", "BG", "IT", "PT"];
 const LINKS = [
+  { href: "/agent", label: "MOA" },
   { href: "/professionals", label: "Professionals" },
   { href: "/tools", label: "Tools" },
   { href: "/memberships", label: "Membership" },
