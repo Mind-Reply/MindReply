@@ -1,5 +1,6 @@
 import { logMetric } from "@/lib/metrics";
 import { runConfiguredChatCompletion, type AIProviderSource } from "@/lib/azure-openai";
+import { languageNames, normalizeLanguage, type LanguageCode } from "@/lib/language";
 
 type AgentReply = {
   reply: string;
@@ -11,6 +12,7 @@ type AgentReply = {
   };
   source: AIProviderSource | "local";
   metricLogged: boolean;
+  language: LanguageCode;
 };
 
 export function analyzeCommunication(message: string): AgentReply["analysis"] {
@@ -99,14 +101,16 @@ export function buildLocalAgentReply(message: string, analysis: AgentReply["anal
   return "I can help with that. Give me the situation, who it involves, and what outcome you want. I will answer practically first, then suggest the best MindReply path only if it helps: a tool for fast wording, a professional session for specialist guidance, Growth for memory, or Pro for ongoing operating leverage.";
 }
 
-async function callAIProvider(message: string, analysis: AgentReply["analysis"]) {
+async function callAIProvider(message: string, analysis: AgentReply["analysis"], language: LanguageCode) {
+  const responseLanguage = languageNames[language];
+
   return runConfiguredChatCompletion({
     temperature: 0.35,
     maxTokens: 450,
     messages: [
       {
         role: "system",
-        content: "You are MRagent for MindReply: a warm, human, commercially aware assistant. Answer ordinary questions and professional questions naturally, safely, and helpfully before selling. Stay calm, concise, confident, and practical. Discreetly guide users toward the right MindReply value path only when it saves time: credits for tools, professional bookings for specialist help, Growth for 30-day memory, and Pro for unlimited memory plus Slack, Gmail, Notion, Character Profiles, and Momentum Clarity. Never sound pushy, never guarantee outcomes, and behave like a trusted consultative salesperson.",
+        content: `You are MRagent for MindReply: a warm, human, commercially aware assistant. Reply in ${responseLanguage} unless the user explicitly asks for another language. Answer ordinary questions and professional questions naturally, safely, and helpfully before selling. Stay calm, concise, confident, and practical. Discreetly guide users toward the right MindReply value path only when it saves time: credits for tools, professional bookings for specialist help, Growth for 30-day memory, and Pro for unlimited memory plus Slack, Gmail, Notion, Character Profiles, and Momentum Clarity. Never sound pushy, never guarantee outcomes, and behave like a trusted consultative salesperson.`,
       },
       {
         role: "user",
@@ -116,16 +120,17 @@ async function callAIProvider(message: string, analysis: AgentReply["analysis"])
   });
 }
 
-export async function runAgent(message: string, userId?: number | null): Promise<AgentReply> {
+export async function runAgent(message: string, userId?: number | null, requestedLanguage?: string | null): Promise<AgentReply> {
   const text = message.trim();
   if (!text) throw new Error("message is required");
 
+  const language = normalizeLanguage(requestedLanguage) ?? "EN";
   const analysis = analyzeCommunication(text);
   let reply = buildLocalAgentReply(text, analysis);
   let source: AgentReply["source"] = "local";
 
   try {
-    const providerReply = await callAIProvider(text, analysis);
+    const providerReply = await callAIProvider(text, analysis, language);
     if (providerReply) {
       reply = providerReply.content;
       source = providerReply.source;
@@ -143,6 +148,7 @@ export async function runAgent(message: string, userId?: number | null): Promise
       intent: analysis.intent,
       emotionalValence: analysis.emotionalValence,
       powerDistance: analysis.powerDistance,
+      language,
     },
   });
 
@@ -151,5 +157,6 @@ export async function runAgent(message: string, userId?: number | null): Promise
     analysis,
     source,
     metricLogged: metric.logged,
+    language,
   };
 }
