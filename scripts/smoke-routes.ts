@@ -26,7 +26,6 @@ const routes = [
   { path: "/memberships" },
   { path: "/rescue" },
   { path: "/rescue/workspace" },
-  { path: "/integrations" },
   { path: "/lexicons" },
   { path: "/solutions/psychologists" },
   { path: "/solutions/executives" },
