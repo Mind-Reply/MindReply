@@ -20,6 +20,9 @@ jobs:
           name: Typecheck
           command: npm run typecheck
       - run:
+          name: Verify language routing
+          command: npm run language:verify
+      - run:
           name: Build
           command: npm run build
   production_smoke:
