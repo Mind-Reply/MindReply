@@ -17,8 +17,8 @@ type StoredCredits = {
 };
 
 const packs = [
-  { credits: 5, price: "£9", label: "Starter Pack", note: "Good for quick wording fixes." },
-  { credits: 20, price: "£29", label: "Operator Pack", note: "Best value for repeated daily work." },
+  { credits: 5, price: "GBP 9", label: "Starter Pack", note: "Good for quick reply fixes." },
+  { credits: 20, price: "GBP 29", label: "Overload Recovery Pack", note: "Best for the next 10 queued items." },
 ] as const;
 
 function readCredits(): StoredCredits | null {
@@ -77,7 +77,7 @@ export default function CreditPurchasePanel({ currentCost = 1, compact = false, 
             {credits?.balance ? `${credits.balance} credits ready` : "Signal preview is limited"}
           </h2>
           <p className="mt-2 text-sm leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>
-            This {context} action uses {currentCost} credit{currentCost === 1 ? "" : "s"}. Buy credits for immediate tool work, use Growth for 50 monthly credits, or move to Pro when daily operations need unlimited memory and integrations.
+            This {context} action uses {currentCost} credit{currentCost === 1 ? "" : "s"}. Buy credits for immediate overload processing, use Growth for 50 monthly credits, or move to Pro when daily communication needs long-term context and integrations.
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export default function CreditPurchasePanel({ currentCost = 1, compact = false, 
       <div className="mt-4 flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: "hsl(40 25% 88%)" }}>
         <div className="flex flex-wrap gap-2 text-xs">
           <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold" style={{ background: "hsl(43 80% 60% / 0.16)", color: "hsl(220 45% 13%)" }}>
-            <Zap size={12} /> Peak-value upgrade prompt active
+            <Zap size={12} /> Upgrade options available
           </span>
           <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold" style={{ background: "hsl(220 55% 20% / 0.08)", color: "hsl(220 45% 13%)" }}>
             <CreditCard size={12} /> Secure checkout ready
