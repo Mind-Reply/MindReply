@@ -20,6 +20,7 @@ export const targetMarkets = [
 export const seoMarketKeywords = [
   "AI communication intelligence UK",
   "executive communication AI United Kingdom",
+  "operations message overload AI tool",
   "professional email polisher USA",
   "legal communication AI Canada",
   "financial advisor communication tool Australia",
@@ -35,8 +36,10 @@ export const publicRoutes = [
   "/agent",
   "/professionals",
   "/tools",
+  "/tools/ops-overload-analyzer",
   "/tools/text-refiner",
   "/tools/email-polisher",
+  "/tools/prospect-reply-analyzer",
   "/memberships",
   "/rescue",
   "/rescue/workspace",
@@ -51,6 +54,8 @@ export const publicRoutes = [
 ];
 
 export const revenueToolRoutes = [
+  "/tools/ops-overload-analyzer",
+  "/tools/prospect-reply-analyzer",
   "/tools/tone-calibrator",
   "/tools/structure-architect",
   "/tools/professional-rewrite",
