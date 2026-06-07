@@ -15,6 +15,9 @@ const initialResult = orchestrateGoal({
   goal: "Expand MindReply with secure AI orchestration, visible platform functionality, automation, integrations, and growth support.",
 });
 
+const controllerPromise =
+  "MOA acts as the central brain of the MindReply multi-agent ecosystem, enforcing order, clarity, stability, and one unified high-quality output.";
+
 export default function AgentPage() {
   return (
     <main className="min-h-screen bg-[hsl(40_20%_96%)] pt-24 text-[hsl(220_45%_13%)]">
@@ -64,7 +67,7 @@ export default function AgentPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-[hsl(43_80%_40%)]">Controller Contract</p>
             <h2 className="mt-2 font-serif text-2xl font-bold text-[hsl(220_45%_13%)]">MOA is the only user-facing control point.</h2>
-            <p className="mt-3 text-sm leading-6 text-[hsl(220_25%_45%)]">{MOA_CONTROLLER_CONTRACT.promise}</p>
+            <p className="mt-3 text-sm leading-6 text-[hsl(220_25%_45%)]">{controllerPromise}</p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
