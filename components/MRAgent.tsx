@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronRight, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type Msg = { role: "agent" | "user"; text: string; source?: string };
 
@@ -14,6 +15,7 @@ const GREET: Msg = {
 const SUGGESTIONS = ["Help me buy credits", "Book a video session", "Which plan should I choose?", "Can we talk about another topic?"];
 
 export default function MRAgent() {
+  const { language } = useLanguage();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([GREET]);
   const [input, setInput] = useState("");
@@ -31,7 +33,7 @@ export default function MRAgent() {
       const response = await fetch("/api/agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, language }),
       });
       if (!response.ok) {
         throw new Error(`MR Agent failed with ${response.status}`);
