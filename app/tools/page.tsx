@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, CheckCircle2, Copy, FileText, Globe2, GraduationCap, Mail, Maximize2, MessageSquare, Minimize2, PhoneCall, RotateCcw, SlidersHorizontal, Sparkles, Target, Wand2 } from "lucide-react";
+import { BookOpen, CheckCircle2, Copy, FileText, Globe2, GraduationCap, Mail, Maximize2, MessageSquare, Minimize2, PhoneCall, RotateCcw, SlidersHorizontal, Sparkles, Target, Wand2, Zap } from "lucide-react";
 import Link from "next/link";
 import CreditPurchasePanel from "@/components/CreditPurchasePanel";
 import DiagnosticTools from "@/components/DiagnosticTools";
 
 type ToolSlug =
+  | "ops-overload-analyzer"
   | "text-refiner"
   | "email-polisher"
   | "call-scripter"
@@ -21,7 +22,8 @@ type ToolSlug =
   | "professional-rewrite"
   | "clarity-booster"
   | "structure-architect"
-  | "cultural-adapter";
+  | "cultural-adapter"
+  | "prospect-reply-analyzer";
 type ToolResponse = {
   result?: string;
   suggestions?: string[];
@@ -34,6 +36,8 @@ type ToolResponse = {
 const TONES = ["professional", "warm", "assertive", "empathetic", "concise", "diplomatic"];
 
 const TOOLS: Array<{ id: ToolSlug; icon: React.ReactNode; title: string; desc: string; placeholder: string }> = [
+  { id: "ops-overload-analyzer", icon: <Zap size={18} />, title: "Ops Overload Analyzer", desc: "Paste overloaded messages/tasks and get urgency, owner, next action, and the 24-hour recovery move.", placeholder: "Paste 5-10 urgent emails, Slack messages, tasks, or follow-up notes..." },
+  { id: "prospect-reply-analyzer", icon: <Target size={18} />, title: "Prospect Reply Analyzer", desc: "Find why replies did not convert and rewrite the offer, close, and follow-up.", placeholder: "Paste 3-10 real prospect replies, objections, or no-response messages..." },
   { id: "text-refiner", icon: <Wand2 size={18} />, title: "Text Refiner", desc: "Refine casual text into polished professional language.", placeholder: "Paste a rough message or informal note..." },
   { id: "email-polisher", icon: <Mail size={18} />, title: "Email Polisher", desc: "Transform draft emails into executive correspondence.", placeholder: "Paste your email draft..." },
   { id: "call-scripter", icon: <PhoneCall size={18} />, title: "Call Scripter", desc: "Generate focused call openings, discovery prompts, objections, and closes.", placeholder: "Describe the call goal, recipient, and desired outcome..." },
@@ -52,7 +56,7 @@ const TOOLS: Array<{ id: ToolSlug; icon: React.ReactNode; title: string; desc: s
 ];
 
 export default function Tools() {
-  const [active, setActive] = useState<ToolSlug>("text-refiner");
+  const [active, setActive] = useState<ToolSlug>("ops-overload-analyzer");
   const [input, setInput] = useState("");
   const [tone, setTone] = useState("professional");
   const [result, setResult] = useState<ToolResponse | null>(null);
@@ -95,7 +99,7 @@ export default function Tools() {
         <div className="max-w-6xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "hsl(43 80% 60%)" }}>Intelligence Suite</p>
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-3" style={{ color: "hsl(43 70% 88%)" }}>Behavioral AI Tools</h1>
-          <p className="text-sm max-w-2xl" style={{ color: "rgba(248,245,240,0.7)" }}>Fifteen focused tools for refining, compressing, expanding, planning, and clarifying professional communication.</p>
+          <p className="text-sm max-w-2xl" style={{ color: "rgba(248,245,240,0.7)" }}>Paste overloaded messages, tasks, and follow-ups. Get the urgent queue, owner, next action, and response that saves the next 2+ hours.</p>
         </div>
       </section>
 
@@ -200,10 +204,10 @@ export default function Tools() {
                   <div className="rounded-xl border p-4" style={{ borderColor: "hsl(40 25% 88%)", background: "hsl(43 80% 60% / 0.08)" }}>
                     <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>Value moment unlocked</p>
                     <p className="mt-1 text-xs leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>
-                      If this saved time, buy credits for the next task or upgrade to Growth for 50 monthly credits. Pro is for unlimited memory, Slack, Gmail, Notion, Character Profiles, and Momentum Clarity.
+                      Process the next 10 messages/tasks before another urgent item slips. Buy credits for the batch or upgrade to Growth when daily overload is costing time.
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <Link href="/memberships" className="rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Upgrade memory</Link>
+                      <Link href="/memberships" className="rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Unlock unlimited processing</Link>
                       <Link href="/professionals" className="rounded-lg border px-3 py-2 text-xs font-semibold" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}>Book expert review</Link>
                     </div>
                   </div>
