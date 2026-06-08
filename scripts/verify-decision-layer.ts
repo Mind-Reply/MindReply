@@ -96,6 +96,7 @@ for (const file of [
   "app/sitemap.ts",
   "app/robots.ts",
   "app/manifest.ts",
+  "app/opengraph-image.tsx",
   "components/ai-elements/message.tsx",
   "lib/mragent.ts",
   "lib/mragent-mcp.ts",
