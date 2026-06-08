@@ -4,8 +4,7 @@ import { useMemo, useState } from "react";
 import { ArrowRight, Check, Shield } from "lucide-react";
 import type { DecisionResponse } from "@/lib/decision-layer";
 
-const example =
-  "A client says the fee is too high and asks whether we can wait until next month.";
+const example = "A client says the fee is too high and asks whether we can wait until next month.";
 
 export default function DecisionIntake() {
   const [input, setInput] = useState(example);
@@ -25,14 +24,14 @@ export default function DecisionIntake() {
       const response = await fetch("/api/intake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input, source: "manual" }),
+        body: JSON.stringify({ input, source: "manual", consentFullContent: false, devicePrivacyFlag: false }),
       });
-      const data = await response.json();
-      if (!response.ok) {
+      const data = (await response.json()) as Partial<DecisionResponse> & { error?: string };
+      if (!response.ok || typeof data.synthesis !== "string" || !data.recommendedAction || !data.receipt) {
         setError(data.error ?? "The intake could not be read.");
         return;
       }
-      setDecision(data);
+      setDecision(data as DecisionResponse);
     } catch {
       setError("The intake could not be read.");
     } finally {
@@ -79,13 +78,16 @@ export default function DecisionIntake() {
             type="button"
             className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#c9a961]/40 px-5 py-3 text-sm font-semibold text-[#f8f5f0] transition hover:border-[#c9a961] hover:text-[#c9a961] sm:w-auto"
           >
-            {actionLabel} <Check size={16} />
+            Proceed when ready: {actionLabel} <Check size={16} />
           </button>
           <div className="grid gap-3 text-sm text-[#cdd6e4] md:grid-cols-3">
             <p>Risk: {decision.risk.level}</p>
             <p>{decision.memoryUpdate.summary}</p>
             <p>Receipt: {decision.receipt.id}</p>
           </div>
+          <p className="text-xs leading-5 text-[#8fa0b8]">
+            Playbook: {decision.receipt.playbookId} v{decision.receipt.playbookVersion}. Redaction: {decision.receipt.redactionLevel}.
+          </p>
         </div>
       ) : null}
     </section>
