@@ -30,6 +30,7 @@ const subAgentFiles = [
 ];
 
 const requiredFiles = [
+  ".circleci/config.yml",
   ".github/workflows/angel-pack-report.yml",
   ".vercelignore",
   "app/api/agent/route.ts",
