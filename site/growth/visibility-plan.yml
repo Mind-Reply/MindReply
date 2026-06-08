@@ -1,0 +1,47 @@
+plan: MRagent visibility loop
+status: active
+cadence: weekly planning, checked by the 15-minute monitor
+purpose: Keep SEO, ad messaging, previews, and proof-building moving in small visible steps.
+positioning:
+  promise: Warm mind read. Clear next move.
+  strongest_angle: Read the pressure before you reply.
+  category: Executive Nervous System
+  audience:
+    - people carrying tense messages
+    - founders handling client hesitation
+    - operators with follow-up pressure
+guardrails:
+  - no clinical claims
+  - no generic helper positioning
+  - no claims that raw intake text is stored
+  - one synthesis and one action in every public promise
+weekly_loop:
+  monday:
+    focus: Check production surfaces and search assets.
+    tasks:
+      - review sitemap, robots, manifest, and social preview status
+      - compare home and agent copy against positioning.yml
+      - record whether active Vercel deployment is green
+  wednesday:
+    focus: Refresh campaign language without changing the product promise.
+    tasks:
+      - test one loaded-message headline
+      - test one hesitant-client headline
+      - test one follow-up-pressure headline
+  friday:
+    focus: Capture proof only from real behavior.
+    tasks:
+      - collect safe anonymized outcome notes when available
+      - add proof sections only after real usage evidence exists
+      - keep privacy language aligned with receipts
+report_fields:
+  - active_deployment
+  - legacy_quota_context
+  - production_surfaces
+  - search_assets
+  - ad_message_sync
+  - next_visibility_task
+next_visibility_tasks:
+  - capture fresh /agent production preview after active deployment is green
+  - add one search-intent note for tense reply moments
+  - prepare a Slack-ready report once a destination channel or DM is named
