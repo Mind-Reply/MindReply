@@ -56,6 +56,10 @@ function limitInputForFreePreview(text: string) {
   return items.slice(0, FREE_ITEM_LIMIT).join("\n");
 }
 
+function queuedUpgradeNotice(queuedCount: number) {
+  return `Queued: ${queuedCount} item${queuedCount === 1 ? "" : "s"} waiting. Upgrade to process immediately. Stop missing critical items and unlock unlimited processing.`;
+}
+
 function fallbackProcess(slug: string, text: string) {
   const cleaned = text.trim().replace(/\s+/g, " ");
   if (slug === "ops-overload-analyzer") return [
@@ -119,6 +123,7 @@ export default function DynamicToolPage() {
   const processedCount = Math.min(inputItems.length, FREE_ITEM_LIMIT);
   const queuedCount = Math.max(inputItems.length - FREE_ITEM_LIMIT, 0);
   const hasQueue = queuedCount > 0;
+  const atLimit = processedCount >= FREE_ITEM_LIMIT;
   const usageLabel = `${processedCount}/${FREE_ITEM_LIMIT}`;
 
   async function run() {
@@ -136,13 +141,13 @@ export default function DynamicToolPage() {
         const result = response.ok ? payload.result : payload.error ?? "The tool could not process this request.";
         setOutput({
           ...payload,
-          result: hasQueue ? `${result}\n\nQueued: ${queuedCount} item${queuedCount === 1 ? "" : "s"} waiting. Upgrade to Growth or Pro to process the rest immediately.` : result,
+          result: hasQueue ? `${result}\n\n${queuedUpgradeNotice(queuedCount)}` : result,
           creditCost: payload.creditCost ?? config.cost,
         });
       } else {
         const result = fallbackProcess(slug, limitedInput);
         setOutput({
-          result: hasQueue ? `${result}\n\nQueued: ${queuedCount} item${queuedCount === 1 ? "" : "s"} waiting. Upgrade to Growth or Pro to process the rest immediately.` : result,
+          result: hasQueue ? `${result}\n\n${queuedUpgradeNotice(queuedCount)}` : result,
           creditCost: config.cost,
           suggestions: ["Confirm the next action is explicit.", "Keep the close concise and action-oriented."],
           analysis: { clarity: 88, authority: 86, warmth: 84, brevity: 82 },
@@ -178,16 +183,16 @@ export default function DynamicToolPage() {
                 <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(43 80% 42%)" }}>Free preview limit</p>
                 <h2 className="mt-1 font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>Messages Processed: {usageLabel}</h2>
               </div>
-              <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: hasQueue ? "hsl(0 72% 94%)" : "hsl(150 45% 92%)", color: hasQueue ? "hsl(0 60% 38%)" : "hsl(150 40% 28%)" }}>
-                {hasQueue ? `${queuedCount} queued` : "Ready"}
+              <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: hasQueue || atLimit ? "hsl(0 72% 94%)" : "hsl(150 45% 92%)", color: hasQueue || atLimit ? "hsl(0 60% 38%)" : "hsl(150 40% 28%)" }}>
+                {hasQueue ? `${queuedCount} queued` : atLimit ? "Limit reached" : "Ready"}
               </span>
             </div>
             <p className="mt-3 text-sm leading-6" style={{ color: "hsl(220 25% 45%)" }}>
-              Process the first 10 items as proof. Extra messages stay queued until Growth or Pro unlocks immediate processing.
+              Free preview processes 10 messages or tasks. Any new incoming item is queued: upgrade to process immediately.
             </p>
-            {hasQueue && (
+            {atLimit && (
               <Link href="/memberships" className="mt-4 inline-flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
-                <Lock size={15} /> Stop missing critical items <ArrowRight size={15} />
+                <Lock size={15} /> Unlock Unlimited Processing <ArrowRight size={15} />
               </Link>
             )}
           </section>
@@ -217,11 +222,11 @@ export default function DynamicToolPage() {
 
         {output?.result && (
           <div className="mt-6 rounded-2xl border bg-white p-5" style={{ borderColor: "hsl(40 25% 88%)" }}>
-            <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>Keep your context.</p>
-            <p className="mt-1 text-sm" style={{ color: "hsl(220 25% 45%)" }}>If this analysis found queued work, use credits for the next batch or move to Growth when daily message overload is costing time.</p>
+            <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>Stop missing critical items.</p>
+            <p className="mt-1 text-sm" style={{ color: "hsl(220 25% 45%)" }}>Unlock immediate processing and reclaim your day when the next batch queues.</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Link href="/tools" className="rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Process next 10 items</Link>
-              <Link href="/memberships" className="rounded-lg border px-3 py-2 text-xs font-semibold" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}>Unlock Growth or Pro</Link>
+              <Link href="/memberships" className="rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Unlock Unlimited Processing</Link>
+              <Link href="/tools" className="rounded-lg border px-3 py-2 text-xs font-semibold" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }}>Process next 10 items</Link>
             </div>
           </div>
         )}
