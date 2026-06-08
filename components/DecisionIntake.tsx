@@ -25,7 +25,12 @@ export default function DecisionIntake() {
       const response = await fetch("/api/intake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input, source: "manual" }),
+        body: JSON.stringify({
+          input,
+          source: "manual",
+          consentFullContent: false,
+          devicePrivacyFlag: false,
+        }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -106,6 +111,11 @@ export default function DecisionIntake() {
             <p>Risk: {decision.risk.level}</p>
             <p>{decision.memoryUpdate.summary}</p>
             <p>Receipt: {decision.receipt.id}</p>
+          </div>
+          <div className="grid gap-3 border-t border-white/10 pt-3 text-xs uppercase tracking-[0.16em] text-[#91a0b6] md:grid-cols-3">
+            <p>Playbook: {decision.receipt.playbookId}</p>
+            <p>Version: {decision.receipt.playbookVersion}</p>
+            <p>Redaction: {decision.receipt.redactionLevel}</p>
           </div>
         </div>
       ) : null}
