@@ -1,0 +1,11 @@
+{
+  "playbook_id": "investor-ir-triage",
+  "title": "Investor relations triage",
+  "description": "Classifies investor requests into one clear movement path.",
+  "version": "1.0",
+  "triggers": [{ "type": "email", "pattern": "investor" }, { "type": "email", "pattern": "shareholder" }, { "type": "manual", "pattern": "term sheet" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "investor request", "action": "reply", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "email_template", "template_id": "investor_ack", "params": { "tone": "formal" } }],
+  "verification": { "required": true, "roles": ["owner"] },
+  "audit": { "exportable": true, "signed": true }
+}
