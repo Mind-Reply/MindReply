@@ -1,0 +1,31 @@
+project: MRagent launch motion brief
+format: short web video
+length_seconds: 24
+purpose: Show MRagent as a warm, confident read before a tense reply.
+voice: calm, clever, intimate, precise
+storyboard:
+  - time: 0-4
+    scene: A tense message sits on screen with the cursor paused.
+    line: The moment before reply is where tone gets expensive.
+  - time: 4-9
+    scene: MRagent reads pressure as layered cards: feeling, protection, risk.
+    line: Read the pressure underneath.
+  - time: 9-15
+    scene: One recommended move becomes clear while the raw text fades away.
+    line: Keep one action. Leave a quiet receipt.
+  - time: 15-21
+    scene: The reply becomes steadier, shorter, and less reactive.
+    line: Warm mind read. Clear next move.
+  - time: 21-24
+    scene: MindReply mark, MRagent surface, and agent URL.
+    line: Open MRagent.
+visual_rules:
+  - use restrained motion
+  - avoid mascot or spectacle
+  - keep text large and legible
+  - show the real MRagent interface once latest production deploy is live
+assets_needed:
+  - fresh production screenshot of /agent
+  - social preview image
+  - MindReply mark
+  - final URL card
