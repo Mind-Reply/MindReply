@@ -7,6 +7,14 @@ purpose: Give humans and future personal-pack automation the same compact state 
 fields:
   generatedAt: ISO timestamp for the monitor run.
   siteUrl: Production or override URL checked by the run.
+  run:
+    repository: GitHub owner/repo for the run.
+    ref: Full Git ref or local fallback.
+    branch: Branch name or local fallback.
+    sha: Commit SHA or local fallback.
+    runId: GitHub Actions run id or local fallback.
+    runAttempt: GitHub Actions attempt number or local fallback.
+    runUrl: GitHub Actions run URL when available.
   summary:
     coreAgent: live or check.
     mcpApp: live or not live.
@@ -16,7 +24,11 @@ fields:
     opinion: Short operating opinion for the pass.
     nextAction: The next recommended move.
   surfaces: Per-URL status, latency, and signal.
-  packSources: Required personal-pack source files and whether each exists.
+  packSources: Required personal-pack source files and whether each exists, including slack-api.
+slack_handoff:
+  config: site/automation/slack-api.yml
+  field_id: Xf0B6WHC2SBH
+  rule: Use only after Slack connector access and a destination channel or DM are available.
 uses:
   - GitHub Actions summary
   - future Slack report handoff after workspace channel is connected
