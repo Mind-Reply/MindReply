@@ -1,0 +1,11 @@
+{
+  "playbook_id": "customer-escalation",
+  "title": "Customer escalation",
+  "description": "One calm reply for customer pressure and relationship repair.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "client" }, { "pattern": "customer" }, { "pattern": "complaint" }],
+  "decision_tree": { "nodes": [{ "id": "reply", "action": "reply", "synthesis": "Customer pressure needs a clear reply and a contained next step." }] },
+  "actions": ["reply", "escalate"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
