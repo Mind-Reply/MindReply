@@ -235,6 +235,7 @@ async function postJson(url: string, payload: unknown) {
 async function sendSlack(report: string) {
   if (!channelRequested("slack")) return receipt("slack", "skipped", "Slack channel not requested.");
   if (!slackWebhook) return receipt("slack", "not-configured", "Slack webhook secret is missing.");
+  if (!reportEnabled) return receipt("slack", "blocked", "Report delivery is not enabled.");
   if (dryRun) return receipt("slack", "dry-run", "Slack webhook configured, but dry-run mode blocked sending.");
 
   const text = [
@@ -249,6 +250,7 @@ async function sendSlack(report: string) {
 async function sendWebhook(report: string) {
   if (!channelRequested("webhook")) return receipt("webhook", "skipped", "Generic webhook channel not requested.");
   if (!genericWebhook) return receipt("webhook", "not-configured", "Generic webhook secret is missing.");
+  if (!reportEnabled) return receipt("webhook", "blocked", "Report delivery is not enabled.");
   if (dryRun) return receipt("webhook", "dry-run", "Generic webhook configured, but dry-run mode blocked sending.");
 
   const result = await postJson(genericWebhook, { title: "MindReply Angel Pack Report", generatedAt: now.toISOString(), report });
@@ -266,6 +268,10 @@ async function sendEmail(report: string) {
   const blocked = recipients.filter((item) => !allowed.has(normalizedEmail(item)));
   if (blocked.length) {
     return receipt("email", "blocked", `Recipient not in allowlist: ${blocked.join(", ")}.`);
+  }
+
+  if (!reportEnabled) {
+    return receipt("email", "blocked", "Report delivery is not enabled.");
   }
 
   if (dryRun) {
@@ -324,6 +330,7 @@ function formatProof(receipts: DeliveryReceipt[]) {
 async function main() {
   const report = buildReport();
   const receipts: DeliveryReceipt[] = [receipt("console", "sent", "Report written to workflow log and artifact.")];
+
   const deliveries: Array<[DeliveryReceipt["channel"], (report: string) => Promise<DeliveryReceipt>]> = [
     ["slack", sendSlack],
     ["webhook", sendWebhook],
