@@ -8,6 +8,23 @@ const rails = [
   "Leaves a quiet receipt, not the raw text.",
 ];
 
+const moments = [
+  {
+    title: "The message feels loaded",
+    copy: "MRagent slows the read before you send anything sharp, small, or over-explained.",
+  },
+  {
+    title: "The ask sounds simple, but your body says no",
+    copy: "It names the pressure, the protection, and the calmer boundary hiding underneath.",
+  },
+  {
+    title: "The follow-up keeps tugging",
+    copy: "It turns the loose thread into one quiet next move so it stops circling your attention.",
+  },
+];
+
+const steps = ["Paste the pressure", "Read what is underneath", "Move once, with a receipt"];
+
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -17,6 +34,10 @@ const structuredData = {
   url: "https://www.mind-reply.com/agent",
   description: "Warm mind reads and one clear next move for tense work moments.",
   featureList: ["One synthesis", "One recommended action", "Risk gate", "Quiet receipt"],
+  audience: {
+    "@type": "Audience",
+    audienceType: "Professionals carrying tense messages, delicate replies, and unresolved follow-ups",
+  },
   brand: {
     "@type": "Brand",
     name: "MindReply",
@@ -67,6 +88,39 @@ export default function Home() {
 
         <div className="min-h-[42rem] overflow-hidden rounded-2xl border border-[#162033]/10 bg-[#0d1729] shadow-2xl shadow-[#162033]/15">
           <MRAgentChat compact />
+        </div>
+      </section>
+
+      <section className="border-y border-[#162033]/10 bg-[#fffaf0] px-4 py-12 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">When to use it</p>
+            <h2 className="mt-4 max-w-md font-serif text-4xl font-bold leading-tight md:text-5xl">
+              For the small moment before a big tone mistake.
+            </h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {moments.map((moment) => (
+              <article key={moment.title} className="rounded-xl border border-[#162033]/10 bg-white p-5 shadow-sm shadow-[#162033]/5">
+                <h3 className="font-serif text-2xl font-bold leading-tight">{moment.title}</h3>
+                <p className="mt-4 text-sm leading-6 text-[#4c5a70]">{moment.copy}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-10 md:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 rounded-2xl bg-[#162033] p-5 text-[#f8f5f0] md:flex-row md:items-center md:justify-between md:p-6">
+          {steps.map((step, index) => (
+            <div key={step} className="flex items-center gap-4">
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#e2b757] text-sm font-bold text-[#162033]">{index + 1}</span>
+              <span className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d8deea]">{step}</span>
+            </div>
+          ))}
+          <Link href="/agent" className="rounded-full bg-[#f8f5f0] px-5 py-3 text-sm font-bold text-[#162033] transition hover:bg-[#e2b757]">
+            Try the Mind Read
+          </Link>
         </div>
       </section>
     </main>
