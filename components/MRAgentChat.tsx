@@ -58,20 +58,19 @@ export default function MRAgentChat() {
       });
       const data = (await response.json()) as Partial<AgentResponse> & { error?: string };
 
-      if (!response.ok || !data.reply || !data.decision || !data.id) {
+      if (!response.ok || typeof data.reply !== "string" || typeof data.id !== "string" || !data.decision) {
         setError(data.error ?? "MRagent could not read that clearly.");
         return;
       }
 
-      setMessages((current) => [
-        ...current,
-        {
-          id: data.id,
-          role: "assistant",
-          content: data.reply,
-          decision: data.decision,
-        },
-      ]);
+      const assistantMessage: ChatMessage = {
+        id: data.id,
+        role: "assistant",
+        content: data.reply,
+        decision: data.decision,
+      };
+
+      setMessages((current) => [...current, assistantMessage]);
     } catch {
       setError("MRagent could not read that clearly.");
     } finally {
