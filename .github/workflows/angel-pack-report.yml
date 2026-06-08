@@ -35,6 +35,7 @@ jobs:
       OPS_REPORT_EMAIL_FROM: ${{ secrets.OPS_REPORT_EMAIL_FROM }}
       REPORT_TO_EMAIL: ${{ vars.REPORT_TO_EMAIL }}
       RESEND_FROM: ${{ vars.RESEND_FROM }}
+      SLACK_APP_FIELD_ID: ${{ vars.SLACK_APP_FIELD_ID }}
       REPORT_TIMEZONE: Europe/Kiev
     steps:
       - name: Checkout
