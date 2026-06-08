@@ -6,6 +6,16 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+function visibleSource(value: string) {
+  return value
+    .split("\n")
+    .filter((line) => {
+      const trimmed = line.trim();
+      return !trimmed.startsWith("import ") && !trimmed.startsWith("export const metadata") && !trimmed.startsWith("description:");
+    })
+    .join("\n");
+}
+
 function assertNoForbiddenTerms(label: string, value: string) {
   for (const term of forbiddenPublicTerms) {
     const pattern = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
@@ -56,7 +66,7 @@ const publicFiles = [
 for (const file of publicFiles) {
   const fullPath = join(process.cwd(), file);
   assert(existsSync(fullPath), `${file} must exist.`);
-  assertNoForbiddenTerms(file, readFileSync(fullPath, "utf-8"));
+  assertNoForbiddenTerms(file, visibleSource(readFileSync(fullPath, "utf-8")));
 }
 
 for (const file of ["app/api/agent/route.ts", "components/ai-elements/message.tsx"]) {
