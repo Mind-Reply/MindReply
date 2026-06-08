@@ -1,0 +1,11 @@
+{
+  "playbook_id": "investor-ir-triage",
+  "title": "Investor relations triage",
+  "description": "One measured response for investor or board pressure.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "investor" }, { "pattern": "shareholder" }, { "pattern": "term sheet" }],
+  "decision_tree": { "nodes": [{ "id": "signal", "action": "reply", "synthesis": "Investor pressure needs a measured reply with a clean record." }] },
+  "actions": ["reply", "escalate"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
