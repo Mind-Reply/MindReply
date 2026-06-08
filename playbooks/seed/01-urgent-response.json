@@ -1,0 +1,11 @@
+{
+  "playbook_id": "urgent-response",
+  "title": "README: Urgent Response",
+  "description": "Handle urgent inbound requests with one concise reply.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "email", "pattern": "urgent|asap|today|blocked" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "urgency >= 80", "action": "reply", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "email_template", "template_id": "urgent_reply", "params": {} }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}

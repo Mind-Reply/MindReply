@@ -1,0 +1,11 @@
+{
+  "playbook_id": "investor-update",
+  "title": "README: Investor Update",
+  "description": "Prepare a calm investor response and escalate only if risk is present.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "email", "pattern": "investor|board|runway|fundraise" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "investor term present", "action": "reply", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "email_template", "template_id": "investor_reply", "params": {} }],
+  "verification": { "required": true, "roles": ["founder"] },
+  "audit": { "exportable": true, "signed": true }
+}

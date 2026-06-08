@@ -1,0 +1,11 @@
+{
+  "playbook_id": "billing-clarity",
+  "title": "README: Billing Clarity",
+  "description": "Reply to billing uncertainty with calm next-step clarity.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "email", "pattern": "invoice|payment|billing|refund" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "billing term present", "action": "reply", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "email_template", "template_id": "billing_reply", "params": {} }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}

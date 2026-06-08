@@ -1,0 +1,11 @@
+{
+  "playbook_id": "schedule-follow-up",
+  "title": "README: Schedule Follow-Up",
+  "description": "Prepare a short follow-up hold when scheduling intent is clear.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "calendar", "pattern": "book|meeting|available|schedule" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "required_action == schedule", "action": "schedule", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "calendar_event", "template_id": "follow_up_hold", "params": {} }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}

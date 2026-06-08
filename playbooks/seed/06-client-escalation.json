@@ -1,0 +1,11 @@
+{
+  "playbook_id": "client-escalation",
+  "title": "README: Client Escalation",
+  "description": "Escalate client messages that show dissatisfaction or account risk.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "email", "pattern": "unhappy|angry|cancel|escalate" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "risk term present", "action": "escalate", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "task_create", "template_id": "client_risk", "params": {} }],
+  "verification": { "required": true, "roles": ["account_owner"] },
+  "audit": { "exportable": true, "signed": true }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "MindReply Decision Layer",
+  "description": "Inline intake, one synthesis, one recommended action.",
+  "version": "0.2.0",
+  "manifest_version": 3,
+  "permissions": ["activeTab", "contextMenus", "storage"],
+  "host_permissions": ["https://mail.google.com/*", "https://calendar.google.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*", "https://calendar.google.com/*", "<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_title": "MindReply",
+    "default_popup": "popup.html"
+  }
+}

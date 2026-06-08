@@ -1,0 +1,11 @@
+{
+  "playbook_id": "sensitive-hr",
+  "title": "README: Sensitive HR",
+  "description": "Escalate sensitive people issues and block fast execution.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "email", "pattern": "harassment|complaint|disciplinary|termination" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "sensitive people term present", "action": "escalate", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "task_create", "template_id": "hr_review", "params": {} }],
+  "verification": { "required": true, "roles": ["hr", "founder"] },
+  "audit": { "exportable": true, "signed": true }
+}

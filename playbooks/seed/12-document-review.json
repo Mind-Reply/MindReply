@@ -1,0 +1,11 @@
+{
+  "playbook_id": "document-review",
+  "title": "README: Document Review",
+  "description": "Escalate documents when signature, risk, or legal review is implied.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "file", "pattern": "sign|review|contract|policy" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "document risk present", "action": "escalate", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "task_create", "template_id": "document_review", "params": {} }],
+  "verification": { "required": true, "roles": ["owner"] },
+  "audit": { "exportable": true, "signed": true }
+}

@@ -1,0 +1,11 @@
+{
+  "playbook_id": "vendor-delay",
+  "title": "README: Vendor Delay",
+  "description": "Reply to vendor delay with one requested confirmation.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "email", "pattern": "delay|blocked|waiting|vendor" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "delay present", "action": "reply", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "email_template", "template_id": "vendor_delay", "params": {} }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}

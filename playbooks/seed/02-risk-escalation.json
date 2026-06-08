@@ -1,0 +1,11 @@
+{
+  "playbook_id": "risk-escalation",
+  "title": "README: Risk Escalation",
+  "description": "Block one-click execution when legal or reputational risk is present.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "email", "pattern": "legal|claim|breach|liability" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "importance >= 90", "action": "escalate", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "task_create", "template_id": "risk_review", "params": {} }],
+  "verification": { "required": true, "roles": ["founder", "legal"] },
+  "audit": { "exportable": true, "signed": true }
+}

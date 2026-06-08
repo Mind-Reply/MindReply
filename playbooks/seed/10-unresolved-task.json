@@ -1,0 +1,11 @@
+{
+  "playbook_id": "unresolved-task",
+  "title": "README: Unresolved Task",
+  "description": "Create one follow-up reminder when work is pending.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "manual", "pattern": "pending|unresolved|waiting" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "pending term present", "action": "schedule", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "calendar_event", "template_id": "pending_check", "params": {} }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}

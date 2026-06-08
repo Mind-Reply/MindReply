@@ -1,0 +1,11 @@
+{
+  "playbook_id": "mark-resolved",
+  "title": "README: Mark Resolved",
+  "description": "Close items that clearly require no further action.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "manual", "pattern": "done|complete|approved|thanks" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "importance < 50", "action": "resolve", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "noop", "template_id": "resolved", "params": {} }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}

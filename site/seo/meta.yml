@@ -1,0 +1,11 @@
+title: "MindReply | Executive Nervous System"
+description: "Decision Infrastructure that turns scattered signal into one synthesis and one recommended action."
+canonical: "https://mind-reply.com/"
+open_graph:
+  title: "MindReply"
+  description: "An Executive Nervous System for leaders who need the next action to become obvious."
+  type: "website"
+privacy:
+  default: "snippet-first"
+  receipts: "redacted"
+  memory: "pattern-only"

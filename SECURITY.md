@@ -1,21 +1,15 @@
 # Security Policy
 
-## Supported Versions
+MindReply is built around privacy-first defaults.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+## Boundaries
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+- Mail intake starts with header and snippet only.
+- Sensitive input is classified on the device when possible.
+- Raw content is excluded from audit receipts by default.
+- High-risk communication requires verification before execution.
+- Signed receipts contain metadata, synthesis, action, rationale, and redaction level.
 
-## Reporting a Vulnerability
+## Reporting
 
-Use this section to tell people how to report a vulnerability.
-
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Send security reports to `info@mind-reply.com` with the subject `MindReply Security`.

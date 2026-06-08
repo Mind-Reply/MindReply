@@ -1,0 +1,11 @@
+{
+  "playbook_id": "hiring-reply",
+  "title": "README: Hiring Reply",
+  "description": "Respond to candidate or hiring updates without opening a decision loop.",
+  "version": "0.1.0",
+  "triggers": [{ "type": "email", "pattern": "candidate|interview|hiring|role" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "hiring term present", "action": "reply", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "email_template", "template_id": "hiring_reply", "params": {} }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}

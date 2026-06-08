@@ -2,15 +2,20 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="pt-20 min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center px-4">
-        <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-3">404</p>
-        <h1 className="font-serif text-4xl font-bold text-foreground mb-3">Page Not Found</h1>
-        <p className="text-muted-foreground text-sm mb-6">The page you're looking for doesn't exist.</p>
-        <Link href="/" className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-medium px-6 py-3 rounded-lg hover:opacity-90 transition-opacity text-sm">
-          Return Home
+    <main className="flex min-h-screen items-center justify-center bg-[#0f1412] px-5 text-[#f4efe4]">
+      <section className="max-w-md rounded-lg border border-[#403b31] bg-[#171d1a] p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b99758]">404</p>
+        <h1 className="mt-3 text-3xl font-semibold">Signal not found.</h1>
+        <p className="mt-4 leading-7 text-[#c9c1b0]">
+          This path is outside the current decision surface.
+        </p>
+        <Link
+          href="/"
+          className="mt-6 inline-flex h-11 items-center rounded-md bg-[#b99758] px-5 text-sm font-semibold text-[#101512]"
+        >
+          Return to MindReply
         </Link>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
