@@ -1,0 +1,11 @@
+{
+  "playbook_id": "meeting-outcome-actioner",
+  "title": "Meeting outcome actioner",
+  "description": "Places meeting residue into one follow-up moment.",
+  "version": "1.0",
+  "triggers": [{ "type": "calendar", "pattern": "meeting" }, { "type": "manual", "pattern": "next step" }, { "type": "manual", "pattern": "follow up" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "unresolved meeting item", "action": "schedule", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "calendar_event", "template_id": "quiet_follow_up", "params": { "minutes": 60 } }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}
