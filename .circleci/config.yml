@@ -1,0 +1,50 @@
+version: 2.1
+
+jobs:
+  verify:
+    docker:
+      - image: cimg/node:20.19
+    resource_class: medium
+    environment:
+      REPORT_TIMEZONE: Europe/Kiev
+      MINDREPLY_REPORT_DRY_RUN: "1"
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - mindreply-npm-v1-{{ checksum "package.json" }}
+            - mindreply-npm-v1-
+      - run:
+          name: Install dependencies
+          command: npm install --prefer-offline --no-audit --fund=false --progress=false
+      - save_cache:
+          key: mindreply-npm-v1-{{ checksum "package.json" }}
+          paths:
+            - ~/.npm
+      - run:
+          name: Verify decision layer
+          command: npm run decision:verify
+      - run:
+          name: Verify MCP submission surface
+          command: npm run mcp:verify
+      - run:
+          name: Verify ops report
+          command: npm run ops:report
+      - run:
+          name: Generate Angel Pack report dry run
+          command: npm run ops:pack | tee mindreply-angel-pack-report.md
+      - run:
+          name: Typecheck
+          command: npm run typecheck
+      - store_artifacts:
+          path: mindreply-angel-pack-report.md
+          destination: mindreply-angel-pack-report.md
+
+workflows:
+  verify:
+    jobs:
+      - verify:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
