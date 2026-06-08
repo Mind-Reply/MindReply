@@ -93,7 +93,7 @@ export default async function SolutionLandingPage({ params }: PageProps) {
               {page.primaryLabel}
             </Link>
             <Link href="/memberships" className="inline-flex justify-center rounded-lg border px-6 py-3.5 text-sm font-semibold" style={{ borderColor: "rgba(248,245,240,0.28)", color: "hsl(43 70% 88%)" }}>
-              View Memberships
+              Unlock Unlimited Processing
             </Link>
           </div>
         </div>
@@ -103,7 +103,7 @@ export default async function SolutionLandingPage({ params }: PageProps) {
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "hsl(43 80% 60%)" }}>
-              Commercial Problem
+              Urgent Problem
             </p>
             <h2 className="mt-3 font-serif text-3xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>
               What MindReply fixes
@@ -145,8 +145,8 @@ export default async function SolutionLandingPage({ params }: PageProps) {
         <div className="mx-auto max-w-6xl">
           <div className="rounded-xl p-8 md:flex md:items-center md:justify-between" style={{ background: "hsl(220 45% 13%)" }}>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "hsl(43 80% 60%)" }}>Start revenue workflow</p>
-              <h2 className="mt-3 font-serif text-3xl font-bold" style={{ color: "hsl(43 70% 88%)" }}>Turn one sensitive message into a paid workflow.</h2>
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "hsl(43 80% 60%)" }}>Start with the next 10 items</p>
+              <h2 className="mt-3 font-serif text-3xl font-bold" style={{ color: "hsl(43 70% 88%)" }}>Turn the active queue into clear next actions.</h2>
             </div>
             <Link href={page.primaryHref} className="mt-6 inline-flex rounded-lg px-6 py-3 text-sm font-semibold md:mt-0" style={{ background: "hsl(43 80% 60%)", color: "hsl(220 45% 13%)" }}>
               {page.primaryLabel}
