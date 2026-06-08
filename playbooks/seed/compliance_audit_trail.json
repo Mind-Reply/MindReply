@@ -1,0 +1,11 @@
+{
+  "playbook_id": "compliance-audit-trail",
+  "title": "Compliance audit trail",
+  "description": "Captures sensitive compliance items as signed receipts.",
+  "version": "1.0",
+  "triggers": [{ "type": "email", "pattern": "audit" }, { "type": "manual", "pattern": "policy" }, { "type": "webhook", "pattern": "breach" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "compliance signal", "action": "escalate", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "task_create", "template_id": "compliance_review", "params": { "role": "owner" } }],
+  "verification": { "required": true, "roles": ["owner"] },
+  "audit": { "exportable": true, "signed": true }
+}
