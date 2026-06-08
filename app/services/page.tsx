@@ -33,12 +33,12 @@ const services = [
 ];
 
 const serviceChecks = [
-  "Footer routes point to core pages",
+  "Core service pages are easy to reach",
   "MRagent can answer broad questions",
   "Bookings guide users to session rooms",
   "Tools produce practical outputs",
-  "Language status is available",
-  "Lexicons support field-aware language",
+  "Language can adapt to visitor context",
+  "Lexicons support field-aware wording",
 ];
 
 export default function ServicesPage() {
@@ -46,10 +46,10 @@ export default function ServicesPage() {
     <main className="min-h-screen pt-20" style={{ background: "hsl(40 33% 97%)" }}>
       <section className="px-4 py-16" style={{ background: "hsl(220 55% 20%)" }}>
         <div className="mx-auto max-w-6xl">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest" style={{ color: "hsl(43 80% 60%)" }}>Service Layer</p>
-          <h1 className="max-w-3xl font-serif text-4xl font-bold md:text-5xl" style={{ color: "hsl(43 70% 88%)" }}>Services for chat, tools, bookings, and lexicons.</h1>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest" style={{ color: "hsl(43 80% 60%)" }}>Services</p>
+          <h1 className="max-w-3xl font-serif text-4xl font-bold md:text-5xl" style={{ color: "hsl(43 70% 88%)" }}>AI chat, tools, bookings, and specialist lexicons.</h1>
           <p className="mt-4 max-w-2xl text-sm leading-6" style={{ color: "rgba(248,245,240,0.72)" }}>
-            Core MindReply paths for AI chat, professional messages, expert previews, bookings, and specialist language.
+            Core MindReply paths for useful AI chat, professional messages, expert previews, bookings, and specialist language.
           </p>
         </div>
       </section>
@@ -65,7 +65,7 @@ export default function ServicesPage() {
                     <Icon size={22} />
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "hsl(150 45% 92%)", color: "hsl(150 40% 28%)" }}>
-                    <CheckCircle2 size={13} /> Ready
+                    <CheckCircle2 size={13} /> Available
                   </span>
                 </div>
                 <h2 className="mt-5 font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>{service.title}</h2>
@@ -80,14 +80,14 @@ export default function ServicesPage() {
 
         <div className="mt-8 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="rounded-2xl border bg-white p-6" style={{ borderColor: "hsl(40 25% 88%)" }}>
-            <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(43 80% 45%)" }}><ShieldCheck size={14} /> Service status</p>
-            <h2 className="font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>Everything here is routed to a core MindReply surface.</h2>
+            <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(43 80% 45%)" }}><ShieldCheck size={14} /> Service paths</p>
+            <h2 className="font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>Everything here leads to a useful MindReply surface.</h2>
             <p className="mt-3 text-sm leading-6" style={{ color: "hsl(220 25% 45%)" }}>
               Start with MRagent for quick direction, use the tools for practical output, or move into booking when you need field-specific support.
             </p>
           </section>
           <section className="rounded-2xl border bg-white p-6" style={{ borderColor: "hsl(40 25% 88%)" }}>
-            <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(43 80% 45%)" }}><Sparkles size={14} /> Working checks</p>
+            <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(43 80% 45%)" }}><Sparkles size={14} /> What you can do</p>
             <div className="grid gap-2 sm:grid-cols-2">
               {serviceChecks.map((item) => (
                 <div key={item} className="flex gap-2 rounded-xl border px-3 py-3 text-sm" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 35% 30%)" }}>
