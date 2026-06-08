@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { isProductionRequirementConfigured } from "@/lib/production-requirements";
 
-function checkStatus(configured: boolean) {
-  return configured ? "configured" : "not_configured";
+function publicStatus(configured: boolean) {
+  return configured ? "ok" : "limited";
 }
 
 export async function GET() {
@@ -18,14 +18,14 @@ export async function GET() {
 
   const checks = {
     app: { status: "ok" },
-    siteUrl: { status: checkStatus(siteUrlConfigured) },
-    database: { status: checkStatus(databaseConfigured) },
-    auth: { status: checkStatus(authConfigured) },
-    payments: { status: checkStatus(stripeConfigured && stripeWebhookConfigured) },
-    bookingPayments: { status: checkStatus(bookingPaymentsConfigured) },
-    analytics: { status: checkStatus(analyticsConfigured) },
-    monitoring: { status: checkStatus(monitoringConfigured) },
-    aiProvider: { status: checkStatus(aiProviderConfigured) },
+    site: { status: publicStatus(siteUrlConfigured) },
+    data: { status: publicStatus(databaseConfigured) },
+    accountAccess: { status: publicStatus(authConfigured) },
+    checkout: { status: publicStatus(stripeConfigured && stripeWebhookConfigured) },
+    bookingCheckout: { status: publicStatus(bookingPaymentsConfigured) },
+    analytics: { status: publicStatus(analyticsConfigured) },
+    monitoring: { status: publicStatus(monitoringConfigured) },
+    aiChat: { status: publicStatus(aiProviderConfigured) },
   };
 
   return NextResponse.json({
