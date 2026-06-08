@@ -1,0 +1,11 @@
+{
+  "playbook_id": "pr-crisis-triage",
+  "title": "Public statement triage",
+  "description": "One restrained review path for public pressure.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "press" }, { "pattern": "journalist" }, { "pattern": "crisis" }],
+  "decision_tree": { "nodes": [{ "id": "review", "action": "escalate", "synthesis": "Public pressure needs review before wording leaves the room." }] },
+  "actions": ["escalate"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
