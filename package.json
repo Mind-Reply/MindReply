@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "npm run typecheck",
     "typecheck": "next typegen && tsc --noEmit",
-    "decision:verify": "tsx scripts/verify-decision-layer.ts"
+    "decision:verify": "tsx scripts/verify-decision-layer.ts",
+    "python:verify": "python -m unittest discover src",
+    "verify:all": "npm run decision:verify && npm run typecheck && npm run python:verify"
   },
   "dependencies": {
     "@vercel/speed-insights": "^2.0.0",
