@@ -24,9 +24,22 @@ async function main() {
     assert(manifest.resources[0]?.uri === MRAGENT_WIDGET_URI, "Widget resource URI changed.");
     assert(manifest.resources[0]?.mimeType === MRAGENT_RESOURCE_MIME_TYPE, "Widget MIME type changed.");
 
+    const prepareTool = manifest.tools.find((tool) => tool.name === "prepare_mindread") as {
+      annotations?: { readOnlyHint?: boolean; destructiveHint?: boolean; openWorldHint?: boolean };
+    };
     const renderTool = manifest.tools.find((tool) => tool.name === "render_mindread") as {
+      annotations?: { readOnlyHint?: boolean; destructiveHint?: boolean; openWorldHint?: boolean };
       _meta?: { ui?: { resourceUri?: string }; [key: string]: unknown };
     };
+    const receiptTool = manifest.tools.find((tool) => tool.name === "fetch_receipt") as {
+      annotations?: { readOnlyHint?: boolean; destructiveHint?: boolean; openWorldHint?: boolean };
+    };
+
+    assert(prepareTool?.annotations?.readOnlyHint === false, "prepare_mindread can persist records and must not be marked read-only.");
+    assert(renderTool?.annotations?.readOnlyHint === false, "render_mindread can persist records and must not be marked read-only.");
+    assert(receiptTool?.annotations?.readOnlyHint === true, "fetch_receipt must remain read-only.");
+    assert(prepareTool.annotations?.destructiveHint === false && renderTool.annotations?.destructiveHint === false, "Preparation tools must not be destructive.");
+    assert(prepareTool.annotations?.openWorldHint === false && renderTool.annotations?.openWorldHint === false, "Preparation tools must not publish or change public systems.");
     assert(renderTool?._meta?.ui?.resourceUri === MRAGENT_WIDGET_URI, "Render tool must attach the widget resource.");
     assert(renderTool?._meta?.["openai/outputTemplate"] === MRAGENT_WIDGET_URI, "Render tool must expose ChatGPT output template metadata.");
 
