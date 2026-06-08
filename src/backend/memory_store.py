@@ -1,3 +1,7 @@
+"""Purpose: Memory Layer stores derived preferences without raw input.
+Local test: python -m unittest discover src
+"""
+
 from __future__ import annotations
 
 
@@ -6,11 +10,14 @@ class MemoryStore:
         self._records: dict[str, list[dict]] = {}
 
     def update(self, user_id: str, raw_input: str, decision: dict) -> dict:
-        action = decision.get("recommended_action", {}).get("kind", "resolve")
+        action = decision.get("recommended_action", {}).get("kind", decision.get("required_action", "resolve"))
+        risk = decision.get("risk", {}).get("level", decision.get("risk_level", "low"))
         derived = {
             "preferred_action": action,
             "tone": "calm",
-            "last_signal_length": len(raw_input),
+            "follow_up_bias": "contained",
+            "risk_bias": "review" if risk in {"medium", "high"} else "normal",
+            "signal_size": "short" if len(raw_input) < 240 else "long",
         }
         self._records.setdefault(user_id, []).append(derived)
         return {
