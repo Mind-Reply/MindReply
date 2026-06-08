@@ -11,6 +11,7 @@ const repo = process.env.GITHUB_REPOSITORY || "Mind-Reply/MindReply";
 const sha = process.env.GITHUB_SHA || "local";
 const ref = process.env.GITHUB_REF_NAME || process.env.GITHUB_REF || "unknown";
 const timezone = process.env.REPORT_TIMEZONE || "Europe/Kiev";
+const dryRun = process.env.MINDREPLY_REPORT_DRY_RUN === "1" || process.env.REPORT_DRY_RUN === "1";
 const runUrl = process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY && process.env.GITHUB_RUN_ID
   ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
   : "not available";
@@ -112,6 +113,7 @@ const report = [
   `Ref: ${ref}`,
   `Commit: ${sha}`,
   `Workflow: ${runUrl}`,
+  `Dry run: ${dryRun ? "yes" : "no"}`,
   "",
   "## Delivery Status",
   "",
@@ -160,6 +162,11 @@ async function postJson(url: string, payload: unknown) {
 }
 
 async function maybeSend() {
+  if (dryRun) {
+    console.log("Report delivery skipped because dry-run mode is active.");
+    return;
+  }
+
   const slackWebhook = process.env.SLACK_WEBHOOK_URL;
   const genericWebhook = process.env.OPS_REPORT_WEBHOOK_URL;
   const resendKey = process.env.RESEND_API_KEY;
