@@ -1,0 +1,11 @@
+{
+  "playbook_id": "personal-life-triage",
+  "title": "Personal life triage",
+  "description": "One warm reply for personal or family pressure.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "family" }, { "pattern": "personal" }, { "pattern": "appointment" }],
+  "decision_tree": { "nodes": [{ "id": "reply", "action": "reply", "synthesis": "Personal pressure needs warmth and a boundary." }] },
+  "actions": ["reply", "schedule"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
