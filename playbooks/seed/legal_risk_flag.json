@@ -1,0 +1,11 @@
+{
+  "playbook_id": "legal-risk-flag",
+  "title": "Legal risk flag",
+  "description": "Holds sensitive legal material for review before movement.",
+  "version": "1.0",
+  "triggers": [{ "type": "email", "pattern": "legal" }, { "type": "manual", "pattern": "lawsuit" }, { "type": "webhook", "pattern": "regulator" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "legal signal", "action": "escalate", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "task_create", "template_id": "legal_review", "params": { "role": "owner" } }],
+  "verification": { "required": true, "roles": ["owner"] },
+  "audit": { "exportable": true, "signed": true }
+}
