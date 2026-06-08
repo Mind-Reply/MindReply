@@ -10,9 +10,16 @@ const now = new Date();
 const repo = process.env.GITHUB_REPOSITORY || "Mind-Reply/MindReply";
 const sha = process.env.GITHUB_SHA || "local";
 const ref = process.env.GITHUB_REF_NAME || process.env.GITHUB_REF || "unknown";
+const timezone = process.env.REPORT_TIMEZONE || "Europe/Kiev";
 const runUrl = process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY && process.env.GITHUB_RUN_ID
   ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
   : "not available";
+
+const localTime = new Intl.DateTimeFormat("en-GB", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: timezone,
+}).format(now);
 
 const workstreams: Workstream[] = [
   {
@@ -77,10 +84,21 @@ function lineFor(stream: Workstream) {
   return `- ${stream.name} (${stream.owner}, ${stream.priority}): ${stream.nextMove} Win signal: ${stream.winSignal}`;
 }
 
+const angelPack = [
+  "## Personal Angel Pack",
+  "",
+  "- Completed move: added a scheduled Angel Pack report lane with Slack/email-ready delivery hooks and artifact retention.",
+  "- Revenue move: keep the paid path as annual setup plus prepaid handled-decision credit loads, with visible usage and clear boundaries.",
+  "- Gift build: create a private executive brief card that shows one useful implementation idea, the exact surface it touches, and a tiny verification checklist.",
+  "- Design gift: keep the first viewport as a private operating room for decisions: command input, executive brief, agent/status modules, risk/receipt strip.",
+  "- Verification: report artifact exists, no secrets are committed, delivery only activates when runtime secrets are configured.",
+];
+
 const report = [
   "# MindReply Angel Pack Report",
   "",
   `Generated: ${now.toISOString()}`,
+  `Local time (${timezone}): ${localTime}`,
   `Repository: ${repo}`,
   `Ref: ${ref}`,
   `Commit: ${sha}`,
@@ -91,7 +109,7 @@ const report = [
   "- Active PR: #12, `codex/executive-nervous-system-main-sync`.",
   "- Known blocker: Vercel status points to `upgradeToPro=build-rate-limit`.",
   "- Code-side protection: ignored-build guard and `.vercelignore` are present on the branch.",
-  "- Owner action: confirm Vercel Pro or wait for the rate-limit window, then redeploy.",
+  "- Owner action: confirm Vercel Pro or wait for the rate-limit window, then redeploy once.",
   "",
   "## 8 Workstreams",
   "",
@@ -101,8 +119,11 @@ const report = [
   "",
   "- Annual setup: private Executive Nervous System installation for the founder or operator.",
   "- Credit load: a handled-decision bundle for reply rescue, risk checks, memory receipts, and follow-up placement.",
+  "- Starter/Growth/Scale can map to access, implementation support, and workflow rollout depth.",
   "- First win: paste one pressure-heavy message and receive one synthesis, one recommended action, one private receipt.",
   "- Upgrade moment: after the first useful decision, offer a handled-decision pack instead of more menus.",
+  "",
+  ...angelPack,
   "",
   "## Surprise Build Slot",
   "",
@@ -125,8 +146,8 @@ async function maybeSend() {
   const slackWebhook = process.env.SLACK_WEBHOOK_URL;
   const genericWebhook = process.env.OPS_REPORT_WEBHOOK_URL;
   const resendKey = process.env.RESEND_API_KEY;
-  const emailTo = process.env.OPS_REPORT_EMAIL_TO;
-  const emailFrom = process.env.OPS_REPORT_EMAIL_FROM || "MindReply Ops <ops@mind-reply.com>";
+  const emailTo = process.env.OPS_REPORT_EMAIL_TO || process.env.REPORT_TO_EMAIL;
+  const emailFrom = process.env.OPS_REPORT_EMAIL_FROM || process.env.RESEND_FROM || "MindReply Ops <ops@mind-reply.com>";
 
   if (slackWebhook) {
     await postJson(slackWebhook, { text: report.slice(0, 3800) });
@@ -142,6 +163,7 @@ async function maybeSend() {
       headers: {
         Authorization: `Bearer ${resendKey}`,
         "Content-Type": "application/json",
+        "Idempotency-Key": `angel-pack-${process.env.GITHUB_RUN_ID || sha}-${process.env.GITHUB_RUN_ATTEMPT || "1"}`,
       },
       body: JSON.stringify({
         from: emailFrom,
