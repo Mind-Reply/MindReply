@@ -21,6 +21,11 @@ const localTime = new Intl.DateTimeFormat("en-GB", {
   timeZone: timezone,
 }).format(now);
 
+const slackConfigured = Boolean(process.env.SLACK_WEBHOOK_URL);
+const slackFieldConfigured = Boolean(process.env.SLACK_APP_FIELD_ID);
+const webhookConfigured = Boolean(process.env.OPS_REPORT_WEBHOOK_URL);
+const emailConfigured = Boolean(process.env.RESEND_API_KEY && (process.env.OPS_REPORT_EMAIL_TO || process.env.REPORT_TO_EMAIL));
+
 const workstreams: Workstream[] = [
   {
     name: "Deployment",
@@ -84,6 +89,10 @@ function lineFor(stream: Workstream) {
   return `- ${stream.name} (${stream.owner}, ${stream.priority}): ${stream.nextMove} Win signal: ${stream.winSignal}`;
 }
 
+function configuredLine(label: string, configured: boolean) {
+  return `- ${label}: ${configured ? "configured" : "not configured"}`;
+}
+
 const angelPack = [
   "## Personal Angel Pack",
   "",
@@ -103,6 +112,14 @@ const report = [
   `Ref: ${ref}`,
   `Commit: ${sha}`,
   `Workflow: ${runUrl}`,
+  "",
+  "## Delivery Status",
+  "",
+  configuredLine("Slack webhook", slackConfigured),
+  configuredLine("Slack app field label", slackFieldConfigured),
+  configuredLine("Generic webhook", webhookConfigured),
+  configuredLine("Email delivery", emailConfigured),
+  "- Secret values are never printed in this report.",
   "",
   "## Current Deploy Truth",
   "",
