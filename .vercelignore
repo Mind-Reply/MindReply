@@ -1,0 +1,29 @@
+# Keep Vercel deployments focused on the Next.js runtime.
+# This does not bypass account build limits; it reduces duplicate payload and stale artifact upload.
+
+.git
+.github
+.autoclaw
+.cursor
+.codex
+.agents
+
+coverage
+reports
+output
+artifacts
+*.log
+
+# Private/support material is validated in CI, not shipped to the public runtime.
+docs
+site
+src/backend
+src/integrations
+src/edge
+playbooks
+
+# Local and imported planning assets.
+*.pdf
+*.docx
+*.zip
+*.7z
