@@ -1,0 +1,11 @@
+{
+  "playbook_id": "product-launch-gatekeeper",
+  "title": "Launch gatekeeper",
+  "description": "Places launch pressure into one readiness checkpoint.",
+  "version": "1.0",
+  "triggers": [{ "type": "manual", "pattern": "launch" }, { "type": "manual", "pattern": "release" }, { "type": "manual", "pattern": "ship" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "launch signal", "action": "schedule", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "calendar_event", "template_id": "launch_checkpoint", "params": { "minutes": 120 } }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}
