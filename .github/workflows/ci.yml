@@ -27,6 +27,9 @@ jobs:
       - name: Verify MRagent MCP
         run: npm run mcp:verify
 
+      - name: Generate ops report
+        run: npm run ops:report
+
       - name: Typecheck
         run: npm run typecheck
 
