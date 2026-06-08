@@ -1,55 +1,64 @@
+"""Purpose: append-only privacy-safe audit receipts for executed actions.
+Local test: python -m unittest discover src
+"""
+
 from __future__ import annotations
 
 import hashlib
 import hmac
 import json
 import os
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
 
 class AuditLog:
-    def __init__(self, path: str = "audit.jsonl") -> None:
+    def __init__(self, path: str = "audit.jsonl", signing_key: str | None = None) -> None:
         self.path = Path(path)
+        self.signing_key = signing_key or os.environ.get("MINDREPLY_AUDIT_SIGNING_KEY", "local-dev-signing-key")
 
     def record(
         self,
         raw_input: str,
         source: str,
         action_kind: str,
-        risk_level: str = "low",
-        playbook_id: str = "unassigned",
-        confidence: float | None = None,
+        playbook_id: str = "clear-next-move",
+        playbook_version: str = "1.0",
+        synthesis: str = "Decision recorded.",
+        actor: str = "server",
+        redaction_level: str = "full",
+        rationale: str = "One recommended action was produced.",
     ) -> dict:
         timestamp = datetime.now(timezone.utc).isoformat()
         input_hash = hashlib.sha256(raw_input.encode("utf-8")).hexdigest()
         receipt = {
-            "id": input_hash[:16],
+            "receipt_id": str(uuid.uuid4()),
             "timestamp": timestamp,
-            "source": source,
-            "action_kind": action_kind,
-            "risk_level": risk_level,
             "playbook_id": playbook_id,
-            "confidence": confidence,
+            "playbook_version": playbook_version,
+            "synthesis": synthesis,
+            "action": action_kind,
+            "actor": actor,
             "input_hash": input_hash,
-            "raw_content_redacted": True,
+            "source": source,
+            "redaction_level": redaction_level,
+            "rationale": rationale,
         }
-        receipt["signature"] = self._signature(receipt)
+        receipt["signatures"] = [{"key_id": "local-dev", "sig": self._sign(receipt)}]
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(receipt, sort_keys=True) + "\n")
         return {
-            "id": receipt["id"],
+            "id": receipt["receipt_id"],
+            "receipt_id": receipt["receipt_id"],
             "timestamp": timestamp,
             "source": source,
-            "signature": receipt["signature"],
+            "playbook_id": playbook_id,
+            "playbook_version": playbook_version,
+            "signatures": receipt["signatures"],
         }
 
-    def _signature(self, receipt: dict) -> str:
-        key = os.getenv("MINDREPLY_RECEIPT_SIGNING_KEY", "mindreply-local-receipt-key")
-        payload = json.dumps(
-            {key_name: value for key_name, value in receipt.items() if key_name != "signature"},
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode("utf-8")
-        return hmac.new(key.encode("utf-8"), payload, hashlib.sha256).hexdigest()
+    def _sign(self, receipt: dict) -> str:
+        payload = json.dumps({key: value for key, value in receipt.items() if key != "signatures"}, sort_keys=True).encode("utf-8")
+        return hmac.new(self.signing_key.encode("utf-8"), payload, hashlib.sha256).hexdigest()
