@@ -1,0 +1,41 @@
+brand: MindReply MRagent
+public_promise: Warm mind read. Clear next move.
+mission: Help people answer tense moments with calm pattern-reading, one safer action, and a privacy-safe receipt.
+current_read:
+  status: The surface now feels like a behavioral companion rather than a generic helper.
+  strength: The brand has a clear emotional lane around pressure before reply.
+  risk: The live site can still look stale when Vercel does not publish the newest GitHub main.
+strongest_angle: Read the pressure before you reply.
+audience:
+  primary: People carrying tense messages, client hesitation, and unresolved follow-ups.
+  secondary: Founders and operators who need one calm move under social pressure.
+page_roles:
+  home: Set the promise, show pressure moments, and move people into MRagent.
+  agent: Deliver the working Mind Read surface.
+  privacy: Prove the receipt-first privacy shape in plain language.
+  mcp: Connect MRagent to ChatGPT Developer Mode.
+visibility_checks:
+  - home page reachable
+  - MRagent page reachable
+  - MCP tool route reachable
+  - health route reachable
+  - sitemap reachable
+  - robots reachable
+  - manifest reachable
+  - social preview image reachable
+language:
+  use:
+    - mind read
+    - pressure
+    - one action
+    - quiet receipt
+    - warm but firm
+  avoid:
+    - generic helper positioning
+    - clinical claims
+    - public claims about raw input storage
+next_tasks:
+  - clear Vercel build-rate-limit so GitHub main can publish
+  - capture a fresh production preview once latest main is live
+  - keep ad messaging and positioning files synced before campaign changes
+  - add proof sections only after real usage evidence exists
