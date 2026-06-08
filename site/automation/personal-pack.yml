@@ -17,6 +17,7 @@ surfaces:
       - MCP app route
       - health route
     current_blocker: Vercel build-rate-limit must clear before newest main can publish.
+    runbook: site/automation/vercel-build-limit-runbook.yml
   generation_persistence:
     watch:
       - generation id present
@@ -40,6 +41,7 @@ surfaces:
   slack_ready:
     workspace: mind-reply
     invite_status: provided privately in chat
+    config: site/automation/slack-api.yml
     rule: Do not commit invite URLs or private channel content to the repo.
     next_safe_step: Use Slack connector only after the workspace is connected and a channel target is named.
   outlook_ready:
