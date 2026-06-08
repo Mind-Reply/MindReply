@@ -43,7 +43,9 @@ const highRisk = buildDecisionResponse({
 assert(highRisk.recommendedAction.kind === "escalate", "High-risk input must escalate.");
 assert(highRisk.risk.level === "high", "High-risk input must be marked high.");
 assertNoForbiddenTerms("high-risk action label", highRisk.recommendedAction.label);
-assert(!redirectedPublicPaths.some((prefix) => "/agent" === prefix || "/agent".startsWith(`${prefix}/`)), "/agent must remain available for MRagent.");
+
+const agentPath = "/agent" as string;
+assert(!redirectedPublicPaths.some((prefix) => agentPath === prefix || agentPath.startsWith(`${prefix}/`)), "/agent must remain available for MRagent.");
 
 for (const path of ["/tools", "/integrations", "/dashboard", "/memberships", "/professionals", "/bookings"]) {
   assert(redirectedPublicPaths.some((prefix) => path === prefix || path.startsWith(`${prefix}/`)), `${path} must be redirected to /.`);
