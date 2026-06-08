@@ -155,12 +155,12 @@ function selectPlaybook(input: string): Playbook {
 function assessRisk(input: string): DecisionResponse["risk"] {
   const lower = input.toLowerCase();
   if (highRiskTerms.some((term) => lower.includes(term))) {
-    return { level: "high", reason: "Risk detected before movement.", escalate: true };
+    return { level: "high", reason: "The pressure could push a move that deserves review before it leaves your hands.", escalate: true };
   }
   if (mediumRiskTerms.some((term) => lower.includes(term))) {
-    return { level: "medium", reason: "Sensitive context detected; proceed with restraint.", escalate: false };
+    return { level: "medium", reason: "The situation is tender enough to need slower language and firmer edges.", escalate: false };
   }
-  return { level: "low", reason: "No blocking risk detected.", escalate: false };
+  return { level: "low", reason: "No blocking risk detected; this can move with care.", escalate: false };
 }
 
 function chooseAction(input: string, playbook: Playbook, risk: DecisionResponse["risk"]): RecommendedActionKind {
@@ -172,11 +172,11 @@ function chooseAction(input: string, playbook: Playbook, risk: DecisionResponse[
 }
 
 function buildSynthesis(input: string, kind: RecommendedActionKind) {
-  if (!input) return "No usable input was provided.";
-  if (kind === "escalate") return "This carries risk and needs review before movement.";
-  if (kind === "reply") return "This needs a calm response that reduces pressure and preserves the relationship.";
-  if (kind === "schedule") return "This needs a quiet follow-up moment rather than more wording now.";
-  return "This can be closed with a clear record and no further movement.";
+  if (!input) return "No usable signal was provided.";
+  if (kind === "escalate") return "The pressure is too charged for a fast move and needs a steadier review first.";
+  if (kind === "reply") return "This needs a calm reply that protects trust without surrendering your position.";
+  if (kind === "schedule") return "This belongs in one contained follow-up moment, not in your head all day.";
+  return "This can leave your attention once it is marked clearly and quietly closed.";
 }
 
 function buildTriage(input: string, source: IntakeSource, risk: DecisionResponse["risk"], playbook: Playbook): TriageContract {
@@ -233,7 +233,7 @@ function buildAction(kind: RecommendedActionKind, synthesis: string): DecisionRe
       label: "Send the prepared reply",
       payload: {
         draft:
-          "Thank you for being direct. I understand the concern. The next step is to confirm the decision point, protect the relationship, and agree the timing.",
+          "Thank you for saying that directly. I understand the concern. The cleanest next step is to name the decision point, protect the relationship, and agree the timing without rushing either side.",
       },
     };
   }
@@ -291,7 +291,7 @@ export function buildDecisionResponse(request: IntakeRequest): DecisionResponse 
     risk,
     memoryUpdate: {
       applied: true,
-      summary: "Decision memory adjusted quietly.",
+      summary: "Tone preference and pressure pattern noted without saving the raw text.",
     },
     receipt: {
       id: receiptId,
