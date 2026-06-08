@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Copy, Wand2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Copy, Lock, Wand2 } from "lucide-react";
 import CreditPurchasePanel from "@/components/CreditPurchasePanel";
 
 type ToolResponse = {
@@ -12,6 +12,8 @@ type ToolResponse = {
   suggestions?: string[];
   analysis?: { clarity: number; authority: number; warmth: number; brevity: number };
 };
+
+const FREE_ITEM_LIMIT = 10;
 
 const TOOL_CONFIGS: Record<string, { name: string; cost: number; description: string; action: string; apiSlug?: string }> = {
   "ops-overload-analyzer": { name: "Ops Overload Analyzer", cost: 3, description: "Process overloaded messages and task notes into urgency, owner, next action, and a 24-hour recovery move.", action: "Process Overload", apiSlug: "ops-overload-analyzer" },
@@ -35,6 +37,23 @@ const TOOL_CONFIGS: Record<string, { name: string; cost: number; description: st
 
 function titleFromSlug(slug: string) {
   return slug.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+
+function splitWorkItems(text: string) {
+  const byLine = text.split(/\r?\n+/).map((line) => line.trim()).filter(Boolean);
+  if (byLine.length > 1) return byLine;
+
+  const byNumberedList = text.split(/(?=\b\d+[.)]\s+)/).map((item) => item.trim()).filter(Boolean);
+  if (byNumberedList.length > 1) return byNumberedList;
+
+  const bySentence = text.split(/(?<=[.!?])\s+/).map((item) => item.trim()).filter(Boolean);
+  return bySentence.length ? bySentence : text.trim() ? [text.trim()] : [];
+}
+
+function limitInputForFreePreview(text: string) {
+  const items = splitWorkItems(text);
+  if (items.length <= FREE_ITEM_LIMIT) return text;
+  return items.slice(0, FREE_ITEM_LIMIT).join("\n");
 }
 
 function fallbackProcess(slug: string, text: string) {
@@ -96,21 +115,34 @@ export default function DynamicToolPage() {
   const [output, setOutput] = useState<ToolResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const inputItems = useMemo(() => splitWorkItems(input), [input]);
+  const processedCount = Math.min(inputItems.length, FREE_ITEM_LIMIT);
+  const queuedCount = Math.max(inputItems.length - FREE_ITEM_LIMIT, 0);
+  const hasQueue = queuedCount > 0;
+  const usageLabel = `${processedCount}/${FREE_ITEM_LIMIT}`;
+
   async function run() {
     if (!input.trim()) return;
     setLoading(true);
+    const limitedInput = limitInputForFreePreview(input);
     try {
       if (config.apiSlug) {
         const response = await fetch(`/api/tools/${config.apiSlug}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: input, tone: "professional" }),
+          body: JSON.stringify({ text: limitedInput, tone: "professional" }),
         });
         const payload = await response.json();
-        setOutput(response.ok ? payload : { result: payload.error ?? "The tool could not process this request.", creditCost: config.cost });
-      } else {
+        const result = response.ok ? payload.result : payload.error ?? "The tool could not process this request.";
         setOutput({
-          result: fallbackProcess(slug, input),
+          ...payload,
+          result: hasQueue ? `${result}\n\nQueued: ${queuedCount} item${queuedCount === 1 ? "" : "s"} waiting. Upgrade to Growth or Pro to process the rest immediately.` : result,
+          creditCost: payload.creditCost ?? config.cost,
+        });
+      } else {
+        const result = fallbackProcess(slug, limitedInput);
+        setOutput({
+          result: hasQueue ? `${result}\n\nQueued: ${queuedCount} item${queuedCount === 1 ? "" : "s"} waiting. Upgrade to Growth or Pro to process the rest immediately.` : result,
           creditCost: config.cost,
           suggestions: ["Confirm the next action is explicit.", "Keep the close concise and action-oriented."],
           analysis: { clarity: 88, authority: 86, warmth: 84, brevity: 82 },
@@ -138,8 +170,27 @@ export default function DynamicToolPage() {
           </span>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_0.95fr]">
           <CreditPurchasePanel currentCost={output?.creditCost ?? config.cost} compact context={config.name} />
+          <section className="rounded-2xl border bg-white p-5 shadow-sm" style={{ borderColor: "hsl(40 25% 88%)" }}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(43 80% 42%)" }}>Free preview limit</p>
+                <h2 className="mt-1 font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>Messages Processed: {usageLabel}</h2>
+              </div>
+              <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: hasQueue ? "hsl(0 72% 94%)" : "hsl(150 45% 92%)", color: hasQueue ? "hsl(0 60% 38%)" : "hsl(150 40% 28%)" }}>
+                {hasQueue ? `${queuedCount} queued` : "Ready"}
+              </span>
+            </div>
+            <p className="mt-3 text-sm leading-6" style={{ color: "hsl(220 25% 45%)" }}>
+              Process the first 10 items as proof. Extra messages stay queued until Growth or Pro unlocks immediate processing.
+            </p>
+            {hasQueue && (
+              <Link href="/memberships" className="mt-4 inline-flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
+                <Lock size={15} /> Stop missing critical items <ArrowRight size={15} />
+              </Link>
+            )}
+          </section>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -147,7 +198,7 @@ export default function DynamicToolPage() {
             <label className="text-xs font-bold uppercase tracking-wider mb-2 block" style={{ color: "hsl(220 25% 45%)" }}>Input</label>
             <textarea value={input} onChange={(e) => setInput(e.target.value)} className="w-full h-64 p-4 rounded-lg border text-sm outline-none focus:border-[hsl(43_80%_60%)] resize-none" style={{ borderColor: "hsl(40 25% 88%)", color: "hsl(220 45% 13%)" }} placeholder={slug === "ops-overload-analyzer" ? "Paste 5-10 urgent emails, Slack messages, tasks, or follow-up notes." : slug === "prospect-reply-analyzer" ? "Paste 3-10 stalled prospect replies, objections, or no-response messages." : "Paste the text, goal, or context you want to process."} />
             <button onClick={run} disabled={!input.trim() || loading} className="w-full mt-4 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
-              <Wand2 size={16} /> {loading ? "Processing..." : config.action}
+              <Wand2 size={16} /> {loading ? "Processing..." : hasQueue ? "Process First 10" : config.action}
             </button>
           </section>
 
