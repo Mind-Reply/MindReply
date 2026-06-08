@@ -9,7 +9,9 @@
     "lint": "npm run typecheck",
     "typecheck": "next typegen && tsc --noEmit",
     "decision:verify": "tsx scripts/verify-decision-layer.ts",
-    "mcp:verify": "tsx scripts/verify-mcp.ts"
+    "mcp:verify": "tsx scripts/verify-mcp.ts",
+    "python:verify": "python -m unittest discover src",
+    "verify:all": "npm run decision:verify && npm run typecheck && npm run python:verify"
   },
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "^1.7.4",
