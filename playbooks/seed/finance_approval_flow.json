@@ -1,0 +1,11 @@
+{
+  "playbook_id": "finance-approval-flow",
+  "title": "Finance approval flow",
+  "description": "Routes payment and approval pressure into verified movement.",
+  "version": "1.0",
+  "triggers": [{ "type": "email", "pattern": "invoice" }, { "type": "manual", "pattern": "payment" }, { "type": "manual", "pattern": "wire" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "finance signal", "action": "escalate", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "task_create", "template_id": "finance_review", "params": { "role": "owner" } }],
+  "verification": { "required": true, "roles": ["owner"] },
+  "audit": { "exportable": true, "signed": true }
+}
