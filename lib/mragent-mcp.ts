@@ -1,44 +1,11 @@
-import {
-  registerAppResource,
-  registerAppTool,
-  RESOURCE_MIME_TYPE,
-} from "@modelcontextprotocol/ext-apps/server";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-
 import { fetchStoredReceipt, prepareMindRead, type MRAgentPreparation } from "./mragent";
 import type { IntakeSource } from "./decision-layer";
 
 export const MRAGENT_WIDGET_URI = "ui://widget/mragent-mindread-v1.html";
 export const MRAGENT_SERVER_INFO = { name: "mindreply-mragent", version: "0.2.0" };
-export const MRAGENT_RESOURCE_MIME_TYPE = RESOURCE_MIME_TYPE;
+export const MRAGENT_RESOURCE_MIME_TYPE = "text/html;profile=mcp-app";
 
 const sourceValues = ["manual", "gmail", "calendar", "extension"] as const;
-const sourceSchema = z.enum(sourceValues).optional();
-const prepareInputSchema = {
-  message: z.string().min(1),
-  source: sourceSchema,
-};
-const receiptInputSchema = {
-  receiptId: z.string().min(1),
-};
-const preparationOutputSchema = {
-  generationId: z.string(),
-  decision: z.any(),
-  reply: z.string(),
-  receipt: z.any(),
-  persistence: z.any(),
-  model: z.string(),
-  status: z.enum(["completed", "fallback"]),
-  tokenUsage: z.any().nullable(),
-};
-const receiptOutputSchema = {
-  found: z.boolean(),
-  receiptId: z.string(),
-  receipt: z.any().optional(),
-  persistence: z.any().optional(),
-  rawContentRedacted: z.boolean().optional(),
-};
 
 function siteOrigin() {
   try {
@@ -160,7 +127,7 @@ function normalizeToolArgs(args: unknown) {
   return { message, source };
 }
 
-function zodToJsonToolSchemas() {
+function jsonToolSchemas() {
   const sourceEnum = [...sourceValues];
   const prepare = {
     type: "object",
@@ -210,7 +177,7 @@ function zodToJsonToolSchemas() {
 }
 
 export function getMRAgentMcpManifest() {
-  const schemas = zodToJsonToolSchemas();
+  const schemas = jsonToolSchemas();
   const resourceMeta = getMRAgentResourceMeta();
 
   return {
@@ -219,7 +186,7 @@ export function getMRAgentMcpManifest() {
       {
         uri: MRAGENT_WIDGET_URI,
         name: "MRagent Mind Read",
-        mimeType: RESOURCE_MIME_TYPE,
+        mimeType: MRAGENT_RESOURCE_MIME_TYPE,
         _meta: resourceMeta,
       },
     ],
@@ -286,69 +253,4 @@ export async function callMRAgentTool(name: string, args: unknown) {
   }
 
   throw new Error(`Unknown MRagent tool: ${name}`);
-}
-
-export function createMRAgentMcpServer() {
-  const server = new McpServer(MRAGENT_SERVER_INFO, {
-    instructions:
-      "Use MRagent for one warm Mind Read, one action, a risk gate, and a quiet receipt. Never request raw input after the preparation step stores only hashes and outputs.",
-  });
-
-  registerAppResource(server, "mragent_mindread", MRAGENT_WIDGET_URI, {}, async () => ({
-    contents: [
-      {
-        uri: MRAGENT_WIDGET_URI,
-        mimeType: RESOURCE_MIME_TYPE,
-        text: getMRAgentWidgetHtml(),
-        _meta: getMRAgentResourceMeta(),
-      },
-    ],
-  }));
-
-  registerAppTool(
-    server,
-    "prepare_mindread",
-    {
-      title: "Prepare Mind Read",
-      description: "Use this when the user wants MRagent to read pressure, reflect behavior, and return one warm next move without rendering a widget.",
-      inputSchema: prepareInputSchema,
-      outputSchema: preparationOutputSchema,
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
-    },
-    async ({ message, source }) => callMRAgentTool("prepare_mindread", { message, source }),
-  );
-
-  registerAppTool(
-    server,
-    "render_mindread",
-    {
-      title: "Render Mind Read",
-      description: "Use this when the user wants a visual MRagent card showing the Mind Read, protection pattern, calmer move, risk gate, and receipt.",
-      inputSchema: prepareInputSchema,
-      outputSchema: preparationOutputSchema,
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
-      _meta: {
-        ui: { resourceUri: MRAGENT_WIDGET_URI },
-        "openai/outputTemplate": MRAGENT_WIDGET_URI,
-        "openai/toolInvocation/invoking": "MRagent is reading slowly",
-        "openai/toolInvocation/invoked": "MRagent is ready",
-      },
-    },
-    async ({ message, source }) => callMRAgentTool("render_mindread", { message, source }),
-  );
-
-  registerAppTool(
-    server,
-    "fetch_receipt",
-    {
-      title: "Fetch Receipt",
-      description: "Use this when the user needs to retrieve a stored privacy-safe MRagent receipt by receipt id.",
-      inputSchema: receiptInputSchema,
-      outputSchema: receiptOutputSchema,
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
-    },
-    async ({ receiptId }) => callMRAgentTool("fetch_receipt", { receiptId }),
-  );
-
-  return server;
 }
