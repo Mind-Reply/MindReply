@@ -17,9 +17,14 @@ export default function Home() {
           <Link href="/" className="font-serif text-2xl font-bold tracking-wide text-[#f8f5f0]">
             MindReply
           </Link>
-          <Link href="/privacy" className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-[#cdd6e4] transition hover:border-[#c9a961] hover:text-[#c9a961]">
-            Privacy
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/agent" className="rounded-full border border-[#c9a961]/40 px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:border-[#c9a961] hover:text-[#c9a961]">
+              MRagent
+            </Link>
+            <Link href="/privacy" className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-[#cdd6e4] transition hover:border-[#c9a961] hover:text-[#c9a961]">
+              Privacy
+            </Link>
+          </div>
         </div>
 
         <div className="relative mx-auto mt-24 max-w-5xl text-center">
