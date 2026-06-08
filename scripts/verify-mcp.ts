@@ -10,6 +10,18 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+type ManifestTool = {
+  name: string;
+  inputSchema?: unknown;
+  outputSchema?: unknown;
+  annotations?: {
+    readOnlyHint?: boolean;
+    destructiveHint?: boolean;
+    openWorldHint?: boolean;
+  };
+  _meta?: { ui?: { resourceUri?: string }; [key: string]: unknown };
+};
+
 async function main() {
   const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN;
   const originalOpenAIKey = process.env.OPENAI_API_KEY;
@@ -24,9 +36,15 @@ async function main() {
     assert(manifest.resources[0]?.uri === MRAGENT_WIDGET_URI, "Widget resource URI changed.");
     assert(manifest.resources[0]?.mimeType === MRAGENT_RESOURCE_MIME_TYPE, "Widget MIME type changed.");
 
-    const renderTool = manifest.tools.find((tool) => tool.name === "render_mindread") as {
-      _meta?: { ui?: { resourceUri?: string }; [key: string]: unknown };
-    };
+    for (const tool of manifest.tools as ManifestTool[]) {
+      assert(Boolean(tool.inputSchema), `${tool.name} must expose an inputSchema.`);
+      assert(Boolean(tool.outputSchema), `${tool.name} must expose an outputSchema.`);
+      assert(tool.annotations?.readOnlyHint === true, `${tool.name} must explicitly be read-only.`);
+      assert(tool.annotations?.destructiveHint === false, `${tool.name} must explicitly be non-destructive.`);
+      assert(tool.annotations?.openWorldHint === false, `${tool.name} must explicitly avoid open-world side effects.`);
+    }
+
+    const renderTool = manifest.tools.find((tool) => tool.name === "render_mindread") as ManifestTool;
     assert(renderTool?._meta?.ui?.resourceUri === MRAGENT_WIDGET_URI, "Render tool must attach the widget resource.");
     assert(renderTool?._meta?.["openai/outputTemplate"] === MRAGENT_WIDGET_URI, "Render tool must expose ChatGPT output template metadata.");
 
