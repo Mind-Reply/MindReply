@@ -1,25 +1,15 @@
-import type { ReactNode } from "react";
+"use client";
 
-type MessageResponseProps = {
-  children: ReactNode;
-  className?: string;
-};
+import { memo, type ComponentProps } from "react";
+import { Streamdown } from "streamdown";
 
-export function MessageResponse({ children, className = "" }: MessageResponseProps) {
-  const text = typeof children === "string" ? children : "";
-  const blocks = text.split(/\n{2,}/).filter(Boolean);
+type MessageResponseProps = ComponentProps<typeof Streamdown>;
 
-  if (!blocks.length) {
-    return null;
-  }
+export const MessageResponse = memo(
+  ({ className = "", ...props }: MessageResponseProps) => (
+    <Streamdown className={`space-y-3 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 ${className}`.trim()} {...props} />
+  ),
+  (prevProps, nextProps) => prevProps.children === nextProps.children && prevProps.className === nextProps.className,
+);
 
-  return (
-    <div className={`space-y-3 ${className}`.trim()}>
-      {blocks.map((block, index) => (
-        <p key={`${index}-${block.slice(0, 12)}`} className="whitespace-pre-wrap leading-7">
-          {block}
-        </p>
-      ))}
-    </div>
-  );
-}
+MessageResponse.displayName = "MessageResponse";
