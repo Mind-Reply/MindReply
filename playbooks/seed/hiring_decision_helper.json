@@ -1,0 +1,11 @@
+{
+  "playbook_id": "hiring-decision-helper",
+  "title": "Hiring decision helper",
+  "description": "Places candidate uncertainty into one timed decision moment.",
+  "version": "1.0",
+  "triggers": [{ "type": "email", "pattern": "candidate" }, { "type": "calendar", "pattern": "interview" }, { "type": "manual", "pattern": "hire" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "hiring item", "action": "schedule", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "calendar_event", "template_id": "candidate_follow_up", "params": { "minutes": 1440 } }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}
