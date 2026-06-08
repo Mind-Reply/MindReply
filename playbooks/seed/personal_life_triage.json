@@ -1,0 +1,11 @@
+{
+  "playbook_id": "personal-life-triage",
+  "title": "Personal life triage",
+  "description": "Keeps personal pressure clear without over-expanding the matter.",
+  "version": "1.0",
+  "triggers": [{ "type": "manual", "pattern": "family" }, { "type": "manual", "pattern": "personal" }, { "type": "calendar", "pattern": "appointment" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "personal pressure", "action": "reply", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "email_template", "template_id": "personal_boundary", "params": { "tone": "warm" } }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}
