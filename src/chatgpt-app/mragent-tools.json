@@ -1,0 +1,47 @@
+{
+  "name": "mindreply-mragent",
+  "version": "0.1.0",
+  "mcp_endpoint": "/mcp",
+  "resource_uri": "ui://widget/mragent-mindread-v1.html",
+  "tools": [
+    {
+      "name": "prepare_mindread",
+      "description": "Prepare one synthesis, one recommended action, risk gate, reply, and receipt without storing raw input.",
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["message"],
+        "properties": {
+          "message": { "type": "string", "minLength": 1 },
+          "source": { "type": "string", "enum": ["manual", "gmail", "calendar", "extension"] }
+        }
+      }
+    },
+    {
+      "name": "render_mindread",
+      "description": "Prepare and render the MRagent widget for one Mind Read.",
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["message"],
+        "properties": {
+          "message": { "type": "string", "minLength": 1 },
+          "source": { "type": "string", "enum": ["manual", "gmail", "calendar", "extension"] }
+        }
+      }
+    },
+    {
+      "name": "fetch_receipt",
+      "description": "Fetch a privacy-safe MRagent receipt by id.",
+      "annotations": { "readOnlyHint": true, "openWorldHint": false, "destructiveHint": false },
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["receiptId"],
+        "properties": { "receiptId": { "type": "string", "minLength": 1 } }
+      }
+    }
+  ]
+}
