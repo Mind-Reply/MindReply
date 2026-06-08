@@ -1,15 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { ArrowUp, Clock, HeartHandshake, Loader2, ShieldCheck, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowUp, Clock, HeartHandshake, Loader2, ShieldCheck } from "lucide-react";
 import { MessageResponse } from "@/components/ai-elements/message";
 import type { DecisionResponse } from "@/lib/decision-layer";
 
 type ChatMessage = {
   id: string;
-  role: "user" | "assistant"; 
+  role: "user" | "assistant";
   content: string;
   decision?: DecisionResponse;
+  writing?: boolean;
 };
 
 type AgentResponse = {
@@ -22,7 +23,7 @@ const starter: ChatMessage = {
   id: "mra-welcome",
   role: "assistant",
   content:
-    "I am here. Paste the message, pressure point, or situation. I will read what is underneath it, steady the feeling, and return one gentle next move.",
+    "I am here with you. Bring the message, the pressure, or the feeling underneath it. I will read it gently, name the signal, and give you one steady move.",
 };
 
 function makeId(prefix: string) {
@@ -37,8 +38,40 @@ export default function MRAgentChat() {
   const [input, setInput] = useState("A client is hesitating after seeing the fee and says they need to think about it.");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
+
+  useEffect(() => {
+    return () => {
+      timers.current.forEach((timer) => clearTimeout(timer));
+      timers.current = [];
+    };
+  }, []);
 
   const lastDecision = useMemo(() => [...messages].reverse().find((message) => message.decision)?.decision, [messages]);
+
+  function revealAssistantMessage(message: ChatMessage, fullText: string) {
+    const chunks = fullText.split(/(\s+)/).filter((chunk) => chunk.length > 0);
+    setMessages((current) => [...current, { ...message, content: "", writing: true }]);
+
+    let index = 0;
+    const step = () => {
+      index += 1;
+      const visible = chunks.slice(0, index).join("");
+      const done = index >= chunks.length;
+
+      setMessages((current) =>
+        current.map((item) => (item.id === message.id ? { ...item, content: visible, writing: !done } : item)),
+      );
+
+      if (!done) {
+        const timer = setTimeout(step, 85);
+        timers.current.push(timer);
+      }
+    };
+
+    const firstTimer = setTimeout(step, 260);
+    timers.current.push(firstTimer);
+  }
 
   async function submit() {
     const text = input.trim();
@@ -54,7 +87,7 @@ export default function MRAgentChat() {
       const response = await fetch("/api/agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: text }),
+        body: JSON.stringify({ input: text, source: "manual" }),
       });
       const data = (await response.json()) as Partial<AgentResponse> & { error?: string };
 
@@ -70,7 +103,7 @@ export default function MRAgentChat() {
         decision: data.decision,
       };
 
-      setMessages((current) => [...current, assistantMessage]);
+      revealAssistantMessage(assistantMessage, data.reply);
     } catch {
       setError("MRagent could not read that clearly.");
     } finally {
@@ -79,27 +112,24 @@ export default function MRAgentChat() {
   }
 
   return (
-    <section className="mx-auto grid min-h-[calc(100vh-8rem)] w-full max-w-6xl gap-6 px-5 py-8 md:grid-cols-[0.78fr_1.22fr] md:px-8">
-      <aside className="flex flex-col justify-between rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/20">
+    <section className="mx-auto grid min-h-[calc(100vh-8rem)] w-full max-w-6xl gap-6 px-5 py-8 md:grid-cols-[0.7fr_1.3fr] md:px-8">
+      <aside className="flex flex-col justify-between rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 shadow-2xl shadow-black/20">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#c9a961]">MRagent Mind Read</p>
           <h1 className="mt-5 font-serif text-4xl font-bold leading-tight text-[#f8f5f0] md:text-5xl">
-            A gentle decision companion that feels what the pressure is asking for.
+            Warm enough to feel you. Clear enough to move you.
           </h1>
           <p className="mt-5 text-base leading-7 text-[#cdd6e4]">
-            One private decision is free. Bring the pressure, wording, hesitation, or conflict. MRagent reflects the mindset underneath it and gives one clear next move.
+            Paste the message, conflict, hesitation, or emotional weather. MRagent reads the pressure underneath and returns one gentle, confident next move.
           </p>
         </div>
 
         <div className="mt-8 grid gap-3 text-sm text-[#cdd6e4]">
           <p className="flex items-center gap-2 rounded-2xl border border-white/10 bg-[#081121]/70 p-3">
-            <Sparkles size={16} className="text-[#c9a961]" /> One free private Mind Read.
+            <HeartHandshake size={16} className="text-[#c9a961]" /> Feels personal without losing discipline.
           </p>
           <p className="flex items-center gap-2 rounded-2xl border border-white/10 bg-[#081121]/70 p-3">
-            <HeartHandshake size={16} className="text-[#c9a961]" /> Warm reflection without losing discipline.
-          </p>
-          <p className="flex items-center gap-2 rounded-2xl border border-white/10 bg-[#081121]/70 p-3">
-            <Clock size={16} className="text-[#c9a961]" /> Reads before moving.
+            <Clock size={16} className="text-[#c9a961]" /> Replies arrive slowly, on purpose.
           </p>
           <p className="flex items-center gap-2 rounded-2xl border border-white/10 bg-[#081121]/70 p-3">
             <ShieldCheck size={16} className="text-[#c9a961]" /> Risk checked before action.
@@ -110,7 +140,7 @@ export default function MRAgentChat() {
       <div className="flex min-h-[36rem] flex-col rounded-[2rem] border border-white/10 bg-[#0d1729] shadow-2xl shadow-black/25">
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
           <div>
-            <p className="text-sm font-semibold text-[#f8f5f0]">Mind Read session</p>
+            <p className="text-sm font-semibold text-[#f8f5f0]">Mind Read room</p>
             <p className="text-xs text-[#8fa0b8]">One mirror. One calmer move. One action.</p>
           </div>
           {lastDecision ? (
@@ -130,8 +160,13 @@ export default function MRAgentChat() {
                     : "rounded-3xl border border-white/10 bg-white/[0.045] px-5 py-4 text-[#f8f5f0]"
                 }
               >
-                {message.role === "assistant" ? <MessageResponse>{message.content}</MessageResponse> : <p className="whitespace-pre-wrap leading-7">{message.content}</p>}
+                {message.role === "assistant" ? (
+                  message.content ? <MessageResponse>{message.content}</MessageResponse> : <p className="text-[#cdd6e4]">Reading the signal...</p>
+                ) : (
+                  <p className="whitespace-pre-wrap leading-7">{message.content}</p>
+                )}
               </div>
+              {message.writing ? <p className="mt-2 text-xs text-[#8fa0b8]">MRagent is taking a slower read.</p> : null}
               {message.decision ? (
                 <div className="mt-2 grid gap-2 rounded-2xl border border-white/10 bg-[#081121]/70 p-3 text-xs text-[#cdd6e4] sm:grid-cols-3">
                   <span>Action: {message.decision.recommendedAction.kind}</span>
