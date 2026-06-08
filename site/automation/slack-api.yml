@@ -1,0 +1,27 @@
+surface: Slack API handoff
+workspace: mind-reply
+field_id: Xf0B6WHC2SBH
+status: configured_without_secret
+purpose: Route MRagent monitor summaries and personal-pack handoffs to Slack when a channel and connector access are available.
+safety:
+  - do not store Slack bot tokens in the repo
+  - do not commit invite URLs
+  - do not commit private channel content
+  - resolve channel and user IDs through the Slack connector before sending
+required_before_send:
+  - connected Slack workspace
+  - destination channel id or DM id
+  - explicit user request to send, post, draft, or triage
+report_payload:
+  source: mragent-monitor-status.json
+  field_id: Xf0B6WHC2SBH
+  title: MRagent 15-minute report
+  include:
+    - generatedAt
+    - summary.coreAgent
+    - summary.mcpApp
+    - summary.discoveryAssets
+    - summary.personalPack
+    - summary.currentBlocker
+    - summary.nextAction
+fallback_when_connector_missing: Keep the GitHub Actions artifact as the source of truth and report that Slack is not connected in this session.
