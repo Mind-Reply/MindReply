@@ -56,6 +56,19 @@ To force a one-off build from the dashboard, set one of these env vars to `1` fo
 - `MINDREPLY_FORCE_VERCEL_BUILD`
 - `VERCEL_FORCE_BUILD`
 
+## Upload scope guard
+
+`.vercelignore` keeps support material out of Vercel runtime uploads:
+
+- GitHub workflow metadata
+- local agent/codex folders
+- reports, logs, coverage, and artifacts
+- private docs and planning files
+- Python/integration/browser-extension scaffolds not used by the Next.js runtime
+- imported PDFs, Word files, ZIPs, and 7z archives
+
+Do not ignore `app`, `components`, `lib`, `public`, `package.json`, lockfiles, config files, or `scripts/vercel-ignore-build.mjs`.
+
 ## What code cannot do
 
 Code cannot upgrade billing, raise account quota, or attach payment details. Those actions must be confirmed in Vercel by the account owner.
