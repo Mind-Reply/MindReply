@@ -1,0 +1,11 @@
+{
+  "playbook_id": "customer-escalation",
+  "title": "Customer escalation",
+  "description": "Keeps customer pressure contained in one reply.",
+  "version": "1.0",
+  "triggers": [{ "type": "email", "pattern": "customer" }, { "type": "email", "pattern": "client" }, { "type": "manual", "pattern": "complaint" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "customer pressure", "action": "reply", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "email_template", "template_id": "customer_containment", "params": { "tone": "calm" } }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}
