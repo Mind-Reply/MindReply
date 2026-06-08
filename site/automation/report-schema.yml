@@ -32,6 +32,7 @@ fields:
   packSources: Required personal-pack source files and whether each exists, including slack-api and vercel-build-limit.
 verification:
   commands:
+    - node scripts/vercel-ignore-build.mjs --self-test
     - npm run decision:verify
     - npm run mcp:verify
     - npm run typecheck
