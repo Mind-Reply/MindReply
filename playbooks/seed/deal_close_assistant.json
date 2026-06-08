@@ -1,0 +1,11 @@
+{
+  "playbook_id": "deal-close-assistant",
+  "title": "Deal close assistant",
+  "description": "Turns pricing hesitation into one steady reply.",
+  "version": "1.0",
+  "triggers": [{ "type": "email", "pattern": "fee" }, { "type": "manual", "pattern": "price" }, { "type": "manual", "pattern": "proposal" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "commercial hesitation", "action": "reply", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "email_template", "template_id": "fee_boundary", "params": { "tone": "calm" } }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}
