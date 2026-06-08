@@ -105,20 +105,25 @@ export function detailLine(decision: DecisionResponse) {
   ].join("\n\n");
 }
 
+function actionLine(decision: DecisionResponse) {
+  const payload = decision.recommendedAction.payload;
+  if (typeof payload.draft === "string") return payload.draft;
+  if (typeof payload.record === "string") return payload.record;
+  if (typeof payload.reason === "string") return payload.reason;
+  if (typeof payload.title === "string") return `Set: ${payload.title}.`;
+  return decision.recommendedAction.label;
+}
+
 export function fallbackReply(decision: DecisionResponse) {
-  if (decision.recommendedAction.kind === "escalate") {
-    return "Hold this before responding. The next move is review, not speed.";
-  }
-
-  if (decision.recommendedAction.kind === "schedule") {
-    return "Set one follow-up moment and let the matter rest there.";
-  }
-
-  if (decision.recommendedAction.kind === "resolve") {
-    return "Record the decision clearly and close the loop without adding more weight.";
-  }
-
-  return String(decision.recommendedAction.payload.draft ?? "Send the prepared reply.");
+  return [
+    "I am with you. Let us slow the room down a little.",
+    `What this is really about: ${decision.mindRead.reallyAbout}`,
+    `What your mind is protecting: ${decision.mindRead.mindsetProtection}`,
+    `The calmer move: ${decision.mindRead.calmerMove}`,
+    `One move: ${decision.recommendedAction.label}.`,
+    actionLine(decision),
+    "Keep it warm, lucid, and unhurried. You do not need to over-explain to be understood.",
+  ].join("\n\n");
 }
 
 function inputHash(input: string) {
@@ -178,12 +183,12 @@ async function providerReply(decision: DecisionResponse, generationId: string): 
       },
       body: JSON.stringify({
         model,
-        max_output_tokens: 260,
+        max_output_tokens: 360,
         input: [
           {
             role: "system",
             content:
-              "You are MRagent for MindReply. Return only the final prepared wording. Preserve one synthesis, one action, risk-aware restraint, and quiet receipt discipline.",
+              "You are MRagent for MindReply: warm like a trusted best friend, confident like a calm operator, and precise about behavior. Return only the final prepared reply. Use uncommon but understandable words sparingly, such as equipoise, lucid, tender, unhurried, or ballast. Never flatter, never overwhelm, and always keep one action.",
           },
           {
             role: "user",
