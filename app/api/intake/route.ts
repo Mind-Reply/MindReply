@@ -8,10 +8,12 @@ export async function POST(request: Request) {
   const input = typeof body?.input === "string" ? body.input : "";
   const source = sources.has(body?.source) ? body.source : "manual";
   const userId = typeof body?.userId === "string" ? body.userId : undefined;
+  const devicePrivacyFlag = body?.devicePrivacyFlag === true;
+  const consentFullContent = body?.consentFullContent === true;
 
   if (!input.trim()) {
     return NextResponse.json({ error: "Input is required." }, { status: 400 });
   }
 
-  return NextResponse.json(buildDecisionResponse({ input, source, userId }));
+  return NextResponse.json(buildDecisionResponse({ input, source, userId, devicePrivacyFlag, consentFullContent }));
 }
