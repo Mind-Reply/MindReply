@@ -1,0 +1,11 @@
+{
+  "playbook_id": "compliance-audit-trail",
+  "title": "Compliance audit trail",
+  "description": "Hold compliance-sensitive movement and keep a receipt.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "audit" }, { "pattern": "policy" }, { "pattern": "breach" }],
+  "decision_tree": { "nodes": [{ "id": "escalate", "action": "escalate", "synthesis": "Compliance pressure needs review and a signed receipt." }] },
+  "actions": ["escalate"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner", "domain_reviewer"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
