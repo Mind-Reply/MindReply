@@ -15,6 +15,7 @@ const endpoints = [
 const packSources = [
   { label: "personal-pack", path: "site/automation/personal-pack.yml" },
   { label: "slack-api", path: "site/automation/slack-api.yml" },
+  { label: "vercel-build-limit", path: "site/automation/vercel-build-limit-runbook.yml" },
   { label: "growth-positioning", path: "site/growth/positioning.yml" },
   { label: "ad-messaging", path: "site/ads/messaging.yml" },
   { label: "figma-loop", path: "site/design/figma-growth-loop.yml" },
@@ -88,7 +89,7 @@ function sourceRow(source) {
 }
 
 function chooseNextAction({ mcpLive, healthLive, discoveryLive, packReady }) {
-  if (!mcpLive || !healthLive || !discoveryLive) return "Confirm latest GitHub main is live, then inspect any missing surface.";
+  if (!mcpLive || !healthLive || !discoveryLive) return "Follow the Vercel build-limit runbook, then verify missing production surfaces.";
   if (!packReady) return "Restore missing personal-pack source files.";
   return "Connect a Slack channel target or capture a fresh /agent production preview for the next asset.";
 }
@@ -105,7 +106,7 @@ const discoveryLive = ["sitemap", "robots", "manifest", "social-preview"].every(
 const packReady = sourceResults.every((source) => source.present);
 const blocker = mcpLive && healthLive && discoveryLive ? "none detected" : "latest GitHub main is not fully deployed to production yet";
 const nextAction = chooseNextAction({ mcpLive, healthLive, discoveryLive, packReady });
-const opinion = packReady ? "The repo has a workable personal pack; Slack routing is staged and waiting on a channel target." : "The personal pack is incomplete.";
+const opinion = packReady ? "The repo has a workable personal pack; Vercel quota and Slack destination are the active handoff items." : "The personal pack is incomplete.";
 
 const report = {
   generatedAt,
