@@ -16,6 +16,7 @@ const packSources = [
   { label: "personal-pack", path: "site/automation/personal-pack.yml" },
   { label: "slack-api", path: "site/automation/slack-api.yml" },
   { label: "vercel-build-limit", path: "site/automation/vercel-build-limit-runbook.yml" },
+  { label: "verification-runbook", path: "site/automation/verification-runbook.yml" },
   { label: "growth-positioning", path: "site/growth/positioning.yml" },
   { label: "ad-messaging", path: "site/ads/messaging.yml" },
   { label: "figma-loop", path: "site/design/figma-growth-loop.yml" },
