@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { buildDecisionResponse, forbiddenPublicTerms, redirectedPublicPaths } from "../lib/decision-layer";
 import { extractMRAgentInput } from "../lib/mragent";
@@ -19,9 +19,15 @@ function visibleSource(value: string) {
 
 function assertNoForbiddenTerms(label: string, value: string) {
   for (const term of forbiddenPublicTerms) {
-    const pattern = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(`\b${escaped}\b`, "i");
     assert(!pattern.test(value), `${label} contains blocked public term: ${term}`);
   }
+}
+
+function assertScore(label: string, value: number) {
+  assert(Number.isInteger(value), `${label} must be an integer.`);
+  assert(value >= 0 && value <= 100, `${label} must be between 0 and 100.`);
 }
 
 const normalInput = "A client says the price is high and asks whether we can wait until next month.";
@@ -29,20 +35,31 @@ const normal = buildDecisionResponse({
   input: normalInput,
   source: "manual",
   userId: "verify",
+  consentFullContent: false,
+  devicePrivacyFlag: false,
 });
 
 assert(normal.synthesis.length > 10, "Decision response must include a synthesis.");
 assert(["reply", "schedule", "resolve", "escalate"].includes(normal.recommendedAction.kind), "Decision response must include one allowed action.");
 assert(Object.keys(normal.recommendedAction).sort().join(",") === "kind,label,payload", "Recommended action shape changed.");
+assert(normal.triage.required_action === normal.recommendedAction.kind, "Triage and action must agree.");
+assert(normal.triage.playbook_id === "deal-close-assistant", "Price intake must use the deal playbook.");
+assertScore("importance", normal.triage.importance);
+assertScore("urgency", normal.triage.urgency);
 assert(normal.receipt.id.startsWith("mr-"), "Receipt id must use the MRagent prefix.");
 assert(normal.receipt.source === "manual", "Receipt must keep the source.");
 assert(normal.receipt.actionKind === normal.recommendedAction.kind, "Receipt action kind must match the recommended action.");
 assert(normal.receipt.riskLevel === normal.risk.level, "Receipt risk level must match risk output.");
 assert(normal.receipt.confidence > 0 && normal.receipt.confidence <= 1, "Receipt confidence must be normalized.");
-assert(normal.receipt.playbookVersion === "mragent-mindread-v1", "Receipt must include the MRagent playbook version.");
+assert(normal.receipt.playbookId === normal.triage.playbook_id, "Receipt must include playbook id.");
+assert(normal.receipt.playbookVersion.length > 0, "Receipt must include playbook version.");
 assert(normal.receipt.inputHash.startsWith("mrh-"), "Receipt must include a privacy-safe input hash.");
 assert(!normal.receipt.inputHash.includes(normalInput), "Receipt input hash must not contain raw input.");
 assert(normal.receipt.rawContentRedacted === true, "Receipt must mark raw content as redacted.");
+assert(normal.receipt.redactionLevel === "full", "Default receipt must be fully redacted.");
+assert(normal.receipt.signature.length > 4, "Receipt must include a signature.");
+assert(normal.memoryUpdate.applied === true, "Memory update must be applied as derived state.");
+assert(normal.mindRead.calmerMove.length > 10, "MRagent mind-read helper must be populated.");
 assertNoForbiddenTerms("synthesis", normal.synthesis);
 assertNoForbiddenTerms("action label", normal.recommendedAction.label);
 
@@ -61,6 +78,7 @@ const highRisk = buildDecisionResponse({
 
 assert(highRisk.recommendedAction.kind === "escalate", "High-risk input must escalate.");
 assert(highRisk.risk.level === "high", "High-risk input must be marked high.");
+assert(highRisk.risk.escalate === true, "High-risk input must set risk escalation.");
 assertNoForbiddenTerms("high-risk action label", highRisk.recommendedAction.label);
 
 const agentPath = "/agent" as string;
@@ -90,15 +108,39 @@ for (const file of publicFiles) {
   assertNoForbiddenTerms(file, visibleSource(readFileSync(fullPath, "utf-8")));
 }
 
-for (const file of [
+const requiredFiles = [
   "app/api/agent/route.ts",
+  "app/api/intake/route.ts",
   "app/mcp/route.ts",
   "components/ai-elements/message.tsx",
   "lib/mragent.ts",
   "lib/mragent-mcp.ts",
   "scripts/verify-mcp.ts",
-]) {
+  "playbooks/schema.json",
+  "src/backend/README.md",
+  "src/backend/triage_engine.py",
+  "src/backend/reply_engine.py",
+  "src/backend/followup_engine.py",
+  "src/backend/risk_engine.py",
+  "src/backend/memory_store.py",
+  "src/backend/audit_log.py",
+  "src/backend/playbook_interpreter.py",
+  "src/integrations/gmail_connector.py",
+  "src/integrations/calendar_connector.py",
+  "src/edge/extension/manifest.json",
+  "src/edge/extension/background.js",
+  "src/edge/extension/content.js",
+  "src/edge/extension/styles.css",
+  "src/chatgpt-app/README.md",
+  "src/chatgpt-app/mragent-tools.json",
+];
+
+for (const file of requiredFiles) {
   assert(existsSync(join(process.cwd(), file)), `${file} must exist.`);
 }
+
+const seedDir = join(process.cwd(), "playbooks", "seed");
+const playbookFiles = readdirSync(seedDir).filter((file) => file.endsWith(".json"));
+assert(playbookFiles.length >= 12, "At least 12 seed playbooks must exist.");
 
 console.log("Decision layer verification passed.");
