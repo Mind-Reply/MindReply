@@ -1,0 +1,11 @@
+{
+  "playbook_id": "exec-inbox-zero",
+  "title": "Executive inbox zero",
+  "description": "Closes low-signal inbox items with a clear record.",
+  "version": "1.0",
+  "triggers": [{ "type": "email", "pattern": "fyi" }, { "type": "email", "pattern": "newsletter" }, { "type": "manual", "pattern": "read later" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "low signal", "action": "resolve", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "noop", "template_id": "record_only", "params": {} }],
+  "verification": { "required": false, "roles": [] },
+  "audit": { "exportable": true, "signed": true }
+}
