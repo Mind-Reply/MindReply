@@ -88,6 +88,7 @@ const publicFiles = [
   "site/growth/positioning.yml",
   "site/growth/visibility-plan.yml",
   "site/growth/search-intents.yml",
+  "site/growth/live-copy-sync.yml",
   "site/design/figma-growth-loop.yml",
   "site/media/remotion-launch-brief.yml",
   "src/agents/prompts.md",
@@ -127,6 +128,13 @@ assertIncludes("MRagent ad copy tests", adCopyTests, "client_hesitation");
 assertIncludes("MRagent ad copy tests", adCopyTests, "follow_up_pressure");
 assertIncludes("MRagent ad copy tests", adCopyTests, "ad_message_sync");
 assertIncludes("MRagent ad copy tests", adCopyTests, "Read the pressure before you reply");
+
+const liveCopySync = readFileSync(join(process.cwd(), "site/growth/live-copy-sync.yml"), "utf-8");
+assertIncludes("MRagent live copy sync", liveCopySync, "Warm mind read. Clear next move.");
+assertIncludes("MRagent live copy sync", liveCopySync, "The message feels loaded");
+assertIncludes("MRagent live copy sync", liveCopySync, "The follow-up keeps tugging");
+assertIncludes("MRagent live copy sync", liveCopySync, "aligned");
+assertIncludes("MRagent live copy sync", liveCopySync, "Capture fresh /agent production preview");
 
 for (const file of [
   "app/api/agent/route.ts",
