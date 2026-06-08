@@ -4,6 +4,19 @@ on:
   schedule:
     - cron: "*/23 * * * *"
   workflow_dispatch:
+    inputs:
+      channels:
+        description: "Comma-separated channels: console,slack,webhook,email"
+        required: false
+        default: "console"
+      dry_run:
+        description: "Keep true until delivery secrets and account limits are verified"
+        required: false
+        default: "true"
+      require_delivery:
+        description: "Fail unless Slack/webhook/email actually sends"
+        required: false
+        default: "false"
   pull_request:
     branches: [main]
     paths:
@@ -28,15 +41,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      OPS_REPORT_WEBHOOK_URL: ${{ secrets.OPS_REPORT_WEBHOOK_URL }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      OPS_REPORT_EMAIL_TO: ${{ secrets.OPS_REPORT_EMAIL_TO }}
-      OPS_REPORT_EMAIL_FROM: ${{ secrets.OPS_REPORT_EMAIL_FROM }}
-      REPORT_TO_EMAIL: ${{ vars.REPORT_TO_EMAIL }}
-      RESEND_FROM: ${{ vars.RESEND_FROM }}
-      SLACK_APP_FIELD_ID: ${{ vars.SLACK_APP_FIELD_ID }}
       REPORT_TIMEZONE: Europe/Kiev
+      MINDREPLY_ANGEL_EMAIL: ANGELLLKR@GMAIL.COM
+      MINDREPLY_REPORT_ENABLED: ${{ vars.MINDREPLY_REPORT_ENABLED || 'false' }}
+      MINDREPLY_REPORT_DRY_RUN: ${{ github.event.inputs.dry_run || vars.MINDREPLY_REPORT_DRY_RUN || 'true' }}
+      MINDREPLY_REPORT_REQUIRE_DELIVERY: ${{ github.event.inputs.require_delivery || vars.MINDREPLY_REPORT_REQUIRE_DELIVERY || 'false' }}
+      MINDREPLY_REPORT_CHANNELS: ${{ github.event.inputs.channels || vars.MINDREPLY_REPORT_CHANNELS || 'console' }}
+      MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || secrets.OPS_REPORT_EMAIL_TO || vars.REPORT_TO_EMAIL }}
+      MINDREPLY_REPORT_EMAIL_ALLOWLIST: ${{ secrets.MINDREPLY_REPORT_EMAIL_ALLOWLIST || secrets.OPS_REPORT_EMAIL_ALLOWLIST || vars.REPORT_EMAIL_ALLOWLIST || 'ANGELLLKR@GMAIL.COM' }}
+      MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || secrets.OPS_REPORT_EMAIL_FROM || vars.RESEND_FROM }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL || secrets.SLACK_WEBHOOK_URL }}
+      OPS_REPORT_WEBHOOK_URL: ${{ secrets.OPS_REPORT_WEBHOOK_URL }}
+      SLACK_APP_FIELD_ID: ${{ vars.SLACK_APP_FIELD_ID || 'Xf0B6WHC2SBH' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,15 +64,17 @@ jobs:
           node-version: "20"
 
       - name: Install
-        run: npm install
+        run: npm install --prefer-offline --no-audit --fund=false --progress=false
 
-      - name: Generate Angel Pack report
+      - name: Generate Angel Pack report and delivery receipt
         run: npm run ops:pack | tee mindreply-angel-pack-report.md
 
-      - name: Upload report
+      - name: Upload report artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mindreply-angel-pack-report-${{ github.run_id }}
-          path: mindreply-angel-pack-report.md
+          path: |
+            mindreply-angel-pack-report.md
+            mindreply-delivery-receipt.json
           retention-days: 7
