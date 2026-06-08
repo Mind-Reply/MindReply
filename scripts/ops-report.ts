@@ -18,6 +18,7 @@ const publicFiles = [
 ];
 
 const requiredFiles = [
+  ".github/workflows/angel-pack-report.yml",
   ".vercelignore",
   "app/api/agent/route.ts",
   "app/api/health/route.ts",
@@ -29,7 +30,9 @@ const requiredFiles = [
   "src/agents/prompts.md",
   "src/chatgpt-app/mragent-tools.json",
   "chatgpt-app-submission.json",
+  "scripts/angel-pack-report.ts",
   "scripts/vercel-ignore-build.mjs",
+  "docs/ops/8-workstream-agent-map.md",
   "docs/ops/azure-vm-infrastructure-plan.md",
   "docs/ops/vercel-deployment-limit-runbook.md",
 ];
@@ -67,6 +70,7 @@ const providerBlocks = [
   "Vercel build/deployment limits are account-side and require dashboard billing/quota action before blocked builds can resume.",
   "The Vercel ignored-build guard is configured to reduce stale preview build usage, not to bypass active account limits.",
   "The Vercel upload ignore file keeps support artifacts out of runtime deployments, reducing wasted transfer and build context.",
+  "The Angel Pack report can send to Slack/email only after SLACK_WEBHOOK_URL, OPS_REPORT_WEBHOOK_URL, or RESEND_API_KEY plus OPS_REPORT_EMAIL_TO are configured as GitHub secrets.",
   "OPENAI_API_KEY controls live MRagent model replies; fallback remains deterministic without it.",
   "BLOB_READ_WRITE_TOKEN controls receipt persistence; raw input remains redacted by default.",
   "Custom domain attachment must be verified in the active Vercel project dashboard.",
