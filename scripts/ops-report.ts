@@ -17,6 +17,18 @@ const publicFiles = [
   "docs/privacy_whitepaper_intro.md",
 ];
 
+const subAgentFiles = [
+  "docs/ops/subagents/README.md",
+  "docs/ops/subagents/01-infrastructure-agent.md",
+  "docs/ops/subagents/02-devops-agent.md",
+  "docs/ops/subagents/03-security-agent.md",
+  "docs/ops/subagents/04-frontend-agent.md",
+  "docs/ops/subagents/05-mragent-agent.md",
+  "docs/ops/subagents/06-integration-agent.md",
+  "docs/ops/subagents/07-revenue-agent.md",
+  "docs/ops/subagents/08-product-design-agent.md",
+];
+
 const requiredFiles = [
   ".github/workflows/angel-pack-report.yml",
   ".vercelignore",
@@ -34,7 +46,9 @@ const requiredFiles = [
   "scripts/vercel-ignore-build.mjs",
   "docs/ops/8-workstream-agent-map.md",
   "docs/ops/azure-vm-infrastructure-plan.md",
+  "docs/ops/slack-email-reporting.md",
   "docs/ops/vercel-deployment-limit-runbook.md",
+  ...subAgentFiles,
 ];
 
 function visibleSource(value: string) {
@@ -71,13 +85,14 @@ const providerBlocks = [
   "The Vercel ignored-build guard is configured to reduce stale preview build usage, not to bypass active account limits.",
   "The Vercel upload ignore file keeps support artifacts out of runtime deployments, reducing wasted transfer and build context.",
   "The Angel Pack report can send to Slack/email only after SLACK_WEBHOOK_URL, OPS_REPORT_WEBHOOK_URL, or RESEND_API_KEY plus OPS_REPORT_EMAIL_TO are configured as GitHub secrets.",
+  "SLACK_APP_FIELD_ID can be stored as a GitHub variable for labeling, but it is not a credential and cannot send messages alone.",
   "OPENAI_API_KEY controls live MRagent model replies; fallback remains deterministic without it.",
   "BLOB_READ_WRITE_TOKEN controls receipt persistence; raw input remains redacted by default.",
   "Custom domain attachment must be verified in the active Vercel project dashboard.",
 ];
 
 const report = [
-  "# MindReply 15-Minute Ops Report",
+  "# MindReply 23-Minute Ops Report",
   "",
   `Generated: ${new Date().toISOString()}`,
   "",
@@ -85,8 +100,9 @@ const report = [
   publicLeakHits.length ? `Blocked terms or missing public files: ${publicLeakHits.join(", ")}` : "No blocked customer-facing terms found in monitored public files.",
   "",
   `Required files: ${statusLine(missingRequired.length === 0)}`,
-  missingRequired.length ? `Missing: ${missingRequired.join(", ")}` : "All required launch files are present.",
+  missingRequired.length ? `Missing: ${missingRequired.join(", ")}` : "All required launch and operating files are present.",
   "",
+  `Sub-agent briefs: ${statusLine(subAgentFiles.every((file) => existsSync(join(root, file))))}`,
   `Playbooks: ${playbookCount} seed files found.`,
   `Redirected legacy public routes: ${redirectedRouteCount}.`,
   "",
