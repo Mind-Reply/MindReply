@@ -13,6 +13,7 @@ This map turns the requested sub-agent spread into repo-controlled operating lan
 - Owns GitHub Actions, scheduled reports, CI gates, and artifacts.
 - Current next move: keep `ops:report` and `ops:pack` passing.
 - Evidence: report artifacts are generated from scheduled or manual workflow runs.
+- Schedule note: `*/23 * * * *` runs at minutes 0, 23, and 46 UTC each hour. It is the lightweight GitHub-native 23-minute slot pattern, not a perfect rolling interval.
 
 ## 3. Security Agent
 
@@ -50,6 +51,25 @@ This map turns the requested sub-agent spread into repo-controlled operating lan
 - Current next move: produce a previewable interface concept once deployment is unblocked.
 - Evidence: first viewport shows category, input, synthesis, action, risk, and receipt without clutter.
 
+## Personal Angel Pack In Every Report
+
+Every scheduled report must include a private Angel Pack section:
+
+- One completed or current implementation move.
+- One revenue packaging move, such as annual setup or credit-load refinement.
+- One small practical gift idea: dashboard snapshot, branded workflow checklist, automation audit, or growth brief.
+- One verification checklist so the idea can become shipped work instead of noise.
+
+## Delivery Hooks
+
+Use runtime configuration only:
+
+- `SLACK_WEBHOOK_URL` for Slack incoming webhook delivery.
+- `RESEND_API_KEY` plus `OPS_REPORT_EMAIL_TO` or `REPORT_TO_EMAIL` for email delivery.
+- `OPS_REPORT_WEBHOOK_URL` for any other approved webhook.
+
+No Slack webhook URL, email key, OAuth token, or mailbox credential is allowed in committed files.
+
 ## Operating Rule
 
-All workstreams report through the Master Orchestrator. No lane publishes internal strategy, secrets, staffing claims, or provider instructions to customer-facing pages.
+All workstreams report through the Master Orchestrator. No lane publishes internal strategy, secrets, staffing claims, provider instructions, or private revenue mechanics to customer-facing pages.
