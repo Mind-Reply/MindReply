@@ -1,0 +1,17 @@
+{
+  "playbook_id": "clear-next-move",
+  "title": "Clear next move",
+  "version": "0.1.0",
+  "triggers": ["decision", "close", "resolved", "record"],
+  "recommended_action": "resolve",
+  "decision_tree": [
+    {
+      "condition": "No reply, follow-up, or risk signal is present.",
+      "action": "resolve"
+    }
+  ],
+  "verification": {
+    "risk_gate": true,
+    "receipt_required": true
+  }
+}
