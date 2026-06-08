@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BookOpen, CheckCircle2, Copy, FileText, Globe2, GraduationCap, Mail, Maximize2, MessageSquare, Minimize2, PhoneCall, RotateCcw, SlidersHorizontal, Sparkles, Target, Wand2, Zap } from "lucide-react";
 import Link from "next/link";
 import CreditPurchasePanel from "@/components/CreditPurchasePanel";
@@ -34,6 +34,7 @@ type ToolResponse = {
 };
 
 const TONES = ["professional", "warm", "assertive", "empathetic", "concise", "diplomatic"];
+const FREE_PREVIEW_LIMIT = 10;
 
 const TOOLS: Array<{ id: ToolSlug; icon: React.ReactNode; title: string; desc: string; placeholder: string }> = [
   { id: "ops-overload-analyzer", icon: <Zap size={18} />, title: "Ops Overload Analyzer", desc: "Paste overloaded messages/tasks and get urgency, owner, next action, and the 24-hour recovery move.", placeholder: "Paste 5-10 urgent emails, Slack messages, tasks, or follow-up notes..." },
@@ -55,6 +56,10 @@ const TOOLS: Array<{ id: ToolSlug; icon: React.ReactNode; title: string; desc: s
   { id: "cultural-adapter", icon: <Globe2 size={18} />, title: "Cultural Adapter", desc: "Adapt phrasing for cross-cultural clarity and relationship context.", placeholder: "Paste text and describe the cultural or relationship context..." },
 ];
 
+function todayUsageKey() {
+  return `mindreply.tools.processed.${new Date().toISOString().slice(0, 10)}`;
+}
+
 export default function Tools() {
   const [active, setActive] = useState<ToolSlug>("ops-overload-analyzer");
   const [input, setInput] = useState("");
@@ -62,9 +67,26 @@ export default function Tools() {
   const [result, setResult] = useState<ToolResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [processedCount, setProcessedCount] = useState(0);
+  const [queuedCount, setQueuedCount] = useState(0);
 
   const current = TOOLS.find((tool) => tool.id === active) ?? TOOLS[0];
   const showTone = active === "email-polisher" || active === "tone-adjuster" || active === "tone-calibrator";
+  const remaining = Math.max(FREE_PREVIEW_LIMIT - processedCount, 0);
+  const atLimit = remaining === 0;
+
+  useEffect(() => {
+    const saved = Number(window.localStorage.getItem(todayUsageKey()) ?? "0");
+    if (Number.isFinite(saved)) {
+      setProcessedCount(Math.min(Math.max(saved, 0), FREE_PREVIEW_LIMIT));
+    }
+  }, []);
+
+  function setDailyProcessed(nextValue: number) {
+    const next = Math.min(Math.max(nextValue, 0), FREE_PREVIEW_LIMIT);
+    setProcessedCount(next);
+    window.localStorage.setItem(todayUsageKey(), String(next));
+  }
 
   function reset() {
     setInput("");
@@ -79,6 +101,23 @@ export default function Tools() {
 
   async function run() {
     if (!input.trim()) return;
+
+    if (atLimit) {
+      const nextQueuedCount = queuedCount + 1;
+      setQueuedCount(nextQueuedCount);
+      setResult({
+        result: `Queued: ${nextQueuedCount} item${nextQueuedCount === 1 ? "" : "s"} waiting. Upgrade to process immediately and stop missing critical messages or tasks.`,
+        suggestions: [
+          "The free preview has reached 10/10 processed items today.",
+          "New items stay queued until unlimited processing is unlocked.",
+          "Use Growth when this overload repeats daily.",
+        ],
+        creditCost: 1,
+        source: "local",
+      });
+      return;
+    }
+
     setLoading(true);
     setResult(null);
     try {
@@ -87,7 +126,9 @@ export default function Tools() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: input, tone }),
       });
-      setResult(await response.json());
+      const nextResult = await response.json();
+      setResult(nextResult);
+      setDailyProcessed(processedCount + 1);
     } finally {
       setLoading(false);
     }
@@ -106,7 +147,22 @@ export default function Tools() {
       <DiagnosticTools />
 
       <section className="max-w-6xl mx-auto px-4 py-10">
-        <div className="mb-6">
+        <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_0.8fr]">
+          <div className="rounded-2xl border bg-white p-5" style={{ borderColor: atLimit ? "hsl(43 80% 60%)" : "hsl(40 25% 88%)" }}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "hsl(43 80% 42%)" }}>Free preview</p>
+                <h2 className="mt-1 font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>Messages processed: {processedCount}/{FREE_PREVIEW_LIMIT}</h2>
+                <p className="mt-1 text-sm" style={{ color: "hsl(220 25% 45%)" }}>
+                  {atLimit ? "Limit reached. New items queue until unlimited processing is unlocked." : `${remaining} free preview item${remaining === 1 ? "" : "s"} left today.`}
+                </p>
+                {queuedCount > 0 && <p className="mt-2 text-xs font-semibold" style={{ color: "hsl(43 80% 38%)" }}>{queuedCount} queued item{queuedCount === 1 ? "" : "s"} waiting.</p>}
+              </div>
+              <Link href="/memberships" className="inline-flex items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
+                Unlock unlimited processing
+              </Link>
+            </div>
+          </div>
           <CreditPurchasePanel currentCost={result?.creditCost ?? 1} context="tool" />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
@@ -131,7 +187,7 @@ export default function Tools() {
                   <h2 className="font-serif text-2xl font-bold" style={{ color: "hsl(220 45% 13%)" }}>{current.title}</h2>
                   <p className="text-sm mt-1" style={{ color: "hsl(220 25% 45%)" }}>{current.desc}</p>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold" style={{ background: "hsl(43 80% 60% / 0.18)", color: "hsl(43 80% 36%)" }}>{result?.creditCost ?? 1} credit</span>
+                <span className="px-3 py-1 rounded-full text-xs font-bold" style={{ background: atLimit ? "hsl(43 80% 60%)" : "hsl(43 80% 60% / 0.18)", color: atLimit ? "hsl(220 45% 13%)" : "hsl(43 80% 36%)" }}>{atLimit ? "Limit reached" : `${result?.creditCost ?? 1} credit`}</span>
               </div>
 
               {showTone && (
@@ -144,8 +200,8 @@ export default function Tools() {
               )}
 
               <textarea value={input} onChange={(event) => setInput(event.target.value)} rows={10} placeholder={current.placeholder} className="w-full rounded-lg px-3 py-3 text-sm outline-none border border-[hsl(40_25%_88%)] focus:border-[hsl(43_80%_60%)] transition-colors resize-none leading-relaxed" style={{ background: "hsl(40 20% 92%)", color: "hsl(220 45% 13%)" }} />
-              <button onClick={run} disabled={!input.trim() || loading} className="w-full mt-4 font-medium py-3 rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity text-sm flex items-center justify-center gap-2" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>
-                {loading ? "Processing..." : <><Sparkles size={15} />Run Intelligence</>}
+              <button onClick={run} disabled={!input.trim() || loading} className="w-full mt-4 font-medium py-3 rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity text-sm flex items-center justify-center gap-2" style={{ background: atLimit ? "hsl(43 80% 60%)" : "hsl(220 55% 20%)", color: atLimit ? "hsl(220 45% 13%)" : "hsl(43 70% 88%)" }}>
+                {loading ? "Processing..." : <><Sparkles size={15} />{atLimit ? "Queue item until upgrade" : "Run Intelligence"}</>}
               </button>
             </section>
 
@@ -163,7 +219,7 @@ export default function Tools() {
               {!result && !loading && (
                 <div className="h-64 flex flex-col items-center justify-center text-sm text-center gap-2" style={{ color: "hsl(220 25% 45%)" }}>
                   <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "hsl(40 20% 92%)" }}><Sparkles size={20} style={{ color: "rgba(10,22,40,0.25)" }} /></div>
-                  <p>Your processed result and behavioral scores will appear here.</p>
+                  <p>{atLimit ? "New items will queue here until unlimited processing is unlocked." : "Your processed result and behavioral scores will appear here."}</p>
                 </div>
               )}
 
@@ -201,10 +257,10 @@ export default function Tools() {
                     </div>
                   )}
 
-                  <div className="rounded-xl border p-4" style={{ borderColor: "hsl(40 25% 88%)", background: "hsl(43 80% 60% / 0.08)" }}>
-                    <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>Value moment unlocked</p>
+                  <div className="rounded-xl border p-4" style={{ borderColor: "hsl(40 25% 88%)", background: atLimit ? "hsl(43 80% 60% / 0.16)" : "hsl(43 80% 60% / 0.08)" }}>
+                    <p className="text-sm font-bold" style={{ color: "hsl(220 45% 13%)" }}>{atLimit ? "Stop missing critical items." : "Value moment unlocked"}</p>
                     <p className="mt-1 text-xs leading-relaxed" style={{ color: "hsl(220 25% 45%)" }}>
-                      Process the next 10 messages/tasks before another urgent item slips. Buy credits for the batch or upgrade to Growth when daily overload is costing time.
+                      {atLimit ? "Unlock immediate processing and reclaim your day when the next urgent batch arrives." : "Process the next 10 messages/tasks before another urgent item slips. Buy credits for the batch or upgrade to Growth when daily overload is costing time."}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Link href="/memberships" className="rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "hsl(220 55% 20%)", color: "hsl(43 70% 88%)" }}>Unlock unlimited processing</Link>
