@@ -23,8 +23,9 @@ function assertNoForbiddenTerms(label: string, value: string) {
   }
 }
 
+const normalInput = "A client says the price is high and asks whether we can wait until next month.";
 const normal = buildDecisionResponse({
-  input: "A client says the price is high and asks whether we can wait until next month.",
+  input: normalInput,
   source: "manual",
   userId: "verify",
 });
@@ -32,6 +33,15 @@ const normal = buildDecisionResponse({
 assert(normal.synthesis.length > 10, "Decision response must include a synthesis.");
 assert(["reply", "schedule", "resolve", "escalate"].includes(normal.recommendedAction.kind), "Decision response must include one allowed action.");
 assert(Object.keys(normal.recommendedAction).sort().join(",") === "kind,label,payload", "Recommended action shape changed.");
+assert(normal.receipt.id.startsWith("mr-"), "Receipt id must use the MRagent prefix.");
+assert(normal.receipt.source === "manual", "Receipt must keep the source.");
+assert(normal.receipt.actionKind === normal.recommendedAction.kind, "Receipt action kind must match the recommended action.");
+assert(normal.receipt.riskLevel === normal.risk.level, "Receipt risk level must match risk output.");
+assert(normal.receipt.confidence > 0 && normal.receipt.confidence <= 1, "Receipt confidence must be normalized.");
+assert(normal.receipt.playbookVersion === "mragent-mindread-v1", "Receipt must include the MRagent playbook version.");
+assert(normal.receipt.inputHash.startsWith("mrh-"), "Receipt must include a privacy-safe input hash.");
+assert(!normal.receipt.inputHash.includes(normalInput), "Receipt input hash must not contain raw input.");
+assert(normal.receipt.rawContentRedacted === true, "Receipt must mark raw content as redacted.");
 assertNoForbiddenTerms("synthesis", normal.synthesis);
 assertNoForbiddenTerms("action label", normal.recommendedAction.label);
 
@@ -71,7 +81,14 @@ for (const file of publicFiles) {
   assertNoForbiddenTerms(file, visibleSource(readFileSync(fullPath, "utf-8")));
 }
 
-for (const file of ["app/api/agent/route.ts", "components/ai-elements/message.tsx"]) {
+for (const file of [
+  "app/api/agent/route.ts",
+  "app/mcp/route.ts",
+  "components/ai-elements/message.tsx",
+  "lib/mragent.ts",
+  "lib/mragent-mcp.ts",
+  "scripts/verify-mcp.ts",
+]) {
   assert(existsSync(join(process.cwd(), file)), `${file} must exist.`);
 }
 
