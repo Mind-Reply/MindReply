@@ -1,0 +1,52 @@
+name: Personal Pack Report
+
+on:
+  workflow_dispatch:
+    inputs:
+      channels:
+        description: "Comma-separated channels: console,slack,email"
+        required: false
+        default: "console"
+      dry_run:
+        description: "Keep true until Slack/email secrets are verified"
+        required: false
+        default: "true"
+  schedule:
+    # GitHub cron cannot keep an exact 23-minute rolling interval across hour boundaries.
+    # This gives frequent personal-only pulses without adding an external scheduler.
+    - cron: "*/23 * * * *"
+
+permissions:
+  contents: read
+  statuses: read
+
+jobs:
+  personal-pack-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://www.mind-reply.com' }}
+      MINDREPLY_REPORT_ENABLED: ${{ vars.MINDREPLY_REPORT_ENABLED || 'false' }}
+      MINDREPLY_REPORT_DRY_RUN: ${{ github.event.inputs.dry_run || vars.MINDREPLY_REPORT_DRY_RUN || 'true' }}
+      MINDREPLY_REPORT_CHANNELS: ${{ github.event.inputs.channels || vars.MINDREPLY_REPORT_CHANNELS || 'console' }}
+      MINDREPLY_REPORT_PERSONAL_ONLY: "true"
+      MINDREPLY_REPORT_PERSONAL_LABEL: ${{ vars.MINDREPLY_REPORT_PERSONAL_LABEL || 'Angel personal pack' }}
+      MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL }}
+      MINDREPLY_REPORT_EMAIL_ALLOWLIST: ${{ secrets.MINDREPLY_REPORT_EMAIL_ALLOWLIST }}
+      MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install
+        run: npm install
+
+      - name: Generate personal pack report
+        run: npm run report:personal-pack
