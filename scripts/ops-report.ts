@@ -28,7 +28,9 @@ const requiredFiles = [
   "src/agents/prompts.md",
   "src/chatgpt-app/mragent-tools.json",
   "chatgpt-app-submission.json",
+  "scripts/vercel-ignore-build.mjs",
   "docs/ops/azure-vm-infrastructure-plan.md",
+  "docs/ops/vercel-deployment-limit-runbook.md",
 ];
 
 function visibleSource(value: string) {
@@ -61,7 +63,8 @@ const playbookDir = join(root, "playbooks", "seed");
 const playbookCount = existsSync(playbookDir) ? readdirSync(playbookDir).filter((file) => file.endsWith(".json")).length : 0;
 const redirectedRouteCount = redirectedPublicPaths.length;
 const providerBlocks = [
-  "Vercel build/deployment limits are account-side and cannot be removed by repo code.",
+  "Vercel build/deployment limits are account-side and require dashboard billing/quota action before blocked builds can resume.",
+  "The Vercel ignored-build guard is configured to reduce stale preview build usage, not to bypass active account limits.",
   "OPENAI_API_KEY controls live MRagent model replies; fallback remains deterministic without it.",
   "BLOB_READ_WRITE_TOKEN controls receipt persistence; raw input remains redacted by default.",
   "Custom domain attachment must be verified in the active Vercel project dashboard.",
@@ -85,7 +88,7 @@ const report = [
   ...providerBlocks.map((item) => `- ${item}`),
   "",
   "Next action:",
-  "- If this report is clean, deploy from the latest passing main/PR build and verify /, /agent, /api/health, /api/intake, and /mcp.",
+  "- Clear the Vercel dashboard build-rate-limit, redeploy PR #12, then verify /, /agent, /api/health, /api/intake, and /mcp.",
 ].join("\n");
 
 console.log(report);
