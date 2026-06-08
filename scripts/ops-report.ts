@@ -18,6 +18,7 @@ const publicFiles = [
 ];
 
 const requiredFiles = [
+  ".vercelignore",
   "app/api/agent/route.ts",
   "app/api/health/route.ts",
   "app/api/intake/route.ts",
@@ -65,6 +66,7 @@ const redirectedRouteCount = redirectedPublicPaths.length;
 const providerBlocks = [
   "Vercel build/deployment limits are account-side and require dashboard billing/quota action before blocked builds can resume.",
   "The Vercel ignored-build guard is configured to reduce stale preview build usage, not to bypass active account limits.",
+  "The Vercel upload ignore file keeps support artifacts out of runtime deployments, reducing wasted transfer and build context.",
   "OPENAI_API_KEY controls live MRagent model replies; fallback remains deterministic without it.",
   "BLOB_READ_WRITE_TOKEN controls receipt persistence; raw input remains redacted by default.",
   "Custom domain attachment must be verified in the active Vercel project dashboard.",
