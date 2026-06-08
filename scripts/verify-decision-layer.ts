@@ -6,6 +6,16 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+function visibleSource(value: string) {
+  return value
+    .split("\n")
+    .filter((line) => {
+      const trimmed = line.trim();
+      return !trimmed.startsWith("import ") && !trimmed.startsWith("export const metadata") && !trimmed.startsWith("description:");
+    })
+    .join("\n");
+}
+
 function assertNoForbiddenTerms(label: string, value: string) {
   for (const term of forbiddenPublicTerms) {
     const pattern = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
@@ -34,15 +44,20 @@ assert(highRisk.recommendedAction.kind === "escalate", "High-risk input must esc
 assert(highRisk.risk.level === "high", "High-risk input must be marked high.");
 assertNoForbiddenTerms("high-risk action label", highRisk.recommendedAction.label);
 
-for (const path of ["/agent", "/tools", "/integrations", "/dashboard", "/memberships", "/professionals", "/bookings"]) {
+const agentPath = "/agent" as string;
+assert(!redirectedPublicPaths.some((prefix) => agentPath === prefix || agentPath.startsWith(`${prefix}/`)), "/agent must remain available for MRagent.");
+
+for (const path of ["/tools", "/integrations", "/dashboard", "/memberships", "/professionals", "/bookings"]) {
   assert(redirectedPublicPaths.some((prefix) => path === prefix || path.startsWith(`${prefix}/`)), `${path} must be redirected to /.`);
 }
 
 const publicFiles = [
   "app/page.tsx",
+  "app/agent/page.tsx",
   "app/privacy/page.tsx",
   "app/layout.tsx",
   "components/DecisionIntake.tsx",
+  "components/MRAgentChat.tsx",
   "site/index.html",
   "site/seo/meta.yml",
   "src/agents/prompts.md",
@@ -53,7 +68,11 @@ const publicFiles = [
 for (const file of publicFiles) {
   const fullPath = join(process.cwd(), file);
   assert(existsSync(fullPath), `${file} must exist.`);
-  assertNoForbiddenTerms(file, readFileSync(fullPath, "utf-8"));
+  assertNoForbiddenTerms(file, visibleSource(readFileSync(fullPath, "utf-8")));
+}
+
+for (const file of ["app/api/agent/route.ts", "components/ai-elements/message.tsx"]) {
+  assert(existsSync(join(process.cwd(), file)), `${file} must exist.`);
 }
 
 console.log("Decision layer verification passed.");

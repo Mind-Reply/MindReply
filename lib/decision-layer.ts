@@ -1,7 +1,6 @@
 export const forbiddenPublicTerms = ["ai", "chatbot", "productivity", "automation", "options", "boost", "hack"] as const;
 
 export const redirectedPublicPaths = [
-  "/agent",
   "/analytics",
   "/book",
   "/booking",
