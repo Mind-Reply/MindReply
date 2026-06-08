@@ -2,7 +2,7 @@ import Link from "next/link";
 import DecisionIntake from "@/components/DecisionIntake";
 
 const principles = [
-  "Intake reads the pressure.",
+  "Mind Read reflects the pressure.",
   "Action returns one next move.",
   "Memory adapts without demanding attention.",
   "Risk is checked before movement.",
@@ -30,10 +30,10 @@ export default function Home() {
         <div className="relative mx-auto mt-24 max-w-5xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#c9a961]">Executive Nervous System</p>
           <h1 className="mt-6 font-serif text-5xl font-bold leading-[0.95] text-[#f8f5f0] md:text-7xl">
-            Decision Infrastructure for the space between input and action.
+            MRagent reads the pressure and gives one gentle next move.
           </h1>
           <p className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-[#cdd6e4]">
-            MindReply turns scattered pressure into one synthesis, one recommended action, and one quiet memory update. The next move becomes obvious.
+            One private decision is free. Paste the pressure, feel the mindset underneath it, and receive one calm action without adding another screen to manage.
           </p>
         </div>
 
