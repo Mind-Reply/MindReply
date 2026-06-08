@@ -1,0 +1,11 @@
+{
+  "playbook_id": "product-launch-gatekeeper",
+  "title": "Launch gatekeeper",
+  "description": "One follow-up gate for release pressure.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "launch" }, { "pattern": "release" }, { "pattern": "ship" }],
+  "decision_tree": { "nodes": [{ "id": "schedule", "action": "schedule", "synthesis": "Launch pressure needs one gate before movement." }] },
+  "actions": ["schedule", "escalate"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
