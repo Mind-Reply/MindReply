@@ -16,6 +16,17 @@ export const metadata: Metadata = {
   },
   description: "A private decision layer for modern work. Paste the pressure. Receive one synthesis and one recommended action.",
   alternates: { canonical: "/" },
+  manifest: "/manifest.webmanifest",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   keywords: [
     "Executive Nervous System",
     "Decision Infrastructure",
