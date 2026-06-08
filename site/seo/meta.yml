@@ -1,15 +1,30 @@
 site: MindReply
 canonical: https://www.mind-reply.com
 title: MindReply | Executive Nervous System
-description: Decision Infrastructure for the space between input and action.
+description: Private decision infrastructure for the space between pressure and action.
 robots: index,follow
+sitemap: https://www.mind-reply.com/sitemap.xml
+manifest: https://www.mind-reply.com/manifest.webmanifest
 category: Executive Nervous System
 open_graph:
   title: MindReply | Executive Nervous System
-  description: Paste the pressure. Receive one synthesis and one recommended action.
+  description: Warm mind read. One synthesis. One recommended action.
   type: website
+primary_surfaces:
+  - /
+  - /agent
+  - /privacy
+indexing:
+  allow:
+    - /
+    - /agent
+    - /privacy
+  disallow:
+    - /api/
+    - /mcp
 principles:
   - intake layer
   - action layer
   - memory layer
   - risk check
+  - quiet receipt
