@@ -1,0 +1,11 @@
+{
+  "playbook_id": "legal-risk-flag",
+  "title": "Legal risk flag",
+  "description": "Hold movement when legal or regulatory pressure appears.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "legal" }, { "pattern": "lawsuit" }, { "pattern": "regulator" }],
+  "decision_tree": { "nodes": [{ "id": "hold", "action": "escalate", "synthesis": "Legal pressure requires review before movement." }] },
+  "actions": ["escalate"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner", "domain_reviewer"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
