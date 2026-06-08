@@ -18,7 +18,12 @@ fields:
     runUrl: GitHub Actions run URL when available.
   commitStatus:
     state: Combined GitHub commit status state, or local/error fallback.
-    signal: Short status signal, prioritizing the Vercel context when present.
+    signal: Short status signal, prioritizing the active Vercel context when present.
+    deployment:
+      primary: Active Vercel status context, prioritizing mind-reply.
+      legacy: Legacy Vercel context, usually mindreply when present.
+      quotaLimited: Vercel context whose target URL indicates build-rate-limit or upgradeToPro.
+      all: All Vercel status contexts seen on the commit.
     statuses: Individual commit status contexts with state, target URL, and description.
   summary:
     coreAgent: live or check.
