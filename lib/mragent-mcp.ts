@@ -40,6 +40,16 @@ const receiptOutputSchema = {
   rawContentRedacted: z.boolean().optional(),
 };
 
+const prepareToolMeta = {
+  "openai/toolInvocation/invoking": "MRagent is reading slowly",
+  "openai/toolInvocation/invoked": "MRagent is ready",
+};
+
+const receiptToolMeta = {
+  "openai/toolInvocation/invoking": "Looking for the private receipt",
+  "openai/toolInvocation/invoked": "Receipt check complete",
+};
+
 function siteOrigin() {
   try {
     return new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.mind-reply.com").origin;
@@ -231,6 +241,7 @@ export function getMRAgentMcpManifest() {
         inputSchema: schemas.prepare,
         outputSchema: schemas.preparationOutput,
         annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+        _meta: prepareToolMeta,
       },
       {
         name: "render_mindread",
@@ -253,6 +264,7 @@ export function getMRAgentMcpManifest() {
         inputSchema: schemas.receipt,
         outputSchema: schemas.receiptOutput,
         annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+        _meta: receiptToolMeta,
       },
     ],
   };
@@ -314,6 +326,7 @@ export function createMRAgentMcpServer() {
       inputSchema: prepareInputSchema,
       outputSchema: preparationOutputSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+      _meta: prepareToolMeta,
     },
     async ({ message, source }) => callMRAgentTool("prepare_mindread", { message, source }),
   );
@@ -346,6 +359,7 @@ export function createMRAgentMcpServer() {
       inputSchema: receiptInputSchema,
       outputSchema: receiptOutputSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+      _meta: receiptToolMeta,
     },
     async ({ receiptId }) => callMRAgentTool("fetch_receipt", { receiptId }),
   );
