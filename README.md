@@ -43,7 +43,7 @@ python -m unittest discover src
 
 ## Environment
 
-Copy `.env.example` to `.env.local` and set only the values needed for the deployment target. Integrations read credentials from environment variables and do not hardcode secrets.
+Use `.env` for the committed base configuration. Put real local-only secrets in `.env.local`, and set production secrets in the deployment provider. Integrations read credentials from environment variables and do not hardcode secrets.
 
 Optional MRagent provider settings:
 
