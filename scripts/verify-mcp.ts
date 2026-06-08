@@ -24,6 +24,10 @@ async function main() {
     assert(manifest.resources[0]?.uri === MRAGENT_WIDGET_URI, "Widget resource URI changed.");
     assert(manifest.resources[0]?.mimeType === MRAGENT_RESOURCE_MIME_TYPE, "Widget MIME type changed.");
 
+    for (const tool of manifest.tools) {
+      assert(Boolean(tool.outputSchema), `${tool.name} must declare an outputSchema.`);
+    }
+
     const prepareTool = manifest.tools.find((tool) => tool.name === "prepare_mindread") as {
       annotations?: { readOnlyHint?: boolean; destructiveHint?: boolean; openWorldHint?: boolean };
     };
@@ -51,16 +55,19 @@ async function main() {
     const rawInput = "A client says the fee is too high and wants an answer now.";
     const prepared = await callMRAgentTool("prepare_mindread", { message: rawInput, source: "manual" });
     const structured = prepared.structuredContent as Record<string, unknown>;
+    const serializedStructured = JSON.stringify(structured);
 
     assert(typeof structured.generationId === "string" && structured.generationId.length > 10, "prepare_mindread must return a generation id.");
     assert(typeof structured.reply === "string" && structured.reply.length > 0, "prepare_mindread must return a reply.");
     assert(Boolean(structured.decision), "prepare_mindread must return decision output.");
     assert(Boolean(structured.receipt), "prepare_mindread must return a receipt.");
 
-    const persistence = structured.persistence as { stored?: boolean; status?: string };
+    const persistence = structured.persistence as { stored?: boolean; status?: string; urls?: unknown };
     assert(persistence.stored === false, "Missing Blob env must leave response usable with stored=false.");
     assert(persistence.status === "skipped", "Missing Blob env must report skipped persistence.");
-    assert(!JSON.stringify(structured).includes(rawInput), "Structured output must not contain raw input.");
+    assert(persistence.urls === undefined, "Persistence must not expose Blob URLs.");
+    assert(!serializedStructured.includes(rawInput), "Structured output must not contain raw input.");
+    assert(!serializedStructured.includes("blob.vercel-storage.com"), "Structured output must not expose Blob storage URLs.");
 
     const rendered = await callMRAgentTool("render_mindread", { message: rawInput, source: "manual" });
     const renderedMeta = rendered._meta as { ui?: { resourceUri?: string } };
