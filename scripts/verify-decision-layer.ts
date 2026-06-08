@@ -24,6 +24,10 @@ function assertNoForbiddenTerms(label: string, value: string) {
   }
 }
 
+function assertIncludes(label: string, value: string, expected: string) {
+  assert(value.includes(expected), `${label} must include: ${expected}`);
+}
+
 const normalInput = "A client says the price is high and asks whether we can wait until next month.";
 const normal = buildDecisionResponse({
   input: normalInput,
@@ -93,6 +97,13 @@ for (const file of publicFiles) {
   assert(existsSync(fullPath), `${file} must exist.`);
   assertNoForbiddenTerms(file, visibleSource(readFileSync(fullPath, "utf-8")));
 }
+
+const promptSpec = readFileSync(join(process.cwd(), "src/agents/prompts.md"), "utf-8");
+assertIncludes("MRagent prompt contract", promptSpec, "MRagent Voice And Cadence");
+assertIncludes("MRagent prompt contract", promptSpec, "Read slowly before answering");
+assertIncludes("MRagent prompt contract", promptSpec, "best-friend warmth with confident boundaries");
+assertIncludes("MRagent prompt contract", promptSpec, "Give one next move, not a menu");
+assertIncludes("MRagent prompt contract", promptSpec, "Keep the receipt quiet, private, and free of raw intake text");
 
 for (const file of [
   "app/api/agent/route.ts",
