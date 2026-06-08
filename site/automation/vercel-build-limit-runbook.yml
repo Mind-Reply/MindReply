@@ -7,7 +7,13 @@ symptom:
 known_mitigation_in_repo:
   file: vercel.json
   guard: scripts/vercel-ignore-build.mjs
-  purpose: Skip non-canonical preview builds and reduce avoidable Vercel build usage.
+  purpose: Skip non-canonical preview builds, duplicate projects, and automation-only commits to reduce avoidable Vercel build usage.
+skipped_change_scopes:
+  - .github workflows
+  - site/automation source files
+  - site/design source files
+  - site/media source files
+  - scripts/mragent-monitor-report.mjs
 checks:
   - confirm latest GitHub commit status
   - open Vercel target URL and verify whether it is quota/rate-limit or code failure
