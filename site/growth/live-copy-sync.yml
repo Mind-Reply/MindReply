@@ -1,0 +1,31 @@
+sync: MRagent live copy alignment
+status: active
+purpose: Keep home, /agent, search intent, and ad copy aligned before external publishing.
+source_files:
+  home: app/page.tsx
+  agent: app/agent/page.tsx
+  search_intents: site/growth/search-intents.yml
+  ad_copy_tests: site/ads/copy-tests.yml
+current_alignment:
+  home_hero:
+    live_text: Warm mind read. Clear next move.
+    aligned_with: site/ads/messaging.yml promise
+    status: aligned
+  loaded_message:
+    live_text: The message feels loaded
+    aligned_with: site/ads/copy-tests.yml loaded_message
+    status: aligned
+  follow_up_pressure:
+    live_text: The follow-up keeps tugging
+    aligned_with: site/ads/copy-tests.yml follow_up_pressure
+    status: aligned
+  agent_metadata:
+    live_text: reads pressure and returns one clear next move
+    aligned_with: site/growth/search-intents.yml primary_lane
+    status: aligned
+review_rules:
+  - check this file before publishing external ad copy
+  - if a headline changes in ads, update home or record why it stays separate
+  - if /agent metadata changes, update search-intents.yml or record why
+  - preserve one synthesis, one next move, and quiet receipt language
+next_sync_task: Capture fresh /agent production preview and compare visible hero copy against this checklist.
