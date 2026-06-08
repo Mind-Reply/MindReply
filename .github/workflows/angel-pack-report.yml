@@ -1,0 +1,56 @@
+name: MindReply Angel Pack Report
+
+on:
+  schedule:
+    - cron: "*/53 * * * *"
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "scripts/**"
+      - "src/**"
+      - "docs/**"
+      - "site/**"
+      - ".github/workflows/angel-pack-report.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: angel-pack-report-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      OPS_REPORT_WEBHOOK_URL: ${{ secrets.OPS_REPORT_WEBHOOK_URL }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      OPS_REPORT_EMAIL_TO: ${{ secrets.OPS_REPORT_EMAIL_TO }}
+      OPS_REPORT_EMAIL_FROM: ${{ secrets.OPS_REPORT_EMAIL_FROM }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install
+        run: npm install
+
+      - name: Generate Angel Pack report
+        run: npm run ops:pack | tee mindreply-angel-pack-report.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mindreply-angel-pack-report
+          path: mindreply-angel-pack-report.md
