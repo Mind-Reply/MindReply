@@ -81,6 +81,8 @@ const publicFiles = [
   "site/seo/meta.yml",
   "site/ads/messaging.yml",
   "site/growth/positioning.yml",
+  "site/design/figma-growth-loop.yml",
+  "site/media/remotion-launch-brief.yml",
   "src/agents/prompts.md",
   "docs/vision_dictionary.md",
   "docs/privacy_whitepaper_intro.md",
