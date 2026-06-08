@@ -29,8 +29,9 @@ fields:
     opinion: Short operating opinion for the pass.
     nextAction: The next recommended move.
   surfaces: Per-URL status, latency, and signal.
-  packSources: Required personal-pack source files and whether each exists, including slack-api and vercel-build-limit.
+  packSources: Required personal-pack source files and whether each exists, including slack-api, vercel-build-limit, and verification-runbook.
 verification:
+  runbook: site/automation/verification-runbook.yml
   commands:
     - node scripts/vercel-ignore-build.mjs --self-test
     - npm run decision:verify
