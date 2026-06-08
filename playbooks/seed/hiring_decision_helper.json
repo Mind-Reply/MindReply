@@ -1,0 +1,11 @@
+{
+  "playbook_id": "hiring-decision-helper",
+  "title": "Hiring decision helper",
+  "description": "One scheduled next step for candidate or hiring pressure.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "candidate" }, { "pattern": "interview" }, { "pattern": "hire" }],
+  "decision_tree": { "nodes": [{ "id": "schedule", "action": "schedule", "synthesis": "Hiring pressure needs a clean follow-up, not drift." }] },
+  "actions": ["schedule", "reply"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
