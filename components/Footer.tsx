@@ -5,6 +5,7 @@ const footerGroups = [
   {
     title: "Workflows",
     links: [
+      { href: "/solutions/operations-managers", label: "Operations Teams" },
       { href: "/tools/ops-overload-analyzer", label: "Ops Overload Analyzer" },
       { href: "/tools/prospect-reply-analyzer", label: "Prospect Reply Analyzer" },
       { href: "/tools/email-polisher", label: "Email Polisher" },
