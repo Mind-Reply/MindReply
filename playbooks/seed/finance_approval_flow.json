@@ -1,0 +1,11 @@
+{
+  "playbook_id": "finance-approval-flow",
+  "title": "Finance approval flow",
+  "description": "Hold financial-control pressure before movement.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "invoice" }, { "pattern": "payment" }, { "pattern": "wire" }],
+  "decision_tree": { "nodes": [{ "id": "escalate", "action": "escalate", "synthesis": "Financial movement needs owner review and a signed receipt." }] },
+  "actions": ["escalate"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
