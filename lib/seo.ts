@@ -79,6 +79,19 @@ export type SolutionPage = {
 
 export const solutionPages: SolutionPage[] = [
   {
+    slug: "operations-managers",
+    audience: "Operations managers in fast-growing SMB teams",
+    title: "Stop Losing 2+ Hours a Day to Message and Task Overload",
+    description:
+      "MindReply turns urgent messages, Slack notes, inbox chaos, and follow-ups into a ranked action queue so operations teams stop missing critical items within 24 hours.",
+    pain: "Operations managers are forced to read every notification, decide what matters, assign owners, chase follow-ups, and rewrite sensitive replies while the real work keeps moving.",
+    offer: "We consolidate and action incoming communications and tasks so you stop wasting 2+ hours daily on manual processing and follow-ups within the next 24 hours.",
+    proofPoints: ["10-item free overload scan", "Urgency and owner mapping", "Queued items show what is slipping", "Unlimited processing upgrade when daily overload repeats"],
+    useCases: ["Team inbox triage", "Slack and Teams follow-ups", "Client escalation routing", "End-of-day task recovery"],
+    primaryHref: "/tools/ops-overload-analyzer?audience=operations-managers",
+    primaryLabel: "Process 10 Urgent Items",
+  },
+  {
     slug: "psychologists",
     audience: "Psychologists and clinical practices",
     title: "AI Communication Intelligence for Psychologists",
