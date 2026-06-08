@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, Bot, BookOpen, CalendarDays, HeartHandshake, ShieldCheck, Sparkles, Wand2 } from "lucide-react";
+import { Bot, BookOpen, CalendarDays, HeartHandshake, ShieldCheck, Sparkles, Wand2 } from "lucide-react";
 
 const footerGroups = [
   {
@@ -25,8 +25,8 @@ const footerGroups = [
     links: [
       { href: "/agent", label: "MRagent" },
       { href: "/memberships", label: "Memberships" },
-      { href: "/api/language", label: "Language Status" },
-      { href: "/health", label: "System Health" },
+      { href: "/login", label: "Member Login" },
+      { href: "/dashboard", label: "Dashboard" },
     ],
   },
 ];
@@ -87,9 +87,9 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-[rgba(248,245,240,0.52)] sm:flex-row sm:items-center sm:justify-between">
-          <span>MindReply keeps chat, tools, bookings, lexicons, and system health within reach from every page.</span>
-          <Link href="/api/health" className="inline-flex items-center gap-2 transition hover:text-[hsl(43_80%_60%)]">
-            <Activity size={13} /> API health
+          <span>MindReply keeps chat, tools, bookings, and lexicons within reach from every page.</span>
+          <Link href="/services" className="inline-flex items-center gap-2 transition hover:text-[hsl(43_80%_60%)]">
+            <Sparkles size={13} /> Explore services
           </Link>
         </div>
       </div>
