@@ -1,0 +1,40 @@
+map: MRagent search intents
+status: active
+purpose: Shape pages and reports around the tense moment before someone replies.
+primary_lane: before you reply
+intent_clusters:
+  tense_reply:
+    audience_state: Person has a message drafted but feels pressure, heat, or hesitation.
+    search_phrases:
+      - how to reply to a tense message
+      - what to say when a client pushes back
+      - calm reply to a difficult message
+    landing_fit: /agent
+    promise: Read the pressure before you reply.
+    content_note: Show that MRagent names the feeling, the protection pattern, and one clean move.
+  client_hesitation:
+    audience_state: Founder or operator needs to answer price, timing, or trust friction.
+    search_phrases:
+      - reply to client hesitation
+      - client says price is high response
+      - answer a client without sounding defensive
+    landing_fit: /
+    promise: Warm authority for the moment before the reply leaves your hands.
+    content_note: Keep language practical and relationship-aware, with no clinical claims.
+  follow_up_pressure:
+    audience_state: Person keeps mentally replaying an unresolved thread.
+    search_phrases:
+      - when to follow up without sounding pushy
+      - write a calm follow up message
+      - follow up after no response calmly
+    landing_fit: /agent
+    promise: Turn the loose thread into one quiet next move.
+    content_note: Lead with relief and closure, not more planning.
+copy_tests:
+  - Read the pressure before you reply.
+  - Warm authority for the message you keep rewriting.
+  - One quiet next move for the thread still tugging at you.
+measurement:
+  checked_by: site/growth/visibility-plan.yml
+  report_signal: search_assets
+  next_review: weekly monday visibility pass
