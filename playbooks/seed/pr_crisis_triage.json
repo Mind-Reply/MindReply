@@ -1,0 +1,11 @@
+{
+  "playbook_id": "pr-crisis-triage",
+  "title": "Public statement triage",
+  "description": "Routes sensitive public statements into review before response.",
+  "version": "1.0",
+  "triggers": [{ "type": "email", "pattern": "press" }, { "type": "manual", "pattern": "journalist" }, { "type": "manual", "pattern": "statement" }],
+  "decision_tree": { "nodes": [{ "id": "n1", "condition": "public statement signal", "action": "escalate", "next": [] }] },
+  "actions": [{ "id": "a1", "type": "task_create", "template_id": "statement_review", "params": { "role": "owner" } }],
+  "verification": { "required": true, "roles": ["owner"] },
+  "audit": { "exportable": true, "signed": true }
+}
