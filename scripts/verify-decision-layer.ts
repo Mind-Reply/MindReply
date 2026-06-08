@@ -86,6 +86,7 @@ const publicFiles = [
   "site/ads/messaging.yml",
   "site/growth/positioning.yml",
   "site/growth/visibility-plan.yml",
+  "site/growth/search-intents.yml",
   "site/design/figma-growth-loop.yml",
   "site/media/remotion-launch-brief.yml",
   "src/agents/prompts.md",
@@ -111,6 +112,13 @@ assertIncludes("MRagent visibility plan", visibilityPlan, "weekly_loop");
 assertIncludes("MRagent visibility plan", visibilityPlan, "search_assets");
 assertIncludes("MRagent visibility plan", visibilityPlan, "ad_message_sync");
 assertIncludes("MRagent visibility plan", visibilityPlan, "next_visibility_task");
+
+const searchIntents = readFileSync(join(process.cwd(), "site/growth/search-intents.yml"), "utf-8");
+assertIncludes("MRagent search intents", searchIntents, "before you reply");
+assertIncludes("MRagent search intents", searchIntents, "tense_reply");
+assertIncludes("MRagent search intents", searchIntents, "client_hesitation");
+assertIncludes("MRagent search intents", searchIntents, "follow_up_pressure");
+assertIncludes("MRagent search intents", searchIntents, "Read the pressure before you reply");
 
 for (const file of [
   "app/api/agent/route.ts",
