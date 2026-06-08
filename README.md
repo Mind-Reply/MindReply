@@ -61,11 +61,14 @@ Required opt-in variables:
 MINDREPLY_REPORT_ENABLED=true
 MINDREPLY_REPORT_DRY_RUN=false
 MINDREPLY_REPORT_CHANNELS=console,slack,email
+MINDREPLY_REPORT_REQUIRE_DELIVERY=true
 MINDREPLY_REPORT_PERSONAL_ONLY=true
 MINDREPLY_REPORT_PERSONAL_LABEL=Angel personal pack
 ```
 
-Slack delivery uses a GitHub secret or deployment secret named `MINDREPLY_SLACK_WEBHOOK_URL`. A Slack app field id is not enough to send; the runtime needs a webhook URL or a connected Slack write destination.
+When `MINDREPLY_REPORT_REQUIRE_DELIVERY=true`, console output does not count as delivery. At least one Slack or email channel must return `sent`, or the workflow fails loudly.
+
+Slack delivery uses a GitHub secret or deployment secret named `MINDREPLY_SLACK_WEBHOOK_URL`. A Slack app field id such as `Xf0B6WHC2SBH` is useful setup context, but it is not enough to send; the runtime needs a webhook URL or a connected Slack write destination.
 
 Email delivery uses GitHub or deployment secrets:
 
