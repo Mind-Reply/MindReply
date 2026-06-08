@@ -1,0 +1,58 @@
+{
+  "name": "mindreply-mragent",
+  "version": "0.1.0",
+  "tools": [
+    {
+      "name": "mragent.decision",
+      "description": "Return one synthesis, one recommended action, risk, memory update, and receipt for a supplied intake.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["input"],
+        "properties": {
+          "input": { "type": "string", "minLength": 1 },
+          "source": {
+            "type": "string",
+            "enum": ["manual", "gmail", "calendar", "extension"],
+            "default": "manual"
+          },
+          "userId": { "type": "string" },
+          "consentFullContent": { "type": "boolean", "default": false },
+          "devicePrivacyFlag": { "type": "boolean", "default": false }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": ["synthesis", "recommendedAction", "risk", "memoryUpdate", "receipt"],
+        "properties": {
+          "synthesis": { "type": "string" },
+          "recommendedAction": {
+            "type": "object",
+            "required": ["kind", "label", "payload"],
+            "properties": {
+              "kind": { "type": "string", "enum": ["reply", "schedule", "resolve", "escalate"] },
+              "label": { "type": "string" },
+              "payload": { "type": "object" }
+            }
+          },
+          "risk": { "type": "object" },
+          "memoryUpdate": { "type": "object" },
+          "receipt": { "type": "object" }
+        }
+      }
+    },
+    {
+      "name": "mragent.chat",
+      "description": "Return a friendly MRagent response that still maps to the decision receipt contract.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["input"],
+        "properties": {
+          "input": { "type": "string", "minLength": 1 },
+          "userId": { "type": "string" }
+        }
+      }
+    }
+  ]
+}
