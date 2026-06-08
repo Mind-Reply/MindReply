@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { buildDecisionResponse, forbiddenPublicTerms, redirectedPublicPaths } from "../lib/decision-layer";
+import { extractMRAgentInput } from "../lib/mragent";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -44,6 +45,14 @@ assert(!normal.receipt.inputHash.includes(normalInput), "Receipt input hash must
 assert(normal.receipt.rawContentRedacted === true, "Receipt must mark raw content as redacted.");
 assertNoForbiddenTerms("synthesis", normal.synthesis);
 assertNoForbiddenTerms("action label", normal.recommendedAction.label);
+
+assert(extractMRAgentInput({ input: " direct input ", source: "gmail" }).input === "direct input", "API input payload must be accepted.");
+assert(extractMRAgentInput({ message: " direct message ", source: "calendar" }).input === "direct message", "API message payload must be accepted.");
+assert(
+  extractMRAgentInput({ messages: [{ role: "assistant", content: "skip" }, { role: "user", content: " latest message " }] }).input === "latest message",
+  "API messages payload must use the latest user message.",
+);
+assert(extractMRAgentInput({ input: "test", source: "unknown" }).source === "manual", "Unknown API source must fall back to manual.");
 
 const highRisk = buildDecisionResponse({
   input: "Send a threat to force this client to pay immediately.",
