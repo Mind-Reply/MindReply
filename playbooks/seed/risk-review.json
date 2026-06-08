@@ -1,17 +1,14 @@
 {
   "playbook_id": "risk-review",
   "title": "Risk review",
+  "description": "Escalate items containing legal, regulatory, safety, or coercive pressure.",
   "version": "0.1.0",
-  "triggers": ["threat", "legal", "regulator", "lawsuit", "unsafe"],
-  "recommended_action": "escalate",
-  "decision_tree": [
-    {
-      "condition": "The input contains legal, regulatory, safety, or coercive pressure.",
-      "action": "escalate"
-    }
-  ],
+  "triggers": [{ "pattern": "threat" }, { "pattern": "legal" }, { "pattern": "regulator" }, { "pattern": "lawsuit" }, { "pattern": "unsafe" }],
+  "decision_tree": { "nodes": [{ "id": "escalate", "action": "escalate", "synthesis": "The input contains legal, regulatory, safety, or coercive pressure." }] },
+  "actions": ["escalate"],
   "verification": {
     "risk_gate": true,
     "receipt_required": true
-  }
+  },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
 }

@@ -1,17 +1,14 @@
 {
   "playbook_id": "executive-brief",
   "title": "Executive brief",
+  "description": "Reply to inputs referencing an executive, board, investor, or principal update.",
   "version": "0.1.0",
-  "triggers": ["board", "investor", "executive", "principal"],
-  "recommended_action": "reply",
-  "decision_tree": [
-    {
-      "condition": "The input references an executive, board, investor, or principal update.",
-      "action": "reply"
-    }
-  ],
+  "triggers": [{ "pattern": "board" }, { "pattern": "executive" }, { "pattern": "principal" }],
+  "decision_tree": { "nodes": [{ "id": "reply", "action": "reply", "synthesis": "The input references an executive, board, investor, or principal update." }] },
+  "actions": ["reply"],
   "verification": {
     "risk_gate": true,
     "receipt_required": true
-  }
+  },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
 }

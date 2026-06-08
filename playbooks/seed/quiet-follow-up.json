@@ -1,17 +1,14 @@
 {
   "playbook_id": "quiet-follow-up",
   "title": "Quiet follow-up",
+  "description": "Schedule a timed check-in for items that need follow-up later.",
   "version": "0.1.0",
-  "triggers": ["follow", "calendar", "later", "tomorrow", "next week"],
-  "recommended_action": "schedule",
-  "decision_tree": [
-    {
-      "condition": "The input needs a timed check-in rather than more wording now.",
-      "action": "schedule"
-    }
-  ],
+  "triggers": [{ "pattern": "follow" }, { "pattern": "calendar" }, { "pattern": "later" }, { "pattern": "tomorrow" }, { "pattern": "next week" }],
+  "decision_tree": { "nodes": [{ "id": "schedule", "action": "schedule", "synthesis": "The input needs a timed check-in rather than more wording now." }] },
+  "actions": ["schedule"],
   "verification": {
     "risk_gate": true,
     "receipt_required": true
-  }
+  },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
 }

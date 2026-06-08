@@ -1,17 +1,14 @@
 {
   "playbook_id": "clear-next-move",
   "title": "Clear next move",
+  "description": "Resolve items where no reply, follow-up, or risk signal is present.",
   "version": "0.1.0",
-  "triggers": ["decision", "close", "resolved", "record"],
-  "recommended_action": "resolve",
-  "decision_tree": [
-    {
-      "condition": "No reply, follow-up, or risk signal is present.",
-      "action": "resolve"
-    }
-  ],
+  "triggers": [{ "pattern": "decision" }, { "pattern": "close" }, { "pattern": "resolved" }, { "pattern": "record" }],
+  "decision_tree": { "nodes": [{ "id": "resolve", "action": "resolve", "synthesis": "No reply, follow-up, or risk signal is present." }] },
+  "actions": ["resolve"],
   "verification": {
     "risk_gate": true,
     "receipt_required": true
-  }
+  },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
 }
