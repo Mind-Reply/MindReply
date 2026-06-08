@@ -36,6 +36,42 @@ function githubRun() {
   };
 }
 
+async function fetchCommitStatus(run) {
+  if (!run.repository || run.sha === "local") {
+    return { state: "local", statuses: [], signal: "Commit status unavailable outside GitHub Actions." };
+  }
+
+  try {
+    const headers = { "Accept": "application/vnd.github+json" };
+    if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+    const response = await fetch(`https://api.github.com/repos/${run.repository}/commits/${run.sha}/status`, { headers });
+    if (!response.ok) {
+      return { state: "unknown", statuses: [], signal: `GitHub status API returned ${response.status}.` };
+    }
+    const data = await response.json();
+    const statuses = Array.isArray(data.statuses)
+      ? data.statuses.map((status) => ({
+          context: status.context,
+          state: status.state,
+          targetUrl: status.target_url,
+          description: status.description,
+        }))
+      : [];
+    const vercel = statuses.find((status) => /vercel/i.test(status.context || ""));
+    return {
+      state: data.state || "unknown",
+      statuses,
+      signal: vercel ? `${vercel.context}: ${vercel.state}` : "No Vercel status context found.",
+    };
+  } catch (error) {
+    return {
+      state: "error",
+      statuses: [],
+      signal: error instanceof Error ? error.message : "GitHub status request failed.",
+    };
+  }
+}
+
 async function checkEndpoint(endpoint) {
   const started = Date.now();
   try {
@@ -84,11 +120,16 @@ function row(result) {
   return `| ${result.label} | ${mark} | ${result.status} | ${result.ms}ms | ${result.signal.replace(/\|/g, "/")} |`;
 }
 
+function statusRow(status) {
+  return `| ${status.context || "unknown"} | ${status.state || "unknown"} | ${status.targetUrl || ""} |`;
+}
+
 function sourceRow(source) {
   return `| ${source.label} | ${source.present ? "ok" : "check"} | ${source.path} |`;
 }
 
-function chooseNextAction({ mcpLive, healthLive, discoveryLive, packReady }) {
+function chooseNextAction({ mcpLive, healthLive, discoveryLive, packReady, commitStatus }) {
+  if (commitStatus.signal.includes("Vercel") && commitStatus.state === "failure") return "Follow the Vercel build-limit runbook, then rerun the production checks.";
   if (!mcpLive || !healthLive || !discoveryLive) return "Follow the Vercel build-limit runbook, then verify missing production surfaces.";
   if (!packReady) return "Restore missing personal-pack source files.";
   return "Connect a Slack channel target or capture a fresh /agent production preview for the next asset.";
@@ -96,7 +137,7 @@ function chooseNextAction({ mcpLive, healthLive, discoveryLive, packReady }) {
 
 const generatedAt = new Date().toISOString();
 const run = githubRun();
-const results = await Promise.all(endpoints.map(checkEndpoint));
+const [results, commitStatus] = await Promise.all([Promise.all(endpoints.map(checkEndpoint)), fetchCommitStatus(run)]);
 const sourceResults = packSources.map((source) => ({ ...source, present: existsSync(source.path) }));
 const byLabel = new Map(results.map((result) => [result.label, result]));
 const liveCore = byLabel.get("agent")?.ok === true;
@@ -104,14 +145,15 @@ const mcpLive = byLabel.get("mcp")?.ok === true;
 const healthLive = byLabel.get("health")?.ok === true;
 const discoveryLive = ["sitemap", "robots", "manifest", "social-preview"].every((label) => byLabel.get(label)?.ok === true);
 const packReady = sourceResults.every((source) => source.present);
-const blocker = mcpLive && healthLive && discoveryLive ? "none detected" : "latest GitHub main is not fully deployed to production yet";
-const nextAction = chooseNextAction({ mcpLive, healthLive, discoveryLive, packReady });
-const opinion = packReady ? "The repo has a workable personal pack; Vercel quota and Slack destination are the active handoff items." : "The personal pack is incomplete.";
+const blocker = commitStatus.state === "failure" ? commitStatus.signal : mcpLive && healthLive && discoveryLive ? "none detected" : "latest GitHub main is not fully deployed to production yet";
+const nextAction = chooseNextAction({ mcpLive, healthLive, discoveryLive, packReady, commitStatus });
+const opinion = packReady ? "The repo has a workable personal pack; Vercel status and Slack destination are the active handoff items." : "The personal pack is incomplete.";
 
 const report = {
   generatedAt,
   siteUrl,
   run,
+  commitStatus,
   summary: {
     coreAgent: liveCore ? "live" : "check",
     mcpApp: mcpLive ? "live" : "not live",
@@ -134,11 +176,16 @@ console.log("");
 console.log(`Time: ${generatedAt}`);
 console.log(`Site: ${siteUrl}`);
 console.log(`Run: ${run.branch} ${run.sha.slice(0, 12)}`);
+console.log(`Commit status: ${commitStatus.state} - ${commitStatus.signal}`);
 console.log(`Core agent: ${report.summary.coreAgent}`);
 console.log(`MCP app: ${report.summary.mcpApp}`);
 console.log(`Discovery assets: ${report.summary.discoveryAssets}`);
 console.log(`Personal pack: ${report.summary.personalPack}`);
 console.log(`Current blocker: ${blocker}`);
+console.log("");
+console.log("| Commit context | State | Target |");
+console.log("| --- | --- | --- |");
+for (const status of commitStatus.statuses) console.log(statusRow(status));
 console.log("");
 console.log("| Surface | Result | Status | Latency | Signal |");
 console.log("| --- | --- | ---: | ---: | --- |");
