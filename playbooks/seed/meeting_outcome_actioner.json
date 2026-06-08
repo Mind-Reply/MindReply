@@ -1,0 +1,11 @@
+{
+  "playbook_id": "meeting-outcome-actioner",
+  "title": "Meeting outcome actioner",
+  "description": "Turn a meeting signal into one timed next step.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "meeting" }, { "pattern": "next step" }, { "pattern": "follow up" }],
+  "decision_tree": { "nodes": [{ "id": "schedule", "action": "schedule", "synthesis": "This needs one contained follow-up moment." }] },
+  "actions": ["schedule"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
