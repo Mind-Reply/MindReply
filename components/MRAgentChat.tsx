@@ -7,7 +7,7 @@ import type { DecisionResponse } from "@/lib/decision-layer";
 
 type ChatMessage = {
   id: string;
-  role: "user" | "assistant";
+  role: "user" | "assistant"; 
   content: string;
   decision?: DecisionResponse;
 };
