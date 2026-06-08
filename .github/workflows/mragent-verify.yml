@@ -23,6 +23,9 @@ jobs:
           cache: npm
           cache-dependency-path: package.json
 
+      - name: Verify Vercel build guard
+        run: node scripts/vercel-ignore-build.mjs --self-test
+
       - name: Install dependencies
         run: npm install --prefer-offline --no-audit --fund=false --progress=false
 
