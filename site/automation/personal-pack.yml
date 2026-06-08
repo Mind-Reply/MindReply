@@ -1,0 +1,53 @@
+pack: MRagent personal pack
+owner: angel
+purpose: Keep each pass useful, visible, and tied to the platform state.
+rhythm:
+  github_report: every 15 minutes through MRagent Monitor
+  codex_pass: inspect current state, improve one real thing, report shortly
+surfaces:
+  code_deploy:
+    watch:
+      - GitHub main
+      - Vercel deploy status
+      - live MRagent page
+      - MCP app route
+      - health route
+    current_blocker: Vercel build-rate-limit must clear before newest main can publish.
+  generation_persistence:
+    watch:
+      - generation id present
+      - receipt id present
+      - raw input redacted
+      - storage state visible
+    rule: Usable result first, storage second.
+  growth:
+    watch:
+      - SEO files
+      - ad messaging source
+      - growth positioning source
+      - social preview image
+    rule: Keep the public promise sharp and non-generic.
+  design_media:
+    watch:
+      - FigJam growth loop
+      - Remotion launch brief
+      - production screenshot after deploy clears
+    rule: Visual material must show the real MRagent surface when live.
+  slack_ready:
+    workspace: mind-reply
+    invite_status: provided privately in chat
+    rule: Do not commit invite URLs or private channel content to the repo.
+    next_safe_step: Use Slack connector only after the workspace is connected and a channel target is named.
+  outlook_ready:
+    rule: Use Outlook only when a mailbox task, message, or folder target is named.
+gift_material_queue:
+  - short MRagent launch video brief
+  - FigJam growth loop
+  - ad messaging angles
+  - production preview once deploy clears
+  - weekly brand-positioning note
+quality_bar:
+  - every pass changes or verifies something concrete
+  - no public raw private text
+  - no generic helper positioning
+  - keep reports short and direct
