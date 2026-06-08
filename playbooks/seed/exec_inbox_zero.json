@@ -1,0 +1,11 @@
+{
+  "playbook_id": "exec-inbox-zero",
+  "title": "Executive inbox zero",
+  "description": "Close low-signal inbox pressure with a clean record.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "inbox" }, { "pattern": "newsletter" }, { "pattern": "fyi" }],
+  "decision_tree": { "nodes": [{ "id": "resolve", "action": "resolve", "synthesis": "This can be closed without becoming a larger decision." }] },
+  "actions": ["resolve"],
+  "verification": { "risk_gate": false, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
