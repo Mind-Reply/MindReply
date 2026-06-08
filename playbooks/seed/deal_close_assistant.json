@@ -1,0 +1,11 @@
+{
+  "playbook_id": "deal-close-assistant",
+  "title": "Deal close assistant",
+  "description": "One calm reply for fee, price, proposal, or deal resistance.",
+  "version": "1.0.0",
+  "triggers": [{ "pattern": "fee" }, { "pattern": "price" }, { "pattern": "proposal" }],
+  "decision_tree": { "nodes": [{ "id": "reply", "action": "reply", "synthesis": "Commercial hesitation needs reassurance without giving away the position." }] },
+  "actions": ["reply", "schedule"],
+  "verification": { "risk_gate": true, "receipt_required": true, "roles": ["owner"] },
+  "audit": { "signed": true, "redaction_level": "derived-only" }
+}
