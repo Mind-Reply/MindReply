@@ -93,6 +93,9 @@ for (const file of publicFiles) {
 for (const file of [
   "app/api/agent/route.ts",
   "app/mcp/route.ts",
+  "app/sitemap.ts",
+  "app/robots.ts",
+  "app/manifest.ts",
   "components/ai-elements/message.tsx",
   "lib/mragent.ts",
   "lib/mragent-mcp.ts",
