@@ -16,6 +16,9 @@ on:
       - "site/**"
       - ".github/workflows/ops-monitor.yml"
 
+permissions:
+  contents: read
+
 jobs:
   report:
     runs-on: ubuntu-latest
