@@ -5,20 +5,35 @@ const allowedProductionHosts = new Set([
   "mind-reply.com",
   "mind-reply-angellllkr-engs-projects.vercel.app",
   "mind-reply-git-main-angellllkr-engs-projects.vercel.app",
+  "mindreply-angellllkr-engs-projects.vercel.app",
+  "mindreply-git-main-angellllkr-engs-projects.vercel.app",
 ]);
 
 const automationOnlyPrefixes = [
   ".github/",
+  "docs/",
+  "reports/",
   "site/automation/",
   "site/design/",
   "site/media/",
 ];
 
 const automationOnlyFiles = new Set([
+  "ARCHITECTURE.md",
+  "README.md",
+  "SECURITY.md",
+  "mindreply-delivery-receipt.json",
+  "mindreply-launch-readiness.json",
+  "mindreply-vercel-status-audit.json",
+  "scripts/activation-pack-report.ts",
   "scripts/mragent-monitor-report.mjs",
   "scripts/mragent-growth-pulse.mjs",
   "scripts/mragent-short-digest.mjs",
+  "scripts/personal-pack-report.ts",
   "scripts/production-domain-incident.mjs",
+  "scripts/promotion-pack-report.ts",
+  "scripts/security-pack-report.ts",
+  "scripts/vercel-ignore-build.mjs",
   "scripts/verify-production-version-contract.ts",
 ]);
 
@@ -69,7 +84,7 @@ export function shouldBuild(env = process.env) {
 
   const scope = changeScope(env);
   if (scope.known && scope.automationOnly) {
-    return { build: false, reason: `Skipping automation-only change: ${scope.files.join(", ")}.` };
+    return { build: false, reason: `Skipping docs/report-only change: ${scope.files.join(", ")}.` };
   }
 
   return { build: true, reason: "Building canonical MindReply production deployment." };
@@ -94,7 +109,7 @@ function selfTest() {
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mind-reply-angellllkr-engs-projects.vercel.app",
+      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
       MRAGENT_CHANGED_FILES: "site/automation/report-schema.yml\nscripts/mragent-monitor-report.mjs",
     }).build === false,
     "Automation-only changes must be skipped.",
@@ -103,16 +118,25 @@ function selfTest() {
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mind-reply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "scripts/mragent-growth-pulse.mjs\nscripts/mragent-short-digest.mjs\nscripts/production-domain-incident.mjs",
+      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
+      MRAGENT_CHANGED_FILES: "README.md\nSECURITY.md\ndocs/front_end_operating_pack.md",
     }).build === false,
-    "Reporting-only script changes must be skipped.",
+    "Docs-only changes must be skipped.",
   );
   assert(
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mind-reply-angellllkr-engs-projects.vercel.app",
+      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
+      MRAGENT_CHANGED_FILES: "scripts/activation-pack-report.ts\nscripts/security-pack-report.ts\nreports/owner.md",
+    }).build === false,
+    "Reporting-only script and report changes must be skipped.",
+  );
+  assert(
+    shouldBuild({
+      VERCEL_ENV: "production",
+      VERCEL_GIT_COMMIT_REF: "main",
+      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
       MRAGENT_CHANGED_FILES: "app/page.tsx\nsite/automation/report-schema.yml",
     }).build === true,
     "App changes must build.",
@@ -121,7 +145,7 @@ function selfTest() {
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mind-reply-angellllkr-engs-projects.vercel.app",
+      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
     }).build === true,
     "Canonical production project must build when change scope is unknown.",
   );
