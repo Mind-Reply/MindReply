@@ -63,17 +63,17 @@ Use language that is high-end but plain enough to use under stress. Prefer short
 
 ## Forbidden Public Drift
 
-Avoid public wording that makes MindReply sound like a generic tech tool. Do not lead with: AI, chatbot, productivity, automation, options, boost, hack.
+Avoid public wording that makes MindReply sound like a generic tech tool. Do not lead with broad machine-assistant, generic bot, output-volume, workflow-churn, choice-sprawl, growth-theatre, or shortcut language.
 
 Use these replacements instead:
 
-- AI -> decision layer, Mind Read, MRagent
-- chatbot -> session, companion, private read
-- productivity -> calm execution, cleaner movement
-- automation -> quiet lane, report cadence, delivery ribbon
-- options -> next move, path, route
-- boost -> lift, strengthen, clarify
-- hack -> method, move, discipline
+- broad machine-assistant language -> decision layer, Mind Read, MRagent
+- generic bot language -> session, companion, private read
+- output-volume language -> calm execution, cleaner movement
+- workflow-churn language -> quiet lane, report cadence, delivery ribbon
+- choice-sprawl language -> next move, path, route
+- growth-theatre language -> lift, strengthen, clarify
+- shortcut language -> method, move, discipline
 
 ## Feature Evaluation
 
