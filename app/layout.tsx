@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     "Website Completion Package",
     "website buying friction",
     "response overload",
-    "client follow up automation",
+    "client follow up cadence",
     "founder communication rescue",
     "assisted close",
     "privacy safe receipt",
