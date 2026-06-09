@@ -152,6 +152,17 @@ assertIncludes("MRagent preview results", previewResults, "mobile");
 assertIncludes("MRagent preview results", previewResults, "staged_reading");
 assertIncludes("MRagent preview results", previewResults, "receipt_visible");
 
+const previewCaptureScript = readFileSync(join(process.cwd(), "scripts/mragent-preview-capture.mjs"), "utf-8");
+assertIncludes("MRagent preview capture script", previewCaptureScript, "chromium");
+assertIncludes("MRagent preview capture script", previewCaptureScript, "agent-desktop.png");
+assertIncludes("MRagent preview capture script", previewCaptureScript, "preview-results.json");
+assertIncludes("MRagent preview capture script", previewCaptureScript, "stagedReadingVisible");
+
+const previewCaptureWorkflow = readFileSync(join(process.cwd(), ".github/workflows/mragent-preview-capture.yml"), "utf-8");
+assertIncludes("MRagent preview capture workflow", previewCaptureWorkflow, "workflow_dispatch");
+assertIncludes("MRagent preview capture workflow", previewCaptureWorkflow, "scripts/mragent-preview-capture.mjs");
+assertIncludes("MRagent preview capture workflow", previewCaptureWorkflow, "mragent-preview-results");
+
 for (const file of [
   "app/api/agent/route.ts",
   "app/mcp/route.ts",
@@ -164,8 +175,10 @@ for (const file of [
   "lib/mragent-mcp.ts",
   "scripts/verify-mcp.ts",
   "scripts/mragent-monitor-report.mjs",
+  "scripts/mragent-preview-capture.mjs",
   ".github/workflows/mragent-monitor.yml",
   ".github/workflows/mragent-verify.yml",
+  ".github/workflows/mragent-preview-capture.yml",
   "site/automation/personal-pack.yml",
   "site/automation/report-schema.yml",
   "site/automation/slack-api.yml",
