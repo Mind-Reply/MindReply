@@ -19,6 +19,14 @@ const automationOnlyFiles = new Set([
   "mindreply-vercel-status-audit.json",
 ]);
 
+const reportingOnlyScriptFiles = new Set([
+  "scripts/mragent-monitor-report.mjs",
+  "scripts/mragent-growth-pulse.mjs",
+  "scripts/mragent-short-digest.mjs",
+  "scripts/production-domain-incident.mjs",
+  "scripts/verify-live-revenue-surface.mjs",
+]);
+
 function parseChangedFiles(value) {
   return value.split("\n").map((file) => file.trim()).filter(Boolean);
 }
@@ -41,7 +49,7 @@ function changedFiles(env = process.env, gitReader = changedFilesFromGit) {
 }
 
 function isAutomationOnly(file) {
-  return automationOnlyFiles.has(file) || automationOnlyPrefixes.some((prefix) => file.startsWith(prefix));
+  return automationOnlyFiles.has(file) || reportingOnlyScriptFiles.has(file) || automationOnlyPrefixes.some((prefix) => file.startsWith(prefix));
 }
 
 export function shouldBuild(env = process.env, gitReader = changedFilesFromGit) {
@@ -64,7 +72,7 @@ export function shouldBuild(env = process.env, gitReader = changedFilesFromGit) 
 
   const files = changedFiles(env, gitReader);
   if (files.length > 0 && files.every(isAutomationOnly)) {
-    return { build: false, reason: `Skipping docs/report-only change: ${files.join(", ")}.` };
+    return { build: false, reason: `Skipping docs/report-only change: ${files.join(", ")}. Live verification/report changes must be skipped. Reporting-only script changes must be skipped.` };
   }
 
   return { build: true, reason: "Building MindReply production main deployment." };
@@ -104,6 +112,15 @@ function selfTest() {
       () => ["docs/production_alias_secret_blocker_2026-06-09.md"],
     ).build === false,
     "Docs-only changes discovered from Git must be skipped.",
+  );
+  assert(
+    shouldBuild({
+      VERCEL_ENV: "production",
+      VERCEL_GIT_COMMIT_REF: "main",
+      VERCEL_PROJECT_ID: canonicalProjectId,
+      MRAGENT_CHANGED_FILES: "scripts/mragent-monitor-report.mjs\nscripts/verify-live-revenue-surface.mjs",
+    }).build === false,
+    "Reporting-only script changes must be skipped.",
   );
   assert(
     shouldBuild({
