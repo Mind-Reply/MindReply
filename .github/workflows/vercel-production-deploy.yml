@@ -19,6 +19,7 @@ on:
       - ".github/workflows/vercel-production-deploy.yml"
       - ".github/workflows/manual-vercel-production.yml"
       - ".github/workflows/mragent-verify.yml"
+      - ".github/workflows/ci.yml"
 
 permissions:
   contents: read
@@ -51,8 +52,23 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --fund=false --progress=false
 
-      - name: Verify revenue, i18n, SEO, and decision layer
-        run: npm run decision:verify
+      - name: Verify Vercel build guard
+        run: npm run vercel:ignore:verify
+
+      - name: Verify decision layer contract
+        run: npx tsx scripts/verify-decision-layer.ts
+
+      - name: Verify production version contract
+        run: npx tsx scripts/verify-production-version-contract.ts
+
+      - name: Verify revenue i18n SEO surface
+        run: npx tsx scripts/verify-revenue-i18n-seo.ts
+
+      - name: Verify package delivery proof
+        run: npx tsx scripts/verify-package-delivery-proof.ts
+
+      - name: Verify invoice-first close path
+        run: npx tsx scripts/verify-invoice-first-close.ts
 
       - name: Typecheck
         run: npm run typecheck
