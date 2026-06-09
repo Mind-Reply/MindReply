@@ -2,6 +2,8 @@ import { writeFileSync } from "node:fs";
 
 const siteUrl = (process.env.MINDREPLY_LIVE_VERIFY_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://www.mind-reply.com").replace(/\/$/, "");
 const outputPath = process.env.MINDREPLY_LIVE_REVENUE_JSON || "mindreply-live-revenue-surface.json";
+const expectedSha = process.env.MINDREPLY_EXPECTED_SHA || process.env.GITHUB_SHA || "";
+const requireShaMatch = process.env.MINDREPLY_REQUIRE_LIVE_SHA_MATCH === "true";
 
 function parseJson(text) {
   try {
@@ -66,10 +68,19 @@ const [home, contact, version, health, packageRequest] = await Promise.all([
 
 const publicText = `${home.text}\n${contact.text}`;
 const checks = [];
+const liveSha = version.json?.deployment?.commitSha || "";
 
 check(checks, "home-reachable", home.status === 200, `Homepage status ${home.status}.`);
 check(checks, "contact-reachable", contact.status === 200, `Contact status ${contact.status}.`);
 check(checks, "version-current", version.status === 200 && version.json?.status === "ok" && version.json?.deployment, `Version status ${version.status}; retired/stale production returns 410.`);
+check(
+  checks,
+  "version-sha-current",
+  !requireShaMatch || (expectedSha && liveSha === expectedSha),
+  requireShaMatch
+    ? `Live SHA ${liveSha || "missing"}; expected ${expectedSha || "missing"}.`
+    : "Live SHA match not required for this run.",
+);
 check(checks, "health-reachable", health.status === 200 && health.json?.status === "ok", `Health status ${health.status}.`);
 check(checks, "package-api-mounted", packageRequest.status === 400 && /email|required|request body/i.test(packageRequest.text), `Package request invalid-body probe status ${packageRequest.status}.`);
 
@@ -85,6 +96,9 @@ const warnings = checks.filter((item) => !item.pass && item.severity !== "error"
 const report = {
   generatedAt,
   siteUrl,
+  expectedSha: expectedSha || null,
+  liveSha: liveSha || null,
+  requireShaMatch,
   status: failed.length === 0 ? "pass" : "fail",
   failed: failed.map((item) => item.id),
   warnings: warnings.map((item) => item.id),
@@ -107,6 +121,8 @@ console.log("# MindReply Live Revenue Surface Verification");
 console.log("");
 console.log(`Generated: ${generatedAt}`);
 console.log(`Site: ${siteUrl}`);
+console.log(`Expected SHA: ${expectedSha || "not required"}`);
+console.log(`Live SHA: ${liveSha || "missing"}`);
 console.log(`Status: ${report.status}`);
 console.log("");
 console.log("| Check | Result | Detail |");
