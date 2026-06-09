@@ -19,7 +19,7 @@ const prompt = readRequired("docs/hourly_owner_goal_prompt.md");
 const sender = readRequired("scripts/send-hourly-owner-report.ts");
 const generator = readRequired("scripts/hourly-owner-report.ts");
 
-const requiredScripts = ["report:check", "launch:report", "audit:blueprint", "report:send"];
+const requiredScripts = ["report:check", "launch:report", "audit:blueprint", "report:send", "verify:live-revenue"];
 for (const script of requiredScripts) {
   assert(packageJson.scripts?.[script], `Missing package script: ${script}`);
 }
@@ -28,18 +28,22 @@ assert(workflow.includes("MindReply Hourly Owner Report"), "Workflow must be nam
 assert(/schedule:[\s\S]*cron:\s*["']0 \* \* \* \*['"]/.test(workflow), "Hourly schedule must run at minute 0 every hour.");
 assert(!workflow.includes("minute_mod") && !workflow.includes("SHOULD_SEND_REPORT"), "Hourly workflow must not use the old 50-minute gate.");
 assert(workflow.includes("workflow_dispatch"), "Workflow must support manual dispatch.");
-assert(/push:[\s\S]*branches:[\s\S]*- main/.test(workflow), "Workflow must run after main pushes.");
-assert(!/push:[\s\S]*paths:/.test(workflow), "Workflow push trigger must not be path-limited; every main implementation push needs an owner report.");
+assert(!/push:[\s\S]*paths:/.test(workflow), "Workflow push trigger must not be path-limited; every main implementation push needs an owner report when push is enabled.");
 assert(workflow.includes("mindreply-hourly-owner-report-${{ github.ref }}"), "Workflow concurrency must be scoped to the branch ref.");
 assert(workflow.includes("cancel-in-progress: true"), "Workflow must cancel stale owner report runs during rapid implementation pushes.");
 assert(workflow.includes("retention-days: 7"), "Workflow should keep private report artifacts on short retention.");
-for (const command of ["npm run report:check", "npm run launch:report", "npm run audit:blueprint", "npm run report:send"]) {
+for (const command of ["npm run report:check", "npm run launch:report", "npm run audit:blueprint", "npm run verify:live-revenue", "npm run report:send"]) {
   assert(workflow.includes(command), `Workflow must run ${command}.`);
 }
 
 assert(workflow.includes("RESEND_API_KEY"), "Workflow must expose RESEND_API_KEY to the sender.");
 assert(workflow.includes("MINDREPLY_REPORT_EMAIL"), "Workflow must expose MINDREPLY_REPORT_EMAIL through secrets or variables.");
 assert(workflow.includes("MINDREPLY_REPORT_FROM"), "Workflow must expose MINDREPLY_REPORT_FROM.");
+assert(workflow.includes("MINDREPLY_REPORT_REQUIRE_LIVE_PROOF"), "Workflow must require live-domain proof before sending when configured.");
+assert(workflow.includes("MINDREPLY_LIVE_VERIFY_URL"), "Workflow must pass the live domain URL into the verifier.");
+assert(workflow.includes("MINDREPLY_REQUIRE_LIVE_SHA_MATCH"), "Workflow must set live SHA verification mode explicitly.");
+assert(workflow.includes("continue-on-error: true"), "Workflow must continue after live verifier failure so the failed proof can be attached to the owner report.");
+assert(workflow.includes("mindreply-live-revenue-surface.json"), "Workflow must upload the live revenue surface proof artifact.");
 assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_TO.");
 assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_FROM.");
 assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_DRY_RUN"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_DRY_RUN.");
@@ -50,7 +54,7 @@ assert(workflow.includes("actions/upload-artifact"), "Workflow must upload repor
 const publicConfigText = [workflow, prompt].join("\n");
 assert(!/gmail\.com/i.test(publicConfigText), "Do not hardcode personal Gmail addresses in public workflow or docs.");
 
-const contractText = [prompt, sender, generator].join("\n");
+const contractText = [prompt, sender, generator, workflow].join("\n");
 for (const phrase of [
   "Website Completion Package",
   "revenue system",
@@ -64,6 +68,7 @@ for (const phrase of [
   "defensive security boundary",
   "Slack",
   "email",
+  "Live Production Revenue Surface",
 ]) {
   assert(contractText.toLowerCase().includes(phrase.toLowerCase()), `Missing hourly owner contract phrase: ${phrase}`);
 }
@@ -73,5 +78,8 @@ assert(generator.includes("packageRequest"), "Hourly receipt must include packag
 assert(generator.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Hourly generator must inspect package request recipient configuration.");
 assert(generator.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Hourly generator must inspect package request sender configuration.");
 assert(generator.includes("RESEND_API_KEY"), "Hourly generator must inspect package request provider configuration.");
+assert(sender.includes("readLiveRevenueProof"), "Sender must attach live revenue proof when available.");
+assert(sender.includes("MINDREPLY_REPORT_REQUIRE_LIVE_PROOF"), "Sender must be able to block delivery when live proof is missing.");
+assert(sender.includes("liveRevenueSurface"), "Delivery receipt must include live revenue surface status.");
 
 console.log("Hourly owner report automation contract verified.");
