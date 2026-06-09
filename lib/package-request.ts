@@ -53,6 +53,26 @@ function clean(value: unknown, limit = 2000) {
   return value.replace(/\s+/g, " ").trim().slice(0, limit);
 }
 
+function configuredPackagePaymentUrl() {
+  return clean(process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "", 500);
+}
+
+function hasDirectPaymentLink() {
+  return Boolean(configuredPackagePaymentUrl());
+}
+
+function ownerDecisionNeeded(directPayment: boolean) {
+  return directPayment
+    ? "Confirm scope, send the configured payment link, or decline/refine with one clear reason."
+    : "Confirm scope, collect billing name and billing email, then send the invoice request or decline/refine with one clear reason.";
+}
+
+function paymentPath(directPayment: boolean) {
+  return directPayment
+    ? "Direct payment link configured; confirm scope, then send the payment link before delivery."
+    : "Invoice-first route: confirm scope, collect billing name and billing email, then send the invoice request before delivery.";
+}
+
 function inputHash(input: PackageRequestInput) {
   const source = [input.email.toLowerCase(), input.intent, input.context, input.triedMRagent || ""].join("|");
   return `pkg-${createHash("sha256").update(source).digest("hex").slice(0, 20)}`;
@@ -78,16 +98,19 @@ function recipients() {
 
 function assistedClose(delivery: PackageRequestReceipt["delivery"]): PackageRequestAssistedClose {
   const fallback = delivery.status !== "sent";
+  const directPayment = hasDirectPaymentLink();
 
   return {
     status: fallback ? "fallback" : "queued",
     nextStep: fallback
-      ? "Send the receipt id to info@mind-reply.com with redacted context so the close can continue manually."
-      : "MindReply reviews the redacted request and sends the next close-ready reply route.",
+      ? "Send the receipt id, redacted context, billing name, and billing email to info@mind-reply.com so the invoice-first close can continue manually."
+      : directPayment
+        ? "MindReply reviews the redacted request, confirms scope, and sends the configured payment link."
+        : "MindReply reviews the redacted request, confirms scope, and sends the invoice-first route.",
     expectedReplyWindow: "one business day",
-    ownerDecisionNeeded: "Confirm scope, invoice/payment route, or decline/refine with one clear reason.",
+    ownerDecisionNeeded: ownerDecisionNeeded(directPayment),
     buyerPromise: "Website Completion Package request: GBP 600 once for ranked fixes, send-ready copy, and buyer path cleanup.",
-    paymentPath: "Scope first, then invoice or payment link after acceptance.",
+    paymentPath: paymentPath(directPayment),
   };
 }
 
@@ -140,6 +163,7 @@ export async function deliverPackageRequest(input: PackageRequestInput): Promise
   const from = process.env.MINDREPLY_PACKAGE_REQUEST_FROM || process.env.MINDREPLY_REPORT_FROM || "";
   const apiKey = process.env.RESEND_API_KEY || "";
   const dryRun = process.env.MINDREPLY_PACKAGE_REQUEST_DRY_RUN === "true";
+  const directPayment = hasDirectPaymentLink();
 
   if (dryRun) {
     return {
@@ -180,8 +204,8 @@ export async function deliverPackageRequest(input: PackageRequestInput): Promise
     `Intent: ${input.intent}`,
     `Package: Website Completion Package, GBP 600`,
     `Reply-to: ${input.email}`,
-    "Owner decision needed: confirm scope, invoice/payment route, or decline/refine with one clear reason.",
-    "Payment path: scope first, then invoice or payment link after acceptance.",
+    `Owner decision needed: ${ownerDecisionNeeded(directPayment)}`,
+    `Payment path: ${paymentPath(directPayment)}`,
     "Expected reply window: one business day.",
     "",
     "Redacted context:",
