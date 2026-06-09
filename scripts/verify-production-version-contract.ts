@@ -112,6 +112,15 @@ includes("live revenue verifier", liveRevenueVerifier, "Website Completion Packa
 includes("live revenue verifier", liveRevenueVerifier, "GBP 600");
 includes("live revenue verifier", liveRevenueVerifier, "info@mind-reply.com");
 includes("live revenue verifier", liveRevenueVerifier, "/api/package-request");
+includes("live revenue verifier", liveRevenueVerifier, "request(\"/website-completion-package\")");
+includes("live revenue verifier", liveRevenueVerifier, "package-page-reachable");
+includes("live revenue verifier", liveRevenueVerifier, "package-invoice-first-route");
+includes("live revenue verifier", liveRevenueVerifier, "Invoice-first request path active");
+includes("live revenue verifier", liveRevenueVerifier, "package-no-payment-link-required");
+includes("live revenue verifier", liveRevenueVerifier, "billing name and billing email");
+includes("live revenue verifier", liveRevenueVerifier, "package-scope-first");
+includes("live revenue verifier", liveRevenueVerifier, "paymentPath");
+includes("live revenue verifier", liveRevenueVerifier, "invoice-first unless a configured direct payment link is present");
 includes("send owner report", sendOwnerReport, "MINDREPLY_REPORT_REQUIRE_LIVE_PROOF");
 includes("send owner report", sendOwnerReport, "## Live Production Revenue Surface");
 includes("send owner report", sendOwnerReport, "Live production revenue proof is required before owner email delivery.");
