@@ -1,25 +1,30 @@
-# Production Alias Secret Blocker - 2026-06-09
+# Production Alias Recovery State - 2026-06-09
 
 ## Status
-Production is not yet repaired. The public custom domain is still serving the older deployment, while the verified ready Vercel deployment contains the current Website Completion Package surface and the public `info@mind-reply.com` contact path.
+Production aliasing has recovered to the verified ready deployment, but current `main` is not deployed yet.
 
-Repo `main` has continued to improve the sellable surface while production aliasing is blocked. The Website Completion Package page now includes a sample delivery receipt so buyers can inspect the proof object before purchase.
+The public custom domain is now serving the ready canonical Vercel deployment `dpl_FK9VqUruBXUoZgWyY3M546U5zmk1`, which contains the Website Completion Package surface and the public `info@mind-reply.com` contact path. This removes the urgent public Gmail exposure from the live contact page.
 
-## Evidence
-- Latest ready canonical deployment: `dpl_FK9VqUruBXUoZgWyY3M546U5zmk1`
-- Latest ready deployment URL: `https://mindreply-ickm8ik48-angellllkr-engs-projects.vercel.app`
-- Commit behind that deployment: `8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8`
-- Emergency alias workflow run: `https://github.com/Mind-Reply/MindReply/actions/runs/27202655044`
-- Workflow failed at `Require Vercel token` because `VERCEL_TOKEN` is empty.
-- The same run showed owner email and Slack delivery secrets are empty, so delivery is blocked rather than claimed.
-- Current `main` includes `scripts/verify-package-delivery-proof.ts` and wires it into `npm run decision:verify`.
-- Current `main` improves `scripts/vercel-ignore-build.mjs` so docs/report-only commits can be detected from Git when `MRAGENT_CHANGED_FILES` is not provided by Vercel.
-- Duplicate Vercel project `mind-reply` has been observed canceling at the ignored-build step with the reason `Skipping non-canonical Vercel project prj_nETWN2SapvnbSWVXK4O5upJHF6bb`.
-- Current Vercel commit checks for canonical `mindreply` are still failing with Vercel `build-rate-limit` targets, so new production deployment is capacity-blocked.
-- Outlook owner email sending is rate-limited with `ErrorExceededMessageLimit`; an owner update draft was created instead of claiming a sent email.
+Repo `main` has continued to improve the sellable surface after that deployment. The Website Completion Package page now includes a sample delivery receipt so buyers can inspect the proof object before purchase, but that newer proof section is not live until canonical `mindreply` can build again.
 
-## Package Proof Added
-The Website Completion Package page now shows a `Sample delivery receipt` section with:
+## Live Evidence
+- Live production deployment resolved by Vercel: `dpl_FK9VqUruBXUoZgWyY3M546U5zmk1`
+- Live production URL behind the custom domain: `https://mindreply-ickm8ik48-angellllkr-engs-projects.vercel.app`
+- Commit behind live production: `8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8`
+- `https://www.mind-reply.com/` serves the Website Completion Package surface.
+- `https://www.mind-reply.com/contact` serves `info@mind-reply.com` rather than a personal Gmail address.
+- `https://www.mind-reply.com/api/version` returns `status: ok` with deployment metadata.
+- `https://www.mind-reply.com/api/health` returns `status: ok` with MRagent/MCP health details.
+
+## Remaining Blockers
+- Current `main` is ahead of live production and canonical `mindreply` commit checks still fail with Vercel `build-rate-limit`.
+- The emergency alias workflow still needs `VERCEL_TOKEN` for deterministic future alias repair.
+- Owner email and Slack delivery secrets remain missing for GitHub Actions reports.
+- Outlook direct sending remains rate-limited with `ErrorExceededMessageLimit`; owner updates may be drafted but not sent until the quota/account prompt is resolved.
+- Live `/api/package-request` invalid-body behavior is covered by source and the live verifier script, but still needs a fresh runner/browser POST verification after local shell or GitHub Actions capacity is available.
+
+## Package Proof Added On Main
+The Website Completion Package page on current `main` now shows a `Sample delivery receipt` section with:
 - `actionKind: website-completion`
 - `riskLevel: low-to-medium`
 - `confidence: medium until the owner accepts scope and payment route`
@@ -34,12 +39,10 @@ The Vercel ignored-build guard now has two protection layers:
 - Skip non-canonical projects when `VERCEL_PROJECT_ID` exposes a project id that is not canonical `mindreply`.
 - Derive changed files from `git diff-tree --no-commit-id --name-only -r --root HEAD` when Vercel does not pass `MRAGENT_CHANGED_FILES`, then skip docs/report-only changes before the full build.
 
-This does not create deployment capacity by itself. It reduces avoidable builds once Vercel can start the ignored-build step.
+Duplicate Vercel project `mind-reply` has been observed canceling at the ignored-build step with the reason `Skipping non-canonical Vercel project prj_nETWN2SapvnbSWVXK4O5upJHF6bb`. This reduces avoidable builds once Vercel can start the ignored-build step.
 
 ## Owner Action Needed
-Add these repository secrets/variables, then rerun the emergency alias repair workflow or wait for the next scheduled run.
-
-Required for production alias repair:
+Required for deterministic production alias repair:
 - `VERCEL_TOKEN`
 
 Required for owner email and Slack reports:
@@ -61,8 +64,8 @@ Required for Vercel build continuity:
 - `https://www.mind-reply.com/api/version` returns `status: ok`.
 - `https://www.mind-reply.com/api/health` returns `status: ok`.
 - `/api/package-request` rejects invalid input with `400`.
+- Current `main` deploys to canonical `mindreply` once Vercel capacity is available.
 - Owner report artifacts mark email and Slack as sent only after secrets exist.
-- No production claim is made until live checks pass on the custom domain.
 
 ## Current Judgment
-The product can move toward a strong launch only after the public domain is corrected. No income, delivery, or production recovery should be claimed until this acceptance list passes on the live domain.
+The urgent public Gmail/privacy issue is repaired on production. The revenue system is not fully done because live production is not current `main`, build capacity is still limited, report delivery is still blocked, and no income should be claimed without payment, invoice, Stripe/Vercel Payments, or owner-confirmed sales data.
