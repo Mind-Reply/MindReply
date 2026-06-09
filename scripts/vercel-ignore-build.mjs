@@ -42,6 +42,7 @@ const automationOnlyFiles = new Set([
   "scripts/vercel-ignore-build.mjs",
   "scripts/verify-hourly-owner-goal.ts",
   "scripts/verify-hourly-owner-report.ts",
+  "scripts/verify-live-revenue-surface.mjs",
   "scripts/verify-production-version-contract.ts",
 ]);
 
@@ -163,9 +164,18 @@ function selfTest() {
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
       VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "scripts/hourly-owner-report.ts\nscripts/send-hourly-owner-report.ts\n.github/workflows/hourly-owner-report.yml",
+      MRAGENT_CHANGED_FILES: "scripts/hourly-owner-report.ts\nscripts/send-hourly-owner-report.ts\.github/workflows/hourly-owner-report.yml",
     }).build === false,
     "Hourly owner report changes must be skipped.",
+  );
+  assert(
+    shouldBuild({
+      VERCEL_ENV: "production",
+      VERCEL_GIT_COMMIT_REF: "main",
+      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
+      MRAGENT_CHANGED_FILES: "scripts/verify-live-revenue-surface.mjs\nscripts/send-hourly-owner-report.ts",
+    }).build === false,
+    "Live verification/report changes must be skipped.",
   );
   assert(
     shouldBuild({
