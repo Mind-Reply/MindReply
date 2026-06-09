@@ -1,0 +1,79 @@
+version: 1
+created: 2026-06-09
+branch: mind-reply
+report_type: preserved_material_manifest
+scope: old codex branch material to preserve before branch retirement
+canonical_repo: Mind-Reply/MindReply
+final_branch_goal:
+  keep:
+    - main
+    - mind-reply
+  retire_after_preservation:
+    - codex/executive-nervous-system
+    - codex/executive-nervous-system-build
+    - codex/executive-nervous-system-main-sync
+    - codex/executive-nervous-system-rebrand
+    - codex/mindreply-moa-controller
+    - codex/mindreply-moa-main
+    - codex/mindreply-moa-production-minimal
+    - codex/mragent-decision-chat
+sampled_sources:
+  - branch: codex/mindreply-moa-controller
+    path: docs/MINDREPLY_MULTI_AGENT_BLUEPRINT.md
+    preserve: true
+    preservation_kind: reference_doc
+    reason: Contains the clearest MOA control model and agent-boundary rules.
+    storage_target: site/automation/preserved/multi-agent-blueprint-notes.yml
+  - branch: codex/mindreply-moa-controller
+    path: lib/moa.ts
+    preserve: true
+    preservation_kind: concept_extract
+    reason: Contains typed agent roster, routing, validation, and boundaries that can inform future automation lanes.
+    storage_target: site/automation/preserved/moa-concept-extract.yml
+  - branch: codex/executive-nervous-system-build
+    path: src/chatgpt-app/README.md
+    preserve: partial
+    preservation_kind: reference_only
+    reason: Useful historical ChatGPT app contract, but current main already has a richer MCP implementation.
+    storage_target: site/automation/preserved/chatgpt-app-legacy-contract.yml
+  - branch: codex/executive-nervous-system-main-sync
+    path: docs/ops/8-workstream-agent-map.md
+    preserve: true
+    preservation_kind: operating_model
+    reason: Contains an 8-workstream map and Angel Pack reporting rule aligned with the user's automation/personal-pack request.
+    storage_target: site/automation/preserved/workstream-agent-map.yml
+  - branch: codex/mindreply-moa-main
+    path: app/api/action/route.ts
+    preserve: partial
+    preservation_kind: behavior_note
+    reason: Has an early action-preparation endpoint, but current main should not add this route blindly until receipt/action contracts are reviewed.
+    storage_target: site/automation/preserved/action-route-behavior-note.yml
+preservation_priority:
+  high:
+    - docs/MINDREPLY_MULTI_AGENT_BLUEPRINT.md
+    - docs/ops/8-workstream-agent-map.md
+  medium:
+    - lib/moa.ts concept extraction
+    - src/chatgpt-app/README.md legacy contract notes
+  low:
+    - app/api/action/route.ts behavior note
+    - early rebrand/positioning text from smaller branches
+port_to_main_later:
+  candidates:
+    - Angel Pack section in report schema and digest if not already fully represented
+    - MOA-style agent lane boundaries as docs only, not runtime code
+    - selected playbook seed ideas if they strengthen MRagent one-action output
+  avoid:
+    - whole-branch merges
+    - adding old /api/action route without receipt/privacy review
+    - exposing internal workstream language on public pages
+next_storage_pass:
+  action: Create site/automation/preserved/ extracts for the high-priority blueprint and workstream map.
+next_delete_after_preservation:
+  branch: codex/mindreply-moa-production-minimal
+  condition: Explicit destructive delete confirmation/tooling available.
+opinion: >-
+  The valuable old-branch material is mostly operating model and reporting structure, not deployable code.
+  Save the ideas into mind-reply storage, then retire the old branches. Main should receive only reviewed,
+  current-compatible slices.
+short_digest_line: Preservation manifest created: save MOA blueprint and 8-workstream map first; avoid whole-branch merges.
