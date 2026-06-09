@@ -4,32 +4,55 @@
 
 Production is usable for the paid Website Completion Package, but public alias control is still not deterministic.
 
-The public custom domain is serving the verified canonical Vercel deployment `dpl_FK9VqUruBXUoZgWyY3M546U5zmk1`, which contains the Website Completion Package surface, `GBP 600`, `/contact`, `/api/version`, and the public `info@mind-reply.com` contact path. This removes the urgent public Gmail exposure from the live contact page.
+The public custom domain is serving a verified Vercel production deployment that contains the Website Completion Package surface, `GBP 600`, `/contact`, `/api/version`, and the public `info@mind-reply.com` contact path. This keeps the urgent public Gmail exposure repaired.
 
-A newer canonical Vercel deployment is also ready:
+A newer canonical Vercel deployment is now ready with the stronger invoice-first package page:
 
-- Latest ready deployment: `dpl_Fy9VkjbmwEwrtXxfuSi1TyRw4xC6`
-- Latest ready deployment URL: `https://mindreply-9kt5b50z4-angellllkr-engs-projects.vercel.app`
-- Latest ready commit: `8a448fcde687c4c53f42d73f8556d6876a124661`
-- Commit message: `feat: add priority market footer strip`
+- Latest ready deployment: `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`
+- Latest ready deployment URL: `https://mindreply-js5m73tfy-angellllkr-engs-projects.vercel.app`
+- Latest ready commit: `e0cab2db420d8be63d9ead67cb7cf9d3e6869252`
+- Commit message: `Clarify package invoice route and SEO proof`
 
-The custom domain still returns `/api/version` metadata for commit `8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8`, so the latest market-priority footer and SEO refinements are not yet proven live on the public domain.
+The latest source verifier commit is also on main:
+
+- Latest source commit: `f3d3367e3267ffa40ced841d49af76d90d1044f3`
+- Commit message: `Guard package page invoice proof`
+- GitHub/Vercel status: Vercel checks are failing with `build-rate-limit` for the verifier-only commit.
+
+The custom domain still returns `/api/version` metadata for commit `8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8`, so the custom domain is not yet proven on the latest invoice-proof deployment.
 
 ## Live Evidence
 
 - Public custom domain: `https://www.mind-reply.com/`
-- Public custom domain deployment currently proven by `/api/version`: `dpl_FK9VqUruBXUoZgWyY3M546U5zmk1`
 - Public custom domain commit currently proven by `/api/version`: `8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8`
 - `https://www.mind-reply.com/` serves the Website Completion Package surface.
 - `https://www.mind-reply.com/contact` serves `info@mind-reply.com` rather than a personal Gmail address.
 - `https://www.mind-reply.com/api/version` returns `status: ok` with deployment metadata.
-- `https://www.mind-reply.com/api/health` has previously returned `status: ok` with MRagent/MCP health details and should be rerun in the next live verifier pass.
-- Latest deployment `dpl_Fy9VkjbmwEwrtXxfuSi1TyRw4xC6` renders the priority-market SEO metadata and footer strip on its deployment URL.
+- `https://www.mind-reply.com/website-completion-package` is live and sellable, but still shows the older `Invoice request path active` copy.
+
+## New Deployment Evidence
+
+Vercel connector fetch succeeded with HTTP `200` for:
+
+- `https://mindreply-js5m73tfy-angellllkr-engs-projects.vercel.app/website-completion-package`
+
+That deployment contains the improved package page proof:
+
+- page title metadata: `Website Completion Package | MindReply`
+- meta description: `A GBP 600 buying-friction rescue for overloaded websites, offers, replies, and follow-up paths. Request invoice-first scope through MindReply.`
+- canonical URL: `https://www.mind-reply.com/website-completion-package`
+- `Invoice-first request path active`
+- `No payment link is required to begin`
+- `billing name and billing email`
+- `Scope first, invoice/payment before delivery`
+- `paymentPath: invoice-first unless a configured direct payment link is present`
+- public proof remains privacy-safe and no personal Gmail is exposed.
 
 ## Remaining Blockers
 
-- Public aliases are still not proven on the latest ready deployment `dpl_Fy9VkjbmwEwrtXxfuSi1TyRw4xC6`.
+- Public aliases are still not proven on latest ready deployment `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`.
 - The emergency alias workflow still needs `VERCEL_TOKEN` for deterministic future alias repair.
+- Vercel checks for the latest verifier-only commit `f3d3367e3267ffa40ced841d49af76d90d1044f3` show `build-rate-limit`.
 - Owner email and Slack delivery secrets remain missing for GitHub Actions reports.
 - Outlook direct sending remains rate-limited with `ErrorExceededMessageLimit`; owner updates may be drafted but not sent until the quota/account prompt is resolved.
 - Live `/api/package-request` invalid-body behavior is covered by source and the live verifier script, but still needs a fresh runner/browser POST verification after local shell or GitHub Actions capacity is available.
@@ -37,20 +60,21 @@ The custom domain still returns `/api/version` metadata for commit `8c8de8aba7c6
 
 ## Package Proof Added On Main
 
-The Website Completion Package page on current `main` shows a `Sample delivery receipt` section with:
+The Website Completion Package page on current `main` now shows a stronger close route and sample delivery receipt:
 
 - `actionKind: website-completion`
 - `riskLevel: low-to-medium`
 - `confidence: medium until the owner accepts scope and payment route`
+- `paymentPath: invoice-first unless a configured direct payment link is present`
 - `rawContentRedacted: true`
 - `inputHash: present; raw text absent`
 - `ownerDecisionNeeded: confirm scope, route invoice or payment link, approve the next close-ready move`
 
-This strengthens the GBP 600 offer by making the delivery object visible and inspectable rather than vague.
+This strengthens the GBP 600 offer by making the delivery object visible and inspectable rather than vague, while keeping the first paid route invoice-first if no payment link is configured.
 
 ## Assisted Close Playbook Added
 
-Current `main` now includes `docs/website_completion_assisted_close_playbook.md`.
+Current `main` includes `docs/website_completion_assisted_close_playbook.md`.
 
 This document gives the owner a practical sales motion that works even before another deployment is promoted:
 
@@ -65,7 +89,7 @@ This document gives the owner a practical sales motion that works even before an
 
 ## Deployment Capacity Control Added
 
-The Vercel ignored-build guard now has two protection layers:
+The Vercel ignored-build guard has two protection layers:
 
 - Skip non-canonical projects when `VERCEL_PROJECT_ID` exposes a project id that is not canonical `mindreply`.
 - Derive changed files from `git diff-tree --no-commit-id --name-only -r --root HEAD` when Vercel does not pass `MRAGENT_CHANGED_FILES`, then skip docs/report-only changes before the full build.
@@ -91,7 +115,7 @@ Required for Outlook direct sending:
 
 Required for Vercel build and alias continuity:
 
-- Promote or alias `dpl_Fy9VkjbmwEwrtXxfuSi1TyRw4xC6` to `www.mind-reply.com` and `mind-reply.com` when Vercel execution access is available.
+- Promote or alias `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T` to `www.mind-reply.com` and `mind-reply.com` when Vercel execution access is available.
 - Keep `mindreply` as canonical production and `mind-reply` as non-production/storage only.
 
 Required for first revenue close:
@@ -105,9 +129,9 @@ Required for first revenue close:
 - `https://www.mind-reply.com/api/version` returns `status: ok`.
 - `https://www.mind-reply.com/api/health` returns `status: ok` in the next live verifier pass.
 - `/api/package-request` rejects invalid input with `400` in the next POST verifier pass.
-- Latest ready deployment `dpl_Fy9VkjbmwEwrtXxfuSi1TyRw4xC6` is promoted to public aliases.
+- Latest ready deployment `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T` is promoted to public aliases.
 - Owner report artifacts mark email and Slack as sent only after secrets exist.
 
 ## Current Judgment
 
-The urgent public Gmail/privacy issue is repaired on production and the paid offer is real enough to sell from today. It is not safe to claim income, virality, or a fully autonomous reporting system yet. The fastest responsible path is: keep production stable, get `VERCEL_TOKEN` for deterministic alias repair, choose the first payment/invoice route, and send the Website Completion Package outreach from the assisted-close playbook.
+MindReply is close enough to sell the Website Completion Package now. The public domain is safe and package-visible, while the latest ready deployment is materially better for invoice-first conversion. It is not safe to claim income, virality, or a fully autonomous reporting system yet. The fastest responsible path is: promote `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`, get `VERCEL_TOKEN` for deterministic alias repair, choose the first payment/invoice route, and send the Website Completion Package outreach from the assisted-close playbook.
