@@ -17,12 +17,12 @@ Important name collision: the Git branch `mind-reply` is storage only. The Verce
 
 ## Latest Provider Evidence
 
-Recent Vercel evidence shows both Vercel projects can still react to the same GitHub repo:
+Recent Vercel evidence shows both Vercel projects still react to the same GitHub repo:
 
-- A main-branch push for commit `ad3bb9e205f1ada1aeeb50cb98f474cd964b3749` triggered production deployment attempts on both projects.
-- `mindreply` latest production attempt: `dpl_CynSRRjhd4EWX1hBetK5aubxmK4E`, state `ERROR`.
-- Duplicate `mind-reply` latest production attempt: `dpl_GT9CJM3NQwkTD7GPqqHKLtsX7LYx`, state `CANCELED`.
-- Previous PR preview deployments for PR #12 reached `READY` on both projects before the branch deployment gate was added.
+- Main commit `dc28b1daa43b17e32f9768478b8362156baec074` triggered production deployment attempts on both projects.
+- Canonical `mindreply` latest production deployment: `dpl_7oLQfEHCp4ctws29RFA5qRVKdhcf`, state `READY`.
+- Duplicate `mind-reply` latest production attempt: `dpl_8j3PZpkdMpbqBVRFz8LZBGeYLqLq`, state `CANCELED`.
+- `https://www.mind-reply.com/` still serves the older Private Decision Support surface until PR #12 is synced, merged, and deployed from `main`.
 
 This proves the duplicate project is still connected at the provider layer. Repository code can reduce branch deployment spam, but it cannot remove duplicate Vercel project wiring or raise the Free plan deployment quota.
 
