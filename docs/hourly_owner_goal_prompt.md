@@ -21,6 +21,12 @@ The package is the paid entry offer:
 
 Do not ask visitors to buy technology. Ask them to buy clarity, queue resolution, communication rescue, website completion, reply recovery, and message refinement under pressure.
 
+The buying path must stay concrete:
+
+- Use `NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL` for a public payment link when one is configured.
+- If no payment link exists, keep the invoice request route active through `/contact?intent=website-completion`.
+- Never claim revenue, bookings, or paid customers unless a connected payment or invoice source proves it.
+
 ## Homepage Model
 
 Use two layers:
@@ -45,7 +51,7 @@ Add proof only when it is defensible:
 The close path is:
 
 1. Ask MRagent first.
-2. If the issue is broader than one reply, request the Website Completion Package.
+2. If the issue is broader than one reply, pay for or request the Website Completion Package.
 3. If MRagent cannot solve it, contact MindReply through the public mailbox or contact page.
 4. Security and owner decisions route privately and stay redacted.
 
@@ -53,7 +59,7 @@ The close path is:
 
 Treat agents as internal lanes, not public claims:
 
-- Revenue Lead: package, assisted close, pricing copy.
+- Revenue Lead: package, assisted close, pricing copy, payment route.
 - Frontend Lead: homepage clarity, trust proof, authority layer.
 - Deploy Lead: Vercel blocker, build status, domain state.
 - Security Lead: secrets, auth/payment safety, redacted owner evidence.
@@ -71,6 +77,7 @@ Every hourly report must include:
 - next revenue move;
 - owner decision needed;
 - Website Completion Package progress;
+- payment link or invoice fallback status;
 - Vercel deploy status;
 - Slack/email delivery receipt.
 
