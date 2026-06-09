@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.mind-reply.com";
 
-const languageParams = ["es", "fr", "de", "it", "pt", "ar", "hi", "ja", "ko", "zh"];
+const languageParams = ["es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
 
 const routes = [
   { path: "/", priority: 1, changeFrequency: "daily" as const, localized: true },
