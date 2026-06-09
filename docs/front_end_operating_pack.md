@@ -106,7 +106,7 @@ Use this line as the campaign spine:
 - New direction file: https://www.figma.com/design/PuRHREBbTixXGxPsBEI1yz
 - FigJam operating map: https://www.figma.com/board/G0lSiegpqHSoQDpmgoYKDL
 
-The Figma MCP Starter limit blocked further frame placement and Code Connect mapping. Once the limit is cleared, the next Figma step is to place the editable frames and map them to `app/page.tsx`, `components/MRAgentChat.tsx`, and `app/pack/page.tsx`.
+The connected Figma account currently reports a Starter plan with a View seat. That blocks creating new editable files, placing new frames, FigJam edits, and Code Connect mappings from this session. Once an edit-capable seat is available, the next Figma step is to place the editable frames and map them to `app/page.tsx`, `components/MRAgentChat.tsx`, and `app/pack/page.tsx`.
 
 ## Vercel And Observability
 
