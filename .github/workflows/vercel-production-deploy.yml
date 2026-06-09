@@ -35,7 +35,7 @@ jobs:
   deploy:
     name: Verify and deploy production
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,4 +73,33 @@ jobs:
         run: vercel build --prod --token="$VERCEL_TOKEN"
 
       - name: Deploy to Vercel production
-        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOY_OUTPUT="$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")"
+          echo "$DEPLOY_OUTPUT"
+          DEPLOY_URL="$(echo "$DEPLOY_OUTPUT" | grep -Eo 'https://[^ ]+\.vercel\.app' | tail -1 || true)"
+          if [ -z "$DEPLOY_URL" ]; then
+            echo "Could not parse Vercel deployment URL from deploy output."
+            exit 1
+          fi
+          echo "deployment_url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for domain propagation
+        run: sleep 45
+
+      - name: Verify live production domain
+        env:
+          MINDREPLY_EXPECTED_SHA: ${{ github.sha }}
+          MINDREPLY_REQUIRE_LIVE_SHA_MATCH: "true"
+          MINDREPLY_LIVE_VERIFY_URL: ${{ env.NEXT_PUBLIC_SITE_URL }}
+        run: npm run verify:live-revenue
+
+      - name: Upload live verification artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mindreply-live-revenue-surface
+          path: mindreply-live-revenue-surface.json
+          if-no-files-found: ignore
