@@ -34,6 +34,7 @@ assert(workflow.includes("RESEND_API_KEY"), "Workflow must expose RESEND_API_KEY
 assert(workflow.includes("MINDREPLY_REPORT_EMAIL"), "Workflow must expose MINDREPLY_REPORT_EMAIL through secrets or variables.");
 assert(workflow.includes("MINDREPLY_REPORT_FROM"), "Workflow must expose MINDREPLY_REPORT_FROM.");
 assert(workflow.includes("MINDREPLY_SLACK_WEBHOOK_URL") || workflow.includes("SLACK_WEBHOOK_URL"), "Workflow must expose a Slack webhook path.");
+assert(workflow.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "Workflow must expose the package payment URL variable.");
 assert(workflow.includes("actions/upload-artifact"), "Workflow must upload report artifacts.");
 
 const publicConfigText = [workflow, prompt].join("\n");
@@ -44,6 +45,8 @@ for (const phrase of [
   "Website Completion Package",
   "revenue system",
   "assisted close",
+  "payment",
+  "invoice",
   "defensive security boundary",
   "Slack",
   "email",
