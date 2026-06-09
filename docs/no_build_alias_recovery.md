@@ -8,12 +8,12 @@ This path does not create a new build. It only re-points public aliases, waits f
 
 - Workflow: `.github/workflows/vercel-alias-ready-deployment.yml`
 - Confirm input: `alias-ready-deployment`
-- Deployment URL: `https://mindreply-deuio7she-angellllkr-engs-projects.vercel.app`
-- Deployment id: `dpl_AQWnPEDmLtFmfqPobMShwaAB7SAn`
-- Expected SHA: `55480c5ede469cb324c5c000b70181e384d38604`
-- Commit message: `Guard no-build alias workflow contract`
+- Deployment URL: `https://mindreply-kbqlfz2h8-angellllkr-engs-projects.vercel.app`
+- Deployment id: `dpl_ALssxKSrgiWh3rJgNzmmyv5WZiPE`
+- Expected SHA: `85a86a6f94bca2f8f1d5ff69894ba4a85cb1ecd7`
+- Commit message: `Guard latest alias recovery target`
 
-This is the newest READY production-target deployment verified by the Vercel connector on 2026-06-09. It includes the invoice-first Website Completion Package page and the source release-gate contract for the no-build alias workflow.
+This is the newest READY production-target deployment verified by the Vercel connector on 2026-06-09 that includes the invoice-first Website Completion Package page and the updated no-build alias recovery contract. Later docs-only commits can remain unpromoted unless they change the public revenue surface.
 
 ## Required Secret
 
