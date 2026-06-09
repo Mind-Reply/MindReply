@@ -1,0 +1,70 @@
+name: MindReply Hourly Owner Report
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+permissions:
+  contents: read
+
+env:
+  MINDREPLY_REPORT_ENABLED: "true"
+  MINDREPLY_REPORT_DRY_RUN: ${{ vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
+  MINDREPLY_REPORT_CHANNELS: ${{ vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
+  MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || vars.MINDREPLY_REPORT_EMAIL }}
+  MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS }}
+  MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || vars.MINDREPLY_REPORT_FROM }}
+  RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+  MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://www.mind-reply.com' }}
+  VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID || 'prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3' }}
+  VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID || 'team_0plIJmQLgZC1wVv9zI2eVf3B' }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+concurrency:
+  group: mindreply-hourly-owner-report
+  cancel-in-progress: true
+
+jobs:
+  owner-report:
+    name: Owner revenue report
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Check report contract
+        run: npm run report:check
+
+      - name: Generate launch report
+        run: npm run launch:report
+
+      - name: Verify revenue blueprint
+        run: npm run audit:blueprint
+
+      - name: Send owner report
+        run: npm run report:send
+
+      - name: Upload owner report artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mindreply-hourly-owner-report
+          path: |
+            reports/outbox/hourly-owner-report-*.md
+            reports/outbox/hourly-owner-delivery-receipt-*.json
+          if-no-files-found: warn
+          retention-days: 14
