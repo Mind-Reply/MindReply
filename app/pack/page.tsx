@@ -21,6 +21,10 @@ export const metadata = {
 };
 
 const supportEmail = "info@mind-reply.com";
+const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
+const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
+const packageCtaLabel = packagePaymentUrl ? "Pay for package" : "Request invoice";
+const packagePaymentStatus = packagePaymentUrl ? "Direct payment link configured" : "Invoice request path active";
 const transactionCount = process.env.NEXT_PUBLIC_PACK_TRANSACTION_COUNT || "0";
 const revenueTotal = process.env.NEXT_PUBLIC_PACK_REVENUE_TOTAL || "GBP 0";
 const revenueNote = process.env.NEXT_PUBLIC_PACK_REVENUE_NOTE || "No connected transaction source yet. Revenue is not claimed until a real source is attached.";
@@ -67,9 +71,9 @@ const sequence = [
     icon: MessageCircle,
   },
   {
-    title: "Package handoff",
-    copy: "If the issue is broader than one message, request the Website Completion Package through the contact page or public mailbox.",
-    icon: Mail,
+    title: "Payment or invoice",
+    copy: "Use the configured payment link when present, or request an invoice through the contact page without exposing private owner details.",
+    icon: Banknote,
   },
   {
     title: "Delivery receipt",
@@ -91,9 +95,9 @@ export default function CompletionPackPage() {
             <Link href="/agent" className="rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72]">
               MRagent
             </Link>
-            <Link href="/contact?intent=website-completion" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
-              Request package
-            </Link>
+            <a href={packageCtaHref} className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
+              {packageCtaLabel}
+            </a>
           </div>
         </div>
       </section>
@@ -122,9 +126,9 @@ export default function CompletionPackPage() {
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
                 Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
-              <Link href="/contact?intent=website-completion" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
-                Request package <Mail aria-hidden className="h-4 w-4" />
-              </Link>
+              <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+                {packageCtaLabel} <Mail aria-hidden className="h-4 w-4" />
+              </a>
             </div>
           </div>
         </div>
@@ -198,7 +202,7 @@ export default function CompletionPackPage() {
               <Banknote aria-hidden className="h-5 w-5" />
               <p className="text-xs font-bold uppercase tracking-[0.22em]">Revenue truth</p>
             </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <div className="rounded-lg bg-[#f8f4ec] p-5">
                 <p className="text-sm font-semibold text-[#4d5c6f]">Transactions tracked</p>
                 <p className="mt-3 font-serif text-5xl font-bold">{transactionCount}</p>
@@ -206,6 +210,10 @@ export default function CompletionPackPage() {
               <div className="rounded-lg bg-[#f8f4ec] p-5">
                 <p className="text-sm font-semibold text-[#4d5c6f]">Revenue tracked</p>
                 <p className="mt-3 font-serif text-5xl font-bold">{revenueTotal}</p>
+              </div>
+              <div className="rounded-lg bg-[#f8f4ec] p-5">
+                <p className="text-sm font-semibold text-[#4d5c6f]">Payment route</p>
+                <p className="mt-3 text-lg font-bold leading-tight">{packagePaymentStatus}</p>
               </div>
             </div>
             <div className="mt-4 flex items-start gap-3 rounded-lg border border-[#122033]/10 bg-[#fbfaf6] p-4 text-sm leading-6 text-[#59687b]">
@@ -237,11 +245,11 @@ export default function CompletionPackPage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-5 rounded-lg bg-[#122033] p-6 text-[#f8f5f0] md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#91d2c8]">Ready route</p>
-            <h2 className="mt-3 font-serif text-3xl font-bold leading-tight">Ask MRagent first. If the website needs a full rescue, request the package.</h2>
+            <h2 className="mt-3 font-serif text-3xl font-bold leading-tight">Ask MRagent first. If the website needs a full rescue, pay or request the package.</h2>
           </div>
-          <Link href="/contact?intent=website-completion" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-            Contact MindReply <Mail aria-hidden className="h-4 w-4" />
-          </Link>
+          <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
+            {packageCtaLabel} <Mail aria-hidden className="h-4 w-4" />
+          </a>
         </div>
       </section>
     </main>
