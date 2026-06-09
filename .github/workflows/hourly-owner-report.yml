@@ -1,0 +1,54 @@
+name: Hourly Owner Report
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  owner-report:
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      MINDREPLY_REPORT_ENABLED: "true"
+      MINDREPLY_REPORT_DRY_RUN: "false"
+      MINDREPLY_REPORT_CHANNELS: "email,slack"
+      MINDREPLY_REPORT_EMAIL: "ANGELLLKR@GMAIL.COM"
+      MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      VERCEL_DEPLOY_STATUS: ${{ vars.VERCEL_DEPLOY_STATUS }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check report lane
+        run: npm run report:check
+
+      - name: Build owner report
+        run: npm run launch:report
+
+      - name: Audit owner blueprint
+        run: npm run audit:blueprint
+
+      - name: Send owner report
+        run: npm run report:send
+
+      - name: Upload owner evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mindreply-owner-report
+          path: .mindreply/reports/**

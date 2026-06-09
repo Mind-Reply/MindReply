@@ -13,6 +13,8 @@ if str(ROOT) not in sys.path:
 from src.backend.audit_log import create_receipt
 from src.backend.followup_engine import plan_follow_up
 from src.backend.memory_store import recent, remember
+from src.backend.owner_export import prepare_owner_mail_export
+from src.backend.owner_security import prepare_owner_decision
 from src.backend.playbook_interpreter import ALLOWED_ACTIONS, decide_action, load_seed_playbooks, validate_playbook
 from src.backend.reply_engine import prepare_reply
 from src.backend.risk_engine import assess_risk
@@ -89,6 +91,29 @@ class ExecutiveNervousSystemTests(unittest.TestCase):
         self.assertEqual(len(receipt["signatures"]), 1)
         self.assertNotIn("raw_input", receipt)
 
+    def test_owner_export_requires_consent_and_stays_redacted(self) -> None:
+        blocked = prepare_owner_decision(
+            "owner@example.com",
+            "Client risk requires owner review.",
+            "escalate",
+            consent_granted=False,
+        )
+        self.assertFalse(blocked["export_allowed"])
+
+        allowed = prepare_owner_decision(
+            "owner@example.com",
+            "Client risk requires owner review.",
+            "escalate",
+            consent_granted=True,
+            redaction_level="partial",
+        )
+        export = prepare_owner_mail_export(allowed, receipt_id="receipt-1")
+
+        self.assertTrue(allowed["export_allowed"])
+        self.assertEqual(export["to"], "owner@example.com")
+        self.assertEqual(export["recommended_action"], "escalate")
+        self.assertIn("Raw content is excluded", export["body"])
+
     def test_blocked_terms_are_absent_from_product_sources(self) -> None:
         scanned = []
         for folder in TEXT_TARGETS:
@@ -101,6 +126,26 @@ class ExecutiveNervousSystemTests(unittest.TestCase):
                             self.assertIsNone(re.search(rf"\b{re.escape(term)}\b", text, flags=re.IGNORECASE))
 
         self.assertGreater(len(scanned), 0)
+
+    def test_hourly_owner_report_contract_is_wired(self) -> None:
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        workflow = (ROOT / ".github" / "workflows" / "hourly-owner-report.yml").read_text(encoding="utf-8")
+        prompt = (ROOT / "docs" / "hourly_owner_goal_prompt.md").read_text(encoding="utf-8")
+
+        self.assertIn('cron: "0 * * * *"', workflow)
+        self.assertIn("ANGELLLKR@GMAIL.COM", workflow)
+        self.assertIn("MINDREPLY_SLACK_WEBHOOK_URL", workflow)
+        self.assertIn("SLACK_WEBHOOK_URL", workflow)
+        self.assertIn("RESEND_API_KEY", workflow)
+
+        for script in ("report:check", "launch:report", "audit:blueprint", "report:send"):
+            self.assertIn(script, package["scripts"])
+            self.assertIn(f"npm run {script}", workflow)
+
+        self.assertIn("Website Completion Package", prompt)
+        self.assertIn("Revenue-first", prompt)
+        self.assertIn("redacted", prompt)
+        self.assertIn("No public page may claim active internal staff count", prompt)
 
 
 if __name__ == "__main__":

@@ -30,3 +30,4 @@ preview-server*.log
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+.mindreply/

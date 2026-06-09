@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "report:check": "node scripts/report-check.mjs",
+    "launch:report": "node scripts/launch-report.mjs",
+    "audit:blueprint": "node scripts/audit-blueprint.mjs",
+    "report:send": "node scripts/report-send.mjs"
   },
   "dependencies": {
     "next": "^15.3.3",
