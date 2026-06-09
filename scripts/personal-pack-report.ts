@@ -49,6 +49,10 @@ function shortSha(value: string) {
   return value === "unknown" ? value : value.slice(0, 7);
 }
 
+function emailRecipients() {
+  return [...new Set([...parseList(env.MINDREPLY_REPORT_EMAILS), ...parseList(env.MINDREPLY_REPORT_EMAIL)])];
+}
+
 async function fetchRepoSnapshot(): Promise<RepoSnapshot> {
   const snapshot: RepoSnapshot = {
     repo,
@@ -97,6 +101,7 @@ function reportMarkdown(snapshot: RepoSnapshot) {
   const label = env.MINDREPLY_REPORT_PERSONAL_LABEL || "Angel personal pack";
   const now = new Date().toISOString();
   const statusLine = snapshot.statusUrl ? `${snapshot.status} (${snapshot.statusUrl})` : snapshot.status;
+  const recipients = emailRecipients();
 
   return [
     `# ${label}`,
@@ -118,10 +123,15 @@ function reportMarkdown(snapshot: RepoSnapshot) {
     "- You get a compact operating receipt instead of hunting through GitHub, Vercel, Slack, and email separately.",
     "- The report calls out deploy blockers, feature movement, and the next useful move in one place.",
     "",
+    "## Delivery",
+    `- Email recipients: ${recipients.length ? recipients.join(", ") : "not configured"}`,
+    `- Slack: ${env.MINDREPLY_SLACK_WEBHOOK_URL ? "configured" : "not configured"}`,
+    "",
     "## Gift material",
     "Use this line in MRagent copy: 'Read the pressure, move once, keep the receipt quiet.'",
     "",
     "## Links",
+    `- Personal Pack: ${siteUrl}/pack`,
     `- Agent preview: ${siteUrl}/agent`,
     `- ChatGPT MCP URL: ${siteUrl}/mcp`,
     "- Figma preview: https://www.figma.com/design/QLximv9mLCIwQB2GPgBgeG",
@@ -146,10 +156,6 @@ async function sendSlack(markdown: string): Promise<SendResult> {
 
   if (!response.ok) return { channel: "slack", status: "failed", detail: `Slack returned ${response.status}.` };
   return { channel: "slack", status: "sent", detail: "Slack report sent." };
-}
-
-function emailRecipients() {
-  return [...new Set([...parseList(env.MINDREPLY_REPORT_EMAILS), ...parseList(env.MINDREPLY_REPORT_EMAIL)])];
 }
 
 function emailAllowed(email: string) {
