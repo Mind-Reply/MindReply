@@ -41,7 +41,8 @@ report_fields:
   - search_assets
   - ad_message_sync
   - next_visibility_task
-next_visibility_tasks:
-  - capture fresh /agent production preview after active deployment is green
-  - add one search-intent note for tense reply moments
-  - prepare a Slack-ready report once a destination channel or DM is named
+next_visibility_task:
+  current:
+    - capture fresh /agent production preview after active deployment is green
+    - add one search-intent note for tense reply moments
+    - prepare a Slack-ready report once a destination channel or DM is named

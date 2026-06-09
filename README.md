@@ -1,17 +1,17 @@
 # MindReply
 
-MindReply is an Executive Nervous System and Decision Infrastructure Layer. It sits between input and action so the next move becomes obvious.
+MindReply is an Executive Nervous System and Decision Infrastructure Layer. It sits between pressure and action so the next move becomes calm, visible, and defensible.
 
 ## MRagent
 
-MRagent is the gentle Mind Read surface for MindReply. It reflects what the pressure is really about, what the user's mindset is protecting, the calmer move, and one recommended action.
+MRagent is the Mind Read surface for MindReply. It reflects what the pressure is really about, what the user's mindset is protecting, the calmer move, and one recommended action.
 
 ## Layers
 
 - Intake Layer: reads the pressure and produces one synthesis.
 - Mind Read Layer: reflects the pressure, mindset protection, and calmer move.
 - Action Layer: returns one recommended action.
-- Memory Layer: adjusts derived preferences quietly.
+- Memory Layer: keeps derived preferences only when approved.
 
 ## Agents
 
@@ -33,6 +33,16 @@ MRagent is the gentle Mind Read surface for MindReply. It reflects what the pres
 
 Old public surfaces are redirected into the decision layer.
 
+## Front End Operating Pack
+
+`docs/front_end_operating_pack.md` explains the full front-end system: Home, MRagent, Personal Pack, privacy posture, reporting cadence, Figma/FigJam state, Remotion motion direction, review guardrails, and observability watch.
+
+Design links:
+
+- Figma preview: https://www.figma.com/design/QLximv9mLCIwQB2GPgBgeG
+- Front-end direction file: https://www.figma.com/design/PuRHREBbTixXGxPsBEI1yz
+- FigJam operating map: https://www.figma.com/board/G0lSiegpqHSoQDpmgoYKDL
+
 ## ChatGPT App Surface
 
 `/mcp` exposes the internal MRagent MCP Apps endpoint for ChatGPT Developer Mode.
@@ -50,7 +60,9 @@ Widget resource:
 
 ## Personal Pack Preview
 
-`/pack` is the personal operating surface for Angel's pack. It shows the four active automations, the configured delivery destinations, the live preview links, and truthful transaction/revenue counters.
+`/pack` is the operating surface for the MindReply pack. It shows delivery destinations, live preview links, truthful transaction/revenue counters, and current movement signals.
+
+Users should ask MRagent first. If the question cannot be solved there, use `/contact` or write to `info@mind-reply.com`.
 
 Revenue and transaction counters are environment-driven so the page does not invent numbers:
 
@@ -62,11 +74,32 @@ NEXT_PUBLIC_PACK_REVENUE_NOTE=No connected transaction source yet.
 
 ## Personal Pack Reports
 
-`npm run report:personal-pack` generates a personal-only pulse with deploy status, MRagent links, the Figma preview, delivery status, a short "where you win" section, and one reusable gift-material line.
+`npm run report:personal-pack` generates a personal-only pulse with deploy status, MRagent links, the Figma preview, delivery status, the operating pack, a short "where you win" section, and one reusable material line.
 
-The scheduled workflow is `.github/workflows/personal-pack-report.yml`. It can be run manually with `workflow_dispatch` or by cron. GitHub cron cannot keep a perfect rolling 23-minute interval across every hour; the workflow uses `*/23 * * * *` as the closest built-in schedule.
+The scheduled workflow is `.github/workflows/personal-pack-report.yml`. It can be run manually with `workflow_dispatch` or by cron. The workflow uses `*/30 * * * *`, which runs twice an hour.
+
+## Activation Pack Reports
+
+`npm run report:activation-pack` generates the activated security and promotion pack:
+
+- 8-lane defensive security team: headers, routes, secrets, receipt privacy, dependencies, deployment protection, runtime observability, incident response.
+- 28-lane social/ad preparation team: positioning, launch copy, channel drafts, Figma/Remotion queue, analytics readiness, revenue truth, distribution permission checks, and next move.
+- Owner decision desk: security findings that affect behavior, access, data retention, delivery, billing, or production rollout are sent as owner decision packets before action.
+
+The scheduled workflow is `.github/workflows/activation-pack-report.yml` and also runs every 30 minutes. It prepares and reports. It does not post externally, scrape audiences, run ads, attack systems, or claim revenue without connected and approved sources.
 
 Sending is disabled by default. Console preview is safe without secrets.
+
+Owner decision routing:
+
+```bash
+MINDREPLY_SECURITY_OWNER_EMAIL=
+MINDREPLY_SECURITY_PUBLIC_EMAIL=info@mind-reply.com
+```
+
+Set `MINDREPLY_SECURITY_OWNER_EMAIL` only in private GitHub/Vercel secrets. Do not commit personal owner mailboxes into public files.
+
+Decision packets include affected surface, evidence, impact, recommended decision, rollback or rotation note, and delivery status. They may include all non-secret security data needed for owner decisions, but they must not include raw secrets, access tokens, credentials, private pressure text, or unredacted sensitive records.
 
 Required opt-in variables:
 
@@ -76,7 +109,8 @@ MINDREPLY_REPORT_DRY_RUN=false
 MINDREPLY_REPORT_CHANNELS=console,slack,email
 MINDREPLY_REPORT_REQUIRE_DELIVERY=true
 MINDREPLY_REPORT_PERSONAL_ONLY=true
-MINDREPLY_REPORT_PERSONAL_LABEL=Angel personal pack
+MINDREPLY_REPORT_PERSONAL_LABEL=MindReply pack
+MINDREPLY_REPORT_AGENT_COUNT=25
 ```
 
 When `MINDREPLY_REPORT_REQUIRE_DELIVERY=true`, console output does not count as delivery. At least one Slack or email channel must return `sent`, or the workflow fails loudly.
@@ -87,12 +121,12 @@ Email delivery uses GitHub or deployment secrets:
 
 ```bash
 RESEND_API_KEY=
-MINDREPLY_REPORT_EMAILS=angelllkr@gmail.com,Info@mind-reply.com
-MINDREPLY_REPORT_EMAIL_ALLOWLIST=angelllkr@gmail.com,info@mind-reply.com
+MINDREPLY_REPORT_EMAILS=info@mind-reply.com
+MINDREPLY_REPORT_EMAIL_ALLOWLIST=info@mind-reply.com
 MINDREPLY_REPORT_FROM=
 ```
 
-`MINDREPLY_REPORT_EMAIL` is still supported as a single-recipient fallback. Prefer `MINDREPLY_REPORT_EMAILS` for Angel plus the MindReply inbox.
+`MINDREPLY_REPORT_EMAIL` is still supported as a single-recipient fallback. Prefer `MINDREPLY_REPORT_EMAILS` for explicit delivery lists.
 
 When `MINDREPLY_REPORT_PERSONAL_ONLY=true`, every email recipient must appear in `MINDREPLY_REPORT_EMAIL_ALLOWLIST`.
 
@@ -103,6 +137,9 @@ npm ci
 npm run decision:verify
 npm run mcp:verify
 npm run report:personal-pack
+npm run report:security-pack
+npm run report:promotion-pack
+npm run report:activation-pack
 npm run typecheck
 npm run build
 python -m unittest discover src

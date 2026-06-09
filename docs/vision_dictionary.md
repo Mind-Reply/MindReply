@@ -1,6 +1,12 @@
 # MindReply Vision Dictionary
 
-MindReply is an Executive Nervous System and Decision Infrastructure Layer. It sits between input and action, reducing hesitation before communication or follow-up happens.
+MindReply is an Executive Nervous System and Decision Infrastructure Layer. It sits between pressure and action so the next move becomes calm, visible, and defensible.
+
+## Voice
+
+MindReply should sound composed, warm, exact, and slightly unexpected. It is not a generic helper, a pep talk, or a control panel. It should feel like a private room where pressure becomes readable.
+
+Use language that is high-end but plain enough to use under stress. Prefer short sentences after rich phrases. Let the product feel intelligent without becoming ornate.
 
 ## Category Terms
 
@@ -17,11 +23,18 @@ MindReply is an Executive Nervous System and Decision Infrastructure Layer. It s
 - professional playbook
 - calm execution
 - controlled access
+- pressure read
+- presence ledger
+- private front room
+- one composed move
+- narrow receipt
+- legal-grade restraint
 
 ## Microcopy
 
-- The next move is obvious.
-- Paste the pressure.
+- Read the pressure.
+- Move with grace.
+- Place the charged message here.
 - One synthesis. One recommended action.
 - Risk checked before movement.
 - Memory adjusted quietly.
@@ -30,6 +43,10 @@ MindReply is an Executive Nervous System and Decision Infrastructure Layer. It s
 - Set the follow-up.
 - Send the prepared reply.
 - Mark resolved.
+- The pack does not perform. It reports.
+- Pressure is not a souvenir.
+- The receipt is narrow on purpose.
+- Calm is treated as infrastructure.
 
 ## Interface Rules
 
@@ -40,6 +57,23 @@ MindReply is an Executive Nervous System and Decision Infrastructure Layer. It s
 - Show one receipt.
 - Keep memory quiet unless the user asks.
 - Remove screens that create extra decisions.
+- Do not imply revenue without a connected transaction source.
+- Do not imply Slack or email delivery without configured secrets.
+- Prefer status words like `On`, `Needs setup`, and `Not connected` over theatrical certainty.
+
+## Forbidden Public Drift
+
+Avoid public wording that makes MindReply sound like a generic tech tool. Do not lead with: AI, chatbot, productivity, automation, options, boost, hack.
+
+Use these replacements instead:
+
+- AI -> decision layer, Mind Read, MRagent
+- chatbot -> session, companion, private read
+- productivity -> calm execution, cleaner movement
+- automation -> quiet lane, report cadence, delivery ribbon
+- options -> next move, path, route
+- boost -> lift, strengthen, clarify
+- hack -> method, move, discipline
 
 ## Feature Evaluation
 

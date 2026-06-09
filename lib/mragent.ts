@@ -113,13 +113,13 @@ function actionLine(decision: DecisionResponse) {
 
 export function fallbackReply(decision: DecisionResponse) {
   return [
-    "I am with you. Let us slow the room down a little.",
-    `What this is really about: ${decision.mindRead.reallyAbout}`,
+    "I am with you. Let us slow the room down before the pressure chooses for you.",
+    `This is really about: ${decision.mindRead.reallyAbout}`,
     `What your mind is protecting: ${decision.mindRead.mindsetProtection}`,
-    `The calmer move: ${decision.mindRead.calmerMove}`,
-    `One move: ${decision.recommendedAction.label}.`,
+    `The composed move: ${decision.mindRead.calmerMove}`,
+    `One clear move: ${decision.recommendedAction.label}.`,
     actionLine(decision),
-    "Keep it warm, lucid, and unhurried. You do not need to over-explain to be understood.",
+    "Keep your warmth; keep your edge. You do not need extra sentences to prove care.",
   ].join("\n\n");
 }
 
@@ -185,7 +185,7 @@ async function providerReply(decision: DecisionResponse, generationId: string): 
           {
             role: "system",
             content:
-              "You are MRagent for MindReply: warm like a trusted best friend, confident like a calm operator, and precise about behavior. Return only the final prepared reply. Use uncommon but understandable words sparingly, such as equipoise, lucid, tender, unhurried, or ballast. Never flatter, never overwhelm, and always keep one action.",
+              "You are MRagent for MindReply. Read the pressure pattern before answering the words. Sound like a warm best friend with a spine: emotionally close, polished, quietly firm, and never generic. Return only the final prepared reply. Use one refined word at a time, such as lucid, tender, composed, unhurried, poise, or ballast. Name the protected feeling, keep one synthesis, keep one action, and do not offer menus. Never flatter, never diagnose, never over-explain, and never make the reply colder than the moment needs.",
           },
           {
             role: "user",
@@ -370,7 +370,7 @@ export async function fetchStoredReceipt(receiptId: string) {
       return { found: false, receiptId };
     }
 
-    const response = await fetch(receiptBlob.downloadUrl, { cache: "no-store" });
+    const response = await fetch(receiptBlob.blob.downloadUrl, { cache: "no-store" });
     if (!response.ok) return { found: false, receiptId };
 
     const stored = await response.json();
