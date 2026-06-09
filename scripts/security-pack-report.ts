@@ -8,8 +8,8 @@ type Finding = {
 };
 
 const env = process.env;
-const ownerEmail = env.MINDREPLY_SECURITY_OWNER_EMAIL || "angelllkr@gmail.com";
 const publicSecurityEmail = env.MINDREPLY_SECURITY_PUBLIC_EMAIL || "info@mind-reply.com";
+const ownerRoute = env.MINDREPLY_SECURITY_OWNER_EMAIL ? "private owner report secret configured" : publicSecurityEmail;
 
 const findings: Finding[] = [
   {
@@ -84,14 +84,17 @@ function reportMarkdown() {
     "- Security report data is evidence-first and redacted: no raw secrets, private pressure text, tokens, or credentials are printed.",
     "",
     "## Owner Decision Desk",
-    `- Owner route: ${ownerEmail}`,
+    `- Owner route: ${ownerRoute}`,
     `- Public security route: ${publicSecurityEmail}`,
     "- Findings that affect behavior, access, data retention, delivery, billing, or production rollout are decision packets for the owner before action.",
     "- Each packet must include affected surface, evidence, impact, recommended owner decision, rollback or rotation note, and delivery status.",
     "- Urgent containment can pause exposure first, but the owner report still follows with the decision record.",
     "",
     "## 8-lane security team",
-    ...findings.map((finding, index) => `- ${String(index + 1).padStart(2, "0")} ${finding.lane}: ${statusWord(finding.status)} - ${finding.note} Owner decision: ${finding.ownerDecision}.`),
+    ...findings.map(
+      (finding, index) =>
+        `- ${String(index + 1).padStart(2, "0")} ${finding.lane}: ${statusWord(finding.status)} - ${finding.note} Owner decision: ${finding.ownerDecision}.`,
+    ),
     "",
     "## Next defensive moves",
     "- Configure a real security contact address and response owner.",
