@@ -49,7 +49,10 @@ includes("layout metadata", layout, "Website Completion and Response Overload Re
 includes("layout metadata", layout, "GBP 600 website package");
 includes("layout metadata", layout, "multilingual business communication support");
 includes("layout metadata", layout, "hi: \"/?lang=hi\"");
+includes("layout metadata", layout, "uk: \"/?lang=uk\"");
 includes("layout metadata", layout, "alternateLocale");
+includes("layout metadata", layout, "target-market");
+includes("layout metadata", layout, "UK, US, DE, FR, ES, AE, SA, SG, IN, JP");
 
 for (const path of ["/", "/agent", "/website-completion-package", "/pricing", "/contact", "/capabilities", "/privacy"]) {
   includes("robots", robots, path);
@@ -62,20 +65,24 @@ includes("sitemap", sitemap, "/website-completion-package");
 includes("sitemap", sitemap, "alternates:");
 includes("sitemap", sitemap, "languages: localeAlternates");
 
-for (const locale of ["en", "es", "fr", "de", "it", "pt", "ar", "hi", "ja", "ko", "zh"]) {
+for (const locale of ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"]) {
   includes("locale assist", localeAssist, `${locale}: {`);
 }
+assert(!/ko: \{|it: \{/.test(localeAssist), "locale assist should stay at the 10 priority languages.");
 includes("locale assist", localeAssist, "Website Completion Package");
 includes("locale assist", localeAssist, "GBP 600");
 includes("locale assist", localeAssist, "info@mind-reply.com");
 includes("locale assist", localeAssist, "aria-live=\"polite\"");
 includes("locale assist", localeAssist, "data-revenue-anchor");
+includes("locale assist", localeAssist, "Auto {country}");
 
 includes("geo locale", geoLocale, "IN: \"hi\"");
 includes("geo locale", geoLocale, "AE: \"ar\"");
 includes("geo locale", geoLocale, "JP: \"ja\"");
-includes("geo locale", geoLocale, "KR: \"ko\"");
+includes("geo locale", geoLocale, "UA: \"uk\"");
 includes("geo locale", geoLocale, "supportedLocales");
+includes("geo locale", geoLocale, "priorityMarkets");
+assert(!/KR: \"ko\"|IT: \"it\"/.test(geoLocale), "geo locale should not recommend removed languages.");
 
 includes("website blueprint", websiteBlueprint, "Website Completion Package");
 includes("website blueprint", websiteBlueprint, "Revenue-First Rule");
@@ -88,4 +95,4 @@ includes("owner security", ownerSecurity, "Defensive Security Boundary");
 includes("owner security", ownerSecurity, "Owner Decision Format");
 assert(!/ANGELLLKR@GMAIL\.COM/i.test(ownerSecurity), "owner security doc must not expose the private Gmail directly.");
 
-console.log("Revenue, i18n, SEO, and security boundary verification passed.");
+console.log("Revenue, 10-language i18n, SEO, and security boundary verification passed.");
