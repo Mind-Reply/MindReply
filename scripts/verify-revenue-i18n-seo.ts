@@ -78,8 +78,10 @@ for (const phrase of [
   "surfaceTranslations",
   "Auto {country}",
   "marketCount",
+  "setMarketCount",
+  "marketProfiles?.length",
   "data-locale-count={localeCodes.length}",
-  "10 priority markets",
+  "{marketCount} priority markets",
   "Contact form",
 ]) {
   includes("locale assist", localeAssist, phrase);
