@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowUp, Feather, HeartHandshake, Loader2, LockKeyhole, RotateCcw, ShieldCheck, Sparkles, TimerReset } from "lucide-react";
+import { ArrowRight, ArrowUp, Feather, HeartHandshake, Loader2, LockKeyhole, RotateCcw, ShieldCheck, Sparkles, TimerReset } from "lucide-react";
 import { MessageResponse } from "@/components/ai-elements/message";
 import type { DecisionResponse } from "@/lib/decision-layer";
 
@@ -33,6 +33,9 @@ const starter: ChatMessage = {
 };
 
 const readingPhases = ["listening under the words", "finding the pressure pattern", "checking the risk gate", "choosing one clean move"];
+const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
+const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
+const packageCtaLabel = packagePaymentUrl ? "Pay for Website Completion Package" : "Request GBP 600 package invoice";
 
 function makeId(prefix: string) {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -234,10 +237,27 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
         </div>
 
         {lastDecision ? (
-          <div className="mx-4 mb-3 flex flex-wrap gap-2 rounded-2xl border border-white/10 bg-[#081121]/80 p-3 text-xs text-[#d8deea] md:mx-6">
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1"><Feather size={13} className="text-[#e2b757]" /> {lastDecision.mindRead.calmerMove}</span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1"><TimerReset size={13} className="text-[#e2b757]" /> {lastDecision.memoryUpdate.summary}</span>
-          </div>
+          <>
+            <div className="mx-4 mb-3 flex flex-wrap gap-2 rounded-2xl border border-white/10 bg-[#081121]/80 p-3 text-xs text-[#d8deea] md:mx-6">
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1"><Feather size={13} className="text-[#e2b757]" /> {lastDecision.mindRead.calmerMove}</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1"><TimerReset size={13} className="text-[#e2b757]" /> {lastDecision.memoryUpdate.summary}</span>
+            </div>
+            <div className="mx-4 mb-3 rounded-2xl border border-[#e2b757]/25 bg-[#132238] p-4 text-sm leading-6 text-[#d8deea] md:mx-6">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#e2b757]">Upgrade trigger</p>
+              <p className="mt-2 font-semibold text-[#f8f5f0]">If this pressure is bigger than one reply, move it into the GBP 600 Website Completion Package.</p>
+              <p className="mt-2 text-xs leading-5 text-[#9fb0c8]">
+                Best fit: website buying friction, repeated client follow-up, offer confusion, or a queue that needs ranked fixes and send-ready copy. If the same overload repeats every week, review Growth or Pro after proof.
+              </p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-4 py-2 text-xs font-bold text-[#162033] transition hover:bg-[#f0c86a]">
+                  {packageCtaLabel} <ArrowRight aria-hidden className="h-3.5 w-3.5" />
+                </a>
+                <a href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+                  See upgrade path <ArrowRight aria-hidden className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+          </>
         ) : null}
 
         {error ? (
