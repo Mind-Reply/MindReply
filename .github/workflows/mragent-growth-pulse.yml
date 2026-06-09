@@ -1,0 +1,32 @@
+name: MRagent Growth Pulse
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "18 9 * * 1"
+
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Write growth pulse
+        env:
+          MRAGENT_GROWTH_PULSE_JSON: mragent-growth-pulse.json
+        run: node scripts/mragent-growth-pulse.mjs >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload growth pulse artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mragent-growth-pulse
+          path: mragent-growth-pulse.json
+          if-no-files-found: error
