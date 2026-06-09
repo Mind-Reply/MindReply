@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
+import { ArrowRight, Languages, Mail, ShieldCheck } from "lucide-react";
 
 const footerLinks = [
   { label: "MRagent", href: "/agent" },
@@ -14,6 +14,19 @@ const demandLanes = [
   "Client follow-up compression",
   "Founder response overload",
   "Privacy-safe assisted close",
+];
+
+const priorityMarkets = [
+  "UK",
+  "US",
+  "UAE",
+  "Saudi Arabia",
+  "Germany",
+  "France",
+  "Japan",
+  "Brazil",
+  "Spain",
+  "India",
 ];
 
 export default function SiteFooter() {
@@ -35,6 +48,15 @@ export default function SiteFooter() {
               </div>
             ))}
           </div>
+          <section className="mt-5 rounded-lg border border-white/10 bg-white/[0.035] p-4">
+            <div className="flex items-center gap-2 text-[#91d2c8]">
+              <Languages aria-hidden className="h-4 w-4" />
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">Auto language and priority markets</p>
+            </div>
+            <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
+              Country signal first, browser language second, manual selector always available. Priority SEO lanes: {priorityMarkets.join(" / ")}.
+            </p>
+          </section>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
