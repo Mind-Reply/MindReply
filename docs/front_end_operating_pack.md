@@ -4,9 +4,9 @@ This pack explains how the current MindReply front end works and what each surfa
 
 ## Surfaces
 
-- `/`: the public front door. It now presents MindReply as a pressure-to-action operating layer with platform layers, workflow, promotion readiness, proof, and observability.
+- `/`: the public front door. It presents MindReply as a pressure-to-action operating layer with platform layers, workflow, readiness, proof, and observability.
 - `/agent`: the live MRagent session. It accepts charged text, explains the slow reply, and returns one synthesis, one recommended move, risk state, memory summary, and a quiet receipt.
-- `/pack`: the private completion surface. It shows delivery readiness, revenue truth, promotion queue state, reporting lanes, and confirmed destination status.
+- `/pack`: the private completion surface. It shows delivery readiness, revenue truth, prepared launch material, reporting lanes, and confirmed destination status.
 - `/privacy`: the restraint page. It explains why raw pressure is not kept as a default record.
 - `/mcp`: the ChatGPT App connection surface for Developer Mode.
 
@@ -26,7 +26,7 @@ The front end is intentionally not a marketing-only page. It is the usable produ
 - Hero: product identity, value, and embedded MRagent chat preview.
 - Platform layers: intake, behavioral read, action composer, and quiet receipt.
 - Workflow: place the pressure, slow the read, act once, report what moved.
-- Promotion readiness: MRadvertisingTeam, promotion queue, and revenue readiness without fake posting claims.
+- Readiness: prepared launch material, review queue, and revenue truth without fake posting claims.
 - Proof and observability: Vercel deploy guard, Speed Insights, email/Slack readiness, and Figma/Remotion handoff state.
 - Completion pack: delivery status, real revenue counters, report lanes, and blockers.
 
@@ -57,18 +57,18 @@ The report covers:
 - revenue truth
 - transaction source watch
 - positioning phrases
-- promotion queue
+- review queue
 - launch blockers
 - useful material
 - next move
 
 Delivery is intentionally gated. Console output is not treated as real delivery when `MINDREPLY_REPORT_REQUIRE_DELIVERY=true`. Slack requires `MINDREPLY_SLACK_WEBHOOK_URL`. Email requires `RESEND_API_KEY`, `MINDREPLY_REPORT_EMAILS`, `MINDREPLY_REPORT_EMAIL_ALLOWLIST`, and `MINDREPLY_REPORT_FROM`.
 
-Confirmed report destination for the app copy is `ANGELLLKR@GMAIL.COM`.
+Confirmed public report destination for app copy is `info@mind-reply.com`. User questions should start with MRagent; unresolved questions should go through `/contact` or the public mailbox.
 
-## Automation Guardrails
+## Reporting Guardrails
 
-The safe automation posture is:
+The safe posture is:
 
 - prepare campaign material, do not publish externally without connected accounts and explicit approval;
 - report blockers directly instead of pretending an integration works;
@@ -87,9 +87,9 @@ A Remotion spot should show MindReply without loud product theatrics:
 
 Motion should be restrained: slow fades, precise reveals, no fake revenue, no exaggerated claims.
 
-## Promotion Positioning
+## Positioning
 
-Promotion should not promise hidden posting, guaranteed revenue, or platform-wide distribution without connected accounts. The safe posture is:
+Positioning should not promise hidden posting, guaranteed revenue, or platform-wide distribution without connected accounts. The safe posture is:
 
 - publish only where accounts and permissions are real;
 - report what was prepared, sent, or blocked;
