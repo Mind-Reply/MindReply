@@ -14,8 +14,8 @@ const dryRun = env.MINDREPLY_REPORT_DRY_RUN !== "false";
 const requireDelivery = env.MINDREPLY_REPORT_REQUIRE_DELIVERY === "true";
 const personalOnly = env.MINDREPLY_REPORT_PERSONAL_ONLY !== "false";
 const requestedChannels = parseChannels(env.MINDREPLY_REPORT_CHANNELS || "console");
-const ownerEmail = env.MINDREPLY_SECURITY_OWNER_EMAIL || "angelllkr@gmail.com";
 const publicSecurityEmail = env.MINDREPLY_SECURITY_PUBLIC_EMAIL || "info@mind-reply.com";
+const ownerEmail = env.MINDREPLY_SECURITY_OWNER_EMAIL || publicSecurityEmail;
 
 const securityLanes = [
   "Headers and browser hardening",
