@@ -8,9 +8,12 @@ This path does not create a new build. It only re-points public aliases, waits f
 
 - Workflow: `.github/workflows/vercel-alias-ready-deployment.yml`
 - Confirm input: `alias-ready-deployment`
-- Deployment URL: `https://mindreply-js5m73tfy-angellllkr-engs-projects.vercel.app`
-- Deployment id: `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`
-- Expected SHA: `e0cab2db420d8be63d9ead67cb7cf9d3e6869252`
+- Deployment URL: `https://mindreply-deuio7she-angellllkr-engs-projects.vercel.app`
+- Deployment id: `dpl_AQWnPEDmLtFmfqPobMShwaAB7SAn`
+- Expected SHA: `55480c5ede469cb324c5c000b70181e384d38604`
+- Commit message: `Guard no-build alias workflow contract`
+
+This is the newest READY production-target deployment verified by the Vercel connector on 2026-06-09. It includes the invoice-first Website Completion Package page and the source release-gate contract for the no-build alias workflow.
 
 ## Required Secret
 
@@ -26,7 +29,7 @@ The workflow also checks the canonical Vercel identifiers:
 1. Confirms the operator typed `alias-ready-deployment`.
 2. Requires the workflow to run from `main`.
 3. Validates the deployment URL is a Vercel deployment URL.
-4. Runs `vercel inspect` on the target.
+4. Runs `vercel inspect` on the target and requires the expected SHA to appear before aliasing.
 5. Runs:
    - `vercel alias set <deployment-url> www.mind-reply.com`
    - `vercel alias set <deployment-url> mind-reply.com`
@@ -37,7 +40,7 @@ The workflow also checks the canonical Vercel identifiers:
 
 ## Revenue Gate
 
-The live revenue verifier now checks the dedicated package page, not only homepage/contact.
+The live revenue verifier checks the dedicated package page, not only homepage/contact.
 
 Production fails if `/website-completion-package` does not show:
 
