@@ -1,11 +1,36 @@
-title: "MindReply | Executive Nervous System"
-description: "Decision Infrastructure that turns scattered signal into one synthesis and one recommended action."
-canonical: "https://mind-reply.com/"
+title: "MindReply | Private Decision Layer for High-Stakes Messages"
+description: "MindReply helps leaders handle sensitive work messages with one synthesis, one recommended action, quiet memory, and legal-grade privacy."
+canonical: "https://www.mind-reply.com/"
+primary_offer: "Private Decision Layer"
+highest_demand:
+  - "Sensitive replies before they leave the inbox"
+  - "Founder, C-suite, investor, legal, sales, and client communication"
+  - "Private chief-of-staff style support where trusted provider supply is thin"
+scarcity_angle: "Many vendors add screens. Few reduce decision pressure, protect tone, preserve receipts, and keep memory quiet."
+languages:
+  auto_detection: "country-header-first"
+  fallback: "accept-language"
+  manual_switcher: "subtle header control"
+  supported:
+    - en
+    - es
+    - fr
+    - de
+    - it
+    - pt
+    - nl
+    - pl
+    - uk
+    - ar
 open_graph:
-  title: "MindReply"
-  description: "An Executive Nervous System for leaders who need the next action to become obvious."
+  title: "MindReply | Private Decision Layer"
+  description: "One synthesis, one recommended action, quiet memory, legal-grade privacy."
   type: "website"
 privacy:
-  default: "snippet-first"
+  default: "minimal-retention"
   receipts: "redacted"
   memory: "pattern-only"
+search_structure:
+  homepage: "category definition plus full-pack service paths"
+  schema: "professional service and organization signals"
+  footer: "intake, contact, build proof"

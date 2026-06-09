@@ -147,6 +147,25 @@ class ExecutiveNervousSystemTests(unittest.TestCase):
         self.assertIn("redacted", prompt)
         self.assertIn("No public page may claim active internal staff count", prompt)
 
+    def test_premium_homepage_locale_and_search_contract(self) -> None:
+        page = (ROOT / "app" / "page.tsx").read_text(encoding="utf-8")
+        layout = (ROOT / "app" / "layout.tsx").read_text(encoding="utf-8")
+        locale_route = (ROOT / "app" / "api" / "locale" / "route.ts").read_text(encoding="utf-8")
+        meta = (ROOT / "site" / "seo" / "meta.yml").read_text(encoding="utf-8")
+
+        for locale in ("en", "es", "fr", "de", "it", "pt", "nl", "pl", "uk", "ar"):
+            self.assertIn(f'code: "{locale}"', page)
+            self.assertIn(f"- {locale}", meta)
+
+        self.assertIn("x-vercel-ip-country", locale_route)
+        self.assertIn("accept-language", locale_route)
+        self.assertIn("Website Completion Package", page)
+        self.assertIn("Full package info", page)
+        self.assertIn("Owner proof", page)
+        self.assertIn("metadataBase", layout)
+        self.assertIn("Website Completion Package", layout)
+        self.assertIn("schema.org", page)
+
 
 if __name__ == "__main__":
     unittest.main()
