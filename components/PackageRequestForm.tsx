@@ -148,6 +148,10 @@ export default function PackageRequestForm({ mailtoHref, supportEmail }: Package
           />
           <span>I consent to MindReply reviewing this redacted context for follow-up.</span>
         </label>
+        <div className="rounded-lg border border-[#122033]/10 bg-[#fbfaf6] p-4 text-sm leading-6 text-[#59687b]">
+          <p className="font-semibold text-[#122033]">Invoice-first route</p>
+          <p className="mt-1">No payment link is required to submit. MindReply confirms scope first, then sends the invoice request or configured payment link before delivery.</p>
+        </div>
         <button
           type="button"
           disabled={!canSubmit}
