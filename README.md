@@ -24,6 +24,7 @@ MRagent is the gentle Mind Read surface for MindReply. It reflects what the pres
 
 - `/`
 - `/agent`
+- `/pack`
 - `/privacy`
 - `/mcp`
 - `/api/intake`
@@ -47,9 +48,21 @@ Widget resource:
 - URI: `ui://widget/mragent-mindread-v1.html`
 - MIME: `text/html;profile=mcp-app`
 
+## Personal Pack Preview
+
+`/pack` is the personal operating surface for Angel's pack. It shows the four active automations, the configured delivery destinations, the live preview links, and truthful transaction/revenue counters.
+
+Revenue and transaction counters are environment-driven so the page does not invent numbers:
+
+```bash
+NEXT_PUBLIC_PACK_TRANSACTION_COUNT=0
+NEXT_PUBLIC_PACK_REVENUE_TOTAL=$0
+NEXT_PUBLIC_PACK_REVENUE_NOTE=No connected transaction source yet.
+```
+
 ## Personal Pack Reports
 
-`npm run report:personal-pack` generates a personal-only pulse with deploy status, MRagent links, the Figma preview, a short "where you win" section, and one reusable gift-material line.
+`npm run report:personal-pack` generates a personal-only pulse with deploy status, MRagent links, the Figma preview, delivery status, a short "where you win" section, and one reusable gift-material line.
 
 The scheduled workflow is `.github/workflows/personal-pack-report.yml`. It can be run manually with `workflow_dispatch` or by cron. GitHub cron cannot keep a perfect rolling 23-minute interval across every hour; the workflow uses `*/23 * * * *` as the closest built-in schedule.
 
@@ -68,18 +81,20 @@ MINDREPLY_REPORT_PERSONAL_LABEL=Angel personal pack
 
 When `MINDREPLY_REPORT_REQUIRE_DELIVERY=true`, console output does not count as delivery. At least one Slack or email channel must return `sent`, or the workflow fails loudly.
 
-Slack delivery uses a GitHub secret or deployment secret named `MINDREPLY_SLACK_WEBHOOK_URL`. A Slack app field id such as `Xf0B6WHC2SBH` is useful setup context, but it is not enough to send; the runtime needs a webhook URL or a connected Slack write destination.
+Slack delivery uses a GitHub secret or deployment secret named `MINDREPLY_SLACK_WEBHOOK_URL`. A Slack app field id such as `Xf0B6WHC2SBH` and a workspace invite link are useful setup context, but they are not enough to send; the runtime needs a webhook URL or a connected Slack write destination. For phone-visible Slack updates, create an incoming webhook in the Mind Reply Slack workspace, point it at the preferred channel or direct-message workflow, and store the webhook URL only as `MINDREPLY_SLACK_WEBHOOK_URL`.
 
 Email delivery uses GitHub or deployment secrets:
 
 ```bash
 RESEND_API_KEY=
-MINDREPLY_REPORT_EMAIL=
-MINDREPLY_REPORT_EMAIL_ALLOWLIST=
+MINDREPLY_REPORT_EMAILS=angelllkr@gmail.com,Info@mind-reply.com
+MINDREPLY_REPORT_EMAIL_ALLOWLIST=angelllkr@gmail.com,info@mind-reply.com
 MINDREPLY_REPORT_FROM=
 ```
 
-When `MINDREPLY_REPORT_PERSONAL_ONLY=true`, email sends only when `MINDREPLY_REPORT_EMAIL` appears in `MINDREPLY_REPORT_EMAIL_ALLOWLIST`.
+`MINDREPLY_REPORT_EMAIL` is still supported as a single-recipient fallback. Prefer `MINDREPLY_REPORT_EMAILS` for Angel plus the MindReply inbox.
+
+When `MINDREPLY_REPORT_PERSONAL_ONLY=true`, every email recipient must appear in `MINDREPLY_REPORT_EMAIL_ALLOWLIST`.
 
 ## Local Commands
 
