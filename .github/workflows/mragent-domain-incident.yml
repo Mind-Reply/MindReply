@@ -1,0 +1,37 @@
+name: MRagent Domain Incident
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: "Site URL to probe"
+        required: false
+        default: "https://www.mind-reply.com"
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Probe production domain
+        env:
+          MRAGENT_SITE_URL: ${{ inputs.site_url }}
+          MRAGENT_DOMAIN_INCIDENT_JSON: mragent-domain-incident.json
+        run: node scripts/production-domain-incident.mjs >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload incident artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mragent-domain-incident
+          path: mragent-domain-incident.json
+          if-no-files-found: error
