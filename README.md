@@ -19,12 +19,40 @@ MRagent is the Mind Read surface for MindReply. It reflects what the pressure is
 - Reply Agent
 - Follow-Up Agent
 - Risk Agent
+- MRagent Core
+- Receipt Keeper
+- MCP Bridge
+- Owner Decision Desk
+- Security Scout
+- Security Builder
+- Security Verifier
+- Vercel Watch
+- Report Courier
+- Pack Messenger
+- Growth Scout
+- Pricing Signal
+- Design Polisher
+- Copy Editor
+- SEO Scout
+- QA Reader
+- Release Clerk
+- Business Case
+- Platform Archivist
+- GitHub Runner
+- Automation Governor
+- Expansion Planner
+- Ops Gauge
+
+`/agents` is the visible Agent Expansion Board. It shows which lanes are live, connected, armed, ready, or secret-gated. It does not claim external workers, Slack delivery, ads, billing access, or provider capacity unless those systems are actually connected.
 
 ## Public Surface
 
 - `/`
 - `/agent`
+- `/agents`
+- `/capabilities`
 - `/pack`
+- `/pricing`
 - `/privacy`
 - `/mcp`
 - `/api/intake`
