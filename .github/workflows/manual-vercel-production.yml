@@ -27,6 +27,8 @@ jobs:
       MINDREPLY_REPORT_ENABLED: ${{ vars.MINDREPLY_REPORT_ENABLED || 'true' }}
       MINDREPLY_REPORT_DRY_RUN: ${{ vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
       MINDREPLY_REPORT_CHANNELS: ${{ vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
+      MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: true
+      MINDREPLY_REPORT_SUBJECT: MindReply production deploy recovery report
       MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || secrets.OPS_REPORT_EMAIL_TO || vars.MINDREPLY_REPORT_EMAIL || vars.REPORT_TO_EMAIL }}
       MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS }}
       MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || secrets.OPS_REPORT_EMAIL_FROM || vars.MINDREPLY_REPORT_FROM || vars.RESEND_FROM }}
@@ -37,6 +39,8 @@ jobs:
       NEXT_PUBLIC_SITE_URL: https://www.mind-reply.com
       MINDREPLY_LIVE_VERIFY_URL: https://www.mind-reply.com
       MINDREPLY_LIVE_REVENUE_JSON: mindreply-live-revenue-surface.json
+      MINDREPLY_EXPECTED_SHA: ${{ github.sha }}
+      MINDREPLY_REQUIRE_LIVE_SHA_MATCH: true
     steps:
       - name: Confirm intentional production deploy
         run: test "${{ inputs.confirm }}" = "deploy-production"
@@ -89,16 +93,46 @@ jobs:
         run: vercel build --prod --token "$VERCEL_TOKEN"
 
       - name: Deploy prebuilt artifact to production
-        run: vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"
+        id: vercel_deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOYMENT_OUTPUT="$(vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN")"
+          printf '%s\n' "$DEPLOYMENT_OUTPUT"
+          DEPLOYMENT_URL="$(printf '%s\n' "$DEPLOYMENT_OUTPUT" | grep -Eo 'https://[^[:space:]]+\.vercel\.app' | tail -n 1)"
+          if [ -z "$DEPLOYMENT_URL" ]; then
+            echo "Could not parse Vercel deployment URL from deploy output."
+            exit 1
+          fi
+          DEPLOYMENT_HOST="${DEPLOYMENT_URL#https://}"
+          echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          echo "deployment_host=$DEPLOYMENT_HOST" >> "$GITHUB_OUTPUT"
+          echo "VERCEL_DEPLOYMENT_URL=$DEPLOYMENT_URL" >> "$GITHUB_ENV"
+          echo "VERCEL_DEPLOYMENT_HOST=$DEPLOYMENT_HOST" >> "$GITHUB_ENV"
+
+      - name: Assign public production aliases
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${VERCEL_DEPLOYMENT_URL:-}"
+          vercel alias set "$VERCEL_DEPLOYMENT_URL" www.mind-reply.com --token "$VERCEL_TOKEN"
+          vercel alias set "$VERCEL_DEPLOYMENT_URL" mind-reply.com --token "$VERCEL_TOKEN"
+          vercel alias set "$VERCEL_DEPLOYMENT_URL" mindreply-mr-64b2efc9.vercel.app --token "$VERCEL_TOKEN" || true
+          echo "Assigned production aliases to $VERCEL_DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Verify live production reachability
         run: |
           curl --fail --show-error --silent https://www.mind-reply.com/ > /tmp/mindreply-home.html
+          curl --fail --show-error --silent https://www.mind-reply.com/contact > /tmp/mindreply-contact.html
           curl --fail --show-error --silent https://www.mind-reply.com/api/health > /tmp/mindreply-health.json
           curl --fail --show-error --silent https://www.mind-reply.com/api/version > /tmp/mindreply-version.json
 
       - name: Verify live revenue and privacy surface
         run: npm run verify:live-revenue >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Refresh owner deployment report with live proof
+        if: always()
+        run: npm run launch:report || true
 
       - name: Send owner deployment report
         if: always()
