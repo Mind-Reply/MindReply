@@ -1,3 +1,5 @@
+const canonicalProjectId = process.env.MR_CANONICAL_VERCEL_PROJECT_ID || "prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3";
+
 const automationOnlyPrefixes = [
   "docs/",
   "reports/",
@@ -27,6 +29,12 @@ function isAutomationOnly(file) {
 export function shouldBuild(env = process.env) {
   const vercelEnv = env.VERCEL_ENV || "";
   const commitRef = env.VERCEL_GIT_COMMIT_REF || "";
+  const projectId = env.VERCEL_PROJECT_ID || env.NEXT_PUBLIC_VERCEL_PROJECT_ID || "";
+  const canonicalId = env.MR_CANONICAL_VERCEL_PROJECT_ID || canonicalProjectId;
+
+  if (projectId && canonicalId && projectId !== canonicalId) {
+    return { build: false, reason: `Skipping non-canonical Vercel project ${projectId}. Canonical project is ${canonicalId}.` };
+  }
 
   if (vercelEnv !== "production") {
     return { build: false, reason: `Skipping ${vercelEnv || "unknown"} deployment.` };
@@ -49,12 +57,21 @@ function assert(condition, message) {
 }
 
 function selfTest() {
+  assert(
+    shouldBuild({
+      VERCEL_PROJECT_ID: "prj_other",
+      VERCEL_ENV: "production",
+      VERCEL_GIT_COMMIT_REF: "main",
+    }).build === false,
+    "Non-canonical Vercel projects must be skipped.",
+  );
   assert(shouldBuild({ VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "main" }).build === false, "Preview deployments must be skipped.");
   assert(shouldBuild({ VERCEL_ENV: "production", VERCEL_GIT_COMMIT_REF: "feature" }).build === false, "Non-main production branches must be skipped.");
   assert(
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
+      VERCEL_PROJECT_ID: canonicalProjectId,
       MRAGENT_CHANGED_FILES: "README.md\ndocs/front_end_operating_pack.md",
     }).build === false,
     "Docs-only changes must be skipped.",
@@ -63,16 +80,18 @@ function selfTest() {
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
+      VERCEL_PROJECT_ID: canonicalProjectId,
       MRAGENT_CHANGED_FILES: "app/page.tsx\ncomponents/LocaleAssist.tsx\napp/api/geo-locale/route.ts",
     }).build === true,
-    "App, component, and API changes must build.",
+    "App, component, and API changes must build on the canonical project.",
   );
   assert(
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
+      VERCEL_PROJECT_ID: canonicalProjectId,
     }).build === true,
-    "Production main must build when change scope is unknown.",
+    "Production main must build on the canonical project when change scope is unknown.",
   );
   console.log("Vercel ignore-build guard verification passed.");
 }
