@@ -1,0 +1,44 @@
+version: 1
+created: 2026-06-09
+branch: mind-reply
+report_type: main_voice_frontend_pass
+canonical_repo: Mind-Reply/MindReply
+main_commits:
+  - commit: e785494d91a7b5434046dd9f7b56d1669247198f
+    path: src/agents/prompts.md
+    change: Rebuilt MRagent prompt language around warm authority, pressure-first reading, and one action.
+  - commit: 6d3546e36c95485fe3dde4ef94639399ea5f95da
+    path: site/voice/mragent-voice-dictionary.yml
+    change: Added reusable MRagent voice dictionary for UI, prompt, reports, and ChatGPT app surfaces.
+  - commit: 98feae2f457b6edae02ae5ecb0f11fe19902f84f
+    path: site/voice/mragent-voice-dictionary.yml
+    change: Tightened dictionary wording to avoid verifier-risk language.
+  - commit: a4bc8186dfc9a721385caf45ffabc43fa0b84590
+    path: lib/mragent.ts
+    change: Refined provider system prompt and fallback reply toward polished, warm, pressure-first behavior.
+  - commit: f589025b154376098a10bca8c11e4471bbe490e1
+    path: components/MRAgentChat.tsx
+    change: Elevated visible /agent frontend copy, read phases, panel labels, receipt label, and input guidance.
+current_status:
+  latest_main_commit: f589025b154376098a10bca8c11e4471bbe490e1
+  vercel_mind_reply: success_on_latest_status_check
+  vercel_mindreply: pending_on_latest_status_check
+  revenue_verified: false
+  revenue_note: No payment, order, or revenue connector data was available in this work pass.
+implementation_notes:
+  frontend:
+    - /agent now speaks as MRagent instead of a generic helper surface.
+    - Assistant welcome text and loading phases now focus on pressure, protection, risk, and one clean move.
+    - Decision metadata labels now use Pressure, Protection, One Move, and Quiet Receipt.
+  runtime:
+    - Provider instructions now enforce pressure-first reading, one synthesis, one action, no menus, no diagnosis, no over-explaining.
+    - Fallback reply now matches the same standard when OPENAI_API_KEY is unavailable or provider calls fail.
+  design_system:
+    - Voice dictionary provides shared product language for future Figma, Remotion, ads, and automation packs.
+open_items:
+  - Recheck pending Vercel statuses until mindreply either succeeds or returns a failure reason.
+  - Add analytics/conversion instrumentation before making any revenue claims.
+  - Create Figma file only after a Figma planKey or target Figma design URL is provided.
+  - Code Connect requires published Figma components and node-specific URLs.
+  - Recurring 30-minute automation needs the automation tool to be exposed; it was not available in the current tool search.
+short_digest_line: Main now has runtime and frontend MRagent voice upgrades; one Vercel project is successful, one is pending, revenue is not yet verified.
