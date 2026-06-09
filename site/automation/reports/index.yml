@@ -1,0 +1,56 @@
+version: 1
+created: 2026-06-09
+branch: mind-reply
+purpose: Central index for storage-branch reports while main/Vercel deployment is rate-limited.
+canonical_repo: Mind-Reply/MindReply
+canonical_deploy_branch: main
+storage_branch: mind-reply
+latest_checked_main_commit: 6ab180402ce88352497d25e0c0ba6fa1180e5003
+current_state:
+  production:
+    agent_page: live_200
+    fallback_intake_api: live_200
+    api_version: stale_410
+    mcp: missing_404
+  deployment:
+    vercel_mind_reply: build_rate_limited
+    vercel_mindreply: build_rate_limited
+  policy:
+    main_commits: pause_non_urgent_app_changes_until_quota_clears
+    storage_commits: allowed_for_reports_plans_and_growth_material
+reports:
+  - date: 2026-06-09
+    type: storage_status
+    path: site/automation/reports/2026-06-09-storage-status.yml
+    commit: 825b61e684b938419d9de3f014d0efa0f2479e51
+    one_line: Public /agent and fallback /api/intake work; production is stale for preferred app routes.
+  - date: 2026-06-09
+    type: seo_visibility_pulse
+    path: site/automation/reports/2026-06-09-seo-visibility-pulse.yml
+    commit: fc09756f1bc6db580fafd35d3f6b78d3ae22bfa9
+    one_line: Title, description, sitemap, and robots are live; manifest and Open Graph are missing.
+  - date: 2026-06-09
+    type: ad_test_sprint
+    path: site/automation/reports/2026-06-09-ad-test-sprint.yml
+    commit: e309b2559441d46a20ba30ba62487034d5aba3d1
+    one_line: Ad sprint is ready, but paid traffic waits for discovery routes and app routes to deploy.
+  - date: 2026-06-09
+    type: production_route_recovery
+    path: site/automation/reports/2026-06-09-route-recovery.yml
+    commit: bdfe91c755a08ec3ef7f6c7eb90245b6c15d9594
+    one_line: Missing public routes exist in GitHub main, so the gap is deployment freshness.
+next_report_slots:
+  - type: daily_short_digest
+    cadence: every active work pass while quota is limited
+    focus: live route state, Vercel state, one next action
+  - type: design_rebuild_brief
+    cadence: next storage pass
+    focus: redo website direction without triggering main deploy
+  - type: branch_cleanup_followup
+    cadence: after delete/ref tooling or user confirmation
+    focus: keep only main and mind-reply after preserving useful files
+opinion: >-
+  The storage branch is now the right place for planning, growth, SEO, ad, and recovery reports.
+  Main should stay quiet until Vercel can build again, because the source already contains the
+  missing app routes and the remaining problem is deployment freshness.
+short_digest_line: Storage reports are indexed; main remains build-rate-limited, with /agent and /api/intake live but /api/version and /mcp stale.
