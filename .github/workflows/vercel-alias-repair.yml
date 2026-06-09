@@ -52,10 +52,6 @@ jobs:
       MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL || secrets.SLACK_WEBHOOK_URL }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
-      - name: Require Vercel token
-        shell: bash
-        run: test -n "$VERCEL_TOKEN"
-
       - name: Check current live production before aliasing
         shell: bash
         run: |
@@ -91,6 +87,11 @@ jobs:
           else
             echo "Live production does not pass yet. Alias repair will run."
           fi
+
+      - name: Require Vercel token
+        if: env.MINDREPLY_SKIP_ALIAS != 'true'
+        shell: bash
+        run: test -n "$VERCEL_TOKEN"
 
       - name: Verify source deployment metadata before aliasing
         if: env.MINDREPLY_SKIP_ALIAS != 'true'
