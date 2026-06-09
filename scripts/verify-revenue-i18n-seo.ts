@@ -37,6 +37,10 @@ for (const phrase of [
   "Discipline-specific language",
   "Behavioral expression read",
   "Professional lexicon calibration",
+  "Invoice-first route ready",
+  "No payment link is required to begin",
+  "billing name and billing email",
+  "invoice-first route works",
 ]) {
   includes("homepage", home, phrase);
 }
@@ -147,4 +151,4 @@ for (const broken of ["Ã", "à¤", "æ—", "Ð£"]) {
   assert(!localeAssist.includes(broken), `locale assist appears to contain mojibake marker ${broken}`);
 }
 
-console.log("Revenue, mobile, market SEO, 10-language country locale, footer handoff, and public safety verification passed.");
+console.log("Revenue, mobile, market SEO, 10-language country locale, invoice-first close path, footer handoff, and public safety verification passed.");
