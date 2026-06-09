@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { Banknote, Bell, Crown, Gem, Gift, Mail, MessageCircle, ReceiptText, ShieldCheck, TicketCheck } from "lucide-react";
+import { Banknote, Bell, Crown, Gem, Gift, Mail, MessageCircle, ReceiptText, ShieldCheck, Sparkles, TicketCheck } from "lucide-react";
+
+export const metadata = {
+  title: "Personal Pack | MindReply",
+  description: "A private MindReply pack for delivery, receipts, revenue truth, and the next useful move.",
+};
 
 const transactionCount = process.env.NEXT_PUBLIC_PACK_TRANSACTION_COUNT || "0";
 const revenueTotal = process.env.NEXT_PUBLIC_PACK_REVENUE_TOTAL || "$0";
@@ -32,6 +37,13 @@ const lanes = [
     rhythm: "Truth only",
     icon: Banknote,
   },
+];
+
+const signals = [
+  "Front door language now speaks in pressure, posture, and grace.",
+  "MRagent session copy is calmer, more exact, and less familiar.",
+  "Reports name delivery status instead of implying private channels are already live.",
+  "Revenue remains honest until a real transaction source is attached.",
 ];
 
 function emailReady(email: string) {
@@ -82,7 +94,7 @@ export default function PersonalPackPage() {
               It reaches you. It stays yours.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-[#d8deea]">
-              A phone-first pack for the quiet work around MindReply: what moved, where it landed, what it earned, and the next useful gift to keep.
+              A private front room for MindReply: what moved, where it landed, what it earned, and what deserves your next bit of attention.
             </p>
           </div>
 
@@ -141,6 +153,26 @@ export default function PersonalPackPage() {
       </section>
 
       <section className="border-y border-[#162033]/10 bg-[#fffaf0] px-4 py-12 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.72fr_1.28fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Signal board</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The pack does not perform. It reports.</h2>
+            <p className="mt-5 max-w-md text-sm leading-7 text-[#4c5a70]">
+              This surface is built to keep your presence intact: no false numbers, no noisy control room, no public theater around private work.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {signals.map((signal) => (
+              <div key={signal} className="flex gap-3 rounded-xl border border-[#162033]/10 bg-white p-4 text-sm leading-6 text-[#4c5a70] shadow-sm shadow-[#162033]/5">
+                <Sparkles aria-hidden className="mt-1 h-4 w-4 shrink-0 text-[#9b7430]" />
+                <span>{signal}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-12 md:px-8">
         <div className="mx-auto max-w-7xl">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Four quiet lanes</p>
           <div className="mt-6 grid gap-4 md:grid-cols-4">
