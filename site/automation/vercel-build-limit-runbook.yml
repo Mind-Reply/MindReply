@@ -14,6 +14,8 @@ secondary_symptom:
 known_mitigation_in_repo:
   file: vercel.json
   guard: scripts/vercel-ignore-build.mjs
+  fast_verify_workflow: .github/workflows/vercel-guard-verify.yml
+  full_verify_workflow: .github/workflows/mragent-verify.yml
   purpose: Skip non-canonical preview builds, duplicate projects, and automation-only commits to reduce avoidable Vercel build usage.
 incident_probe:
   workflow: .github/workflows/mragent-domain-incident.yml
@@ -40,6 +42,7 @@ skipped_change_scopes:
 checks:
   - confirm latest GitHub commit status
   - open Vercel target URL and verify whether it is quota/rate-limit or code failure
+  - run Vercel Guard Verify after changing vercel.json or scripts/vercel-ignore-build.mjs
   - run MRagent Domain Incident when public domain behavior disagrees with active Vercel status
   - if quota clears, verify /agent, /api/agent, /api/intake, /api/version, /mcp, /api/health, sitemap, robots, manifest, and social preview
   - if quota remains, avoid unnecessary extra deploy-triggering commits unless the change is important
