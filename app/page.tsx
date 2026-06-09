@@ -3,27 +3,27 @@ import MRAgentChat from "@/components/MRAgentChat";
 
 const rails = [
   "Feels the pressure before it answers.",
-  "Reads behavior without making it clinical.",
+  "Reads posture, timing, and tone without making it clinical.",
   "Keeps one clear move in view.",
   "Leaves a quiet receipt, not the raw text.",
 ];
 
 const moments = [
   {
-    title: "The message feels loaded",
+    title: "The message has weather in it",
     copy: "MRagent slows the read before you send anything sharp, small, or over-explained.",
   },
   {
-    title: "The ask sounds simple, but your body says no",
-    copy: "It names the pressure, the protection, and the calmer boundary hiding underneath.",
+    title: "The ask is simple, but your body refuses it",
+    copy: "It names the pressure, the protection, and the cleaner boundary underneath.",
   },
   {
-    title: "The follow-up keeps tugging",
-    copy: "It turns the loose thread into one quiet next move so it stops circling your attention.",
+    title: "The follow-up keeps touching your attention",
+    copy: "It turns the loose thread into one quiet next move so the matter stops orbiting you.",
   },
 ];
 
-const steps = ["Paste the pressure", "Read what is underneath", "Move once, with a receipt"];
+const steps = ["Place the pressure", "Read what is underneath", "Move once, with a receipt"];
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -32,7 +32,7 @@ const structuredData = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   url: "https://www.mind-reply.com/agent",
-  description: "Warm mind reads and one clear next move for tense work moments.",
+  description: "A composed pressure read and one clear next move for tense work moments.",
   featureList: ["One synthesis", "One recommended action", "Risk gate", "Quiet receipt"],
   audience: {
     "@type": "Audience",
@@ -73,10 +73,10 @@ export default function Home() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#e2b757]">MRagent</p>
             <h1 className="mt-6 max-w-xl font-serif text-5xl font-bold leading-[0.94] md:text-7xl">
-              Warm mind read. Clear next move.
+              Read the pressure. Move with grace.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-8 text-[#d8deea]">
-              Bring the message, hesitation, or emotional knot. MRagent answers like a steady bestie with ballast: gentle, clever, and quietly firm.
+              Bring the message, hesitation, or private knot. MRagent listens for the hidden temperature, returns one composed read, and keeps the next move mercifully clear.
             </p>
           </div>
 
@@ -99,7 +99,7 @@ export default function Home() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">When to use it</p>
             <h2 className="mt-4 max-w-md font-serif text-4xl font-bold leading-tight md:text-5xl">
-              For the small moment before a big tone mistake.
+              For the charged second before your tone becomes the story.
             </h2>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
