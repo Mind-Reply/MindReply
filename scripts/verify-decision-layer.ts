@@ -154,7 +154,7 @@ assertIncludes("MRagent preview results", previewResults, "receipt_visible");
 
 const previewCaptureScript = readFileSync(join(process.cwd(), "scripts/mragent-preview-capture.mjs"), "utf-8");
 assertIncludes("MRagent preview capture script", previewCaptureScript, "chromium");
-assertIncludes("MRagent preview capture script", previewCaptureScript, "agent-desktop.png");
+assertIncludes("MRagent preview capture script", previewCaptureScript, "agent-${viewport.name}.png");
 assertIncludes("MRagent preview capture script", previewCaptureScript, "preview-results.json");
 assertIncludes("MRagent preview capture script", previewCaptureScript, "stagedReadingVisible");
 
