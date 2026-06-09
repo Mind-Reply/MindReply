@@ -17,6 +17,10 @@ import {
 import MRAgentChat from "@/components/MRAgentChat";
 
 const supportEmail = "info@mind-reply.com";
+const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
+const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
+const packageCtaLabel = packagePaymentUrl ? "Pay for the package" : "Request invoice";
+const packageRouteLabel = packagePaymentUrl ? "Direct payment enabled" : "Invoice request ready";
 
 const navItems = [
   { label: "Offer", href: "#offer" },
@@ -84,8 +88,8 @@ const closeSteps = [
   },
   {
     step: "02",
-    title: "Buy the package",
-    copy: "Choose the Website Completion Package when the issue is bigger than one reply: homepage, offer, contact path, and proof language.",
+    title: "Buy or request invoice",
+    copy: "Use the direct payment link when configured, or request an invoice for the Website Completion Package.",
   },
   {
     step: "03",
@@ -102,7 +106,7 @@ const structuredData = {
   operatingSystem: "Web",
   url: "https://www.mind-reply.com/",
   description:
-    "MindReply turns communication pressure into one clear next move and sells a Website Completion Package for overloaded websites, messages, and follow-up queues.",
+    "MindReply helps overloaded operators reclaim time by turning communication pressure into one clear next move and a Website Completion Package for overloaded websites, messages, and follow-up queues.",
   featureList: [
     "MRagent pressure read",
     "Website Completion Package",
@@ -117,6 +121,7 @@ const structuredData = {
     price: "600",
     priceCurrency: "GBP",
     availability: "https://schema.org/InStock",
+    url: "https://www.mind-reply.com/website-completion-package",
   },
   brand: {
     "@type": "Brand",
@@ -148,7 +153,7 @@ export default function Home() {
             )}
           </nav>
           <div className="flex items-center gap-2">
-            <Link href="/pack" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
+            <Link href="/website-completion-package" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
               Website Package
             </Link>
             <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
@@ -172,18 +177,18 @@ export default function Home() {
               Relief before checkout
             </div>
             <h1 className="mt-7 max-w-3xl font-serif text-5xl font-bold leading-[0.94] md:text-7xl">
-              Reclaim the message, the offer, and the next move before work slips.
+              Reclaim 2+ hours daily within 24 hours.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
-              MindReply starts with MRagent: paste the overloaded message, task, follow-up, or website confusion and receive one composed read. When the problem is bigger than one reply, buy the Website Completion Package.
+              MindReply helps overloaded operators, founders, and client-facing teams turn emails, Slack notes, tasks, follow-ups, and website confusion into one action queue or send-ready message with no long setup.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
                 Try the Mind Read <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
-              <Link href="/pack" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
-                Buy the Website Package <Target aria-hidden className="h-4 w-4" />
-              </Link>
+              <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+                {packageCtaLabel} <Target aria-hidden className="h-4 w-4" />
+              </a>
             </div>
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
@@ -195,8 +200,8 @@ export default function Home() {
                 <p className="mt-3 text-sm font-semibold">GBP 600 Website Completion Package</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Public contact</p>
-                <p className="mt-3 break-words text-sm font-semibold">{supportEmail}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Payment route</p>
+                <p className="mt-3 text-sm font-semibold">{packageRouteLabel}</p>
               </div>
             </div>
           </div>
@@ -219,6 +224,9 @@ export default function Home() {
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9b7430]">Package total</p>
               <p className="mt-3 font-serif text-5xl font-bold">GBP 600</p>
               <p className="mt-3 text-sm leading-6 text-[#59687b]">Three concrete rows. One clear receipt. No long setup.</p>
+              <a href={packageCtaHref} className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150]">
+                {packageCtaLabel} <ArrowRight aria-hidden className="h-4 w-4" />
+              </a>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -245,11 +253,11 @@ export default function Home() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Authority layer</p>
               <h2 className="mt-4 max-w-2xl font-serif text-4xl font-bold leading-tight md:text-5xl">
-                Premium communication infrastructure, explained without fog.
+                Executive communication intelligence, explained without fog.
               </h2>
             </div>
             <p className="max-w-md text-sm leading-7 text-[#59687b]">
-              MindReply sells relief first, then earns authority by showing how language, behavior, risk, consent, and receipts work together.
+              MindReply sells relief first, then earns authority by showing how language, behavior, risk, consent, analytics shape, and receipts work together.
             </p>
           </div>
           <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -273,7 +281,7 @@ export default function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#91d2c8]">Assisted close</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The commercial path is deliberately short.</h2>
             <p className="mt-5 text-sm leading-7 text-[#d3e5e2]">
-              The buyer should not have to decode a platform. They should feel the pressure loosen, see a concrete package, and know exactly where to ask for human follow-up.
+              The buyer should not have to decode a platform. They should feel the pressure loosen, see a concrete package, and know exactly where to pay or request an invoice.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -294,7 +302,7 @@ export default function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Trust proof</p>
             <h2 className="mt-4 max-w-2xl font-serif text-4xl font-bold leading-tight md:text-5xl">Warm, premium, and strict about evidence.</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
-              Serious buyers do not need theatre. They need a believable promise, a clear route, and claims that survive inspection.
+              Serious buyers do not need theatre. They need a believable promise, a clear payment or invoice route, and claims that survive inspection.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
@@ -318,9 +326,9 @@ export default function Home() {
             <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
               Try MRagent <Zap aria-hidden className="h-4 w-4" />
             </Link>
-            <Link href="/contact?intent=website-completion" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
-              Request package <Mail aria-hidden className="h-4 w-4" />
-            </Link>
+            <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+              {packageCtaLabel} <Mail aria-hidden className="h-4 w-4" />
+            </a>
           </div>
         </div>
       </section>
