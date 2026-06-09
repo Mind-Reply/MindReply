@@ -69,7 +69,7 @@ async function sendEmail(report: string, dryRun: boolean): Promise<{ status: Del
     body: JSON.stringify({
       from,
       to,
-      subject: "MindReply hourly owner report",
+      subject: "MindReply 50-minute owner report",
       text: report,
     }),
   });
@@ -103,7 +103,7 @@ async function sendSlack(report: string, dryRun: boolean): Promise<{ status: Del
 
 async function main() {
   if (!existsSync(latestReportPath)) {
-    throw new Error("Missing hourly owner report. Run npm run launch:report first.");
+    throw new Error("Missing owner report. Run npm run launch:report first.");
   }
 
   const report = await readFile(latestReportPath, "utf8");
@@ -140,7 +140,7 @@ async function main() {
   const failed = Object.values(delivery).some((value) => ["failed"].includes(String(value.status)));
   const blocked = Object.values(delivery).some((value) => ["blocked"].includes(String(value.status)));
 
-  console.log(`Hourly owner report delivery complete. failed=${failed} blocked=${blocked} dryRun=${dryRun}`);
+  console.log(`50-minute owner report delivery complete. failed=${failed} blocked=${blocked} dryRun=${dryRun}`);
 
   if (failed) process.exit(1);
 }
