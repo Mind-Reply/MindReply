@@ -13,6 +13,11 @@ export async function GET() {
     status: "ok",
     service: "mindreply-decision-layer",
     timestamp: new Date().toISOString(),
+    connectionUrls: {
+      primaryMcp: "/mcp",
+      fallbackMcp: "/api/mcp",
+      agent: "/agent",
+    },
     checks: {
       intakeLayer: "ready",
       actionLayer: "ready",
