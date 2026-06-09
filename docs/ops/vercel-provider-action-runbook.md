@@ -4,22 +4,31 @@ Generated: 2026-06-09
 
 ## Current Problem
 
-The code branch is not the active blocker. The active blocker is provider-side Vercel configuration and the Free daily deployment quota.
+The code branch is not the active blocker. The active blocker is provider-side Vercel configuration plus the Free daily deployment quota.
 
-Evidence from GitHub/Vercel:
+Angel confirmed the production Vercel project ID:
 
-- PR: `#12` (`codex/executive-nervous-system-main-sync`)
-- GitHub combined status before the deployment gate: `failure`
-- Vercel status contexts reported: `Deployment rate limited - retry in 24 hours`
-- Failing target observed: `https://vercel.com/mr-64b2efc9?upgradeToPro=build-rate-limit`
-- Vercel project inspected: `prj_nETWN2SapvnbSWVXK4O5upJHF6bb`
-- Vercel project name: `mind-reply`
-- Latest production deployments observed: `CANCELED`
-- Last useful PR preview observed: `dpl_8N89VuWmX8oMhBT93U3P4Gtkfwxr`, `READY`, branch `codex/executive-nervous-system-main-sync`, commit `8f637a3f90f51d85ad1130b1e235703b90c4d29f`
+- Canonical project to keep: `mindreply` / `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`.
+- Team: `team_0plIJmQLgZC1wVv9zI2eVf3B`.
+- Production domains on canonical project: `www.mind-reply.com`, `mind-reply.com`, and `mind-reply.vercel.app`.
+- Duplicate/lookalike project to disable or disconnect: `mind-reply` / `prj_nETWN2SapvnbSWVXK4O5upJHF6bb`.
+
+Important name collision: the Git branch `mind-reply` is storage only. The Vercel project named `mind-reply` is not the canonical production project.
+
+## Latest Provider Evidence
+
+Recent Vercel evidence shows both Vercel projects can still react to the same GitHub repo:
+
+- A main-branch push for commit `ad3bb9e205f1ada1aeeb50cb98f474cd964b3749` triggered production deployment attempts on both projects.
+- `mindreply` latest production attempt: `dpl_CynSRRjhd4EWX1hBetK5aubxmK4E`, state `ERROR`.
+- Duplicate `mind-reply` latest production attempt: `dpl_GT9CJM3NQwkTD7GPqqHKLtsX7LYx`, state `CANCELED`.
+- Previous PR preview deployments for PR #12 reached `READY` on both projects before the branch deployment gate was added.
+
+This proves the duplicate project is still connected at the provider layer. Repository code can reduce branch deployment spam, but it cannot remove duplicate Vercel project wiring or raise the Free plan deployment quota.
 
 ## Repo-Side Quota Guard
 
-`vercel.json` now includes Vercel's official Git deployment gate:
+`vercel.json` now includes Vercel's Git deployment gate:
 
 ```json
 {
@@ -41,7 +50,7 @@ Effect:
 - The storage branch `mind-reply` does not deploy.
 - Manual Vercel deploys can still be run intentionally when a preview is needed.
 
-This is stronger than the ignored build step. The ignored build step can still create canceled deployment records; the Git deployment gate prevents automatic branch deployments from starting.
+This protects PR and storage branches. It does not stop duplicate Vercel projects from both responding to a `main` push while both projects remain connected to GitHub.
 
 ## What Can Be Fixed In Code
 
@@ -49,7 +58,7 @@ Already done or in progress:
 
 - Vercel ignore guard exists in `scripts/vercel-ignore-build.mjs`.
 - Reporting-only files are classified so routine reports can avoid burning builds when Vercel honors the ignore script.
-- `git.deploymentEnabled` now blocks automatic deployments from temporary and storage branches.
+- `git.deploymentEnabled` blocks automatic deployments from temporary and storage branches.
 - `docs/ops/branch-consolidation-report.md` maps which branches to keep and which to delete after production merge.
 - PR #12 is the active production migration path.
 
@@ -58,35 +67,33 @@ Already done or in progress:
 These actions require Vercel/GitHub provider access in the dashboard or a correctly configured provider token:
 
 1. Upgrade the Vercel plan or wait for the Free daily deployment quota reset.
-2. Disconnect the duplicate/wrong Vercel project or integration that points status checks at `mr-64b2efc9`.
-3. Remove any duplicate required GitHub status context named `Vercel - mindreply` if it is still configured as required.
-4. Attach `mind-reply.com` and `www.mind-reply.com` to the canonical `mind-reply` project.
-5. Promote/redeploy from `main` only after PR #12 is merged cleanly.
+2. Keep project `mindreply` / `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3` as the only production project for `Mind-Reply/MindReply`.
+3. Disable Git deployments or disconnect GitHub integration on duplicate project `mind-reply` / `prj_nETWN2SapvnbSWVXK4O5upJHF6bb`.
+4. Remove any duplicate required GitHub status context tied to the duplicate project.
+5. Promote/redeploy from `main` only after PR #12 is merged cleanly and the duplicate project is disconnected or disabled.
 
 ## Fastest Dashboard Fix
 
 1. Open Vercel dashboard.
-2. Select the team/project area that contains `mind-reply`.
-3. Find any project or Git integration tied to `mr-64b2efc9`.
-4. Disable Git deployments for the duplicate project or disconnect that project from `Mind-Reply/MindReply`.
-5. Keep one deployment project only:
-   - Project name: `mind-reply`
-   - Framework: `Next.js`
-   - Git repo: `Mind-Reply/MindReply`
-   - Production branch: `main`
-6. If immediate deploys are required, upgrade Vercel to Pro or wait for quota reset.
-7. In GitHub branch protection, remove duplicate required status contexts if present.
-8. Re-run the PR check or push one small sync commit after provider state is fixed.
+2. Select team `angellllkr-engs-projects` / `team_0plIJmQLgZC1wVv9zI2eVf3B`.
+3. Keep project `mindreply` / `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`.
+4. Confirm `mindreply` owns:
+   - `www.mind-reply.com`
+   - `mind-reply.com`
+   - `mind-reply.vercel.app`
+5. Open duplicate project `mind-reply` / `prj_nETWN2SapvnbSWVXK4O5upJHF6bb`.
+6. In the duplicate project's Git settings, disable Git deployments or disconnect the project from `Mind-Reply/MindReply`.
+7. If deletion is desired, compare environment variables and domains first, then delete only after explicit owner approval.
+8. In GitHub branch protection, remove duplicate required Vercel status contexts if present.
+9. If immediate deploys are required, upgrade Vercel intentionally from the Vercel account; repository code cannot make the account Pro.
 
 ## Merge Sequence After Provider Fix
 
-1. Sync/rebase PR #12 with latest `main`.
-2. Run one intentional canonical Vercel check or manual preview deploy.
-3. Merge PR #12 into `main`.
-4. Confirm production deployment reaches `READY`.
-5. Attach/promote:
-   - `mind-reply.com`
-   - `www.mind-reply.com`
+1. Stop the duplicate project first: disconnect/disable Vercel project `mind-reply` / `prj_nETWN2SapvnbSWVXK4O5upJHF6bb`.
+2. Sync/rebase PR #12 with latest `main`.
+3. Run one intentional canonical check or preview only if needed.
+4. Merge PR #12 into `main`.
+5. Confirm one production deployment on `mindreply` reaches `READY`.
 6. Smoke-check:
    - `/`
    - `/agent`
