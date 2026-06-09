@@ -15,155 +15,166 @@ function includes(label: string, value: string, expected: string) {
   assert(value.includes(expected), `${label} must include: ${expected}`);
 }
 
-const packageJson = read("package.json");
-const versionRoute = read("app/api/version/route.ts");
-const healthRoute = read("app/api/health/route.ts");
-const monitorReport = read("scripts/mragent-monitor-report.mjs");
-const monitorWorkflow = read(".github/workflows/mragent-monitor.yml");
-const incidentProbe = read("scripts/production-domain-incident.mjs");
-const incidentWorkflow = read(".github/workflows/mragent-domain-incident.yml");
-const growthPulse = read("scripts/mragent-growth-pulse.mjs");
-const growthWorkflow = read(".github/workflows/mragent-growth-pulse.yml");
-const shortDigest = read("scripts/mragent-short-digest.mjs");
-const vercelIgnore = read("scripts/vercel-ignore-build.mjs");
-const vercelGuardWorkflow = read(".github/workflows/vercel-guard-verify.yml");
-const manualDeployWorkflow = read(".github/workflows/manual-vercel-production.yml");
-const aliasReadyWorkflow = read(".github/workflows/vercel-alias-ready-deployment.yml");
-const liveRevenueVerifier = read("scripts/verify-live-revenue-surface.mjs");
-const sendOwnerReport = read("scripts/send-hourly-owner-report.ts");
-const reportSchema = read("site/automation/report-schema.yml");
-const vercelRunbook = read("site/automation/vercel-build-limit-runbook.yml");
+const files: Record<string, string> = {
+  packageJson: read("package.json"),
+  versionRoute: read("app/api/version/route.ts"),
+  healthRoute: read("app/api/health/route.ts"),
+  monitorReport: read("scripts/mragent-monitor-report.mjs"),
+  monitorWorkflow: read(".github/workflows/mragent-monitor.yml"),
+  incidentProbe: read("scripts/production-domain-incident.mjs"),
+  incidentWorkflow: read(".github/workflows/mragent-domain-incident.yml"),
+  growthPulse: read("scripts/mragent-growth-pulse.mjs"),
+  growthWorkflow: read(".github/workflows/mragent-growth-pulse.yml"),
+  shortDigest: read("scripts/mragent-short-digest.mjs"),
+  vercelIgnore: read("scripts/vercel-ignore-build.mjs"),
+  vercelGuardWorkflow: read(".github/workflows/vercel-guard-verify.yml"),
+  manualDeployWorkflow: read(".github/workflows/manual-vercel-production.yml"),
+  aliasReadyWorkflow: read(".github/workflows/vercel-alias-ready-deployment.yml"),
+  liveRevenueVerifier: read("scripts/verify-live-revenue-surface.mjs"),
+  sendOwnerReport: read("scripts/send-hourly-owner-report.ts"),
+  reportSchema: read("site/automation/report-schema.yml"),
+  vercelRunbook: read("site/automation/vercel-build-limit-runbook.yml"),
+};
 
-includes("package scripts", packageJson, "\"incident:domain\"");
-includes("package scripts", packageJson, "\"growth:pulse\"");
-includes("package scripts", packageJson, "\"report:digest\"");
-includes("package scripts", packageJson, "\"verify:live-revenue\"");
-includes("version route", versionRoute, "VERCEL_GIT_COMMIT_SHA");
-includes("version route", versionRoute, "VERCEL_PROJECT_PRODUCTION_URL");
-includes("version route", versionRoute, "shortSha");
-includes("health route", healthRoute, "version:");
-includes("health route", healthRoute, "\"/api/version\"");
-includes("monitor report", monitorReport, "{ label: \"version\"");
-includes("monitor report", monitorReport, "{ label: \"agent-api\"");
-includes("monitor report", monitorReport, "{ label: \"intake-api\"");
-includes("monitor report", monitorReport, "hasAgentShape");
-includes("monitor report", monitorReport, "hasDecisionShape");
-includes("monitor report", monitorReport, "functionalChecks");
-includes("monitor report", monitorReport, "decisionApi");
-includes("monitor report", monitorReport, "productionVersion");
-includes("monitor report", monitorReport, "production is stale");
-includes("monitor report", monitorReport, "matchesRun");
-includes("monitor workflow", monitorWorkflow, "*/15 * * * *");
-includes("monitor workflow", monitorWorkflow, "scripts/mragent-monitor-report.mjs");
-includes("monitor workflow", monitorWorkflow, "scripts/mragent-growth-pulse.mjs");
-includes("monitor workflow", monitorWorkflow, "scripts/mragent-short-digest.mjs");
-includes("monitor workflow", monitorWorkflow, "mragent-monitor-status.json");
-includes("monitor workflow", monitorWorkflow, "mragent-growth-pulse.json");
-includes("monitor workflow", monitorWorkflow, "mragent-short-digest.json");
-includes("monitor workflow", monitorWorkflow, "mragent-short-digest.md");
-includes("incident probe", incidentProbe, "fallback-only-domain");
-includes("incident probe", incidentProbe, "stale-production-domain");
-includes("incident probe", incidentProbe, "mragent-domain-incident.json");
-includes("incident probe", incidentProbe, "preferred-agent-api");
-includes("incident probe", incidentProbe, "fallback-intake-api");
-includes("incident workflow", incidentWorkflow, "workflow_dispatch");
-includes("incident workflow", incidentWorkflow, "scripts/production-domain-incident.mjs");
-includes("incident workflow", incidentWorkflow, "mragent-domain-incident");
-includes("growth pulse", growthPulse, "mragent-growth-pulse.json");
-includes("growth pulse", growthPulse, "primaryLane");
-includes("growth pulse", growthPulse, "copyTests");
-includes("growth pulse", growthPulse, "recommendedAction");
-includes("growth workflow", growthWorkflow, "workflow_dispatch");
-includes("growth workflow", growthWorkflow, "18 9 * * 1");
-includes("growth workflow", growthWorkflow, "scripts/mragent-growth-pulse.mjs");
-includes("growth workflow", growthWorkflow, "mragent-growth-pulse");
-includes("short digest", shortDigest, "mragent-short-digest.json");
-includes("short digest", shortDigest, "mragent-short-digest.md");
-includes("short digest", shortDigest, "MRagent short digest");
-includes("short digest", shortDigest, "Blocker:");
-includes("short digest", shortDigest, "Promise:");
-includes("short digest", shortDigest, "Next:");
-includes("vercel ignore", vercelIgnore, "scripts/mragent-monitor-report.mjs");
-includes("vercel ignore", vercelIgnore, "scripts/mragent-growth-pulse.mjs");
-includes("vercel ignore", vercelIgnore, "scripts/mragent-short-digest.mjs");
-includes("vercel ignore", vercelIgnore, "scripts/production-domain-incident.mjs");
-includes("vercel ignore", vercelIgnore, "scripts/verify-live-revenue-surface.mjs");
-includes("vercel ignore", vercelIgnore, "Live verification/report changes must be skipped.");
-includes("vercel ignore", vercelIgnore, "Reporting-only script changes must be skipped.");
-includes("vercel guard workflow", vercelGuardWorkflow, "Vercel Guard Verify");
-includes("vercel guard workflow", vercelGuardWorkflow, "workflow_dispatch");
-includes("vercel guard workflow", vercelGuardWorkflow, "node scripts/vercel-ignore-build.mjs --self-test");
-includes("vercel guard workflow", vercelGuardWorkflow, "scripts/vercel-ignore-build.mjs");
-includes("manual deploy workflow", manualDeployWorkflow, "MindReply Manual Vercel Production Deploy");
-includes("manual deploy workflow", manualDeployWorkflow, "MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: true");
-includes("manual deploy workflow", manualDeployWorkflow, "MINDREPLY_REQUIRE_LIVE_SHA_MATCH: true");
-includes("manual deploy workflow", manualDeployWorkflow, "Deploy prebuilt artifact to production");
-includes("manual deploy workflow", manualDeployWorkflow, "VERCEL_DEPLOYMENT_URL");
-includes("manual deploy workflow", manualDeployWorkflow, "Assign public production aliases");
-includes("manual deploy workflow", manualDeployWorkflow, "vercel alias set \"$VERCEL_DEPLOYMENT_URL\" www.mind-reply.com");
-includes("manual deploy workflow", manualDeployWorkflow, "vercel alias set \"$VERCEL_DEPLOYMENT_URL\" mind-reply.com");
-includes("manual deploy workflow", manualDeployWorkflow, "npm run verify:live-revenue");
-includes("manual deploy workflow", manualDeployWorkflow, "Refresh owner deployment report with live proof");
-includes("manual deploy workflow", manualDeployWorkflow, "npm run report:send");
-includes("alias ready workflow", aliasReadyWorkflow, "MindReply Alias Ready Vercel Deployment");
-includes("alias ready workflow", aliasReadyWorkflow, "alias-ready-deployment");
-includes("alias ready workflow", aliasReadyWorkflow, "https://mindreply-js5m73tfy-angellllkr-engs-projects.vercel.app");
-includes("alias ready workflow", aliasReadyWorkflow, "e0cab2db420d8be63d9ead67cb7cf9d3e6869252");
-includes("alias ready workflow", aliasReadyWorkflow, "dpl_ihE5efSiypndY1g6j3jUzWZ4od1T");
-includes("alias ready workflow", aliasReadyWorkflow, "MINDREPLY_REQUIRE_LIVE_DEPLOYMENT_MATCH: true");
-includes("alias ready workflow", aliasReadyWorkflow, "vercel alias set \"$VERCEL_DEPLOYMENT_URL\" www.mind-reply.com");
-includes("alias ready workflow", aliasReadyWorkflow, "vercel alias set \"$VERCEL_DEPLOYMENT_URL\" mind-reply.com");
-includes("alias ready workflow", aliasReadyWorkflow, "Public version reports expected SHA");
-includes("alias ready workflow", aliasReadyWorkflow, "npm run verify:live-revenue");
-includes("alias ready workflow", aliasReadyWorkflow, "npm run report:send");
-includes("live revenue verifier", liveRevenueVerifier, "MINDREPLY_EXPECTED_SHA");
-includes("live revenue verifier", liveRevenueVerifier, "MINDREPLY_REQUIRE_LIVE_SHA_MATCH");
-includes("live revenue verifier", liveRevenueVerifier, "version-sha-current");
-includes("live revenue verifier", liveRevenueVerifier, "no-personal-gmail");
-includes("live revenue verifier", liveRevenueVerifier, "Website Completion Package");
-includes("live revenue verifier", liveRevenueVerifier, "GBP 600");
-includes("live revenue verifier", liveRevenueVerifier, "info@mind-reply.com");
-includes("live revenue verifier", liveRevenueVerifier, "/api/package-request");
-includes("live revenue verifier", liveRevenueVerifier, "request(\"/website-completion-package\")");
-includes("live revenue verifier", liveRevenueVerifier, "package-page-reachable");
-includes("live revenue verifier", liveRevenueVerifier, "package-invoice-first-route");
-includes("live revenue verifier", liveRevenueVerifier, "Invoice-first request path active");
-includes("live revenue verifier", liveRevenueVerifier, "package-no-payment-link-required");
-includes("live revenue verifier", liveRevenueVerifier, "billing name and billing email");
-includes("live revenue verifier", liveRevenueVerifier, "package-scope-first");
-includes("live revenue verifier", liveRevenueVerifier, "paymentPath");
-includes("live revenue verifier", liveRevenueVerifier, "invoice-first unless a configured direct payment link is present");
-includes("send owner report", sendOwnerReport, "MINDREPLY_REPORT_REQUIRE_LIVE_PROOF");
-includes("send owner report", sendOwnerReport, "## Live Production Revenue Surface");
-includes("send owner report", sendOwnerReport, "Live production revenue proof is required before owner email delivery.");
-includes("send owner report", sendOwnerReport, "Live production revenue proof is required before owner Slack delivery.");
-includes("send owner report", sendOwnerReport, "MINDREPLY_REPORT_SUBJECT");
-includes("report schema", reportSchema, "productionVersion:");
-includes("report schema", reportSchema, "live_revenue_surface:");
-includes("report schema", reportSchema, "liveRevenueSurface:");
-includes("report schema", reportSchema, "production_deploy_recovery:");
-includes("report schema", reportSchema, "required_aliases:");
-includes("report schema", reportSchema, "https://www.mind-reply.com");
-includes("report schema", reportSchema, "https://mind-reply.com");
-includes("report schema", reportSchema, "npm run verify:live-revenue");
-includes("report schema", reportSchema, "no-personal-gmail");
-includes("report schema", reportSchema, "owner_delivery_rule");
-includes("report schema", reportSchema, "functionalChecks:");
-includes("report schema", reportSchema, "growth_pulse:");
-includes("report schema", reportSchema, "short_digest:");
-includes("report schema", reportSchema, "vercel_guard:");
-includes("report schema", reportSchema, "fast Vercel guard verification");
-includes("report schema", reportSchema, "every 15 minutes, weekly monday");
-includes("report schema", reportSchema, "short digest artifact for fast status updates");
-includes("report schema", reportSchema, "preferred_agent_api: https://www.mind-reply.com/api/agent");
-includes("report schema", reportSchema, "fallback_intake_api: https://www.mind-reply.com/api/intake");
-includes("report schema", reportSchema, "package_request_api: https://www.mind-reply.com/api/package-request");
-includes("report schema", reportSchema, "https://www.mind-reply.com/api/version");
-includes("vercel runbook", vercelRunbook, "incident_probe:");
-includes("vercel runbook", vercelRunbook, ".github/workflows/mragent-domain-incident.yml");
-includes("vercel runbook", vercelRunbook, ".github/workflows/vercel-guard-verify.yml");
-includes("vercel runbook", vercelRunbook, "scripts/production-domain-incident.mjs");
-includes("vercel runbook", vercelRunbook, "scripts/mragent-growth-pulse.mjs");
-includes("vercel runbook", vercelRunbook, "scripts/mragent-short-digest.mjs");
+const checks: Array<[label: string, file: string, expected: string]> = [
+  ["package scripts", "packageJson", '"incident:domain"'],
+  ["package scripts", "packageJson", '"growth:pulse"'],
+  ["package scripts", "packageJson", '"report:digest"'],
+  ["package scripts", "packageJson", '"verify:live-revenue"'],
+  ["version route", "versionRoute", "VERCEL_GIT_COMMIT_SHA"],
+  ["version route", "versionRoute", "VERCEL_PROJECT_PRODUCTION_URL"],
+  ["version route", "versionRoute", "shortSha"],
+  ["health route", "healthRoute", "version:"],
+  ["health route", "healthRoute", '"/api/version"'],
+  ["monitor report", "monitorReport", '{ label: "version"'],
+  ["monitor report", "monitorReport", '{ label: "agent-api"'],
+  ["monitor report", "monitorReport", '{ label: "intake-api"'],
+  ["monitor report", "monitorReport", "hasAgentShape"],
+  ["monitor report", "monitorReport", "hasDecisionShape"],
+  ["monitor report", "monitorReport", "functionalChecks"],
+  ["monitor report", "monitorReport", "decisionApi"],
+  ["monitor report", "monitorReport", "productionVersion"],
+  ["monitor report", "monitorReport", "production is stale"],
+  ["monitor report", "monitorReport", "matchesRun"],
+  ["monitor workflow", "monitorWorkflow", "*/15 * * * *"],
+  ["monitor workflow", "monitorWorkflow", "scripts/mragent-monitor-report.mjs"],
+  ["monitor workflow", "monitorWorkflow", "scripts/mragent-growth-pulse.mjs"],
+  ["monitor workflow", "monitorWorkflow", "scripts/mragent-short-digest.mjs"],
+  ["monitor workflow", "monitorWorkflow", "mragent-monitor-status.json"],
+  ["monitor workflow", "monitorWorkflow", "mragent-growth-pulse.json"],
+  ["monitor workflow", "monitorWorkflow", "mragent-short-digest.json"],
+  ["monitor workflow", "monitorWorkflow", "mragent-short-digest.md"],
+  ["incident probe", "incidentProbe", "fallback-only-domain"],
+  ["incident probe", "incidentProbe", "stale-production-domain"],
+  ["incident probe", "incidentProbe", "mragent-domain-incident.json"],
+  ["incident probe", "incidentProbe", "preferred-agent-api"],
+  ["incident probe", "incidentProbe", "fallback-intake-api"],
+  ["incident workflow", "incidentWorkflow", "workflow_dispatch"],
+  ["incident workflow", "incidentWorkflow", "scripts/production-domain-incident.mjs"],
+  ["incident workflow", "incidentWorkflow", "mragent-domain-incident"],
+  ["growth pulse", "growthPulse", "mragent-growth-pulse.json"],
+  ["growth pulse", "growthPulse", "primaryLane"],
+  ["growth pulse", "growthPulse", "copyTests"],
+  ["growth pulse", "growthPulse", "recommendedAction"],
+  ["growth workflow", "growthWorkflow", "workflow_dispatch"],
+  ["growth workflow", "growthWorkflow", "18 9 * * 1"],
+  ["growth workflow", "growthWorkflow", "scripts/mragent-growth-pulse.mjs"],
+  ["growth workflow", "growthWorkflow", "mragent-growth-pulse"],
+  ["short digest", "shortDigest", "mragent-short-digest.json"],
+  ["short digest", "shortDigest", "mragent-short-digest.md"],
+  ["short digest", "shortDigest", "MRagent short digest"],
+  ["short digest", "shortDigest", "Blocker:"],
+  ["short digest", "shortDigest", "Promise:"],
+  ["short digest", "shortDigest", "Next:"],
+  ["vercel ignore", "vercelIgnore", "scripts/mragent-monitor-report.mjs"],
+  ["vercel ignore", "vercelIgnore", "scripts/mragent-growth-pulse.mjs"],
+  ["vercel ignore", "vercelIgnore", "scripts/mragent-short-digest.mjs"],
+  ["vercel ignore", "vercelIgnore", "scripts/production-domain-incident.mjs"],
+  ["vercel ignore", "vercelIgnore", "scripts/verify-live-revenue-surface.mjs"],
+  ["vercel ignore", "vercelIgnore", "Live verification/report changes must be skipped."],
+  ["vercel ignore", "vercelIgnore", "Reporting-only script changes must be skipped."],
+  ["vercel guard workflow", "vercelGuardWorkflow", "Vercel Guard Verify"],
+  ["vercel guard workflow", "vercelGuardWorkflow", "workflow_dispatch"],
+  ["vercel guard workflow", "vercelGuardWorkflow", "node scripts/vercel-ignore-build.mjs --self-test"],
+  ["vercel guard workflow", "vercelGuardWorkflow", "scripts/vercel-ignore-build.mjs"],
+  ["manual deploy workflow", "manualDeployWorkflow", "MindReply Manual Vercel Production Deploy"],
+  ["manual deploy workflow", "manualDeployWorkflow", "MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: true"],
+  ["manual deploy workflow", "manualDeployWorkflow", "MINDREPLY_REQUIRE_LIVE_SHA_MATCH: true"],
+  ["manual deploy workflow", "manualDeployWorkflow", "Deploy prebuilt artifact to production"],
+  ["manual deploy workflow", "manualDeployWorkflow", "VERCEL_DEPLOYMENT_URL"],
+  ["manual deploy workflow", "manualDeployWorkflow", "Assign public production aliases"],
+  ["manual deploy workflow", "manualDeployWorkflow", 'vercel alias set "$VERCEL_DEPLOYMENT_URL" www.mind-reply.com'],
+  ["manual deploy workflow", "manualDeployWorkflow", 'vercel alias set "$VERCEL_DEPLOYMENT_URL" mind-reply.com'],
+  ["manual deploy workflow", "manualDeployWorkflow", "npm run verify:live-revenue"],
+  ["manual deploy workflow", "manualDeployWorkflow", "Refresh owner deployment report with live proof"],
+  ["manual deploy workflow", "manualDeployWorkflow", "npm run report:send"],
+  ["alias ready workflow", "aliasReadyWorkflow", "MindReply Alias Ready Vercel Deployment"],
+  ["alias ready workflow", "aliasReadyWorkflow", "alias-ready-deployment"],
+  ["alias ready workflow", "aliasReadyWorkflow", "https://mindreply-deuio7she-angellllkr-engs-projects.vercel.app"],
+  ["alias ready workflow", "aliasReadyWorkflow", "55480c5ede469cb324c5c000b70181e384d38604"],
+  ["alias ready workflow", "aliasReadyWorkflow", "dpl_AQWnPEDmLtFmfqPobMShwaAB7SAn"],
+  ["alias ready workflow", "aliasReadyWorkflow", "MINDREPLY_REQUIRE_LIVE_DEPLOYMENT_MATCH: true"],
+  ["alias ready workflow", "aliasReadyWorkflow", "Deployment metadata did not include expected SHA"],
+  ["alias ready workflow", "aliasReadyWorkflow", 'vercel alias set "$VERCEL_DEPLOYMENT_URL" www.mind-reply.com'],
+  ["alias ready workflow", "aliasReadyWorkflow", 'vercel alias set "$VERCEL_DEPLOYMENT_URL" mind-reply.com'],
+  ["alias ready workflow", "aliasReadyWorkflow", "Public version reports expected SHA"],
+  ["alias ready workflow", "aliasReadyWorkflow", "npm run verify:live-revenue"],
+  ["alias ready workflow", "aliasReadyWorkflow", "npm run report:send"],
+  ["live revenue verifier", "liveRevenueVerifier", "MINDREPLY_EXPECTED_SHA"],
+  ["live revenue verifier", "liveRevenueVerifier", "MINDREPLY_REQUIRE_LIVE_SHA_MATCH"],
+  ["live revenue verifier", "liveRevenueVerifier", "version-sha-current"],
+  ["live revenue verifier", "liveRevenueVerifier", "no-personal-gmail"],
+  ["live revenue verifier", "liveRevenueVerifier", "Website Completion Package"],
+  ["live revenue verifier", "liveRevenueVerifier", "GBP 600"],
+  ["live revenue verifier", "liveRevenueVerifier", "info@mind-reply.com"],
+  ["live revenue verifier", "liveRevenueVerifier", "/api/package-request"],
+  ["live revenue verifier", "liveRevenueVerifier", 'request("/website-completion-package")'],
+  ["live revenue verifier", "liveRevenueVerifier", "package-page-reachable"],
+  ["live revenue verifier", "liveRevenueVerifier", "package-invoice-first-route"],
+  ["live revenue verifier", "liveRevenueVerifier", "Invoice-first request path active"],
+  ["live revenue verifier", "liveRevenueVerifier", "package-no-payment-link-required"],
+  ["live revenue verifier", "liveRevenueVerifier", "billing name and billing email"],
+  ["live revenue verifier", "liveRevenueVerifier", "package-scope-first"],
+  ["live revenue verifier", "liveRevenueVerifier", "paymentPath"],
+  ["live revenue verifier", "liveRevenueVerifier", "invoice-first unless a configured direct payment link is present"],
+  ["send owner report", "sendOwnerReport", "MINDREPLY_REPORT_REQUIRE_LIVE_PROOF"],
+  ["send owner report", "sendOwnerReport", "## Live Production Revenue Surface"],
+  ["send owner report", "sendOwnerReport", "Live production revenue proof is required before owner email delivery."],
+  ["send owner report", "sendOwnerReport", "Live production revenue proof is required before owner Slack delivery."],
+  ["send owner report", "sendOwnerReport", "MINDREPLY_REPORT_SUBJECT"],
+  ["report schema", "reportSchema", "productionVersion:"],
+  ["report schema", "reportSchema", "live_revenue_surface:"],
+  ["report schema", "reportSchema", "liveRevenueSurface:"],
+  ["report schema", "reportSchema", "production_deploy_recovery:"],
+  ["report schema", "reportSchema", "required_aliases:"],
+  ["report schema", "reportSchema", "https://www.mind-reply.com"],
+  ["report schema", "reportSchema", "https://mind-reply.com"],
+  ["report schema", "reportSchema", "npm run verify:live-revenue"],
+  ["report schema", "reportSchema", "no-personal-gmail"],
+  ["report schema", "reportSchema", "owner_delivery_rule"],
+  ["report schema", "reportSchema", "functionalChecks:"],
+  ["report schema", "reportSchema", "growth_pulse:"],
+  ["report schema", "reportSchema", "short_digest:"],
+  ["report schema", "reportSchema", "vercel_guard:"],
+  ["report schema", "reportSchema", "fast Vercel guard verification"],
+  ["report schema", "reportSchema", "every 15 minutes, weekly monday"],
+  ["report schema", "reportSchema", "short digest artifact for fast status updates"],
+  ["report schema", "reportSchema", "preferred_agent_api: https://www.mind-reply.com/api/agent"],
+  ["report schema", "reportSchema", "fallback_intake_api: https://www.mind-reply.com/api/intake"],
+  ["report schema", "reportSchema", "package_request_api: https://www.mind-reply.com/api/package-request"],
+  ["report schema", "reportSchema", "https://www.mind-reply.com/api/version"],
+  ["vercel runbook", "vercelRunbook", "incident_probe:"],
+  ["vercel runbook", "vercelRunbook", ".github/workflows/mragent-domain-incident.yml"],
+  ["vercel runbook", "vercelRunbook", ".github/workflows/vercel-guard-verify.yml"],
+  ["vercel runbook", "vercelRunbook", "scripts/production-domain-incident.mjs"],
+  ["vercel runbook", "vercelRunbook", "scripts/mragent-growth-pulse.mjs"],
+  ["vercel runbook", "vercelRunbook", "scripts/mragent-short-digest.mjs"],
+];
+
+for (const [label, file, expected] of checks) {
+  const value = files[file];
+  assert(value, `${file} must be loaded.`);
+  includes(label, value, expected);
+}
 
 console.log("Production version contract verification passed.");
