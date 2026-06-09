@@ -27,7 +27,7 @@ permissions:
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || vars.VERCEL_ORG_ID || 'team_0plIJmQLgZC1wVv9zI2eVf3B' }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || vars.VERCEL_PROJECT_ID || 'prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3' }}
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN || secrets.VERCEL_API_TOKEN }}
   NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://www.mind-reply.com' }}
   NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL: ${{ vars.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL }}
 
@@ -77,7 +77,7 @@ jobs:
         shell: bash
         run: |
           if [ -z "$VERCEL_TOKEN" ]; then
-            echo "VERCEL_TOKEN is missing. Add it in GitHub Actions secrets to enable production deploys."
+            echo "Vercel token missing. Add VERCEL_TOKEN, VERCEL_ACCESS_TOKEN, or VERCEL_API_TOKEN in GitHub Actions secrets to enable production deploys."
             exit 1
           fi
 
