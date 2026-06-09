@@ -214,7 +214,7 @@ export default function WebsiteCompletionPackagePage() {
               ))}
             </div>
           </div>
-          <div className="rounded-lg bg-[#122033] p-6 text-[#f8f5f0">
+          <div className="rounded-lg bg-[#122033] p-6 text-[#f8f5f0]">
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#91d2c8]">Booking page line</p>
             <h2 className="mt-5 font-serif text-3xl font-bold leading-tight">Bring the page, message, or follow-up that is leaking the sale.</h2>
             <p className="mt-4 text-sm leading-7 text-[#d9e3e7]">
