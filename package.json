@@ -14,6 +14,7 @@
     "ops:report": "tsx scripts/ops-report.ts",
     "ops:pack": "tsx scripts/angel-pack-report.ts",
     "launch:report": "tsx scripts/launch-readiness-report.ts",
+    "deploy:status-contexts": "tsx scripts/vercel-status-context-audit.ts",
     "python:verify": "python -m unittest discover src",
     "verify:all": "npm run decision:verify && npm run mcp:verify && npm run playbooks:verify && npm run ops:report && npm run ops:pack && npm run typecheck && npm run python:verify"
   },
