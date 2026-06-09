@@ -1,0 +1,42 @@
+name: MRagent Preview Capture
+
+on:
+  workflow_dispatch:
+    inputs:
+      preview_url:
+        description: "Preview URL to capture"
+        required: false
+        default: "https://www.mind-reply.com/agent"
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright for capture
+        run: |
+          npm install --no-save playwright@^1.56.1
+          npx playwright install --with-deps chromium
+
+      - name: Capture /agent desktop and mobile
+        env:
+          MRAGENT_PREVIEW_URL: ${{ inputs.preview_url }}
+          MRAGENT_PREVIEW_DIR: mragent-preview-results
+        run: node scripts/mragent-preview-capture.mjs >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload preview artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mragent-preview-results
+          path: mragent-preview-results
+          if-no-files-found: error
