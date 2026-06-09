@@ -106,9 +106,10 @@ const structuredData = {
   operatingSystem: "Web",
   url: "https://www.mind-reply.com/",
   description:
-    "MindReply helps overloaded operators reclaim time by turning communication pressure into one clear next move and a Website Completion Package for overloaded websites, messages, and follow-up queues.",
+    "MindReply helps overloaded operators reclaim time through website buying-friction rescue, response overload support, and a Website Completion Package for overloaded websites, messages, and follow-up queues.",
   featureList: [
     "MRagent pressure read",
+    "Website buying-friction rescue",
     "Website Completion Package",
     "Ranked action queue",
     "Send-ready copy",
@@ -172,15 +173,18 @@ export default function Home() {
       >
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
           <div className="py-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#e2b757]/35 bg-[#e2b757]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#e2b757]">
+            <div className="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-[#e2b757]/35 bg-[#e2b757]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#e2b757]">
               <Sparkles aria-hidden className="h-4 w-4" />
-              Relief before checkout
+              High-demand lane: website buying-friction rescue
             </div>
             <h1 className="mt-7 max-w-3xl font-serif text-5xl font-bold leading-[0.94] md:text-7xl">
               Reclaim 2+ hours daily within 24 hours.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
               MindReply helps overloaded operators, founders, and client-facing teams turn emails, Slack notes, tasks, follow-ups, and website confusion into one action queue or send-ready message with no long setup.
+            </p>
+            <p className="mt-4 max-w-2xl text-sm font-semibold leading-7 text-[#91d2c8]">
+              The highest-demand gap is the last mile: buyers are almost ready, but the page, reply, or follow-up does not close cleanly.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
@@ -192,16 +196,16 @@ export default function Home() {
             </div>
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Demand wedge</p>
+                <p className="mt-3 text-sm font-semibold">Website buying-friction rescue</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">First output</p>
                 <p className="mt-3 text-sm font-semibold">Action queue or send-ready message</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Paid offer</p>
-                <p className="mt-3 text-sm font-semibold">GBP 600 Website Completion Package</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Payment route</p>
-                <p className="mt-3 text-sm font-semibold">{packageRouteLabel}</p>
+                <p className="mt-3 text-sm font-semibold">GBP 600 Website Completion Package. {packageRouteLabel}.</p>
               </div>
             </div>
           </div>
