@@ -36,6 +36,7 @@ jobs:
       VERCEL_TEAM_ID: team_0plIJmQLgZC1wVv9zI2eVf3B
       GOOD_DEPLOYMENT_ID: ${{ github.event.inputs.deployment_id || 'dpl_CUCBFk9NdQ4eTYkqf7fm5kREgTeQ' }}
       GOOD_DEPLOYMENT_URL: ${{ github.event.inputs.deployment_url || 'https://mindreply-8qfejky4p-angellllkr-engs-projects.vercel.app' }}
+      GOOD_DEPLOYMENT_SHA: 269a6aa7cd74c594dd0fa5f0b53cf84bf5aed427
       MINDREPLY_LIVE_VERIFY_URL: https://www.mind-reply.com
       MINDREPLY_LIVE_REVENUE_JSON: mindreply-live-revenue-surface.json
       MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: true
@@ -91,6 +92,20 @@ jobs:
             echo "Live production does not pass yet. Alias repair will run."
           fi
 
+      - name: Verify source deployment metadata before aliasing
+        if: env.MINDREPLY_SKIP_ALIAS != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --show-error --silent \
+            --url "https://api.vercel.com/v13/deployments/${GOOD_DEPLOYMENT_ID}?teamId=${VERCEL_TEAM_ID}" \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            > good-deployment.json
+          grep -q "${GOOD_DEPLOYMENT_ID}" good-deployment.json
+          grep -q '"name"[[:space:]]*:[[:space:]]*"mindreply"' good-deployment.json
+          grep -Eq '"(readyState|state)"[[:space:]]*:[[:space:]]*"READY"' good-deployment.json
+          grep -q "${GOOD_DEPLOYMENT_SHA}" good-deployment.json
+
       - name: Assign public aliases to verified deployment
         if: env.MINDREPLY_SKIP_ALIAS != 'true'
         shell: bash
@@ -114,22 +129,6 @@ jobs:
           assign_alias "www.mind-reply.com"
           assign_alias "mind-reply.com"
           assign_alias "mindreply-mr-64b2efc9.vercel.app"
-
-      - name: Verify source deployment before public proof
-        if: env.MINDREPLY_SKIP_ALIAS != 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl --fail --show-error --silent "$GOOD_DEPLOYMENT_URL/contact" > /tmp/good-contact.html
-          curl --fail --show-error --silent "$GOOD_DEPLOYMENT_URL/api/version" > /tmp/good-version.json
-          grep -q "info@mind-reply.com" /tmp/good-contact.html
-          grep -q "Website Completion Package" /tmp/good-contact.html
-          grep -q "GBP 600" /tmp/good-contact.html
-          if grep -qi "gmail.com" /tmp/good-contact.html; then
-            echo "Verified deployment still exposes gmail.com. Refusing alias repair."
-            exit 1
-          fi
-          grep -q '"status":"ok"' /tmp/good-version.json
 
       - name: Verify live production revenue and privacy surface
         if: env.MINDREPLY_SKIP_ALIAS != 'true'
@@ -207,6 +206,7 @@ jobs:
           path: |
             alias-*.json
             alias-responses.jsonl
+            good-deployment.json
             mindreply-alias-repair-report.md
             mindreply-live-revenue-surface.json
             reports/outbox/**
