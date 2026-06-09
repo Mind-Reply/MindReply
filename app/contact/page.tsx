@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import PackageRequestForm from "@/components/PackageRequestForm";
 
 export const metadata = {
   title: "Contact | MindReply",
@@ -57,7 +58,7 @@ export default function ContactPage() {
             <span className="font-serif text-xl font-bold tracking-wide">MindReply</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link href="/pack" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
+            <Link href="/website-completion-package" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
               Package
             </Link>
             <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
@@ -87,7 +88,7 @@ export default function ContactPage() {
                 Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
               <a href={mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
-                Email MindReply <Mail aria-hidden className="h-4 w-4" />
+                Fallback email <Mail aria-hidden className="h-4 w-4" />
               </a>
             </div>
           </div>
@@ -140,38 +141,7 @@ export default function ContactPage() {
 
       <section className="px-4 py-12 md:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_1fr]">
-          <form action={`mailto:${supportEmail}`} method="post" encType="text/plain" className="rounded-lg border border-[#122033]/10 bg-white p-6 shadow-xl shadow-[#122033]/10">
-            <div className="flex items-center gap-3 text-[#2f6f72]">
-              <Mail aria-hidden className="h-5 w-5" />
-              <p className="text-xs font-bold uppercase tracking-[0.22em]">Contact form</p>
-            </div>
-            <div className="mt-6 grid gap-4">
-              <label className="grid gap-2 text-sm font-semibold text-[#39485b]">
-                Your email
-                <input name="email" type="email" required className="rounded-lg border border-[#122033]/15 bg-[#fbfaf6] px-4 py-3 text-[#122033] outline-none transition focus:border-[#2f6f72]" />
-              </label>
-              <label className="grid gap-2 text-sm font-semibold text-[#39485b]">
-                What do you need?
-                <select name="intent" defaultValue="Website Completion Package" className="rounded-lg border border-[#122033]/15 bg-[#fbfaf6] px-4 py-3 text-[#122033] outline-none transition focus:border-[#2f6f72]">
-                  <option>Website Completion Package</option>
-                  <option>MRagent question could not be solved</option>
-                  <option>Security or owner decision</option>
-                  <option>Billing or payment route</option>
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm font-semibold text-[#39485b]">
-                Short context, redacted
-                <textarea name="context" rows={5} required className="resize-none rounded-lg border border-[#122033]/15 bg-[#fbfaf6] px-4 py-3 text-[#122033] outline-none transition focus:border-[#2f6f72]" placeholder="Describe the issue without pasting secrets, tokens, private addresses, or unredacted sensitive text." />
-              </label>
-              <label className="flex gap-3 text-sm leading-6 text-[#59687b]">
-                <input name="consent" type="checkbox" value="I consent to MindReply reviewing this redacted context for follow-up" required className="mt-1 h-4 w-4 shrink-0" />
-                <span>I consent to MindReply reviewing this redacted context for follow-up.</span>
-              </label>
-              <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150]">
-                Send with email app <Mail aria-hidden className="h-4 w-4" />
-              </button>
-            </div>
-          </form>
+          <PackageRequestForm mailtoHref={mailtoHref} supportEmail={supportEmail} />
 
           <div className="grid gap-4">
             <section className="rounded-lg bg-[#103b39] p-6 text-[#f8f5f0]">
