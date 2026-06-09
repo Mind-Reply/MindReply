@@ -71,13 +71,24 @@ reports:
     path: site/automation/reports/2026-06-09-preserved-material-manifest.yml
     commit: 8dbf32317ccd8418ec74e4a53883b2a230bd3030
     one_line: Preservation manifest created for old branch concepts before retiring codex branches.
+preserved_extracts:
+  - date: 2026-06-09
+    type: moa_blueprint_notes
+    path: site/automation/preserved/multi-agent-blueprint-notes.yml
+    commit: a9d157a92714132554fa8506acb3750225e71320
+    one_line: MOA blueprint preserved as internal operating model, not runtime merge candidate.
+  - date: 2026-06-09
+    type: workstream_agent_map
+    path: site/automation/preserved/workstream-agent-map.yml
+    commit: 7ca893aee8b9d3eeb907a5223e0f1d13e07d202b
+    one_line: 8-workstream map and Angel Pack reporting rule preserved for internal reports.
 next_report_slots:
-  - type: preserved_extracts
-    cadence: next storage pass
-    focus: create extract files for MOA blueprint and 8-workstream map
   - type: daily_short_digest
     cadence: every active work pass while quota is limited
     focus: live route state, Vercel state, one next action
+  - type: preserved_extracts_medium_priority
+    cadence: next storage pass
+    focus: MOA typed roster concept and legacy ChatGPT app contract note
   - type: post_quota_main_execution
     cadence: once active Vercel mind-reply can build again
     focus: route freshness, product-first redesign, growth assets, capture
@@ -85,4 +96,4 @@ opinion: >-
   The storage branch remains the right place for planning, growth, SEO, ad, branch cleanup,
   preservation, and recovery reports. Main should stay quiet until Vercel can build again, because
   the source already contains the missing app routes and the remaining problem is deployment freshness.
-short_digest_line: Preservation manifest added: save MOA blueprint and 8-workstream map first, avoid whole-branch merges, then retire old codex branches carefully.
+short_digest_line: Preserved extracts created: MOA blueprint plus 8-workstream/Angel Pack map are now safely stored on mind-reply.
