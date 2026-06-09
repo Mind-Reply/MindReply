@@ -1,3 +1,5 @@
+export {};
+
 type Channel = "console" | "slack" | "email";
 
 type SendResult = {
@@ -132,7 +134,7 @@ async function fetchRepoSnapshot(): Promise<RepoSnapshot> {
 
 function reportMarkdown(snapshot: RepoSnapshot) {
   const siteUrl = env.NEXT_PUBLIC_SITE_URL || "https://www.mind-reply.com";
-  const label = env.MINDREPLY_REPORT_PERSONAL_LABEL || "Angel personal pack";
+  const label = env.MINDREPLY_REPORT_PERSONAL_LABEL || "MindReply pack";
   const now = new Date().toISOString();
   const statusLine = snapshot.statusUrl ? `${snapshot.status} (${snapshot.statusUrl})` : snapshot.status;
   const recipients = emailRecipients();
