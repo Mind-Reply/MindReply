@@ -28,6 +28,11 @@ assert(workflow.includes("MindReply Hourly Owner Report"), "Workflow must be nam
 assert(/schedule:[\s\S]*cron:\s*["']0 \* \* \* \*['"]/.test(workflow), "Hourly schedule must run at minute 0 every hour.");
 assert(!workflow.includes("minute_mod") && !workflow.includes("SHOULD_SEND_REPORT"), "Hourly workflow must not use the old 50-minute gate.");
 assert(workflow.includes("workflow_dispatch"), "Workflow must support manual dispatch.");
+assert(/push:[\s\S]*branches:[\s\S]*- main/.test(workflow), "Workflow must run after main pushes.");
+assert(!/push:[\s\S]*paths:/.test(workflow), "Workflow push trigger must not be path-limited; every main implementation push needs an owner report.");
+assert(workflow.includes("mindreply-hourly-owner-report-${{ github.ref }}"), "Workflow concurrency must be scoped to the branch ref.");
+assert(workflow.includes("cancel-in-progress: true"), "Workflow must cancel stale owner report runs during rapid implementation pushes.");
+assert(workflow.includes("retention-days: 7"), "Workflow should keep private report artifacts on short retention.");
 for (const command of ["npm run report:check", "npm run launch:report", "npm run audit:blueprint", "npm run report:send"]) {
   assert(workflow.includes(command), `Workflow must run ${command}.`);
 }
