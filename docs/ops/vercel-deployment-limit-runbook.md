@@ -22,11 +22,12 @@ That is an account, project, quota, or GitHub-integration condition. Repository 
 
 ## Latest duplicate-project evidence
 
-Recent Vercel evidence shows both projects can still react to the same GitHub repo:
+Recent Vercel evidence shows both projects still react to the same GitHub repo:
 
-- Main commit `ad3bb9e205f1ada1aeeb50cb98f474cd964b3749` triggered production attempts on both projects.
-- Canonical `mindreply` production attempt: `dpl_CynSRRjhd4EWX1hBetK5aubxmK4E`, state `ERROR`.
-- Duplicate `mind-reply` production attempt: `dpl_GT9CJM3NQwkTD7GPqqHKLtsX7LYx`, state `CANCELED`.
+- Main commit `dc28b1daa43b17e32f9768478b8362156baec074` triggered production attempts on both projects.
+- Canonical `mindreply` production deployment: `dpl_7oLQfEHCp4ctws29RFA5qRVKdhcf`, state `READY`.
+- Duplicate `mind-reply` production attempt: `dpl_8j3PZpkdMpbqBVRFz8LZBGeYLqLq`, state `CANCELED`.
+- `https://www.mind-reply.com/` still serves the older Private Decision Support surface until PR #12 is synced, merged, and deployed from `main`.
 
 This confirms the duplicate project is still connected at the provider layer. The duplicate project must be disabled, disconnected, or made non-required in provider settings to stop duplicate main-branch deployment attempts.
 
@@ -137,8 +138,8 @@ Interpretation:
 ## What is working now
 
 - `mindreply` owns `www.mind-reply.com`, `mind-reply.com`, and `mind-reply.vercel.app`.
-- `https://www.mind-reply.com/agent` previously returned `200`.
-- `https://www.mind-reply.com/api/health` previously returned `200` with the live health payload.
+- Latest observed canonical production deployment reached `READY` on `mindreply` for main commit `dc28b1daa43b17e32f9768478b8362156baec074`.
+- `https://www.mind-reply.com/` currently serves the older Private Decision Support surface, so the PR #12 production surface is not live yet.
 - The launch report gives a fresh proof artifact instead of relying only on static runbook deployment IDs.
 - The status context audit gives a fresh proof artifact for duplicate Vercel status cleanup.
 - Latest PR branch commits stopped receiving Vercel status entries after the `git.deploymentEnabled` gate, consistent with automatic PR deploy suppression.
@@ -147,7 +148,7 @@ Interpretation:
 
 1. The duplicate Vercel project `mind-reply` / `prj_nETWN2SapvnbSWVXK4O5upJHF6bb` is still connected and can react to main-branch pushes.
 2. Main-branch deployment attempts can still hit the Free daily deployment limit until the duplicate project is disconnected and quota resets.
-3. `https://www.mind-reply.com/` still needs a fresh smoke-check after a clean `mindreply` production deployment.
+3. `https://www.mind-reply.com/` still needs a fresh smoke-check after PR #12 is merged and deployed from canonical `mindreply`.
 4. Provider-backed model replies and receipt persistence remain fallback until production env vars are configured in Vercel.
 5. PR #12 must be synced/rebased with latest `main` before merge.
 
