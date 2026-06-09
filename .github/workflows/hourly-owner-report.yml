@@ -2,16 +2,37 @@ name: MindReply Hourly Owner Report
 
 on:
   workflow_dispatch:
+    inputs:
+      channels:
+        description: "Comma-separated channels: email,slack"
+        required: false
+        default: "email,slack"
+      dry_run:
+        description: "Set true to write receipts without sending"
+        required: false
+        default: "false"
   schedule:
     - cron: "0 * * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/hourly-owner-report.yml"
+      - "scripts/hourly-owner-report.ts"
+      - "scripts/send-hourly-owner-report.ts"
+      - "scripts/verify-hourly-owner-report.ts"
+      - "scripts/verify-hourly-owner-goal.ts"
+      - "docs/hourly_owner_goal_prompt.md"
+      - "package.json"
+      - "package-lock.json"
 
 permissions:
   contents: read
 
 env:
-  MINDREPLY_REPORT_ENABLED: "true"
-  MINDREPLY_REPORT_DRY_RUN: ${{ vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
-  MINDREPLY_REPORT_CHANNELS: ${{ vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
+  MINDREPLY_REPORT_ENABLED: ${{ vars.MINDREPLY_REPORT_ENABLED || 'true' }}
+  MINDREPLY_REPORT_DRY_RUN: ${{ github.event.inputs.dry_run || vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
+  MINDREPLY_REPORT_CHANNELS: ${{ github.event.inputs.channels || vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
   MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || vars.MINDREPLY_REPORT_EMAIL }}
   MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS }}
   MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || vars.MINDREPLY_REPORT_FROM }}
@@ -29,7 +50,7 @@ env:
 
 concurrency:
   group: mindreply-hourly-owner-report
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   owner-report:
@@ -45,6 +66,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
         run: npm ci || npm install
@@ -67,6 +89,8 @@ jobs:
         with:
           name: mindreply-hourly-owner-report
           path: |
+            reports/outbox/hourly-owner-report-latest.md
+            reports/outbox/hourly-owner-delivery-receipt-latest.json
             reports/outbox/hourly-owner-report-*.md
             reports/outbox/hourly-owner-delivery-receipt-*.json
           if-no-files-found: warn
