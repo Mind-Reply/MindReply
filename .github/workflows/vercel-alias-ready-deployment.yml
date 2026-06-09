@@ -10,17 +10,17 @@ on:
       deployment_url:
         description: Ready Vercel deployment URL or host to promote.
         required: true
-        default: https://mindreply-deuio7she-angellllkr-engs-projects.vercel.app
+        default: https://mindreply-kbqlfz2h8-angellllkr-engs-projects.vercel.app
         type: string
       expected_sha:
         description: Git commit SHA expected from /api/version after aliasing.
         required: true
-        default: 55480c5ede469cb324c5c000b70181e384d38604
+        default: 85a86a6f94bca2f8f1d5ff69894ba4a85cb1ecd7
         type: string
       expected_deployment_id:
         description: Vercel deployment id expected in rendered assets after aliasing.
         required: true
-        default: dpl_AQWnPEDmLtFmfqPobMShwaAB7SAn
+        default: dpl_ALssxKSrgiWh3rJgNzmmyv5WZiPE
         type: string
 
 permissions:
