@@ -36,6 +36,7 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       NEXT_PUBLIC_SITE_URL: https://www.mind-reply.com
       MINDREPLY_LIVE_VERIFY_URL: https://www.mind-reply.com
+      MINDREPLY_LIVE_REVENUE_JSON: mindreply-live-revenue-surface.json
     steps:
       - name: Confirm intentional production deploy
         run: test "${{ inputs.confirm }}" = "deploy-production"
@@ -90,11 +91,14 @@ jobs:
       - name: Deploy prebuilt artifact to production
         run: vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"
 
-      - name: Verify live production
+      - name: Verify live production reachability
         run: |
           curl --fail --show-error --silent https://www.mind-reply.com/ > /tmp/mindreply-home.html
           curl --fail --show-error --silent https://www.mind-reply.com/api/health > /tmp/mindreply-health.json
           curl --fail --show-error --silent https://www.mind-reply.com/api/version > /tmp/mindreply-version.json
+
+      - name: Verify live revenue and privacy surface
+        run: npm run verify:live-revenue >> "$GITHUB_STEP_SUMMARY"
 
       - name: Send owner deployment report
         if: always()
@@ -107,6 +111,7 @@ jobs:
           name: mindreply-manual-deploy-reports
           path: |
             reports/outbox/**
+            mindreply-live-revenue-surface.json
             mindreply-*.md
             mindreply-*.log
           if-no-files-found: ignore
