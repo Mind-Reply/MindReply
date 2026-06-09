@@ -4,8 +4,10 @@ import { Banknote, Bell, Crown, Gem, Gift, Mail, MessageCircle, ReceiptText, Shi
 const transactionCount = process.env.NEXT_PUBLIC_PACK_TRANSACTION_COUNT || "0";
 const revenueTotal = process.env.NEXT_PUBLIC_PACK_REVENUE_TOTAL || "$0";
 const revenueNote = process.env.NEXT_PUBLIC_PACK_REVENUE_NOTE || "No connected transaction source yet.";
+const reportEmails = `${process.env.MINDREPLY_REPORT_EMAILS || ""},${process.env.MINDREPLY_REPORT_EMAIL || ""}`.toLowerCase();
+const slackReady = Boolean(process.env.MINDREPLY_SLACK_WEBHOOK_URL);
 
-const automations = [
+const lanes = [
   {
     title: "Mind Read Pulse",
     copy: "Reads the pressure, names the calmer move, and keeps the receipt quiet.",
@@ -32,13 +34,22 @@ const automations = [
   },
 ];
 
+function emailReady(email: string) {
+  return reportEmails.includes(email.toLowerCase());
+}
+
 const delivery = [
-  { label: "Gmail", value: "angelllkr@gmail.com", icon: Mail },
-  { label: "MindReply", value: "Info@mind-reply.com", icon: Mail },
-  { label: "Slack", value: "angelllkr@gmail.com", icon: MessageCircle },
+  { label: "Gmail", value: "angelllkr@gmail.com", icon: Mail, status: emailReady("angelllkr@gmail.com") ? "On" : "Needs setup" },
+  { label: "MindReply", value: "Info@mind-reply.com", icon: Mail, status: emailReady("Info@mind-reply.com") ? "On" : "Needs setup" },
+  { label: "Slack", value: "angelllkr@gmail.com", icon: MessageCircle, status: slackReady ? "On" : "Needs setup" },
 ];
 
 const gifts = ["Presence receipt", "One useful line", "Pack win", "Next move"];
+
+function statusClass(status: string) {
+  if (status === "On") return "bg-[#2f6f52]/10 text-[#2f6f52]";
+  return "bg-[#e2b757]/15 text-[#755d24]";
+}
 
 export default function PersonalPackPage() {
   return (
@@ -120,7 +131,7 @@ export default function PersonalPackPage() {
                         <p className="text-sm text-[#4c5a70]">{item.value}</p>
                       </div>
                     </div>
-                    <span className="rounded-full bg-[#2f6f52]/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#2f6f52]">On</span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${statusClass(item.status)}`}>{item.status}</span>
                   </div>
                 );
               })}
@@ -131,9 +142,9 @@ export default function PersonalPackPage() {
 
       <section className="border-y border-[#162033]/10 bg-[#fffaf0] px-4 py-12 md:px-8">
         <div className="mx-auto max-w-7xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Four automations</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Four quiet lanes</p>
           <div className="mt-6 grid gap-4 md:grid-cols-4">
-            {automations.map((item) => {
+            {lanes.map((item) => {
               const Icon = item.icon;
               return (
                 <article key={item.title} className="rounded-xl border border-[#162033]/10 bg-white p-5 shadow-sm shadow-[#162033]/5">
