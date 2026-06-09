@@ -24,7 +24,10 @@ const supportEmail = "info@mind-reply.com";
 const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
 const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
 const packageCtaLabel = packagePaymentUrl ? "Pay for the package" : "Request invoice";
-const packageRouteLabel = packagePaymentUrl ? "Direct payment enabled" : "Invoice request ready";
+const packageRouteLabel = packagePaymentUrl ? "Direct payment enabled" : "Invoice-first route ready";
+const packageRouteCopy = packagePaymentUrl
+  ? "Scope is confirmed first, then the configured payment link is used before delivery."
+  : "No payment link is required to begin. MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice before delivery.";
 
 const navItems = [
   { label: "Offer", href: "#offer" },
@@ -116,8 +119,8 @@ const closeSteps = [
   },
   {
     step: "02",
-    title: "Buy or request invoice",
-    copy: "Use the direct payment link when configured, or request an invoice for the Website Completion Package.",
+    title: "Confirm scope and invoice",
+    copy: "No payment link is required to begin. If direct payment is not configured, MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice.",
   },
   {
     step: "03",
@@ -236,6 +239,7 @@ export default function Home() {
               <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Paid offer</p>
                 <p className="mt-3 text-sm font-semibold">GBP 600 Website Completion Package. {packageRouteLabel}.</p>
+                <p className="mt-3 text-xs leading-5 text-[#d9e3e7]">{packageRouteCopy}</p>
               </div>
             </div>
           </div>
@@ -258,6 +262,7 @@ export default function Home() {
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9b7430]">Package total</p>
               <p className="mt-3 font-serif text-5xl font-bold">GBP 600</p>
               <p className="mt-3 text-sm leading-6 text-[#59687b]">Three concrete rows. One clear receipt. No long setup.</p>
+              <p className="mt-3 text-sm font-semibold leading-6 text-[#2f6f72]">{packageRouteCopy}</p>
               <a href={packageCtaHref} className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150]">
                 {packageCtaLabel} <ArrowRight aria-hidden className="h-4 w-4" />
               </a>
@@ -336,7 +341,7 @@ export default function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#91d2c8]">Assisted close</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The commercial path is deliberately short.</h2>
             <p className="mt-5 text-sm leading-7 text-[#d3e5e2]">
-              The buyer should not have to decode a platform. They should feel the pressure loosen, see a concrete package, and know exactly where to pay or request an invoice.
+              The buyer should not have to decode a platform. They should feel the pressure loosen, see a concrete package, and know exactly where to pay or how the invoice-first route works.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
