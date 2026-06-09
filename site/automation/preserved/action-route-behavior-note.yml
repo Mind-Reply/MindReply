@@ -1,0 +1,54 @@
+version: 1
+created: 2026-06-09
+branch: mind-reply
+preserved_from:
+  branch: codex/mindreply-moa-main
+  path: app/api/action/route.ts
+preservation_type: behavior_note
+status: storage_only
+purpose: Preserve the old action-preparation behavior idea before retiring old codex branches.
+legacy_behavior:
+  endpoint: POST /api/action
+  accepted_fields:
+    - synthesis
+    - recommended_action
+  allowed_actions:
+    - reply
+    - schedule
+    - resolve
+    - escalate
+  behavior:
+    reply: prepares a short acknowledgement-style response
+    schedule: prepares a short hold/window message
+    resolve: marks the thread closed with a private receipt
+    escalate: blocks execution and requires review
+  generated_fields:
+    - synthesis
+    - recommended_action
+    - prepared
+    - blocked
+    - prepared_text
+    - receipt_id
+what_is_useful:
+  - The action kind list matches the MRagent one-action model.
+  - Escalate blocks action instead of drafting unsafe output.
+  - Prepared action text is separated from synthesis.
+what_is_not_ready_for_main:
+  - It uses crypto.randomUUID receipt IDs without the current receipt/privacy contract.
+  - It does not include input hash, risk details, persistence status, or quiet receipt shape.
+  - It could conflict with current /api/agent and /api/intake decision flow.
+  - It might imply execution/automation that is not currently wired.
+recommended_current_use:
+  storage: keep as behavior reference
+  main: do not port directly
+  future_design: consider only after receipt/action contract has explicit tests
+future_acceptance_if_rebuilt:
+  - action output must derive from current DecisionResponse shape
+  - receipt must use current MRagent receipt fields
+  - high-risk/escalate must block or hand off safely
+  - no raw input storage
+  - tests must cover reply, schedule, resolve, and escalate
+opinion: >-
+  The old action route has a good instinct: action should be prepared only after synthesis and risk.
+  But the current MRagent contract is more mature, so this route should remain a note, not a direct port.
+short_digest_line: Old /api/action behavior preserved as storage-only; do not port until receipt/action tests exist.
