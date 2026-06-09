@@ -10,10 +10,11 @@
     "typecheck": "next typegen && tsc --noEmit",
     "decision:verify": "tsx scripts/verify-decision-layer.ts",
     "mcp:verify": "tsx scripts/verify-mcp.ts",
+    "playbooks:verify": "tsx scripts/verify-playbooks.ts",
     "ops:report": "tsx scripts/ops-report.ts",
     "ops:pack": "tsx scripts/angel-pack-report.ts",
     "python:verify": "python -m unittest discover src",
-    "verify:all": "npm run decision:verify && npm run mcp:verify && npm run ops:report && npm run ops:pack && npm run typecheck && npm run python:verify"
+    "verify:all": "npm run decision:verify && npm run mcp:verify && npm run playbooks:verify && npm run ops:report && npm run ops:pack && npm run typecheck && npm run python:verify"
   },
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "^1.7.4",
