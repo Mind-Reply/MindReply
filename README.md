@@ -84,10 +84,20 @@ The scheduled workflow is `.github/workflows/personal-pack-report.yml`. It can b
 
 - 8-lane defensive security team: headers, routes, secrets, receipt privacy, dependencies, deployment protection, runtime observability, incident response.
 - 28-lane social/ad preparation team: positioning, launch copy, channel drafts, Figma/Remotion queue, analytics readiness, revenue truth, distribution permission checks, and next move.
+- Owner decision desk: security findings that affect behavior, access, data retention, delivery, billing, or production rollout are sent as owner decision packets before action.
 
 The scheduled workflow is `.github/workflows/activation-pack-report.yml` and also runs every 30 minutes. It prepares and reports. It does not post externally, scrape audiences, run ads, attack systems, or claim revenue without connected and approved sources.
 
 Sending is disabled by default. Console preview is safe without secrets.
+
+Owner decision routing:
+
+```bash
+MINDREPLY_SECURITY_OWNER_EMAIL=angelllkr@gmail.com
+MINDREPLY_SECURITY_PUBLIC_EMAIL=info@mind-reply.com
+```
+
+Decision packets include affected surface, evidence, impact, recommended decision, rollback or rotation note, and delivery status. They may include all non-secret security data needed for owner decisions, but they must not include raw secrets, access tokens, credentials, private pressure text, or unredacted sensitive records.
 
 Required opt-in variables:
 
@@ -109,8 +119,8 @@ Email delivery uses GitHub or deployment secrets:
 
 ```bash
 RESEND_API_KEY=
-MINDREPLY_REPORT_EMAILS=info@mind-reply.com
-MINDREPLY_REPORT_EMAIL_ALLOWLIST=info@mind-reply.com
+MINDREPLY_REPORT_EMAILS=angelllkr@gmail.com,info@mind-reply.com
+MINDREPLY_REPORT_EMAIL_ALLOWLIST=angelllkr@gmail.com,info@mind-reply.com
 MINDREPLY_REPORT_FROM=
 ```
 
