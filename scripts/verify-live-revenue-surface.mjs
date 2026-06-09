@@ -62,9 +62,10 @@ function includes(text, phrase) {
 }
 
 const generatedAt = new Date().toISOString();
-const [home, contact, version, health, packageRequest, robots, sitemap, geoLocale] = await Promise.all([
+const [home, contact, packagePage, version, health, packageRequest, robots, sitemap, geoLocale] = await Promise.all([
   request("/"),
   request("/contact"),
+  request("/website-completion-package"),
   request("/api/version"),
   request("/api/health"),
   request("/api/package-request", {
@@ -77,13 +78,14 @@ const [home, contact, version, health, packageRequest, robots, sitemap, geoLocal
   request("/api/geo-locale"),
 ]);
 
-const publicText = `${home.text}\n${contact.text}`;
+const publicText = `${home.text}\n${contact.text}\n${packagePage.text}`;
 const checks = [];
 const liveSha = version.json?.deployment?.commitSha || "";
-const renderedDeploymentIds = [...new Set([...home.deploymentIds, ...contact.deploymentIds])];
+const renderedDeploymentIds = [...new Set([...home.deploymentIds, ...contact.deploymentIds, ...packagePage.deploymentIds])];
 
 check(checks, "home-reachable", home.status === 200, `Homepage status ${home.status}.`);
 check(checks, "contact-reachable", contact.status === 200, `Contact status ${contact.status}.`);
+check(checks, "package-page-reachable", packagePage.status === 200, `Package page status ${packagePage.status}.`);
 check(checks, "version-current", version.status === 200 && version.json?.status === "ok" && version.json?.deployment, `Version status ${version.status}; retired/stale production returns 410.`);
 check(
   checks,
@@ -112,6 +114,13 @@ check(checks, "no-personal-gmail", !/gmail\.com/i.test(publicText), "Live public
 check(checks, "no-stale-executive-nervous-system", !includes(publicText, "Executive Nervous System"), "Live public surface must not serve the retired Executive Nervous System page.");
 check(checks, "contact-assisted-close", includes(contact.text, "Package request") || includes(contact.text, "Submit package request"), "Contact page must expose assisted close, not only a passive email link.");
 
+check(checks, "package-page-title", includes(packagePage.text, "Website Completion Package | MindReply") || includes(packagePage.text, "Website Completion Package"), "Package page must expose the paid offer title.");
+check(checks, "package-invoice-first-route", includes(packagePage.text, "Invoice-first request path active"), "Package page must prove the invoice-first route is live.");
+check(checks, "package-no-payment-link-required", includes(packagePage.text, "No payment link is required to begin"), "Package page must tell buyers they can start without a configured payment link.");
+check(checks, "package-billing-fields", includes(packagePage.text, "billing name and billing email"), "Package page must name the invoice intake fields.");
+check(checks, "package-scope-first", includes(packagePage.text, "Scope first, invoice/payment before delivery"), "Package page must keep the scope-first close guard.");
+check(checks, "package-payment-path-receipt", includes(packagePage.text, "paymentPath") && includes(packagePage.text, "invoice-first unless a configured direct payment link is present"), "Package page must show the receipt paymentPath proof.");
+
 check(checks, "footer-market-strip", includes(home.text, "Auto language and priority markets"), "Live footer must expose the quiet auto-language and market strip.");
 check(checks, "market-priority-meta", includes(home.text, "target-market-priority") && includes(home.text, "UK > US > UAE"), "Live metadata must include the current target-market priority.");
 check(checks, "geo-locale-market-profiles", geoLocale.status === 200 && Array.isArray(geoLocale.json?.marketProfiles) && geoLocale.json.marketProfiles.length >= 10, `Geo locale status ${geoLocale.status}; market profiles ${geoLocale.json?.marketProfiles?.length ?? "missing"}.`);
@@ -134,7 +143,7 @@ const report = {
   failed: failed.map((item) => item.id),
   warnings: warnings.map((item) => item.id),
   checks,
-  surfaces: [home, contact, version, health, packageRequest, robots, sitemap, geoLocale].map(({ path, url, ok, status, contentType, latencyMs, json, deploymentIds, error }) => ({
+  surfaces: [home, contact, packagePage, version, health, packageRequest, robots, sitemap, geoLocale].map(({ path, url, ok, status, contentType, latencyMs, json, deploymentIds, error }) => ({
     path,
     url,
     ok,
