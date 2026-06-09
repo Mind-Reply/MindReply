@@ -1,7 +1,12 @@
 import { writeFileSync } from "node:fs";
 
 type ProbeKind = "page" | "health";
-type Marker = "executive-nervous-system" | "legacy-communication-intelligence" | "unknown";
+type Marker =
+  | "executive-nervous-system"
+  | "private-decision-support"
+  | "legacy-communication-intelligence"
+  | "vercel-auth-protection"
+  | "unknown";
 
 type Probe = {
   label: string;
@@ -40,8 +45,16 @@ function markerFor(body: string): Marker {
     return "executive-nervous-system";
   }
 
+  if (/Private Decision Support/i.test(body) || /MindReply \| Private Decision Support/i.test(body)) {
+    return "private-decision-support";
+  }
+
   if (/Executive Communication Intelligence/i.test(body)) {
     return "legacy-communication-intelligence";
+  }
+
+  if (/Vercel Authentication|Deployment Protection|Authentication Required|Protected Deployment/i.test(body)) {
+    return "vercel-auth-protection";
   }
 
   return "unknown";
