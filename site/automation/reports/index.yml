@@ -92,13 +92,18 @@ preserved_extracts:
     path: site/automation/preserved/chatgpt-app-legacy-contract.yml
     commit: db3199bfe4d4d53ae5b3bd2910797803bdac3bcf
     one_line: Legacy ChatGPT app contract preserved while current main MCP remains source of truth.
+  - date: 2026-06-09
+    type: action_route_behavior_note
+    path: site/automation/preserved/action-route-behavior-note.yml
+    commit: 38bb88b7873bb4cc3cc9b13a83cb66cdc4095d9f
+    one_line: Old /api/action behavior preserved as storage-only; do not port without receipt/action tests.
 next_report_slots:
   - type: daily_short_digest
     cadence: every active work pass while quota is limited
     focus: live route state, Vercel state, one next action
-  - type: preserved_behavior_note
+  - type: branch_retirement_ready_check
     cadence: next storage pass
-    focus: old action-route behavior note and whether it should stay storage-only
+    focus: confirm old branch material coverage and safe delete candidate status
   - type: post_quota_main_execution
     cadence: once active Vercel mind-reply can build again
     focus: route freshness, product-first redesign, growth assets, capture
@@ -106,4 +111,4 @@ opinion: >-
   The storage branch remains the right place for planning, growth, SEO, ad, branch cleanup,
   preservation, and recovery reports. Main should stay quiet until Vercel can build again, because
   the source already contains the missing app routes and the remaining problem is deployment freshness.
-short_digest_line: Medium-priority extracts added: MOA typed roster concept and legacy ChatGPT app contract are preserved on mind-reply.
+short_digest_line: Old /api/action behavior note preserved; useful old branch material is now substantially covered on mind-reply.
