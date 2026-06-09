@@ -61,18 +61,23 @@ reports:
     path: site/automation/reports/2026-06-09-vercel-quota-recheck.yml
     commit: a3988d6abcc9281ffd74a3c4a985d12e5e650b3f
     one_line: Vercel quota still active; public page and fallback API live, app/developer routes stale or missing.
+  - date: 2026-06-09
+    type: branch_cleanup_followup
+    path: site/automation/reports/2026-06-09-branch-cleanup-followup.yml
+    commit: 12275c9aeffac3e1f61b6b13c0d3478b3e07cfea
+    one_line: Branch cleanup path confirmed: keep main and mind-reply, preserve selected old material, delete only with confirmation/tooling.
 next_report_slots:
   - type: daily_short_digest
     cadence: every active work pass while quota is limited
     focus: live route state, Vercel state, one next action
-  - type: branch_cleanup_followup
-    cadence: after delete/ref tooling or user confirmation
-    focus: keep only main and mind-reply after preserving useful files
+  - type: preserved_material_manifest
+    cadence: next storage pass
+    focus: selected old-branch material to save before deleting codex branches
   - type: post_quota_main_execution
     cadence: once active Vercel mind-reply can build again
     focus: route freshness, product-first redesign, growth assets, capture
 opinion: >-
-  The storage branch remains the right place for planning, growth, SEO, ad, and recovery reports.
-  Main should stay quiet until Vercel can build again, because the source already contains the
-  missing app routes and the remaining problem is deployment freshness.
-short_digest_line: Latest recheck: Vercel quota still active; /agent and /api/intake live, but app/developer/growth routes need a successful main deploy.
+  The storage branch remains the right place for planning, growth, SEO, ad, branch cleanup,
+  and recovery reports. Main should stay quiet until Vercel can build again, because the source
+  already contains the missing app routes and the remaining problem is deployment freshness.
+short_digest_line: Latest cleanup report: keep main and mind-reply, preserve selected old branch material, and avoid destructive deletes until confirmed/tooling is available.
