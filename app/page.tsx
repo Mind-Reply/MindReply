@@ -253,7 +253,7 @@ export default function Home() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Authority layer</p>
               <h2 className="mt-4 max-w-2xl font-serif text-4xl font-bold leading-tight md:text-5xl">
-                Executive communication intelligence, explained without fog.
+                Decision Infrastructure, explained without fog.
               </h2>
             </div>
             <p className="max-w-md text-sm leading-7 text-[#59687b]">
