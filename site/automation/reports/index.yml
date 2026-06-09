@@ -66,18 +66,23 @@ reports:
     path: site/automation/reports/2026-06-09-branch-cleanup-followup.yml
     commit: 12275c9aeffac3e1f61b6b13c0d3478b3e07cfea
     one_line: Branch cleanup path confirmed: keep main and mind-reply, preserve selected old material, delete only with confirmation/tooling.
+  - date: 2026-06-09
+    type: preserved_material_manifest
+    path: site/automation/reports/2026-06-09-preserved-material-manifest.yml
+    commit: 8dbf32317ccd8418ec74e4a53883b2a230bd3030
+    one_line: Preservation manifest created for old branch concepts before retiring codex branches.
 next_report_slots:
+  - type: preserved_extracts
+    cadence: next storage pass
+    focus: create extract files for MOA blueprint and 8-workstream map
   - type: daily_short_digest
     cadence: every active work pass while quota is limited
     focus: live route state, Vercel state, one next action
-  - type: preserved_material_manifest
-    cadence: next storage pass
-    focus: selected old-branch material to save before deleting codex branches
   - type: post_quota_main_execution
     cadence: once active Vercel mind-reply can build again
     focus: route freshness, product-first redesign, growth assets, capture
 opinion: >-
   The storage branch remains the right place for planning, growth, SEO, ad, branch cleanup,
-  and recovery reports. Main should stay quiet until Vercel can build again, because the source
-  already contains the missing app routes and the remaining problem is deployment freshness.
-short_digest_line: Latest cleanup report: keep main and mind-reply, preserve selected old branch material, and avoid destructive deletes until confirmed/tooling is available.
+  preservation, and recovery reports. Main should stay quiet until Vercel can build again, because
+  the source already contains the missing app routes and the remaining problem is deployment freshness.
+short_digest_line: Preservation manifest added: save MOA blueprint and 8-workstream map first, avoid whole-branch merges, then retire old codex branches carefully.
