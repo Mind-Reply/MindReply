@@ -54,9 +54,9 @@ export default function SiteFooter() {
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-4 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
                 Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
-              <a href="mailto:info@mind-reply.com?subject=MindReply%20Website%20Completion%20Package" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
-                Email MindReply <Mail aria-hidden className="h-4 w-4" />
-              </a>
+              <Link href="/contact?intent=website-completion" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+                Contact form <Mail aria-hidden className="h-4 w-4" />
+              </Link>
             </div>
           </section>
         </div>
