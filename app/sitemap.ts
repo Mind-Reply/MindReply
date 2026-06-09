@@ -9,9 +9,7 @@ const routes = [
   { path: "/agent", priority: 0.95, changeFrequency: "daily" as const, localized: true },
   { path: "/website-completion-package", priority: 0.92, changeFrequency: "daily" as const, localized: true },
   { path: "/pricing", priority: 0.9, changeFrequency: "weekly" as const, localized: true },
-  { path: "/agents", priority: 0.88, changeFrequency: "daily" as const, localized: false },
   { path: "/capabilities", priority: 0.75, changeFrequency: "weekly" as const, localized: true },
-  { path: "/pack", priority: 0.65, changeFrequency: "weekly" as const, localized: false },
   { path: "/contact", priority: 0.55, changeFrequency: "monthly" as const, localized: true },
   { path: "/privacy", priority: 0.5, changeFrequency: "monthly" as const, localized: false },
 ];
