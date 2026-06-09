@@ -1,26 +1,12 @@
 import Link from "next/link";
-import {
-  Banknote,
-  Bell,
-  CheckCircle2,
-  Crown,
-  LineChart,
-  Mail,
-  Megaphone,
-  MessageCircle,
-  ReceiptText,
-  ShieldCheck,
-  Sparkles,
-  TicketCheck,
-  Workflow,
-} from "lucide-react";
+import { Banknote, CheckCircle2, Crown, LineChart, Mail, MessageCircle, ReceiptText, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 
 export const metadata = {
   title: "Completion Pack | MindReply",
   description: "A private MindReply completion pack for delivery, receipts, revenue truth, promotion readiness, and the next useful move.",
 };
 
-const confirmedEmail = "ANGELLLKR@GMAIL.COM";
+const supportEmail = "info@mind-reply.com";
 const transactionCount = process.env.NEXT_PUBLIC_PACK_TRANSACTION_COUNT || "0";
 const revenueTotal = process.env.NEXT_PUBLIC_PACK_REVENUE_TOTAL || "$0";
 const revenueNote = process.env.NEXT_PUBLIC_PACK_REVENUE_NOTE || "No connected transaction source yet.";
@@ -30,43 +16,43 @@ const agentCount = process.env.MINDREPLY_REPORT_AGENT_COUNT || "25";
 
 const lanes = [
   {
-    title: "Mind Read Pulse",
-    copy: "Reads the pressure, names the calmer move, and keeps the receipt narrow.",
-    rhythm: "Every report cycle",
-    icon: Bell,
-  },
-  {
-    title: "Delivery Proof",
-    copy: "Shows whether email and Slack are actually configured instead of implying private channels are live.",
-    rhythm: "Truth first",
+    title: "Ask MRagent first",
+    copy: "Start with the charged message or decision. MRagent reads the pressure, gives one clear move, and keeps the receipt narrow.",
+    rhythm: "First step",
     icon: MessageCircle,
   },
   {
-    title: "Promotion Queue",
-    copy: "Prepares campaign ideas and platform copy for review before any external posting happens.",
-    rhythm: "Review first",
-    icon: Megaphone,
+    title: "Use the contact route",
+    copy: "If MRagent cannot solve the question, send it through the MindReply contact path or write to the public mailbox.",
+    rhythm: "Escalate cleanly",
+    icon: Mail,
   },
   {
-    title: "Revenue Ledger",
-    copy: "Shows transaction count and revenue only when a real source is connected.",
+    title: "Keep proof narrow",
+    copy: "Reports show what moved, what is blocked, and what needs setup without exposing private wording.",
+    rhythm: "Truth first",
+    icon: ReceiptText,
+  },
+  {
+    title: "Revenue truth",
+    copy: "Transaction and revenue numbers stay tied to connected sources. If no source is connected, the page says so plainly.",
     rhythm: "No fake numbers",
     icon: Banknote,
   },
 ];
 
 const signals = [
-  "Front door now presents MindReply as a full pressure-to-action operating layer.",
-  "MRagent explains its slow reply, behavior read, and narrow receipt contract.",
-  "Promotion is framed as prepared launch material, not stealth posting or guaranteed reach.",
+  "Public support now uses info@mind-reply.com only.",
+  "User questions should start with MRagent before becoming contact requests.",
+  "The pack reports delivery status and blockers without inventing outside activity.",
   "Revenue remains honest until a real transaction source is attached.",
 ];
 
 const materials = [
   { label: "Website asset", value: "Full front end direction", icon: CheckCircle2 },
-  { label: "Advertising asset", value: "MRadvertisingTeam queue", icon: Megaphone },
   { label: "Report asset", value: `${agentCount}-lane pack`, icon: Workflow },
   { label: "Revenue asset", value: "Annual and credit-load angles", icon: LineChart },
+  { label: "Support path", value: supportEmail, icon: Mail },
 ];
 
 function emailReady(email: string) {
@@ -74,8 +60,9 @@ function emailReady(email: string) {
 }
 
 const delivery = [
-  { label: "Confirmed email", value: confirmedEmail, icon: Mail, status: emailReady(confirmedEmail) ? "On" : "Needs setup" },
-  { label: "MindReply mailbox", value: "Info@mind-reply.com", icon: Mail, status: emailReady("Info@mind-reply.com") ? "On" : "Needs setup" },
+  { label: "Public mailbox", value: supportEmail, icon: Mail, status: emailReady(supportEmail) ? "On" : "Needs setup" },
+  { label: "MRagent route", value: "/agent", icon: MessageCircle, status: "On" },
+  { label: "Contact form", value: "/contact", icon: Mail, status: "On" },
   { label: "Slack", value: "Connected destination required", icon: MessageCircle, status: slackReady ? "On" : "Needs setup" },
 ];
 
@@ -97,8 +84,8 @@ export default function CompletionPackPage() {
             <Link href="/agent" className="rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72]">
               MRagent
             </Link>
-            <Link href="/" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
-              Home
+            <Link href="/contact" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
+              Contact
             </Link>
           </div>
         </div>
@@ -112,10 +99,10 @@ export default function CompletionPackPage() {
               Completion Pack
             </div>
             <h1 className="mt-8 max-w-2xl font-serif text-5xl font-bold leading-[0.94] md:text-7xl">
-              Delivery, proof, revenue truth, and the next move.
+              Ask MRagent first. Escalate only when needed.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-[#d9e3e7]">
-              This is the private control surface for what changed, what reached the confirmed destination, what is ready for promotion, and what still needs setup.
+              The pack keeps the path simple: use MRagent for the pressure read, then contact MindReply at {supportEmail} or through the contact form when the question needs human follow-up.
             </p>
           </div>
 
@@ -128,7 +115,7 @@ export default function CompletionPackPage() {
                     <Icon aria-hidden className="h-4 w-4" />
                     {item.label}
                   </div>
-                  <p className="mt-3 text-sm font-semibold text-[#f8f5f0]">{item.value}</p>
+                  <p className="mt-3 break-words text-sm font-semibold text-[#f8f5f0]">{item.value}</p>
                 </div>
               );
             })}
@@ -140,7 +127,7 @@ export default function CompletionPackPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Revenue so far</p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <div className="rounded-lg bg-[#f7f4ed] p-5">
-                <div className="flex items-center gap-2 text-sm font-semibold text-[#4d5c6f]"><TicketCheck aria-hidden className="h-4 w-4" /> Transactions</div>
+                <div className="flex items-center gap-2 text-sm font-semibold text-[#4d5c6f]"><ReceiptText aria-hidden className="h-4 w-4" /> Transactions</div>
                 <p className="mt-3 font-serif text-5xl font-bold">{transactionCount}</p>
                 <p className="mt-2 text-sm text-[#4d5c6f]">tracked</p>
               </div>
@@ -157,7 +144,7 @@ export default function CompletionPackPage() {
           </section>
 
           <section className="rounded-lg border border-[#122033]/10 bg-white p-6 shadow-xl shadow-[#122033]/10">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Delivery</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Support and delivery</p>
             <div className="mt-5 grid gap-3">
               {delivery.map((item) => {
                 const Icon = item.icon;
@@ -185,7 +172,7 @@ export default function CompletionPackPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Signal board</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The pack reports what is real.</h2>
             <p className="mt-5 max-w-md text-sm leading-7 text-[#59687b]">
-              The useful version of automation is not noise. It is prepared material, delivery status, blockers, proof, and one verified next task.
+              The useful version is not noise. It is prepared material, delivery status, blockers, proof, and one verified next task.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
