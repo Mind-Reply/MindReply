@@ -139,8 +139,21 @@ assert(!/mailto:/i.test(footer), "footer should route to contact form, not direc
 
 includes("contact page", contact, "Ask MRagent first");
 includes("contact page", contact, "info@mind-reply.com");
-includes("package page", packagePage, "Website Completion Package");
-includes("package page", packagePage, "GBP 600");
+
+for (const phrase of [
+  "Website Completion Package",
+  "Website Completion Package | MindReply",
+  "GBP 600",
+  "Invoice-first request path active",
+  "No payment link is required to begin",
+  "billing name and billing email",
+  "Scope first, invoice/payment before delivery",
+  "paymentPath",
+  "invoice-first unless a configured direct payment link is present",
+]) {
+  includes("package page", packagePage, phrase);
+}
+
 includes("capabilities", capabilities, "Service readiness");
 includes("agents redirect", agents, "redirect(\"/capabilities\")");
 includes("legacy pack redirect", legacyPack, "redirect(\"/website-completion-package\")");
@@ -149,8 +162,8 @@ const publicSurface = [home, layout, footer, localeAssist, contact, packagePage,
 assert(!/ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i.test(publicSurface), "public surface must not expose personal Gmail.");
 assert(!/57 active staff|Agent expansion board|worktree|command board/i.test(publicSurface), "public surface must not expose internal agent/worktree language.");
 
-for (const broken of ["Ã", "à¤", "æ—", "Ð£"]) {
+for (const broken of ["\u00c3", "\u00e0\u00a4", "\u00e6\u2014", "\u00d0\u00a3"]) {
   assert(!localeAssist.includes(broken), `locale assist appears to contain mojibake marker ${broken}`);
 }
 
-console.log("Revenue, mobile, market SEO, 10-language country locale, invoice-first close path, footer handoff, and public safety verification passed.");
+console.log("Revenue, mobile, market SEO, 10-language country locale, invoice-first close path, package page proof, footer handoff, and public safety verification passed.");
