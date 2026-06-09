@@ -30,6 +30,15 @@ const proofRows = [
   { label: "Receipt", value: "privacy-safe summary, not raw sensitive text", icon: ReceiptText },
 ];
 
+const receiptRows = [
+  { label: "actionKind", value: "website-completion" },
+  { label: "riskLevel", value: "low-to-medium, depending on claims and sensitive context" },
+  { label: "confidence", value: "medium until the owner accepts scope and payment route" },
+  { label: "rawContentRedacted", value: "true" },
+  { label: "inputHash", value: "present; raw text absent" },
+  { label: "ownerDecisionNeeded", value: "confirm scope, route invoice or payment link, approve the next close-ready move" },
+];
+
 const ladder = [
   { title: "Free first output", copy: "Use MRagent to prove relief before checkout." },
   { title: "Website Completion Package", copy: "Buy one focused rescue pass when the site or offer is blocking action." },
@@ -155,6 +164,26 @@ export default function WebsiteCompletionPackagePage() {
         </div>
       </section>
 
+      <section className="bg-[#122033] px-4 py-12 text-[#f8f5f0] md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#91d2c8]">Sample delivery receipt</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">This is the proof object, not a vague strategy note.</h2>
+            <p className="mt-5 text-sm leading-7 text-[#d9e3e7]">
+              The buyer should be able to inspect what was processed, what was withheld, what decision is needed, and where the payment path stands.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {receiptRows.map((row) => (
+              <div key={row.label} className="rounded-lg border border-white/10 bg-white/[0.06] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#e2b757]">{row.label}</p>
+                <p className="mt-3 text-sm leading-6 text-[#d3e5e2]">{row.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="px-4 py-12 md:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
@@ -185,7 +214,7 @@ export default function WebsiteCompletionPackagePage() {
               ))}
             </div>
           </div>
-          <div className="rounded-lg bg-[#122033] p-6 text-[#f8f5f0]">
+          <div className="rounded-lg bg-[#122033] p-6 text-[#f8f5f0">
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#91d2c8]">Booking page line</p>
             <h2 className="mt-5 font-serif text-3xl font-bold leading-tight">Bring the page, message, or follow-up that is leaking the sale.</h2>
             <p className="mt-4 text-sm leading-7 text-[#d9e3e7]">
