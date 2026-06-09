@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: "%s | MindReply",
   },
   description:
-    "MindReply turns website buying friction, client follow-up pressure, and response overload into one clear next move, a ranked action queue, and privacy-safe assisted close for priority English, European, Gulf, Indian, Japanese, Chinese, and Ukrainian markets.",
+    "MindReply turns website buying friction, client follow-up pressure, and response overload into one clear next move, a ranked action queue, and privacy-safe assisted close for priority UK, US, Gulf, German, French, Japanese, Brazilian, Spanish, Indian, Chinese, and Ukrainian readers.",
   alternates: {
     canonical: "/",
     languages: {
@@ -61,14 +61,21 @@ export const metadata: Metadata = {
     "executive communication infrastructure",
     "United Kingdom website completion",
     "United States founder response overload",
-    "Germany executive communication support",
-    "France client follow up rescue",
-    "Spain website conversion copy",
     "UAE executive communication support",
-    "Saudi Arabia business communication support",
-    "Singapore founder communication support",
-    "India business response overload",
+    "Saudi Arabia Arabic business communication support",
+    "Germany professional reply support",
+    "France client follow up rescue",
     "Japan executive communication support",
+    "Brazil Portuguese business communication support",
+    "Spain website conversion copy",
+    "India business response overload",
+    "China business communication support",
+    "Ukraine founder communication support",
+    "Arabic executive communication support",
+    "German risk aware professional replies",
+    "Japanese business reply refinement",
+    "Portuguese website completion Brazil",
+    "Spanish sales objection reply support",
   ],
   category: "Business Communication",
   openGraph: {
@@ -96,8 +103,10 @@ export const metadata: Metadata = {
   },
   other: {
     "content-language": "en, es, fr, de, pt, ar, hi, ja, zh, uk",
-    "geo.placename": "United Kingdom, United States, Germany, France, Spain, United Arab Emirates, Saudi Arabia, Singapore, India, Japan",
-    "target-market": "UK, US, DE, FR, ES, AE, SA, SG, IN, JP",
+    "geo.placename": "United Kingdom, United States, United Arab Emirates, Saudi Arabia, Germany, France, Japan, Brazil, Spain, India",
+    "target-market": "UK, US, AE, SA, DE, FR, JP, BR, ES, IN",
+    "target-market-priority": "UK > US > UAE > Saudi Arabia > Germany > France > Japan > Brazil > Spain > India",
+    "localization-priority": "English, Arabic, German, French, Japanese, Portuguese, Spanish, Hindi, Chinese, Ukrainian",
   },
 };
 
