@@ -164,7 +164,7 @@ function selfTest() {
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
       VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "scripts/hourly-owner-report.ts\nscripts/send-hourly-owner-report.ts\.github/workflows/hourly-owner-report.yml",
+      MRAGENT_CHANGED_FILES: "scripts/hourly-owner-report.ts\nscripts/send-hourly-owner-report.ts\n.github/workflows/hourly-owner-report.yml",
     }).build === false,
     "Hourly owner report changes must be skipped.",
   );
