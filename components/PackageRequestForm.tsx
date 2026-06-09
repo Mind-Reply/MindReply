@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, Loader2, Mail, ReceiptText, RotateCcw, ShieldCheck } from "lucide-react";
+import { ArrowRight, Loader2, Mail, ReceiptText, RotateCcw, ShieldCheck } from "lucide-react";
 
 type DeliveryStatus = "sent" | "blocked" | "dry-run" | "failed";
 
