@@ -18,6 +18,9 @@ function includes(label: string, value: string, expected: string) {
 const home = read("app/page.tsx");
 const contact = read("app/contact/page.tsx");
 const packagePage = read("app/website-completion-package/page.tsx");
+const capabilities = read("app/capabilities/page.tsx");
+const agents = read("app/agents/page.tsx");
+const legacyPack = read("app/pack/page.tsx");
 const layout = read("app/layout.tsx");
 const robots = read("app/robots.ts");
 const sitemap = read("app/sitemap.ts");
@@ -64,6 +67,16 @@ includes("site footer", siteFooter, "Try MRagent");
 assert(!/mailto:/i.test(siteFooter), "footer should route to contact form, not direct mailto.");
 assert(!/ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i.test(siteFooter), "footer must not expose personal Gmail.");
 
+includes("capabilities", capabilities, "Service readiness");
+includes("capabilities", capabilities, "What MindReply can do for a visitor right now.");
+includes("capabilities", capabilities, "MRagent first. Package next. Contact only when the handoff needs a person.");
+includes("capabilities", capabilities, "10 priority markets");
+assert(!/worktree|command board|Agent expansion board|NVIDIA|57|teams exist/i.test(capabilities), "capabilities page must not expose internal operations language.");
+assert(!/ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i.test(capabilities), "capabilities page must not expose personal Gmail.");
+
+includes("agents redirect", agents, "redirect(\"/capabilities\")");
+includes("legacy pack redirect", legacyPack, "redirect(\"/website-completion-package\")");
+
 includes("package page", packagePage, "Website Completion Package");
 includes("package page", packagePage, "GBP 600");
 includes("package page", packagePage, "buying-friction rescue");
@@ -99,13 +112,15 @@ includes("layout metadata", layout, "UK, US, DE, FR, ES, AE, SA, SG, IN, JP");
 for (const path of ["/", "/agent", "/website-completion-package", "/pricing", "/contact", "/capabilities", "/privacy"]) {
   includes("robots", robots, path);
 }
-includes("robots", robots, "disallow: [\"/api/\", \"/mcp\"]");
+includes("robots", robots, "disallow: [\"/api/\", \"/mcp\", \"/agents\", \"/pack\"]");
 
 includes("sitemap", sitemap, "languageParams");
 includes("sitemap", sitemap, "hi");
 includes("sitemap", sitemap, "/website-completion-package");
 includes("sitemap", sitemap, "alternates:");
 includes("sitemap", sitemap, "languages: localeAlternates");
+assert(!sitemap.includes('{ path: "/agents"'), "sitemap must not index /agents.");
+assert(!sitemap.includes('{ path: "/pack"'), "sitemap must not index /pack.");
 
 for (const locale of ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"]) {
   includes("locale assist", localeAssist, `${locale}: {`);
@@ -146,4 +161,4 @@ includes("owner security", ownerSecurity, "Defensive Security Boundary");
 includes("owner security", ownerSecurity, "Owner Decision Format");
 assert(!/ANGELLLKR@GMAIL\.COM/i.test(ownerSecurity), "owner security doc must not expose the private Gmail directly.");
 
-console.log("Revenue, 10-language surface i18n, SEO, MRagent upgrade trigger, assisted close, footer handoff, and security boundary verification passed.");
+console.log("Revenue, customer-safe capabilities, 10-language surface i18n, SEO, MRagent upgrade trigger, footer handoff, and security boundary verification passed.");
