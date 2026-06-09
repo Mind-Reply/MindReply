@@ -19,8 +19,12 @@ const pack = readRequired("app/pack/page.tsx");
 const canonicalPackage = readRequired("app/website-completion-package/page.tsx");
 const pricing = readRequired("app/pricing/page.tsx");
 const contact = readRequired("app/contact/page.tsx");
+const packageApi = readRequired("app/api/package-request/route.ts");
+const packageHelper = readRequired("lib/package-request.ts");
+const packageForm = readRequired("components/PackageRequestForm.tsx");
+const health = readRequired("app/api/health/route.ts");
 
-const publicPages = [home, pack, canonicalPackage, pricing, contact].join("\n");
+const publicPages = [home, pack, canonicalPackage, pricing, contact, packageForm].join("\n");
 const operatingContract = prompt.toLowerCase();
 
 for (const phrase of [
@@ -31,6 +35,8 @@ for (const phrase of [
   "authority",
   "trust proof",
   "assisted close",
+  "package request API",
+  "fallback email",
   "defensive security boundary",
 ]) {
   assert((prompt + publicPages).toLowerCase().includes(phrase.toLowerCase()), `Missing revenue-first phrase: ${phrase}`);
@@ -62,6 +68,33 @@ assert(pricing.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "
 assert(contact.includes("Ask MRagent first"), "/contact must preserve MRagent-first support.");
 assert(contact.includes("Security owner route"), "/contact must include owner/security routing language.");
 assert(contact.includes("info@mind-reply.com"), "/contact must use the public MindReply mailbox.");
+assert(contact.includes("PackageRequestForm"), "/contact must use the package request form instead of a passive mailto-only path.");
+assert(contact.includes("mailtoHref"), "/contact must keep fallback email available.");
+
+assert(packageForm.includes("/api/package-request"), "Package request form must submit to the API route.");
+assert(packageForm.includes("inputHash"), "Package request form must display the privacy-safe input hash.");
+assert(packageForm.includes("rawContentRedacted"), "Package request form must display raw content redaction status.");
+assert(packageForm.includes("Fallback email"), "Package request form must keep fallback email visible when delivery is blocked.");
+assert(packageForm.includes("consent"), "Package request form must require consent before review.");
+assert(packageForm.includes("Website Completion Package"), "Package request form must keep the paid package visible.");
+
+assert(packageApi.includes("deliverPackageRequest"), "/api/package-request must call the delivery helper.");
+assert(packageApi.includes("makePackageReceipt"), "/api/package-request must return a receipt.");
+assert(packageApi.includes("parsePackageRequest"), "/api/package-request must validate input.");
+assert(packageApi.includes("fallback-required"), "/api/package-request must expose fallback-required status when delivery is blocked.");
+
+assert(packageHelper.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Package request helper must support a private package recipient env var.");
+assert(packageHelper.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Package request helper must support a private package sender env var.");
+assert(packageHelper.includes("MINDREPLY_PACKAGE_REQUEST_DRY_RUN"), "Package request helper must support dry-run delivery.");
+assert(packageHelper.includes("RESEND_API_KEY"), "Package request helper must use the existing Resend provider path.");
+assert(packageHelper.includes("Website Completion Package"), "Package request helper must keep the paid package name in the receipt/email path.");
+assert(packageHelper.includes("GBP 600"), "Package request helper must keep the paid package value in the receipt/email path.");
+assert(packageHelper.includes("rawContentRedacted: true"), "Package request helper must preserve rawContentRedacted in the receipt contract.");
+assert(packageHelper.includes("inputHash"), "Package request helper must produce a privacy-safe input hash.");
+
+assert(health.includes("/api/package-request"), "Health route must expose the package request URL.");
+assert(health.includes("packageRequestRecipientConfigured"), "Health route must report package request recipient readiness.");
+assert(health.includes("packageRequestProviderConfigured"), "Health route must report package request provider readiness.");
 
 assert(!/gmail\.com/i.test(publicPages), "Public pages must not expose personal Gmail addresses.");
 assert(!/57 active staff/i.test(publicPages), "Public pages must not claim 57 active staff.");
