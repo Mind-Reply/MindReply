@@ -15,14 +15,19 @@ function includes(label: string, value: string, expected: string) {
   assert(value.includes(expected), `${label} must include: ${expected}`);
 }
 
+const packageJson = read("package.json");
 const versionRoute = read("app/api/version/route.ts");
 const healthRoute = read("app/api/health/route.ts");
 const monitorReport = read("scripts/mragent-monitor-report.mjs");
 const incidentProbe = read("scripts/production-domain-incident.mjs");
 const incidentWorkflow = read(".github/workflows/mragent-domain-incident.yml");
+const growthPulse = read("scripts/mragent-growth-pulse.mjs");
+const growthWorkflow = read(".github/workflows/mragent-growth-pulse.yml");
 const reportSchema = read("site/automation/report-schema.yml");
 const vercelRunbook = read("site/automation/vercel-build-limit-runbook.yml");
 
+includes("package scripts", packageJson, "\"incident:domain\"");
+includes("package scripts", packageJson, "\"growth:pulse\"");
 includes("version route", versionRoute, "VERCEL_GIT_COMMIT_SHA");
 includes("version route", versionRoute, "VERCEL_PROJECT_PRODUCTION_URL");
 includes("version route", versionRoute, "shortSha");
@@ -46,8 +51,18 @@ includes("incident probe", incidentProbe, "fallback-intake-api");
 includes("incident workflow", incidentWorkflow, "workflow_dispatch");
 includes("incident workflow", incidentWorkflow, "scripts/production-domain-incident.mjs");
 includes("incident workflow", incidentWorkflow, "mragent-domain-incident");
+includes("growth pulse", growthPulse, "mragent-growth-pulse.json");
+includes("growth pulse", growthPulse, "primaryLane");
+includes("growth pulse", growthPulse, "copyTests");
+includes("growth pulse", growthPulse, "recommendedAction");
+includes("growth workflow", growthWorkflow, "workflow_dispatch");
+includes("growth workflow", growthWorkflow, "18 9 * * 1");
+includes("growth workflow", growthWorkflow, "scripts/mragent-growth-pulse.mjs");
+includes("growth workflow", growthWorkflow, "mragent-growth-pulse");
 includes("report schema", reportSchema, "productionVersion:");
 includes("report schema", reportSchema, "functionalChecks:");
+includes("report schema", reportSchema, "growth_pulse:");
+includes("report schema", reportSchema, "weekly growth pulse artifact");
 includes("report schema", reportSchema, "preferred_agent_api: https://www.mind-reply.com/api/agent");
 includes("report schema", reportSchema, "fallback_intake_api: https://www.mind-reply.com/api/intake");
 includes("report schema", reportSchema, "https://www.mind-reply.com/api/version");
