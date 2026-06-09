@@ -1,132 +1,90 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BarChart3,
-  Bot,
-  BrainCircuit,
   CheckCircle2,
-  Clock3,
-  Cloud,
-  Cpu,
-  DatabaseZap,
+  ClipboardList,
+  FileText,
   Gauge,
   LockKeyhole,
-  Mail,
   MessageSquare,
   MonitorSmartphone,
-  Network,
+  ReceiptText,
   ShieldCheck,
   Sparkles,
-  TriangleAlert,
-  Video,
+  Target,
 } from "lucide-react";
 
-const publicEmail = "info@mind-reply.com";
-
-const teams = [
+const serviceLanes = [
   {
-    name: "MRagent core",
-    status: "Built",
-    signal: "Live app lane",
-    icon: BrainCircuit,
-    copy: "The pressure-to-action surface: one read, one recommended move, one narrow receipt. Users should start here before contacting support.",
-    worksNow: ["/agent surface", "API intake contract", "quiet receipt shape", "risk and confidence labels"],
-  },
-  {
-    name: "ChatGPT app lane",
-    status: "Built in repo",
-    signal: "Needs deployed build",
-    icon: Bot,
-    copy: "MCP-facing shape for prepare, render, and receipt fetch. It is meant for Developer Mode connection once the production build is green.",
-    worksNow: ["/mcp route files", "tool contract docs", "widget direction", "readiness scripts"],
-  },
-  {
-    name: "Vercel operations",
-    status: "Connected",
-    signal: "Build repair active",
-    icon: Cloud,
-    copy: "The canonical project is mindreply. Domains are attached, Speed Insights is mounted, and deploy status is inspectable through Vercel.",
-    worksNow: ["production project link", "deployment history", "custom domain ownership", "build failure visibility"],
-  },
-  {
-    name: "Generated-message front end",
-    status: "Partial",
-    signal: "Markdown renderer target",
-    icon: MonitorSmartphone,
-    copy: "The right direction is structured message rendering for generated text. The capability is planned around source components, not a black-box widget.",
-    worksNow: ["chat component surface", "message rendering target", "React/Next.js structure", "compact and full app modes"],
-  },
-  {
-    name: "Reports and visibility",
-    status: "Built",
-    signal: "Local scripts exist",
-    icon: BarChart3,
-    copy: "Readiness, launch, deployment, and delivery reports exist as scripts and report artifacts. They are useful for truth, not theatre.",
-    worksNow: ["launch report", "release audit", "deploy preflight", "delivery receipt files"],
-  },
-  {
-    name: "Slack and email pack",
-    status: "Connector-ready",
-    signal: "Needs approved tokens",
+    name: "MRagent pressure read",
+    status: "Available now",
+    signal: "Start here",
     icon: MessageSquare,
-    copy: "Can triage/export/report once credentials and channel permissions are in place. Public contact should use the MindReply mailbox only.",
-    worksNow: ["Slack export can be inspected", "email report scripts", "public mailbox", "no personal address policy"],
+    copy: "Paste the tense message, unclear reply, or overloaded note. MRagent returns one synthesis, one recommended move, risk, confidence, and a narrow receipt.",
+    proof: ["/agent is the main support entry", "one-action output", "risk and confidence labels", "privacy-safe receipt shape"],
   },
   {
-    name: "Promotion studio",
-    status: "Draft lane",
-    signal: "Approval-first",
-    icon: Sparkles,
-    copy: "Campaign angles, positioning, launch copy, and platform variants can be drafted. Publishing must wait for explicit account connection and approval.",
-    worksNow: ["campaign copy queue", "public wording guard", "pack page", "review-first posture"],
+    name: "Website Completion Package",
+    status: "Available now",
+    signal: "GBP 600 fixed scope",
+    icon: ClipboardList,
+    copy: "A direct rescue for buying-friction pages: ranked fixes, stronger offer language, send-ready copy, and a clean handoff path.",
+    proof: ["GBP 600 package page", "request form", "ranked action queue", "copy and receipt deliverables"],
   },
   {
-    name: "NVIDIA AIQ research",
-    status: "Not deployed",
-    signal: "Runtime missing locally",
-    icon: Cpu,
-    copy: "NVIDIA AIQ is powerful for a research backend, but real deployment needs Git plus Docker/Python/uv or Kubernetes, and private NVIDIA/search keys.",
-    worksNow: ["deployment plan known", "server URL handoff model", "secret rules", "runtime prerequisites mapped"],
+    name: "Contact handoff",
+    status: "Available now",
+    signal: "MRagent first",
+    icon: MonitorSmartphone,
+    copy: "The public path stays simple: ask MRagent first, then use the contact form when a human handoff is needed.",
+    proof: ["contact form route", "public mailbox only", "package intent routing", "no personal inbox on site"],
   },
   {
-    name: "Physical simulation / reconstruction",
-    status: "Concept-ready",
-    signal: "Needs assets and GPU path",
-    icon: Network,
-    copy: "Neural reconstruction and infrastructure scaling belong in a separate technical lane with USD/scene assets, GPUs, and validation scenes.",
-    worksNow: ["capability framing", "infrastructure checklist", "simulation path", "blocked-until-assets label"],
+    name: "Privacy receipts",
+    status: "Available now",
+    signal: "Sensitive by default",
+    icon: ReceiptText,
+    copy: "Receipts are designed to prove what happened without turning raw private pressure into public proof.",
+    proof: ["redacted receipt language", "risk level", "confidence label", "source and timestamp"],
+  },
+  {
+    name: "Professional refinement layer",
+    status: "In use",
+    signal: "Warm authority",
+    icon: FileText,
+    copy: "MindReply’s language stays calm, premium, and practical: clearer structure, better tone, sharper boundaries, and less hesitation.",
+    proof: ["lexicon-aware copy", "tone calibration", "structure optimization", "boundary-aware persuasion"],
+  },
+  {
+    name: "Multilingual surface",
+    status: "Active layer",
+    signal: "10 priority languages",
+    icon: Gauge,
+    copy: "Country and browser signals set the first language gently, with a subtle manual selector for priority English, European, Gulf, Indian, Japanese, Chinese, and Ukrainian visitors.",
+    proof: ["IP-country route", "manual selector", "RTL support", "localized revenue copy"],
   },
 ];
 
-const worktrees = [
+const readinessRows = [
   {
-    folder: "MindReply",
-    role: "Canonical production app",
-    repo: "Mind-Reply/MindReply",
-    status: "Use this for main",
-    details: "Linked to Vercel project mindreply and the public domain. Local Git is present but command-line Git is unavailable, so GitHub connector is authoritative.",
+    label: "Ready for visitors",
+    copy: "MRagent, Website Completion Package, pricing, contact, privacy, sitemap, metadata, and the footer handoff are the public surfaces that should carry sales now.",
   },
   {
-    folder: "Mind-Reply",
-    role: "Storage / older app copy",
-    repo: "angellllkr-eng/Mind-Reply",
-    status: "Inspect before copying",
-    details: "Contains a separate Next.js app shape with heavier dependencies. Treat as source/storage until specific files are reviewed and moved deliberately.",
+    label: "Needs account connection",
+    copy: "Payment links, email delivery, Slack updates, and deeper inbox/calendar flows require approved provider credentials before they can be presented as active for a buyer.",
   },
   {
-    folder: "WebApplication1",
-    role: "Duplicate app copy",
-    repo: "Mind-Reply/MindReply",
-    status: "Do not deploy blindly",
-    details: "Looks like another clone of the older app stack. Useful only if it contains missing assets after inspection.",
+    label: "Do not publish as a claim",
+    copy: "Internal staffing counts, private prompts, tokens, build limits, provider secrets, and owner-only report lanes stay out of public copy.",
   },
 ];
 
-const blockers = [
-  "Local Git, npm, npx, and gh are not usable from this shell; GitHub and Vercel connectors are the reliable control plane.",
-  "The newest Vercel production deployments are failing, so the latest main changes are not live until the build error chain is cleared.",
-  "NVIDIA AIQ cannot be honestly marked deployed without the selected runtime and private keys configured outside chat.",
-  "Slack/email sending cannot be claimed active until app tokens, channels, and delivery targets are confirmed.",
+const proofItems = [
+  "Public contact routes through MRagent and the contact form.",
+  "The footer keeps the main CTA simple on desktop and phone.",
+  "Language detection is helpful but gentle; visitors can change it without a loud widget.",
+  "Revenue and provider claims are shown only when connected evidence exists.",
 ];
 
 export default function CapabilitiesPage() {
@@ -139,41 +97,41 @@ export default function CapabilitiesPage() {
             <span className="font-serif text-xl font-bold tracking-wide">MindReply</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
-              Ask MRagent
+            <Link href="/website-completion-package" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
+              Package
             </Link>
-            <Link href="/contact" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
-              Contact
+            <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
+              Try MRagent
             </Link>
           </div>
         </div>
       </header>
 
       <section className="bg-[#122033] px-4 py-12 text-[#f8f5f0] md:px-8 md:py-16">
-        <div className="mx-auto max-w-7xl">
-          <p className="inline-flex items-center gap-2 rounded-full border border-[#e2b757]/35 bg-[#e2b757]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#e2b757]">
-            <Gauge aria-hidden className="h-4 w-4" /> Capability command board
-          </p>
-          <div className="mt-7 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
-            <div>
-              <h1 className="font-serif text-5xl font-bold leading-[0.96] md:text-7xl">What teams exist, what works, and what is still gated.</h1>
-              <p className="mt-6 max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
-                This page separates actual working MindReply lanes from connector-ready ideas. No theatre: built means built, connected means inspectable, and blocked means a credential/runtime/asset is still missing.
-              </p>
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-end">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-[#e2b757]/35 bg-[#e2b757]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#e2b757]">
+              <Sparkles aria-hidden className="h-4 w-4" /> Service readiness
+            </p>
+            <h1 className="mt-7 max-w-3xl font-serif text-5xl font-bold leading-[0.96] md:text-7xl">
+              What MindReply can do for a visitor right now.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
+              This page keeps the promise clean: what is available, what needs an approved connection, and what should never be exposed as public theatre.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">First move</p>
+              <p className="mt-3 text-lg font-bold">Try MRagent</p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-lg border border-white/10 bg-white/[0.045] p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Canonical</p>
-                <p className="mt-3 text-lg font-bold">MindReply main</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.045] p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Public email</p>
-                <p className="mt-3 break-words text-lg font-bold">{publicEmail}</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.045] p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">First move</p>
-                <p className="mt-3 text-lg font-bold">Ask MRagent</p>
-              </div>
+            <div className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Paid offer</p>
+              <p className="mt-3 text-lg font-bold">GBP 600 package</p>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Language layer</p>
+              <p className="mt-3 text-lg font-bold">10 priority markets</p>
             </div>
           </div>
         </div>
@@ -183,27 +141,27 @@ export default function CapabilitiesPage() {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Teams and lanes</p>
-              <h2 className="mt-4 max-w-2xl font-serif text-4xl font-bold leading-tight md:text-5xl">Capability map</h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Public capability map</p>
+              <h2 className="mt-4 max-w-2xl font-serif text-4xl font-bold leading-tight md:text-5xl">Sharp enough to sell. Calm enough to trust.</h2>
             </div>
             <p className="max-w-md text-sm leading-7 text-[#59687b]">
-              The high-end version is disciplined: every lane has a status, a use, and a limit. That keeps the platform warm, sharp, and believable.
+              Each lane below is phrased for a buyer, not an internal operator. The goal is clarity, confidence, and a fast path into MRagent or the package.
             </p>
           </div>
           <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {teams.map((team) => {
-              const Icon = team.icon;
+            {serviceLanes.map((lane) => {
+              const Icon = lane.icon;
               return (
-                <article key={team.name} className="rounded-lg border border-[#122033]/10 bg-white p-5 shadow-sm shadow-[#122033]/5">
+                <article key={lane.name} className="rounded-lg border border-[#122033]/10 bg-white p-5 shadow-sm shadow-[#122033]/5">
                   <div className="flex items-start justify-between gap-3">
                     <span className="grid h-11 w-11 place-items-center rounded-lg bg-[#122033] text-[#e2b757]"><Icon aria-hidden className="h-5 w-5" /></span>
-                    <span className="rounded-full bg-[#f7f4ed] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#2f6f72]">{team.status}</span>
+                    <span className="rounded-full bg-[#f7f4ed] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#2f6f72]">{lane.status}</span>
                   </div>
-                  <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-[#9b7430]">{team.signal}</p>
-                  <h3 className="mt-3 font-serif text-2xl font-bold leading-tight">{team.name}</h3>
-                  <p className="mt-4 text-sm leading-6 text-[#59687b]">{team.copy}</p>
+                  <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-[#9b7430]">{lane.signal}</p>
+                  <h3 className="mt-3 font-serif text-2xl font-bold leading-tight">{lane.name}</h3>
+                  <p className="mt-4 text-sm leading-6 text-[#59687b]">{lane.copy}</p>
                   <div className="mt-5 grid gap-2">
-                    {team.worksNow.map((item) => (
+                    {lane.proof.map((item) => (
                       <div key={item} className="flex gap-2 text-sm text-[#39485b]">
                         <CheckCircle2 aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#2f6f72]" />
                         <span>{item}</span>
@@ -218,26 +176,22 @@ export default function CapabilitiesPage() {
       </section>
 
       <section className="border-y border-[#122033]/10 bg-white px-4 py-12 md:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Worktree truth</p>
-            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Three folders found. One should steer production.</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Readiness boundary</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Specific claims, no noise.</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
-              The right operating rule is: build on MindReply main, use Mind-Reply as reviewed storage, and treat WebApplication1 as duplicate material until proven useful.
+              The site should feel premium because it is restrained. Buyers get the route that works now and a plain label for anything requiring an account connection.
             </p>
           </div>
           <div className="grid gap-4">
-            {worktrees.map((tree) => (
-              <article key={tree.folder} className="rounded-lg border border-[#122033]/10 bg-[#f7f4ed] p-5">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <h3 className="font-serif text-2xl font-bold leading-tight">{tree.folder}</h3>
-                    <p className="mt-1 text-sm font-semibold text-[#2f6f72]">{tree.role}</p>
-                  </div>
-                  <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#9b7430]">{tree.status}</span>
+            {readinessRows.map((row) => (
+              <article key={row.label} className="rounded-lg border border-[#122033]/10 bg-[#f7f4ed] p-5">
+                <div className="flex items-center gap-3 text-[#2f6f72]">
+                  <ShieldCheck aria-hidden className="h-5 w-5" />
+                  <h3 className="font-serif text-2xl font-bold leading-tight">{row.label}</h3>
                 </div>
-                <p className="mt-4 text-sm leading-6 text-[#59687b]">{tree.details}</p>
-                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#59687b]">{tree.repo}</p>
+                <p className="mt-4 text-sm leading-7 text-[#59687b]">{row.copy}</p>
               </article>
             ))}
           </div>
@@ -248,56 +202,36 @@ export default function CapabilitiesPage() {
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_1fr]">
           <div className="rounded-lg bg-[#103b39] p-6 text-[#f8f5f0]">
             <div className="flex items-center gap-3 text-[#91d2c8]">
-              <ShieldCheck aria-hidden className="h-5 w-5" />
-              <p className="text-xs font-bold uppercase tracking-[0.22em]">How users should flow</p>
+              <Target aria-hidden className="h-5 w-5" />
+              <p className="text-xs font-bold uppercase tracking-[0.22em]">Recommended buyer path</p>
             </div>
-            <h2 className="mt-5 font-serif text-3xl font-bold leading-tight">Ask MRagent first. Contact only when the agent cannot solve it.</h2>
+            <h2 className="mt-5 font-serif text-3xl font-bold leading-tight">MRagent first. Package next. Contact only when the handoff needs a person.</h2>
             <p className="mt-4 text-sm leading-7 text-[#d3e5e2]">
-              That keeps support focused and protects privacy. The public route is MRagent, then contact form, then {publicEmail}. No personal mailbox belongs on the website.
+              This makes the phone view simple and keeps the page from becoming a maze. A visitor should know where to start within seconds.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
                 Open MRagent <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
-              <Link href="/contact" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
-                Contact form <Mail aria-hidden className="h-4 w-4" />
+              <Link href="/website-completion-package" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+                View package <FileText aria-hidden className="h-4 w-4" />
               </Link>
             </div>
           </div>
 
           <div className="rounded-lg border border-[#122033]/10 bg-white p-6">
-            <div className="flex items-center gap-3 text-[#d96f4a]">
-              <TriangleAlert aria-hidden className="h-5 w-5" />
-              <p className="text-xs font-bold uppercase tracking-[0.22em]">Current blockers</p>
+            <div className="flex items-center gap-3 text-[#9b7430]">
+              <LockKeyhole aria-hidden className="h-5 w-5" />
+              <p className="text-xs font-bold uppercase tracking-[0.22em]">Trust proof</p>
             </div>
             <div className="mt-6 grid gap-3">
-              {blockers.map((blocker) => (
-                <div key={blocker} className="flex gap-3 rounded-lg border border-[#122033]/10 bg-[#fbfaf6] p-4 text-sm leading-6 text-[#59687b]">
-                  <LockKeyhole aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#d96f4a]" />
-                  <span>{blocker}</span>
+              {proofItems.map((item) => (
+                <div key={item} className="flex gap-3 rounded-lg border border-[#122033]/10 bg-[#fbfaf6] p-4 text-sm leading-6 text-[#59687b]">
+                  <CheckCircle2 aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#2f6f72]" />
+                  <span>{item}</span>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-4 pb-12 md:px-8">
-        <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
-          <div className="rounded-lg border border-[#122033]/10 bg-white p-5">
-            <DatabaseZap aria-hidden className="h-6 w-6 text-[#2f6f72]" />
-            <h3 className="mt-4 font-serif text-2xl font-bold">Data visualization</h3>
-            <p className="mt-3 text-sm leading-6 text-[#59687b]">Best used for KPI boards, deployment timelines, receipt counts, and conversion events once the data source is confirmed.</p>
-          </div>
-          <div className="rounded-lg border border-[#122033]/10 bg-white p-5">
-            <Video aria-hidden className="h-6 w-6 text-[#2f6f72]" />
-            <h3 className="mt-4 font-serif text-2xl font-bold">Launch media</h3>
-            <p className="mt-3 text-sm leading-6 text-[#59687b]">Remotion/Figma-style assets can explain MRagent, but should not delay the core site or publish unreviewed claims.</p>
-          </div>
-          <div className="rounded-lg border border-[#122033]/10 bg-white p-5">
-            <Clock3 aria-hidden className="h-6 w-6 text-[#2f6f72]" />
-            <h3 className="mt-4 font-serif text-2xl font-bold">Cadence</h3>
-            <p className="mt-3 text-sm leading-6 text-[#59687b]">Recurring reports are designed around checked status and receipts. A real scheduler still needs Vercel Cron or another authorized runner.</p>
           </div>
         </div>
       </section>
