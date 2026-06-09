@@ -28,6 +28,7 @@ export const metadata: Metadata = {
       it: "/?lang=it",
       pt: "/?lang=pt",
       ar: "/?lang=ar",
+      hi: "/?lang=hi",
       ja: "/?lang=ja",
       ko: "/?lang=ko",
       zh: "/?lang=zh",
@@ -46,7 +47,9 @@ export const metadata: Metadata = {
   },
   keywords: [
     "Website Completion Package",
+    "GBP 600 website package",
     "website buying friction",
+    "website completion service",
     "response overload",
     "client follow up cadence",
     "founder communication rescue",
@@ -55,6 +58,8 @@ export const metadata: Metadata = {
     "ranked action queue",
     "send ready copy",
     "MRagent",
+    "multilingual business communication support",
+    "executive communication infrastructure",
   ],
   category: "Business Communication",
   openGraph: {
@@ -64,6 +69,7 @@ export const metadata: Metadata = {
     siteName: "MindReply",
     type: "website",
     locale: "en_GB",
+    alternateLocale: ["es_ES", "fr_FR", "de_DE", "it_IT", "pt_BR", "ar_AE", "hi_IN", "ja_JP", "ko_KR", "zh_CN"],
     images: [
       {
         url: "/opengraph-image",
