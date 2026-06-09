@@ -16,6 +16,10 @@ const automationOnlyPrefixes = [
 
 const automationOnlyFiles = new Set([
   "scripts/mragent-monitor-report.mjs",
+  "scripts/mragent-growth-pulse.mjs",
+  "scripts/mragent-short-digest.mjs",
+  "scripts/production-domain-incident.mjs",
+  "scripts/verify-production-version-contract.ts",
 ]);
 
 function normalizeHost(value = "") {
@@ -94,6 +98,15 @@ function selfTest() {
       MRAGENT_CHANGED_FILES: "site/automation/report-schema.yml\nscripts/mragent-monitor-report.mjs",
     }).build === false,
     "Automation-only changes must be skipped.",
+  );
+  assert(
+    shouldBuild({
+      VERCEL_ENV: "production",
+      VERCEL_GIT_COMMIT_REF: "main",
+      VERCEL_PROJECT_PRODUCTION_URL: "mind-reply-angellllkr-engs-projects.vercel.app",
+      MRAGENT_CHANGED_FILES: "scripts/mragent-growth-pulse.mjs\nscripts/mragent-short-digest.mjs\nscripts/production-domain-incident.mjs",
+    }).build === false,
+    "Reporting-only script changes must be skipped.",
   );
   assert(
     shouldBuild({
