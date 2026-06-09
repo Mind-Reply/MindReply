@@ -24,9 +24,18 @@ jobs:
           MRAGENT_REPORT_JSON: mragent-monitor-status.json
         run: node scripts/mragent-monitor-report.mjs >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Write growth pulse
+        env:
+          MRAGENT_GROWTH_PULSE_JSON: mragent-growth-pulse.json
+        run: |
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          node scripts/mragent-growth-pulse.mjs >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload machine-readable status
         uses: actions/upload-artifact@v4
         with:
           name: mragent-monitor-status
-          path: mragent-monitor-status.json
+          path: |
+            mragent-monitor-status.json
+            mragent-growth-pulse.json
           if-no-files-found: error
