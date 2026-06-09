@@ -22,13 +22,17 @@ const layout = read("app/layout.tsx");
 const robots = read("app/robots.ts");
 const sitemap = read("app/sitemap.ts");
 const localeAssist = read("components/LocaleAssist.tsx");
+const packageRequestForm = read("components/PackageRequestForm.tsx");
 const geoLocale = read("app/api/geo-locale/route.ts");
+const packageRequestApi = read("app/api/package-request/route.ts");
+const packageRequestLib = read("lib/package-request.ts");
 const websiteBlueprint = read("docs/website_audit_action_blueprint.md");
 const ownerSecurity = read("docs/owner_decision_security.md");
 
 includes("homepage", home, "Reclaim 2+ hours daily within 24 hours");
 includes("homepage", home, "Website Completion Package");
 includes("homepage", home, "GBP 600");
+includes("homepage", home, "website buying-friction rescue");
 includes("homepage", home, "Discipline-specific language");
 includes("homepage", home, "Behavioral expression read");
 includes("homepage", home, "Measurable communication structure");
@@ -44,6 +48,23 @@ includes("package page", packagePage, "GBP 600");
 includes("package page", packagePage, "buying-friction rescue");
 includes("package page", packagePage, "ranked action queue");
 includes("package page", packagePage, "send-ready copy");
+
+includes("package request form", packageRequestForm, "Submit GBP 600 package request");
+includes("package request form", packageRequestForm, "Owner decision needed");
+includes("package request form", packageRequestForm, "Payment path");
+includes("package request form", packageRequestForm, "Reply window");
+includes("package request form", packageRequestForm, "Risk:");
+
+includes("package request API", packageRequestApi, "Expect the next close-ready route within one business day");
+includes("package request API", packageRequestApi, "assistedClose");
+
+includes("package request receipt", packageRequestLib, "assistedClose");
+includes("package request receipt", packageRequestLib, "riskLevel: \"low\"");
+includes("package request receipt", packageRequestLib, "confidence: \"medium\"");
+includes("package request receipt", packageRequestLib, "playbookVersion: \"website-completion-2026-06\"");
+includes("package request receipt", packageRequestLib, "fallbackEmail: \"info@mind-reply.com\"");
+includes("package request receipt", packageRequestLib, "Owner decision needed: confirm scope");
+includes("package request receipt", packageRequestLib, "Payment path: scope first, then invoice or payment link after acceptance.");
 
 includes("layout metadata", layout, "Website Completion and Response Overload Rescue");
 includes("layout metadata", layout, "GBP 600 website package");
@@ -95,4 +116,4 @@ includes("owner security", ownerSecurity, "Defensive Security Boundary");
 includes("owner security", ownerSecurity, "Owner Decision Format");
 assert(!/ANGELLLKR@GMAIL\.COM/i.test(ownerSecurity), "owner security doc must not expose the private Gmail directly.");
 
-console.log("Revenue, 10-language i18n, SEO, and security boundary verification passed.");
+console.log("Revenue, 10-language i18n, SEO, assisted close, and security boundary verification passed.");
