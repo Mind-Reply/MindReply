@@ -32,20 +32,33 @@ fields:
     expectedSha: GitHub Actions SHA for the monitor run when available.
     matchesRun: true, false, or null when unavailable.
     data: Full /api/version JSON payload.
+  functionalChecks:
+    agentApi:
+      ok: true when /api/agent returns reply, receipt, risk, and one action.
+      signal: Short outcome for the preferred API.
+    intakeApi:
+      ok: true when /api/intake returns synthesis, receipt, risk, and one action.
+      signal: Short outcome for the fallback decision route.
+    decisionApi: live when either preferred or fallback decision route works.
   summary:
     coreAgent: live or check.
+    decisionApi: live or not live.
+    preferredAgentApi: live or not live.
+    fallbackIntakeApi: live or not live.
     mcpApp: live or not live.
     health: live or not live.
     version: live or not live.
     discoveryAssets: live or not live.
     personalPack: ready or check.
-    currentBlocker: Current deploy, stale production, or platform blocker in plain language.
+    currentBlocker: Current deploy, stale production, API, or platform blocker in plain language.
     opinion: Short operating opinion for the pass.
     nextAction: The next recommended move.
-  surfaces: Per-URL status, latency, signal, and JSON data when available, including version, primary_mcp, and fallback_mcp checks.
+  surfaces: Per-URL status, method, latency, signal, and JSON data when available, including agent-api, intake-api, version, primary_mcp, and fallback_mcp checks.
   packSources: Required personal-pack source files and whether each exists, including slack-api, vercel-build-limit, verification-runbook, preview-capture-script, preview-capture-workflow, visibility-plan, search-intents, live-copy-sync, preview-qa, preview-results, and ad-copy-tests.
 connection_urls:
   agent: https://www.mind-reply.com/agent
+  preferred_agent_api: https://www.mind-reply.com/api/agent
+  fallback_intake_api: https://www.mind-reply.com/api/intake
   version: https://www.mind-reply.com/api/version
   primary_mcp: https://www.mind-reply.com/mcp
   fallback_mcp: https://www.mind-reply.com/api/mcp
@@ -72,6 +85,7 @@ visibility:
     - active_deployment
     - legacy_quota_context
     - production_version
+    - functional_api_checks
     - production_surfaces
     - search_assets
     - ad_message_sync
