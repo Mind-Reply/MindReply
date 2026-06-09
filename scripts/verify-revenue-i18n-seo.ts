@@ -99,9 +99,19 @@ includes("globals", globals, "overflow-x: hidden");
 includes("globals", globals, ".min-h-\\[43rem\\]");
 includes("globals", globals, "overflow-wrap: anywhere");
 
-includes("site footer", footer, "Contact form");
-includes("site footer", footer, "/contact?intent=website-completion");
-includes("site footer", footer, "Try MRagent");
+for (const phrase of [
+  "Contact form",
+  "/contact?intent=website-completion",
+  "Try MRagent",
+  "Auto language and priority markets",
+  "Country signal first, browser language second",
+  "UK",
+  "UAE",
+  "Saudi Arabia",
+  "Brazil",
+]) {
+  includes("site footer", footer, phrase);
+}
 assert(!/mailto:/i.test(footer), "footer should route to contact form, not direct mailto.");
 
 includes("contact page", contact, "Ask MRagent first");
