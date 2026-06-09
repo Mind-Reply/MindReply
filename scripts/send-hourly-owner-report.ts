@@ -69,7 +69,7 @@ async function sendEmail(report: string, dryRun: boolean): Promise<{ status: Del
     body: JSON.stringify({
       from,
       to,
-      subject: "MindReply 50-minute owner report",
+      subject: "MindReply hourly owner report",
       text: report,
     }),
   });
@@ -140,7 +140,7 @@ async function main() {
   const failed = Object.values(delivery).some((value) => ["failed"].includes(String(value.status)));
   const blocked = Object.values(delivery).some((value) => ["blocked"].includes(String(value.status)));
 
-  console.log(`50-minute owner report delivery complete. failed=${failed} blocked=${blocked} dryRun=${dryRun}`);
+  console.log(`Hourly owner report delivery complete. failed=${failed} blocked=${blocked} dryRun=${dryRun}`);
 
   if (failed) process.exit(1);
 }
