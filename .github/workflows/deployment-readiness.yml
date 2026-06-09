@@ -1,0 +1,82 @@
+name: MindReply Deployment Readiness Check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mindreply-deployment-readiness
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    name: Verify production deploy readiness without deploying
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || vars.VERCEL_PROJECT_ID }}
+      NEXT_PUBLIC_SITE_URL: https://www.mind-reply.com
+      MINDREPLY_LIVE_VERIFY_URL: https://www.mind-reply.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify report state
+        run: npm run report:check
+
+      - name: Generate owner state report
+        run: npm run launch:report
+
+      - name: Verify revenue blueprint
+        run: npm run audit:blueprint
+
+      - name: Verify app contract
+        run: npm run verify:all
+
+      - name: Verify Vercel target secrets
+        run: |
+          test -n "$VERCEL_TOKEN"
+          test "$VERCEL_ORG_ID" = "team_0plIJmQLgZC1wVv9zI2eVf3B"
+          test "$VERCEL_PROJECT_ID" = "prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3"
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel production environment
+        run: vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
+
+      - name: Build Vercel artifact without deploying
+        run: vercel build --prod --token "$VERCEL_TOKEN"
+
+      - name: Check current live health
+        run: |
+          curl --fail --show-error --silent https://www.mind-reply.com/ > /tmp/mindreply-home.html
+          curl --fail --show-error --silent https://www.mind-reply.com/api/health > /tmp/mindreply-health.json
+          if curl --fail --show-error --silent https://www.mind-reply.com/api/version > /tmp/mindreply-version.json; then
+            echo "Live /api/version is already deployed."
+          else
+            echo "Live /api/version is not deployed yet; manual production deploy is still required."
+          fi
+
+      - name: Upload readiness artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mindreply-deployment-readiness
+          path: |
+            reports/outbox/**
+            .vercel/output/**
+          if-no-files-found: ignore
