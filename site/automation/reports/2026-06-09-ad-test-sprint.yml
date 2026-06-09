@@ -1,0 +1,88 @@
+version: 1
+created: 2026-06-09
+branch: mind-reply
+report_type: ad_test_sprint
+campaign: MRagent warm mind read
+status: ready_after_discovery_routes_are_live
+primary_promise: Read the pressure before you reply.
+landing_priority:
+  first: /agent
+  second: /
+not_ready_blockers:
+  - /manifest.webmanifest is 404 on production
+  - /opengraph-image is 404 on production
+  - /api/agent is 410 on production
+  - /api/version is 410 on production
+  - /mcp is 404 on production
+creative_guardrails:
+  use:
+    - pressure
+    - warm authority
+    - quiet receipt
+    - one clear next move
+    - before you reply
+  avoid:
+    - AI assistant
+    - therapy or diagnosis claims
+    - productivity hack
+    - guaranteed outcomes
+    - claims that raw input is stored
+ad_sets:
+  tense_reply:
+    audience_state: They are staring at a loaded message and do not trust their first draft.
+    landing: /agent
+    hypothesis: The clearest pull is relief before sending, not better writing.
+    variants:
+      - headline: Read the pressure before you reply.
+        body: Paste the tense message. MRagent gives one warm read, one safer move, and a quiet receipt.
+      - headline: Do not send while the message still has heat.
+        body: Name what is underneath, then answer once with calm authority.
+      - headline: The reply is not the hard part. The pressure is.
+        body: MRagent reads the tension and gives you one clean next action.
+    success_signal: /agent visit plus sample submission
+    stop_if: clicks come from generic writing-help intent
+  pricing_pushback:
+    audience_state: Founder or seller needs to answer price hesitation without shrinking.
+    landing: /
+    hypothesis: Warm authority will beat discount-defense language.
+    variants:
+      - headline: When price pushback gets personal, answer cleanly.
+        body: Read the hesitation, keep the relationship warm, and move once.
+      - headline: Client says it is high. Do not sound smaller.
+        body: MRagent finds the pressure pattern and gives one calm next move.
+      - headline: Keep the price conversation human and firm.
+        body: One synthesis. One action. No spiral.
+    success_signal: home visit continuing to /agent
+    stop_if: copy attracts negotiation-advice seekers only
+  follow_up_dread:
+    audience_state: They keep replaying an unanswered thread and delaying the follow-up.
+    landing: /agent
+    hypothesis: Closure language will convert better than task language.
+    variants:
+      - headline: One quiet next move for the thread still tugging at you.
+        body: Bring the follow-up you keep postponing. Leave with a clear action and receipt.
+      - headline: Follow up without sounding pushy or small.
+        body: MRagent reads the social pressure and gives one warm next move.
+      - headline: Stop carrying the unsent follow-up.
+        body: Turn the loose thread into a calm reply path.
+    success_signal: /agent visit plus follow-up scenario submission
+    stop_if: traffic behaves like task-manager intent
+measurement_plan:
+  minimum_before_spend:
+    - production /agent works
+    - production /api/agent or fallback decision API works
+    - production manifest works
+    - production Open Graph image works
+    - sitemap and robots remain live
+  manual_metrics:
+    - visits to /agent
+    - submissions on /agent
+    - route used by decision request
+    - receipt generated
+    - top clicked headline
+  decision_rule: Run the smallest audience first; keep only headlines that produce /agent submissions, not just clicks.
+next_build_when_quota_clears:
+  - make missing discovery routes live
+  - align live hero phrase to Read the pressure before you reply
+  - run preview capture with desktop and mobile screenshots
+short_digest_line: Ad sprint is ready, but paid traffic should wait until manifest, Open Graph, preferred API, version, and MCP routes are live.
