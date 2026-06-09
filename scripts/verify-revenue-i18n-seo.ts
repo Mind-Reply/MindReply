@@ -22,6 +22,7 @@ const layout = read("app/layout.tsx");
 const robots = read("app/robots.ts");
 const sitemap = read("app/sitemap.ts");
 const localeAssist = read("components/LocaleAssist.tsx");
+const siteFooter = read("components/SiteFooter.tsx");
 const packageRequestForm = read("components/PackageRequestForm.tsx");
 const geoLocale = read("app/api/geo-locale/route.ts");
 const packageRequestApi = read("app/api/package-request/route.ts");
@@ -47,7 +48,13 @@ includes("homepage", home, "Public contact uses info@mind-reply.com only.");
 includes("contact page", contact, "info@mind-reply.com");
 includes("contact page", contact, "Ask MRagent first");
 includes("contact page", contact, "Website Completion Package, GBP 600");
-assert(!/ANGELLLKR@GMAIL\.COM|gmail\.com/i.test(contact), "contact page must not expose personal Gmail.");
+assert(!/ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i.test(contact), "contact page must not expose personal Gmail.");
+
+includes("site footer", siteFooter, "Contact form");
+includes("site footer", siteFooter, "/contact?intent=website-completion");
+includes("site footer", siteFooter, "Try MRagent");
+assert(!/mailto:/i.test(siteFooter), "footer should route to contact form, not direct mailto.");
+assert(!/ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i.test(siteFooter), "footer must not expose personal Gmail.");
 
 includes("package page", packagePage, "Website Completion Package");
 includes("package page", packagePage, "GBP 600");
@@ -96,12 +103,21 @@ for (const locale of ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"
   includes("locale assist", localeAssist, `${locale}: {`);
 }
 assert(!/ko: \{|it: \{/.test(localeAssist), "locale assist should stay at the 10 priority languages.");
+includes("locale assist", localeAssist, "surfaceTranslations");
+includes("locale assist", localeAssist, "applySurfaceLocale");
+includes("locale assist", localeAssist, "document.documentElement.lang");
+includes("locale assist", localeAssist, "document.documentElement.dir");
 includes("locale assist", localeAssist, "Website Completion Package");
 includes("locale assist", localeAssist, "GBP 600");
-includes("locale assist", localeAssist, "info@mind-reply.com");
+includes("locale assist", localeAssist, "contact form");
 includes("locale assist", localeAssist, "aria-live=\"polite\"");
 includes("locale assist", localeAssist, "data-revenue-anchor");
 includes("locale assist", localeAssist, "Auto {country}");
+includes("locale assist", localeAssist, "Reclaim 2+ hours daily within 24 hours.");
+includes("locale assist", localeAssist, "Recupere más de 2 horas diarias en 24 horas.");
+includes("locale assist", localeAssist, "استعد أكثر من ساعتين يومياً خلال 24 ساعة.");
+includes("locale assist", localeAssist, "24 घंटे में रोज़ 2+ घंटे वापस पाएं.");
+assert(!/ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i.test(localeAssist), "locale assist must not expose personal Gmail.");
 
 includes("geo locale", geoLocale, "IN: \"hi\"");
 includes("geo locale", geoLocale, "AE: \"ar\"");
@@ -122,4 +138,4 @@ includes("owner security", ownerSecurity, "Defensive Security Boundary");
 includes("owner security", ownerSecurity, "Owner Decision Format");
 assert(!/ANGELLLKR@GMAIL\.COM/i.test(ownerSecurity), "owner security doc must not expose the private Gmail directly.");
 
-console.log("Revenue, 10-language i18n, SEO, premium authority, assisted close, and security boundary verification passed.");
+console.log("Revenue, 10-language surface i18n, SEO, assisted close, footer handoff, and security boundary verification passed.");
