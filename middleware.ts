@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isRedirectedPublicPath } from "@/lib/decision-layer";
 
-const allowedApiPaths = new Set(["/api/health", "/api/intake", "/api/agent", "/api/mcp", "/api/version"]);
+const allowedApiPaths = new Set(["/api/health", "/api/intake", "/api/conversion", "/api/agent", "/api/mcp", "/api/version"]);
 
 export default function middleware(req: NextRequest) {
   const host = req.headers.get("host")?.toLowerCase();
