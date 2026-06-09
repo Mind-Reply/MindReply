@@ -43,7 +43,20 @@ function flag(value?: string) {
 }
 
 function normalizeContext(value: string) {
-  return value.toLowerCase().replace(/[–—]/g, "-").replace(/\s+/g, " ").trim();
+  return value.toLowerCase().replace(/[\u2013\u2014]/g, "-").replace(/\s+/g, " ").trim();
+}
+
+function safeState(value?: string) {
+  const normalized = (value || "").trim().toLowerCase();
+  return ["error", "failure", "pending", "success"].includes(normalized) ? normalized : "unknown";
+}
+
+function safeRepository(value: string) {
+  return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(value) ? value : "Mind-Reply/MindReply";
+}
+
+function safeCommitSha(value: string) {
+  return /^[a-f0-9]{7,40}$/i.test(value) ? value : "";
 }
 
 function isCanonicalMindReplyStatus(status: RawStatus) {
@@ -64,7 +77,7 @@ function classify(status: RawStatus): ClassifiedStatus {
 
   return {
     context,
-    state: status.state || "unknown",
+    state: safeState(status.state),
     targetUrl,
     description: status.description || "",
     updatedAt: status.updated_at || "",
@@ -97,7 +110,7 @@ async function fetchCombinedStatus() {
   if (!response.ok) {
     return {
       configured: true,
-      error: `GitHub status request failed with ${response.status}: ${text.slice(0, 300)}`,
+      error: `GitHub status request failed with ${response.status}.`,
       response: undefined,
     };
   }
@@ -116,15 +129,22 @@ function writeAndPrint(summary: unknown, lines: string[]) {
 
 async function main() {
   const result = await fetchCombinedStatus();
+  const receiptBase = {
+    generatedAt: new Date().toISOString(),
+    repository: safeRepository(repository),
+    commitSha: safeCommitSha(commitSha || ""),
+    requireSingleContext,
+  };
 
   if (!result.configured || result.error || !result.response) {
     const summary = {
-      generatedAt: new Date().toISOString(),
-      repository,
-      commitSha: commitSha || "",
+      ...receiptBase,
       status: "not-verifiable",
-      requireSingleContext,
-      error: result.error,
+      error: result.error ? "status-request-failed" : "missing-status-configuration",
+      notes: [
+        "This JSON receipt intentionally excludes provider response bodies.",
+        "Detailed provider context is printed to stdout for operator review.",
+      ],
     };
 
     writeAndPrint(summary, [
@@ -151,22 +171,19 @@ async function main() {
   const status = singleCanonicalContext ? "single-canonical" : "needs-provider-action";
 
   const summary = {
-    generatedAt: new Date().toISOString(),
-    repository,
-    commitSha,
+    ...receiptBase,
     status,
-    requireSingleContext,
-    combinedState: result.response.state || "unknown",
+    combinedState: safeState(result.response.state),
     counts: {
       vercel: vercelStatuses.length,
       canonical: canonicalStatuses.length,
       duplicate: duplicateStatuses.length,
       quotaLinked: quotaLinkedStatuses.length,
     },
-    statuses: vercelStatuses,
     notes: [
       "This command is read-only and does not create, update, delete, or redeploy anything.",
-      "Canonical status is the Vercel context targeting the mind-reply project.",
+      "This JSON receipt intentionally excludes provider-supplied context strings, URLs, descriptions, and timestamps.",
+      "Detailed provider context is printed to stdout for operator review.",
       "Duplicate contexts must be disconnected, disabled, or made non-required provider-side.",
     ],
   };
