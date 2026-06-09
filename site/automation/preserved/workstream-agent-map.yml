@@ -1,0 +1,109 @@
+version: 1
+created: 2026-06-09
+branch: mind-reply
+preserved_from:
+  branch: codex/executive-nervous-system-main-sync
+  path: docs/ops/8-workstream-agent-map.md
+preservation_type: operating_model_extract
+status: preserved_reference
+purpose: Preserve useful workstream/reporting structure before retiring old codex branches.
+workstreams:
+  infrastructure:
+    owns:
+      - Vercel
+      - domain
+      - preview and production readiness
+      - deployment blockers
+    current_evidence:
+      - active Vercel status
+      - public route probes
+      - /api/version freshness once live
+  devops:
+    owns:
+      - GitHub Actions
+      - scheduled reports
+      - CI gates
+      - artifacts
+    current_evidence:
+      - MRagent Monitor every 15 minutes
+      - storage report index
+      - Vercel guard verification
+  security:
+    owns:
+      - secrets hygiene
+      - public surface leaks
+      - privacy-safe reporting
+      - provider key safety
+    current_evidence:
+      - no raw input in reports
+      - no Slack webhook or API keys committed
+  frontend:
+    owns:
+      - home page
+      - agent page
+      - responsive product surface
+      - browser capture quality
+    current_evidence:
+      - design rebuild brief
+      - product-first acceptance checks
+  mragent:
+    owns:
+      - warm conversational behavior
+      - slow-read phases
+      - one-action response contract
+      - receipt and risk output
+    current_evidence:
+      - /agent live
+      - fallback /api/intake live
+      - /api/agent freshness pending
+  integration:
+    owns:
+      - Gmail/calendar/browser extension intake concepts
+      - ChatGPT Apps/MCP public connection path
+      - privacy-safe handoff
+    current_evidence:
+      - /mcp source exists on main
+      - public /mcp stale until Vercel quota clears
+  growth:
+    owns:
+      - positioning
+      - SEO
+      - ad tests
+      - visibility reports
+    current_evidence:
+      - SEO visibility pulse
+      - ad test sprint
+      - positioning files
+  product_design:
+    owns:
+      - high-end minimal look
+      - first viewport product experience
+      - Figma/design handoff readiness
+    current_evidence:
+      - design rebuild brief
+      - implementation readiness pack
+angel_pack_reporting_rule:
+  every_report_should_include:
+    - one completed or current implementation move
+    - one growth/revenue/visibility move
+    - one practical gift idea such as checklist, dashboard snapshot, automation audit, or growth brief
+    - one verification checklist or next proof gate
+  current_storage_interpretation:
+    implementation_move: storage report or readiness artifact created
+    growth_move: SEO/ad/positioning/report action recorded
+    practical_gift: report artifact that can be reused or handed off
+    verification_gate: Vercel status, public route probes, no-deploy storage proof
+fit_for_current_mindreply:
+  keep:
+    - workstream ownership model for internal reports
+    - Angel Pack reporting rule
+    - evidence-first status updates
+  avoid:
+    - public staffing claims
+    - claiming integrations are live before route and credential proof
+    - perfect 23-minute schedule pattern; current monitor is 15 minutes and should remain the source of truth
+recommended_use:
+  storage: keep as report operating model
+  main: port Angel Pack/reporting rule only if needed in report schema or digest
+  public_site: do not expose workstream internals
+short_digest_line: 8-workstream map preserved; Angel Pack reporting rule retained for internal report structure.

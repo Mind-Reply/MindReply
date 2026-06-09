@@ -2,30 +2,39 @@ version: 1
 created: 2026-06-09
 updated: 2026-06-09
 branch: mind-reply
-purpose: Central index for storage-branch reports while main/Vercel deployment is rate-limited.
+purpose: Central index for storage-branch reports while main/Vercel deployment state is being tracked.
 canonical_repo: Mind-Reply/MindReply
 canonical_deploy_branch: main
 storage_branch: mind-reply
-latest_checked_main_commit: 6ab180402ce88352497d25e0c0ba6fa1180e5003
+latest_checked_main_commit: f589025b154376098a10bca8c11e4471bbe490e1
 current_state:
   production:
-    home_page: live_200
-    agent_page: live_200
-    fallback_intake_api: live_200
-    api_agent: stale_410
-    api_version: stale_410
-    mcp: missing_404
-    manifest: missing_404
-    opengraph_image: missing_404
-    sitemap: live_200
-    robots: live_200
+    home_page: live_200_from_prior_check
+    agent_page: deployed_green_latest_commit_public_http_timed_out_from_codex_machine
+    fallback_intake_api: live_200_from_prior_check
+    api_agent: deployed_green_latest_commit_public_http_timed_out_from_codex_machine
+    api_version: needs_browser_recheck
+    mcp: needs_browser_recheck
+    manifest: needs_browser_recheck
+    opengraph_image: needs_browser_recheck
+    sitemap: live_200_from_prior_check
+    robots: live_200_from_prior_check
   deployment:
-    vercel_mind_reply: build_rate_limited
-    vercel_mindreply: build_rate_limited
+    vercel_mind_reply: success_on_latest_main_status_check
+    vercel_mindreply: success_on_latest_main_status_check
+    vercel_deployments_context: success_on_latest_main_status_check
+  revenue:
+    verified_income: false
+    note: No payment, order, or revenue data was available through the current repo/connectors.
   policy:
-    main_commits: pause_non_urgent_app_changes_until_quota_clears
-    storage_commits: allowed_for_reports_plans_and_growth_material
+    main_commits: allowed_for_high_impact_runtime_frontend_work_requested_by_owner
+    storage_commits: allowed_for_reports_plans_growth_material_and_status_trail
 reports:
+  - date: 2026-06-09
+    type: main_voice_frontend_pass
+    path: site/automation/reports/2026-06-09-main-voice-frontend-pass.yml
+    commit: c0294b30f567ba61fe381b17dac2b72c81d3bdf1
+    one_line: Main now has runtime and frontend MRagent voice upgrades; Vercel checks are green, public HTTP checks timed out from this machine, revenue is not yet verified.
   - date: 2026-06-09
     type: storage_status
     path: site/automation/reports/2026-06-09-storage-status.yml
@@ -61,18 +70,53 @@ reports:
     path: site/automation/reports/2026-06-09-vercel-quota-recheck.yml
     commit: a3988d6abcc9281ffd74a3c4a985d12e5e650b3f
     one_line: Vercel quota still active; public page and fallback API live, app/developer routes stale or missing.
+  - date: 2026-06-09
+    type: branch_cleanup_followup
+    path: site/automation/reports/2026-06-09-branch-cleanup-followup.yml
+    commit: 12275c9aeffac3e1f61b6b13c0d3478b3e07cfea
+    one_line: Branch cleanup path confirmed: keep main and mind-reply, preserve selected old material, delete only with confirmation/tooling.
+  - date: 2026-06-09
+    type: preserved_material_manifest
+    path: site/automation/reports/2026-06-09-preserved-material-manifest.yml
+    commit: 8dbf32317ccd8418ec74e4a53883b2a230bd3030
+    one_line: Preservation manifest created for old branch concepts before retiring codex branches.
+preserved_extracts:
+  - date: 2026-06-09
+    type: moa_blueprint_notes
+    path: site/automation/preserved/multi-agent-blueprint-notes.yml
+    commit: a9d157a92714132554fa8506acb3750225e71320
+    one_line: MOA blueprint preserved as internal operating model, not runtime merge candidate.
+  - date: 2026-06-09
+    type: workstream_agent_map
+    path: site/automation/preserved/workstream-agent-map.yml
+    commit: 7ca893aee8b9d3eeb907a5223e0f1d13e07d202b
+    one_line: 8-workstream map and Angel Pack reporting rule preserved for internal reports.
+  - date: 2026-06-09
+    type: moa_concept_extract
+    path: site/automation/preserved/moa-concept-extract.yml
+    commit: b517c8b05bb909c460ed2fcd55aa423686bff3d3
+    one_line: MOA typed roster and validation concepts preserved as report/checklist inspiration.
+  - date: 2026-06-09
+    type: chatgpt_app_legacy_contract
+    path: site/automation/preserved/chatgpt-app-legacy-contract.yml
+    commit: db3199bfe4d4d53ae5b3bd2910797803bdac3bcf
+    one_line: Legacy ChatGPT app contract preserved while current main MCP remains source of truth.
+  - date: 2026-06-09
+    type: action_route_behavior_note
+    path: site/automation/preserved/action-route-behavior-note.yml
+    commit: 38bb88b7873bb4cc3cc9b13a83cb66cdc4095d9f
+    one_line: Old /api/action behavior preserved as storage-only; do not port without receipt/action tests.
 next_report_slots:
-  - type: daily_short_digest
-    cadence: every active work pass while quota is limited
-    focus: live route state, Vercel state, one next action
-  - type: branch_cleanup_followup
-    cadence: after delete/ref tooling or user confirmation
-    focus: keep only main and mind-reply after preserving useful files
-  - type: post_quota_main_execution
-    cadence: once active Vercel mind-reply can build again
-    focus: route freshness, product-first redesign, growth assets, capture
+  - type: browser_preview_recheck
+    cadence: next active work pass
+    focus: confirm latest public /agent, /api/agent, and /mcp from browser-accessible network
+  - type: frontend_full_surface_pass
+    cadence: next main implementation pass
+    focus: richer session workspace, receipts, action controls, observability, and conversion tracking
+  - type: branch_retirement_ready_check
+    cadence: next storage pass
+    focus: confirm old branch material coverage and safe delete candidate status
 opinion: >-
-  The storage branch remains the right place for planning, growth, SEO, ad, and recovery reports.
-  Main should stay quiet until Vercel can build again, because the source already contains the
-  missing app routes and the remaining problem is deployment freshness.
-short_digest_line: Latest recheck: Vercel quota still active; /agent and /api/intake live, but app/developer/growth routes need a successful main deploy.
+  There is genuine good news: the latest main commit deployed green across both Vercel project contexts.
+  The revenue answer stays sober until analytics, payments, or order data are wired in and checked.
+short_digest_line: Vercel is green on the latest MRagent voice/frontend commit; revenue is not verified yet.

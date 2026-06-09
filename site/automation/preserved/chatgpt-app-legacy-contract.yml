@@ -1,0 +1,54 @@
+version: 1
+created: 2026-06-09
+branch: mind-reply
+preserved_from:
+  branch: codex/executive-nervous-system-build
+  path: src/chatgpt-app/README.md
+preservation_type: legacy_contract_note
+status: preserved_reference
+purpose: Preserve older ChatGPT app contract notes while recognizing current main has richer MCP implementation.
+legacy_contract:
+  tool_name_examples:
+    - mragent.decision
+    - mragent.chat
+  decision_shape:
+    includes:
+      - synthesis
+      - recommendedAction.kind
+      - recommendedAction.label
+      - risk.level
+      - risk.reason
+      - memoryUpdate.summary
+      - receipt.id
+      - receipt.timestamp
+      - receipt.source
+      - receipt.playbookVersion
+  principles:
+    - one synthesis
+    - one recommended action
+    - high-risk text escalates instead of drafting unsafe response
+    - raw input is not stored by default
+    - generated text stays private to the user session unless consent is captured
+current_main_status:
+  richer_current_mcp_tools:
+    - prepare_mindread
+    - render_mindread
+    - fetch_receipt
+  current_public_blocker:
+    - source exists on main
+    - public /mcp is stale or missing until Vercel quota clears
+fit_for_current_mindreply:
+  keep:
+    - one synthesis and one action contract
+    - high-risk escalation rule
+    - privacy-safe receipt-first language
+    - raw-input non-storage guardrail
+  avoid:
+    - reverting to old tool names if current MCP contract is already richer
+    - claiming public ChatGPT connection works until /mcp is live
+    - exposing provider names, hidden prompts, or internal strategy
+recommended_use:
+  storage: historical contract reference
+  main: no direct port unless current MCP docs need wording
+  public_site: only use privacy-safe, non-technical wording
+short_digest_line: Legacy ChatGPT app contract preserved; current main MCP remains the source of truth.
