@@ -6,18 +6,20 @@ Production is usable for the paid Website Completion Package, but public alias c
 
 The public custom domain is serving a verified Vercel production deployment that contains the Website Completion Package surface, `GBP 600`, `/contact`, `/api/version`, and the public `info@mind-reply.com` contact path. This keeps the urgent public Gmail exposure repaired.
 
-A newer canonical Vercel deployment is now ready with the stronger invoice-first package page:
+A newer canonical Vercel deployment is ready with the stronger invoice-first package page:
 
 - Latest ready deployment: `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`
 - Latest ready deployment URL: `https://mindreply-js5m73tfy-angellllkr-engs-projects.vercel.app`
 - Latest ready commit: `e0cab2db420d8be63d9ead67cb7cf9d3e6869252`
 - Commit message: `Clarify package invoice route and SEO proof`
 
-The latest source verifier commit is also on main:
+The latest release-gate source commits are also on main:
 
-- Latest source commit: `f3d3367e3267ffa40ced841d49af76d90d1044f3`
-- Commit message: `Guard package page invoice proof`
-- GitHub/Vercel status: Vercel checks are failing with `build-rate-limit` for the verifier-only commit.
+- Live package-page verifier commit: `2e629f6ce5c7e4cc6c8a49c7764a63cd86f11075`
+- Commit message: `Verify live package page invoice proof`
+- Contract verifier commit: `fe1132b5252b5d22e8b4eef88aabf029e3c3d05c`
+- Commit message: `Guard live package proof verifier contract`
+- GitHub/Vercel status: Vercel checks are failing with `build-rate-limit` for these verifier-only commits.
 
 The custom domain still returns `/api/version` metadata for commit `8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8`, so the custom domain is not yet proven on the latest invoice-proof deployment.
 
@@ -48,11 +50,27 @@ That deployment contains the improved package page proof:
 - `paymentPath: invoice-first unless a configured direct payment link is present`
 - public proof remains privacy-safe and no personal Gmail is exposed.
 
+## Release Gate Added
+
+`npm run verify:live-revenue` now fetches the dedicated package page in addition to homepage, contact, health, version, package request, robots, sitemap, and geo-locale.
+
+It now fails production if `/website-completion-package` does not prove:
+
+- page reachability;
+- Website Completion Package title;
+- invoice-first request path;
+- no payment link required to begin;
+- billing name and billing email;
+- scope first, invoice/payment before delivery;
+- `paymentPath` receipt proof.
+
+`npm run decision:verify` also guards that the live verifier contains those package-page checks, so the release gate cannot be quietly softened without failing the source contract.
+
 ## Remaining Blockers
 
 - Public aliases are still not proven on latest ready deployment `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`.
 - The emergency alias workflow still needs `VERCEL_TOKEN` for deterministic future alias repair.
-- Vercel checks for the latest verifier-only commit `f3d3367e3267ffa40ced841d49af76d90d1044f3` show `build-rate-limit`.
+- Vercel checks for the latest verifier-only commits show `build-rate-limit`.
 - Owner email and Slack delivery secrets remain missing for GitHub Actions reports.
 - Outlook direct sending remains rate-limited with `ErrorExceededMessageLimit`; owner updates may be drafted but not sent until the quota/account prompt is resolved.
 - Live `/api/package-request` invalid-body behavior is covered by source and the live verifier script, but still needs a fresh runner/browser POST verification after local shell or GitHub Actions capacity is available.
@@ -126,6 +144,7 @@ Required for first revenue close:
 
 - `https://www.mind-reply.com/` shows the Website Completion Package surface.
 - `https://www.mind-reply.com/contact` shows `info@mind-reply.com` and no personal inbox.
+- `https://www.mind-reply.com/website-completion-package` shows `Invoice-first request path active`, `No payment link is required to begin`, billing name/email language, scope-first close proof, and `paymentPath` receipt proof.
 - `https://www.mind-reply.com/api/version` returns `status: ok`.
 - `https://www.mind-reply.com/api/health` returns `status: ok` in the next live verifier pass.
 - `/api/package-request` rejects invalid input with `400` in the next POST verifier pass.
