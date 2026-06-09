@@ -3,6 +3,11 @@ file: mragent-monitor-status.json
 producer: scripts/mragent-monitor-report.mjs
 workflow: .github/workflows/mragent-monitor.yml
 verification_workflow: .github/workflows/mragent-verify.yml
+vercel_guard:
+  guard: scripts/vercel-ignore-build.mjs
+  workflow: .github/workflows/vercel-guard-verify.yml
+  command: node scripts/vercel-ignore-build.mjs --self-test
+  purpose: Fast GitHub-only check for Vercel quota guard and automation-only skip behavior.
 preview_capture_workflow: .github/workflows/mragent-preview-capture.yml
 preview_capture_script: scripts/mragent-preview-capture.mjs
 growth_pulse:
@@ -105,6 +110,7 @@ visibility:
     - functional_api_checks
     - growth_pulse
     - short_digest
+    - vercel_guard
     - production_surfaces
     - search_assets
     - ad_message_sync
@@ -133,3 +139,4 @@ uses:
   - manual preview capture artifacts from MRagent Preview Capture
   - growth pulse artifact for SEO and ad message alignment in every 15-minute monitor
   - short digest artifact for fast status updates
+  - fast Vercel guard verification for quota-control changes
