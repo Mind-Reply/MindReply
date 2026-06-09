@@ -4,16 +4,29 @@ Use this when production must update without burning deployments on every push.
 
 ## Before Clicking Deploy
 
-Confirm these GitHub Actions secrets exist:
+Confirm these GitHub Actions secrets or variables exist:
 
 - `VERCEL_TOKEN`
 - `VERCEL_ORG_ID`
 - `VERCEL_PROJECT_ID`
 
+`VERCEL_TOKEN` must be a secret. `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` may be secrets or repository variables.
+
 Expected values for the linked project:
 
 - `VERCEL_ORG_ID`: `team_0plIJmQLgZC1wVv9zI2eVf3B`
 - `VERCEL_PROJECT_ID`: `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`
+
+## Readiness Check Without Deploying
+
+Run this first when you want proof that production can deploy without spending one deployment:
+
+1. Open `https://github.com/Mind-Reply/MindReply/actions`.
+2. Select `MindReply Deployment Readiness Check`.
+3. Click `Run workflow` on branch `main`.
+4. Confirm it builds the Vercel production artifact and reports whether `/api/version` is already live.
+
+This workflow does not run `vercel deploy`.
 
 ## Deploy
 
