@@ -19,7 +19,8 @@ The latest release-gate source commits are also on main:
 - Commit message: `Verify live package page invoice proof`
 - Contract verifier commit: `fe1132b5252b5d22e8b4eef88aabf029e3c3d05c`
 - Commit message: `Guard live package proof verifier contract`
-- GitHub/Vercel status: Vercel checks are failing with `build-rate-limit` for these verifier-only commits.
+- No-build alias workflow commit: `4c0cfe987d8bd1ed3915d84579eab8bfb42e43eb`
+- No-build alias contract commit: `55480c5ede469cb324c5c000b70181e384d38604`
 
 The custom domain still returns `/api/version` metadata for commit `8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8`, so the custom domain is not yet proven on the latest invoice-proof deployment.
 
@@ -50,6 +51,19 @@ That deployment contains the improved package page proof:
 - `paymentPath: invoice-first unless a configured direct payment link is present`
 - public proof remains privacy-safe and no personal Gmail is exposed.
 
+## No-Build Alias Recovery
+
+A dedicated no-build alias workflow now exists:
+
+- Workflow: `.github/workflows/vercel-alias-ready-deployment.yml`
+- Runbook: `docs/no_build_alias_recovery.md`
+- Confirm input: `alias-ready-deployment`
+- Deployment URL input: `https://mindreply-js5m73tfy-angellllkr-engs-projects.vercel.app`
+- Expected SHA input: `e0cab2db420d8be63d9ead67cb7cf9d3e6869252`
+- Expected deployment id input: `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`
+
+The workflow does not create another build. It validates Vercel credentials, runs `vercel inspect`, aliases the ready deployment to `www.mind-reply.com` and `mind-reply.com`, waits until `/api/version` reports the expected SHA, then runs `npm run verify:live-revenue`.
+
 ## Release Gate Added
 
 `npm run verify:live-revenue` now fetches the dedicated package page in addition to homepage, contact, health, version, package request, robots, sitemap, and geo-locale.
@@ -64,13 +78,12 @@ It now fails production if `/website-completion-package` does not prove:
 - scope first, invoice/payment before delivery;
 - `paymentPath` receipt proof.
 
-`npm run decision:verify` also guards that the live verifier contains those package-page checks, so the release gate cannot be quietly softened without failing the source contract.
+`npm run decision:verify` also guards that the live verifier contains those package-page checks and that the no-build alias workflow exists, so the release gate cannot be quietly softened without failing the source contract.
 
 ## Remaining Blockers
 
 - Public aliases are still not proven on latest ready deployment `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`.
-- The emergency alias workflow still needs `VERCEL_TOKEN` for deterministic future alias repair.
-- Vercel checks for the latest verifier-only commits show `build-rate-limit`.
+- The no-build alias workflow still needs `VERCEL_TOKEN` for deterministic future alias repair.
 - Owner email and Slack delivery secrets remain missing for GitHub Actions reports.
 - Outlook direct sending remains rate-limited with `ErrorExceededMessageLimit`; owner updates may be drafted but not sent until the quota/account prompt is resolved.
 - Live `/api/package-request` invalid-body behavior is covered by source and the live verifier script, but still needs a fresh runner/browser POST verification after local shell or GitHub Actions capacity is available.
@@ -131,9 +144,10 @@ Required for Outlook direct sending:
 
 - Resolve the Outlook daily sending quota / account verification prompt.
 
-Required for Vercel build and alias continuity:
+Required for Vercel alias continuity:
 
-- Promote or alias `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T` to `www.mind-reply.com` and `mind-reply.com` when Vercel execution access is available.
+- Run `.github/workflows/vercel-alias-ready-deployment.yml` with `confirm=alias-ready-deployment`.
+- Use deployment URL `https://mindreply-js5m73tfy-angellllkr-engs-projects.vercel.app`.
 - Keep `mindreply` as canonical production and `mind-reply` as non-production/storage only.
 
 Required for first revenue close:
@@ -145,7 +159,7 @@ Required for first revenue close:
 - `https://www.mind-reply.com/` shows the Website Completion Package surface.
 - `https://www.mind-reply.com/contact` shows `info@mind-reply.com` and no personal inbox.
 - `https://www.mind-reply.com/website-completion-package` shows `Invoice-first request path active`, `No payment link is required to begin`, billing name/email language, scope-first close proof, and `paymentPath` receipt proof.
-- `https://www.mind-reply.com/api/version` returns `status: ok`.
+- `https://www.mind-reply.com/api/version` returns `status: ok` for expected commit `e0cab2db420d8be63d9ead67cb7cf9d3e6869252` after aliasing.
 - `https://www.mind-reply.com/api/health` returns `status: ok` in the next live verifier pass.
 - `/api/package-request` rejects invalid input with `400` in the next POST verifier pass.
 - Latest ready deployment `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T` is promoted to public aliases.
@@ -153,4 +167,4 @@ Required for first revenue close:
 
 ## Current Judgment
 
-MindReply is close enough to sell the Website Completion Package now. The public domain is safe and package-visible, while the latest ready deployment is materially better for invoice-first conversion. It is not safe to claim income, virality, or a fully autonomous reporting system yet. The fastest responsible path is: promote `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`, get `VERCEL_TOKEN` for deterministic alias repair, choose the first payment/invoice route, and send the Website Completion Package outreach from the assisted-close playbook.
+MindReply is close enough to sell the Website Completion Package now. The public domain is safe and package-visible, while the latest ready deployment is materially better for invoice-first conversion. It is not safe to claim income, virality, or a fully autonomous reporting system yet. The fastest responsible path is: run the no-build alias workflow for `dpl_ihE5efSiypndY1g6j3jUzWZ4od1T`, get `VERCEL_TOKEN` for deterministic alias repair, choose the first payment/invoice route, and send the Website Completion Package outreach from the assisted-close playbook.
