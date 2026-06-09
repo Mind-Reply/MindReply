@@ -36,7 +36,7 @@ fields:
     opinion: Short operating opinion for the pass.
     nextAction: The next recommended move.
   surfaces: Per-URL status, latency, and signal.
-  packSources: Required personal-pack source files and whether each exists, including slack-api, vercel-build-limit, verification-runbook, visibility-plan, search-intents, live-copy-sync, preview-qa, preview-results, and ad-copy-tests.
+  packSources: Required personal-pack source files and whether each exists, including slack-api, vercel-build-limit, verification-runbook, preview-capture-script, preview-capture-workflow, visibility-plan, search-intents, live-copy-sync, preview-qa, preview-results, and ad-copy-tests.
 visibility:
   plan: site/growth/visibility-plan.yml
   positioning: site/growth/positioning.yml
@@ -45,6 +45,9 @@ visibility:
   preview_qa: site/growth/preview-qa.yml
   preview_results: site/growth/preview-results.yml
   preview_capture:
+    monitor_labels:
+      - preview-capture-script
+      - preview-capture-workflow
     workflow: .github/workflows/mragent-preview-capture.yml
     script: scripts/mragent-preview-capture.mjs
     artifacts:
