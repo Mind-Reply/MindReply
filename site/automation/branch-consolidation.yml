@@ -1,0 +1,91 @@
+version: 1
+updated: 2026-06-09
+canonical:
+  deploy_branch: main
+  storage_branch: mind-reply
+  active_vercel_project: mind-reply
+  legacy_vercel_project: mindreply
+latest_main_commit: e9230a50b0068607df9bd2573545c9e39ba4fb11
+production_status:
+  active_vercel_context: success
+  legacy_vercel_context: failure
+  public_agent: 200
+  public_intake_api: 200
+  public_version_api: 410
+  public_mcp: 404
+  note: Public domain still appears to be serving stale legacy routing for newer MCP/version routes.
+branches:
+  main:
+    role: canonical deploy branch
+    action: keep
+  mind-reply:
+    role: storage branch for preserved branch/file material
+    action: keep
+  codex/mindreply-moa-production-minimal:
+    status: behind_main
+    ahead_by: 0
+    behind_by: 259
+    action: safe_to_delete_after_owner_confirmation
+  codex/mragent-decision-chat:
+    status: diverged
+    ahead_by: 11
+    behind_by: 194
+    useful_material:
+      - early MRagent chat route and UI
+      - AI Elements message component seed
+    action: preserve_reference_only; current main already has newer MRagent surface
+  codex/mindreply-moa-controller:
+    status: diverged
+    ahead_by: 2
+    behind_by: 349
+    useful_material:
+      - MOA console concept
+      - multi-agent blueprint doc
+      - lib/moa.ts concept implementation
+    action: review_selected_files_before_porting; do_not_merge_whole_branch
+  codex/mindreply-moa-main:
+    status: diverged
+    ahead_by: 1
+    behind_by: 196
+    useful_material:
+      - memory/action route concepts
+      - early action API
+    action: review_selected_files_before_porting; do_not_merge_whole_branch
+  codex/executive-nervous-system-build:
+    status: diverged
+    ahead_by: 37
+    behind_by: 192
+    useful_material:
+      - expanded playbook seed set
+      - extension/integration improvements
+      - ChatGPT app reference docs
+    action: review_selected_files_before_porting; do_not_merge_whole_branch
+  codex/executive-nervous-system-main-sync:
+    status: diverged
+    ahead_by: 110
+    behind_by: 155
+    useful_material:
+      - ops docs
+      - reporting scripts
+      - vercel guard lineage
+      - playbook seed variants
+    action: much_already_ported_to_main; review_remaining_docs_only
+  codex/executive-nervous-system:
+    status: diverged
+    ahead_by: 3
+    behind_by: 196
+    action: preserve_reference_only; unsafe_to_merge_whole_branch
+  codex/executive-nervous-system-rebrand:
+    status: diverged
+    ahead_by: 1
+    behind_by: 263
+    action: preserve_reference_only; unsafe_to_merge_whole_branch
+cleanup_policy:
+  delete_only_after_confirmation: true
+  reason: Branch deletion is destructive, and several old branches contain non-main ideas mixed with stale deletions.
+  recommended_next_deletes:
+    - codex/mindreply-moa-production-minimal
+  recommended_next_ports:
+    - selected docs from codex/mindreply-moa-controller
+    - selected playbook seeds from codex/executive-nervous-system-build
+    - remaining ops docs from codex/executive-nervous-system-main-sync
