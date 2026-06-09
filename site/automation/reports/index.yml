@@ -2,30 +2,38 @@ version: 1
 created: 2026-06-09
 updated: 2026-06-09
 branch: mind-reply
-purpose: Central index for storage-branch reports while main/Vercel deployment is rate-limited.
+purpose: Central index for storage-branch reports while main/Vercel deployment is rate-limited or pending.
 canonical_repo: Mind-Reply/MindReply
 canonical_deploy_branch: main
 storage_branch: mind-reply
-latest_checked_main_commit: 6ab180402ce88352497d25e0c0ba6fa1180e5003
+latest_checked_main_commit: f589025b154376098a10bca8c11e4471bbe490e1
 current_state:
   production:
     home_page: live_200
     agent_page: live_200
     fallback_intake_api: live_200
-    api_agent: stale_410
-    api_version: stale_410
-    mcp: missing_404
-    manifest: missing_404
-    opengraph_image: missing_404
+    api_agent: stale_410_until_new_deploy_confirmed
+    api_version: stale_410_until_new_deploy_confirmed
+    mcp: missing_404_until_new_deploy_confirmed
+    manifest: missing_404_until_new_deploy_confirmed
+    opengraph_image: missing_404_until_new_deploy_confirmed
     sitemap: live_200
     robots: live_200
   deployment:
-    vercel_mind_reply: build_rate_limited
-    vercel_mindreply: build_rate_limited
+    vercel_mind_reply: success_on_latest_main_status_check
+    vercel_mindreply: pending_on_latest_main_status_check
+  revenue:
+    verified_income: false
+    note: No payment, order, or revenue data was available through the current repo/connectors.
   policy:
-    main_commits: pause_non_urgent_app_changes_until_quota_clears
-    storage_commits: allowed_for_reports_plans_and_growth_material
+    main_commits: allowed_for_high_impact_runtime_frontend_work_requested_by_owner
+    storage_commits: allowed_for_reports_plans_growth_material_and_status_trail
 reports:
+  - date: 2026-06-09
+    type: main_voice_frontend_pass
+    path: site/automation/reports/2026-06-09-main-voice-frontend-pass.yml
+    commit: de78505321a25343734482c6bb35feaa681489d9
+    one_line: Main now has runtime and frontend MRagent voice upgrades; one Vercel project is successful, one is pending, revenue is not yet verified.
   - date: 2026-06-09
     type: storage_status
     path: site/automation/reports/2026-06-09-storage-status.yml
@@ -98,17 +106,17 @@ preserved_extracts:
     commit: 38bb88b7873bb4cc3cc9b13a83cb66cdc4095d9f
     one_line: Old /api/action behavior preserved as storage-only; do not port without receipt/action tests.
 next_report_slots:
-  - type: daily_short_digest
-    cadence: every active work pass while quota is limited
-    focus: live route state, Vercel state, one next action
+  - type: deployment_recheck
+    cadence: next active work pass
+    focus: confirm pending mindreply Vercel status and public route freshness
+  - type: frontend_full_surface_pass
+    cadence: next main implementation pass
+    focus: richer full frontend, observability, conversion tracking, and Figma handoff readiness
   - type: branch_retirement_ready_check
     cadence: next storage pass
     focus: confirm old branch material coverage and safe delete candidate status
-  - type: post_quota_main_execution
-    cadence: once active Vercel mind-reply can build again
-    focus: route freshness, product-first redesign, growth assets, capture
 opinion: >-
-  The storage branch remains the right place for planning, growth, SEO, ad, branch cleanup,
-  preservation, and recovery reports. Main should stay quiet until Vercel can build again, because
-  the source already contains the missing app routes and the remaining problem is deployment freshness.
-short_digest_line: Old /api/action behavior note preserved; useful old branch material is now substantially covered on mind-reply.
+  The useful news is that main now contains real MRagent behavior and frontend voice improvements,
+  not only planning artifacts. The cautious news is that income is not verified yet, and the pending
+  Vercel project must settle before claiming the freshest public preview everywhere.
+short_digest_line: MRagent main voice/frontend pass logged; Vercel mind-reply success, mindreply pending, no verified income yet.
