@@ -25,7 +25,6 @@ export const redirectedPublicPaths = [
   "/solutions",
   "/subconscious",
   "/tasks",
-  "/terms",
   "/tools",
 ] as const;
 
@@ -151,7 +150,7 @@ function buildMindRead(kind: RecommendedActionKind, risk: DecisionResponse["risk
   if (kind === "schedule") {
     return {
       reallyAbout: "This needs rhythm, not more rumination. The pressure relaxes when it is placed somewhere reliable.",
-      mindsetProtection: "Your attention is trying to keep the matter alive so nothing slips. Sweet instinct, costly method.",
+      mindsetProtection: "Your attention is trying to keep the matter alive so nothing slips. Tender instinct, costly method.",
       calmerMove: "Give it one follow-up moment, then let your mind stop rehearsing it.",
     };
   }
@@ -215,8 +214,8 @@ export function buildDecisionResponse(request: IntakeRequest): DecisionResponse 
     recommendedAction: buildAction(kind, synthesis),
     risk,
     memoryUpdate: {
-      applied: true,
-      summary: "Tone preference and pressure pattern noted without saving the raw text.",
+      applied: false,
+      summary: "Memory note held until you approve it; raw text stays out of the receipt.",
     },
     receipt: {
       id: makeReceiptId(input, timestamp),
