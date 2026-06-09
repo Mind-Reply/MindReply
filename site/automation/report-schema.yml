@@ -27,18 +27,26 @@ fields:
       quotaLimited: Vercel context whose target URL indicates build-rate-limit or upgradeToPro.
       all: All Vercel status contexts seen on the commit.
     statuses: Individual commit status contexts with state, target URL, and description.
+  productionVersion:
+    liveSha: Commit SHA reported by /api/version on the checked site.
+    expectedSha: GitHub Actions SHA for the monitor run when available.
+    matchesRun: true, false, or null when unavailable.
+    data: Full /api/version JSON payload.
   summary:
     coreAgent: live or check.
     mcpApp: live or not live.
+    health: live or not live.
+    version: live or not live.
     discoveryAssets: live or not live.
     personalPack: ready or check.
-    currentBlocker: Current deploy or platform blocker in plain language.
+    currentBlocker: Current deploy, stale production, or platform blocker in plain language.
     opinion: Short operating opinion for the pass.
     nextAction: The next recommended move.
-  surfaces: Per-URL status, latency, and signal, including primary_mcp and fallback_mcp checks.
+  surfaces: Per-URL status, latency, signal, and JSON data when available, including version, primary_mcp, and fallback_mcp checks.
   packSources: Required personal-pack source files and whether each exists, including slack-api, vercel-build-limit, verification-runbook, preview-capture-script, preview-capture-workflow, visibility-plan, search-intents, live-copy-sync, preview-qa, preview-results, and ad-copy-tests.
 connection_urls:
   agent: https://www.mind-reply.com/agent
+  version: https://www.mind-reply.com/api/version
   primary_mcp: https://www.mind-reply.com/mcp
   fallback_mcp: https://www.mind-reply.com/api/mcp
 visibility:
@@ -63,6 +71,7 @@ visibility:
   report_fields:
     - active_deployment
     - legacy_quota_context
+    - production_version
     - production_surfaces
     - search_assets
     - ad_message_sync
