@@ -18,7 +18,10 @@ function includes(label: string, value: string, expected: string) {
 const versionRoute = read("app/api/version/route.ts");
 const healthRoute = read("app/api/health/route.ts");
 const monitorReport = read("scripts/mragent-monitor-report.mjs");
+const incidentProbe = read("scripts/production-domain-incident.mjs");
+const incidentWorkflow = read(".github/workflows/mragent-domain-incident.yml");
 const reportSchema = read("site/automation/report-schema.yml");
+const vercelRunbook = read("site/automation/vercel-build-limit-runbook.yml");
 
 includes("version route", versionRoute, "VERCEL_GIT_COMMIT_SHA");
 includes("version route", versionRoute, "VERCEL_PROJECT_PRODUCTION_URL");
@@ -35,10 +38,21 @@ includes("monitor report", monitorReport, "decisionApi");
 includes("monitor report", monitorReport, "productionVersion");
 includes("monitor report", monitorReport, "production is stale");
 includes("monitor report", monitorReport, "matchesRun");
+includes("incident probe", incidentProbe, "fallback-only-domain");
+includes("incident probe", incidentProbe, "stale-production-domain");
+includes("incident probe", incidentProbe, "mragent-domain-incident.json");
+includes("incident probe", incidentProbe, "preferred-agent-api");
+includes("incident probe", incidentProbe, "fallback-intake-api");
+includes("incident workflow", incidentWorkflow, "workflow_dispatch");
+includes("incident workflow", incidentWorkflow, "scripts/production-domain-incident.mjs");
+includes("incident workflow", incidentWorkflow, "mragent-domain-incident");
 includes("report schema", reportSchema, "productionVersion:");
 includes("report schema", reportSchema, "functionalChecks:");
 includes("report schema", reportSchema, "preferred_agent_api: https://www.mind-reply.com/api/agent");
 includes("report schema", reportSchema, "fallback_intake_api: https://www.mind-reply.com/api/intake");
 includes("report schema", reportSchema, "https://www.mind-reply.com/api/version");
+includes("vercel runbook", vercelRunbook, "incident_probe:");
+includes("vercel runbook", vercelRunbook, ".github/workflows/mragent-domain-incident.yml");
+includes("vercel runbook", vercelRunbook, "scripts/production-domain-incident.mjs");
 
 console.log("Production version contract verification passed.");
