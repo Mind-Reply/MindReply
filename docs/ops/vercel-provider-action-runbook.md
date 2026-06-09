@@ -9,21 +9,47 @@ The code branch is not the active blocker. The active blocker is provider-side V
 Evidence from GitHub/Vercel:
 
 - PR: `#12` (`codex/executive-nervous-system-main-sync`)
-- Current PR head before this runbook: `cd7336a1223b9f4654242eb509d3ea656d7372cb`
-- GitHub combined status: `failure`
-- Vercel status contexts both report: `Deployment rate limited - retry in 24 hours`
-- Both contexts target: `https://vercel.com/mr-64b2efc9?upgradeToPro=build-rate-limit`
+- GitHub combined status before the deployment gate: `failure`
+- Vercel status contexts reported: `Deployment rate limited - retry in 24 hours`
+- Failing target observed: `https://vercel.com/mr-64b2efc9?upgradeToPro=build-rate-limit`
 - Vercel project inspected: `prj_nETWN2SapvnbSWVXK4O5upJHF6bb`
 - Vercel project name: `mind-reply`
-- Latest production deployment observed: `CANCELED`
+- Latest production deployments observed: `CANCELED`
 - Last useful PR preview observed: `dpl_8N89VuWmX8oMhBT93U3P4Gtkfwxr`, `READY`, branch `codex/executive-nervous-system-main-sync`, commit `8f637a3f90f51d85ad1130b1e235703b90c4d29f`
+
+## Repo-Side Quota Guard
+
+`vercel.json` now includes Vercel's official Git deployment gate:
+
+```json
+{
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "codex/**": false,
+      "mind-reply": false,
+      "*": false
+    }
+  }
+}
+```
+
+Effect:
+
+- `main` remains the only automatic deployment branch.
+- Temporary `codex/*` branches stop creating automatic Vercel deployments.
+- The storage branch `mind-reply` does not deploy.
+- Manual Vercel deploys can still be run intentionally when a preview is needed.
+
+This is stronger than the ignored build step. The ignored build step can still create canceled deployment records; the Git deployment gate prevents automatic branch deployments from starting.
 
 ## What Can Be Fixed In Code
 
 Already done or in progress:
 
 - Vercel ignore guard exists in `scripts/vercel-ignore-build.mjs`.
-- Reporting-only files are classified so routine reports can avoid burning preview builds when Vercel honors the ignore script.
+- Reporting-only files are classified so routine reports can avoid burning builds when Vercel honors the ignore script.
+- `git.deploymentEnabled` now blocks automatic deployments from temporary and storage branches.
 - `docs/ops/branch-consolidation-report.md` maps which branches to keep and which to delete after production merge.
 - PR #12 is the active production migration path.
 
@@ -55,7 +81,7 @@ These actions require Vercel/GitHub provider access in the dashboard or a correc
 ## Merge Sequence After Provider Fix
 
 1. Sync/rebase PR #12 with latest `main`.
-2. Run the canonical Vercel check once.
+2. Run one intentional canonical Vercel check or manual preview deploy.
 3. Merge PR #12 into `main`.
 4. Confirm production deployment reaches `READY`.
 5. Attach/promote:
