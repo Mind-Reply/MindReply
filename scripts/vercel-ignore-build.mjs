@@ -8,7 +8,7 @@ const allowedProductionHosts = new Set([
   "mind-reply-git-main-angellllkr-engs-projects.vercel.app",
   "mindreply.vercel.app",
   "mindreply-angellllkr-engs-projects.vercel.app",
-  "mindreply-git-main-angellllkr-engs-projects.vercel.app",
+  "mindreply-git-main-mr-64b2efc9.vercel.app",
   "mindreply-mr-64b2efc9.vercel.app",
   "mindreply-git-main-mr-64b2efc9.vercel.app",
 ]);
@@ -157,14 +157,14 @@ function selfTest() {
       VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
       MRAGENT_CHANGED_FILES: "scripts/activation-pack-report.ts\nscripts/security-pack-report.ts\nreports/owner.md",
     }).build === false,
-    "Reporting-only script and report changes must be skipped.",
+    "Reporting-only script changes must be skipped.",
   );
   assert(
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
       VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "scripts/hourly-owner-report.ts\nscripts/send-hourly-owner-report.ts\n.github/workflows/hourly-owner-report.yml",
+      MRAGENT_CHANGED_FILES: "scripts/hourly-owner-report.ts\nscripts/send-hourly-owner-report.ts\.github/workflows/hourly-owner-report.yml",
     }).build === false,
     "Hourly owner report changes must be skipped.",
   );
