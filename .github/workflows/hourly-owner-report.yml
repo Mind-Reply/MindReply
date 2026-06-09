@@ -13,9 +13,6 @@ on:
         default: "false"
   schedule:
     - cron: "0 * * * *"
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read
