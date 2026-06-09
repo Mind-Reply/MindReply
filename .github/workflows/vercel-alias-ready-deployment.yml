@@ -10,17 +10,17 @@ on:
       deployment_url:
         description: Ready Vercel deployment URL or host to promote.
         required: true
-        default: https://mindreply-js5m73tfy-angellllkr-engs-projects.vercel.app
+        default: https://mindreply-deuio7she-angellllkr-engs-projects.vercel.app
         type: string
       expected_sha:
         description: Git commit SHA expected from /api/version after aliasing.
         required: true
-        default: e0cab2db420d8be63d9ead67cb7cf9d3e6869252
+        default: 55480c5ede469cb324c5c000b70181e384d38604
         type: string
       expected_deployment_id:
         description: Vercel deployment id expected in rendered assets after aliasing.
         required: true
-        default: dpl_ihE5efSiypndY1g6j3jUzWZ4od1T
+        default: dpl_AQWnPEDmLtFmfqPobMShwaAB7SAn
         type: string
 
 permissions:
@@ -102,6 +102,8 @@ jobs:
           echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           echo "VERCEL_DEPLOYMENT_URL=$DEPLOYMENT_URL" >> "$GITHUB_ENV"
           echo "Alias target: $DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "Expected SHA: $MINDREPLY_EXPECTED_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "Expected deployment: $MINDREPLY_EXPECTED_DEPLOYMENT_ID" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest --no-audit --fund=false --progress=false
@@ -110,7 +112,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          vercel inspect "$VERCEL_DEPLOYMENT_URL" --token "$VERCEL_TOKEN" --scope angellllkr-engs-projects >> "$GITHUB_STEP_SUMMARY"
+          vercel inspect "$VERCEL_DEPLOYMENT_URL" --token "$VERCEL_TOKEN" --scope angellllkr-engs-projects | tee /tmp/mindreply-vercel-inspect.txt
+          cat /tmp/mindreply-vercel-inspect.txt >> "$GITHUB_STEP_SUMMARY"
+          if ! grep -q "$MINDREPLY_EXPECTED_SHA" /tmp/mindreply-vercel-inspect.txt; then
+            echo "Deployment metadata did not include expected SHA $MINDREPLY_EXPECTED_SHA."
+            exit 1
+          fi
 
       - name: Assign public production aliases
         shell: bash
