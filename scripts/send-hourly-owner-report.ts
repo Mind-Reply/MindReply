@@ -6,6 +6,7 @@ const root = process.cwd();
 const outboxDir = path.join(root, "reports", "outbox");
 const latestReportPath = path.join(outboxDir, "hourly-owner-report-latest.md");
 const latestReceiptPath = path.join(outboxDir, "hourly-owner-delivery-receipt-latest.json");
+const liveRevenuePath = path.join(root, process.env.MINDREPLY_LIVE_REVENUE_JSON || "mindreply-live-revenue-surface.json");
 
 type DeliveryStatus = "sent" | "blocked" | "dry-run" | "disabled" | "skipped" | "failed";
 
@@ -17,6 +18,20 @@ type Receipt = {
   channels?: string[];
   delivery?: Record<string, Record<string, unknown>>;
   blockers?: string[];
+  liveRevenueSurface?: Record<string, unknown>;
+};
+
+type LiveRevenueProof = {
+  generatedAt?: string;
+  siteUrl?: string;
+  expectedSha?: string | null;
+  liveSha?: string | null;
+  requireShaMatch?: boolean;
+  status?: string;
+  failed?: string[];
+  warnings?: string[];
+  checks?: Array<{ id?: string; pass?: boolean; detail?: string }>;
+  surfaces?: Array<{ path?: string; status?: number | string; url?: string }>;
 };
 
 function boolEnv(name: string, defaultValue = false) {
@@ -50,6 +65,24 @@ async function readReceipt(): Promise<Receipt> {
   return JSON.parse(await readFile(latestReceiptPath, "utf8")) as Receipt;
 }
 
+async function readLiveRevenueProof(): Promise<LiveRevenueProof | null> {
+  if (!existsSync(liveRevenuePath)) return null;
+  return JSON.parse(await readFile(liveRevenuePath, "utf8")) as LiveRevenueProof;
+}
+
+function liveProofSection(proof: LiveRevenueProof) {
+  const failed = proof.failed?.length ? proof.failed.join(", ") : "none";
+  const warnings = proof.warnings?.length ? proof.warnings.join(", ") : "none";
+  const checks = (proof.checks || [])
+    .map((item) => `- ${item.pass ? "PASS" : "FAIL"}: ${item.id || "unknown"} - ${item.detail || "no detail"}`)
+    .join("\n");
+  const surfaces = (proof.surfaces || [])
+    .map((item) => `- ${item.path || item.url || "unknown"}: ${item.status || "unknown"}`)
+    .join("\n");
+
+  return `\n\n## Live Production Revenue Surface\n\nStatus: ${(proof.status || "unknown").toUpperCase()}\nGenerated: ${proof.generatedAt || "unknown"}\nSite: ${proof.siteUrl || "unknown"}\nExpected SHA: ${proof.expectedSha || "not required"}\nLive SHA: ${proof.liveSha || "missing"}\nStrict SHA match: ${proof.requireShaMatch ? "true" : "false"}\nFailed checks: ${failed}\nWarnings: ${warnings}\n\n### Live Checks\n\n${checks || "No check rows were recorded."}\n\n### Live Surfaces\n\n${surfaces || "No surface rows were recorded."}\n`;
+}
+
 async function sendEmail(report: string, dryRun: boolean): Promise<{ status: DeliveryStatus; detail: string }> {
   const to = recipients();
   const from = process.env.MINDREPLY_REPORT_FROM || "";
@@ -69,7 +102,7 @@ async function sendEmail(report: string, dryRun: boolean): Promise<{ status: Del
     body: JSON.stringify({
       from,
       to,
-      subject: "MindReply hourly owner report",
+      subject: process.env.MINDREPLY_REPORT_SUBJECT || "MindReply hourly owner report",
       text: report,
     }),
   });
@@ -106,17 +139,28 @@ async function main() {
     throw new Error("Missing owner report. Run npm run launch:report first.");
   }
 
-  const report = await readFile(latestReportPath, "utf8");
+  let report = await readFile(latestReportPath, "utf8");
   const receipt = await readReceipt();
   const enabled = boolEnv("MINDREPLY_REPORT_ENABLED", false);
   const dryRun = boolEnv("MINDREPLY_REPORT_DRY_RUN", true);
+  const liveProofRequired = boolEnv("MINDREPLY_REPORT_REQUIRE_LIVE_PROOF", false);
   const requestedChannels = channels();
+  const liveProof = await readLiveRevenueProof();
+
+  if (liveProof && !report.includes("## Live Production Revenue Surface")) {
+    report = `${report}${liveProofSection(liveProof)}`;
+    await writeFile(latestReportPath, report, "utf8");
+  }
 
   const delivery: Record<string, Record<string, unknown>> = receipt.delivery || {};
+  const liveProofAttached = Boolean(liveProof && report.includes("## Live Production Revenue Surface"));
 
   if (!enabled) {
     delivery.email = { status: "disabled", detail: "MINDREPLY_REPORT_ENABLED is not true." };
     delivery.slack = { status: "disabled", detail: "MINDREPLY_REPORT_ENABLED is not true." };
+  } else if (liveProofRequired && !liveProofAttached) {
+    delivery.email = { status: "blocked", detail: "Live production revenue proof is required before owner email delivery." };
+    delivery.slack = { status: "blocked", detail: "Live production revenue proof is required before owner Slack delivery." };
   } else {
     delivery.email = requestedChannels.includes("email")
       ? await sendEmail(report, dryRun)
@@ -132,6 +176,16 @@ async function main() {
     reportEnabled: enabled,
     dryRun,
     channels: requestedChannels,
+    liveRevenueSurface: liveProof
+      ? {
+          attached: liveProofAttached,
+          path: liveRevenuePath,
+          status: liveProof.status || "unknown",
+          expectedSha: liveProof.expectedSha || null,
+          liveSha: liveProof.liveSha || null,
+          failed: liveProof.failed || [],
+        }
+      : { attached: false, path: liveRevenuePath, status: "missing" },
     delivery,
   };
 
@@ -140,7 +194,7 @@ async function main() {
   const failed = Object.values(delivery).some((value) => ["failed"].includes(String(value.status)));
   const blocked = Object.values(delivery).some((value) => ["blocked"].includes(String(value.status)));
 
-  console.log(`Hourly owner report delivery complete. failed=${failed} blocked=${blocked} dryRun=${dryRun}`);
+  console.log(`Hourly owner report delivery complete. failed=${failed} blocked=${blocked} dryRun=${dryRun} liveProofAttached=${liveProofAttached}`);
 
   if (failed) process.exit(1);
 }
