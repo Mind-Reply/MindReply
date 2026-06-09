@@ -20,30 +20,87 @@ const countryLocale: Record<string, string> = {
   IE: "en",
   IN: "hi",
   JP: "ja",
+  KW: "ar",
   MX: "es",
   MY: "en",
   NZ: "en",
+  OM: "ar",
   PT: "pt",
+  QA: "ar",
   SA: "ar",
   SG: "en",
   TW: "zh",
   UA: "uk",
+  UK: "en",
   US: "en",
 };
 
 const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
 
 const priorityMarkets = [
-  "United States",
   "United Kingdom",
-  "Germany",
-  "France",
-  "Spain",
+  "United States",
   "United Arab Emirates",
   "Saudi Arabia",
-  "Singapore",
-  "India",
+  "Germany",
+  "France",
   "Japan",
+  "Brazil",
+  "Spain",
+  "India",
+];
+
+const marketProfiles = [
+  {
+    country: "United Kingdom",
+    locale: "en",
+    angle: "B2B services density, client-facing teams, and strong website completion demand.",
+  },
+  {
+    country: "United States",
+    locale: "en",
+    angle: "largest buyer pool for founder replies, sales follow-up, and website buying-friction rescue.",
+  },
+  {
+    country: "United Arab Emirates",
+    locale: "ar",
+    angle: "premium executive communication demand and high urgency around sensitive business replies.",
+  },
+  {
+    country: "Saudi Arabia",
+    locale: "ar",
+    angle: "Arabic business communication demand with fewer specialist decision-support providers.",
+  },
+  {
+    country: "Germany",
+    locale: "de",
+    angle: "high willingness to pay for precise, risk-aware professional replies.",
+  },
+  {
+    country: "France",
+    locale: "fr",
+    angle: "strong professional-services demand where local tone and restraint matter.",
+  },
+  {
+    country: "Japan",
+    locale: "ja",
+    angle: "high value for hierarchy, restraint, and exact business reply tone.",
+  },
+  {
+    country: "Brazil",
+    locale: "pt",
+    angle: "large Portuguese market with growing demand and fewer localized B2B providers.",
+  },
+  {
+    country: "Spain",
+    locale: "es",
+    angle: "Spanish-language gateway for sales objection and agency follow-up use cases.",
+  },
+  {
+    country: "India",
+    locale: "hi",
+    angle: "high-volume founder and operator market using English plus local-language context.",
+  },
 ];
 
 function normalizeLocale(value: string | null) {
@@ -68,6 +125,7 @@ export function GET(req: NextRequest) {
     browserLocale,
     supportedLocales,
     priorityMarkets,
+    marketProfiles,
     source: countryLocale[countryCode] ? "country" : "browser",
   });
 }
