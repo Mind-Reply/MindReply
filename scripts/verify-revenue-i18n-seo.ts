@@ -58,17 +58,25 @@ for (const locale of ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"
 }
 
 for (const phrase of [
+  "type LocaleCode = \"en\" | \"es\" | \"fr\" | \"de\" | \"pt\" | \"ar\" | \"hi\" | \"ja\" | \"zh\" | \"uk\"",
   "fetch(\"/api/geo-locale\"",
+  "GeoLocaleResponse",
+  "countryLocale",
+  "BR: \"pt\"",
+  "AE: \"ar\"",
+  "IN: \"hi\"",
+  "JP: \"ja\"",
+  "UA: \"uk\"",
+  "resolveManualLocale",
+  "localeFromBrowser",
   "document.documentElement.lang",
   "document.documentElement.dir",
   "surfaceTranslations",
   "Auto {country}",
   "marketCount",
+  "data-locale-count={localeCodes.length}",
   "10 priority markets",
-  "Recupere más de 2 horas diarias en 24 horas.",
-  "استعد أكثر من ساعتين يومياً خلال 24 ساعة.",
-  "24 घंटे में रोज़ 2+ घंटे वापस पाएं.",
-  "24時間以内に毎日2時間以上を取り戻します。",
+  "Contact form",
 ]) {
   includes("locale assist", localeAssist, phrase);
 }
@@ -95,9 +103,18 @@ for (const phrase of ["/website-completion-package", "languageParams", "alternat
 }
 
 includes("robots", robots, "disallow: [\"/api/\", \"/mcp\", \"/agents\", \"/pack\"]");
-includes("globals", globals, "overflow-x: hidden");
-includes("globals", globals, ".min-h-\\[43rem\\]");
-includes("globals", globals, "overflow-wrap: anywhere");
+
+for (const phrase of [
+  "overflow-x: hidden",
+  ".min-h-\\[43rem\\]",
+  "overflow-wrap: anywhere",
+  ".locale-assist-shell",
+  ".locale-assist-copy",
+  ".locale-assist-controls select",
+  ".locale-chip",
+]) {
+  includes("globals", globals, phrase);
+}
 
 for (const phrase of [
   "Contact form",
@@ -130,4 +147,4 @@ for (const broken of ["Ã", "à¤", "æ—", "Ð£"]) {
   assert(!localeAssist.includes(broken), `locale assist appears to contain mojibake marker ${broken}`);
 }
 
-console.log("Revenue, mobile, market SEO, 10-language auto locale, footer handoff, and public safety verification passed.");
+console.log("Revenue, mobile, market SEO, 10-language country locale, footer handoff, and public safety verification passed.");
