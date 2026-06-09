@@ -32,6 +32,15 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
+.locale-assist-shell,
+.locale-assist-shell * {
+  min-width: 0;
+}
+
+.locale-assist-copy {
+  text-wrap: balance;
+}
+
 @media (max-width: 640px) {
   h1,
   h2,
@@ -39,11 +48,34 @@ body {
   p,
   a,
   button,
-  span {
+  span,
+  select {
     overflow-wrap: anywhere;
   }
 
   .min-h-\[43rem\] {
     min-height: 34rem !important;
+  }
+
+  .locale-assist-shell {
+    padding-inline: 0.875rem;
+  }
+
+  .locale-assist-inner,
+  .locale-assist-controls {
+    gap: 0.45rem;
+  }
+
+  .locale-assist-controls select {
+    max-width: 8.5rem;
+  }
+
+  .locale-chip {
+    max-width: 100%;
+  }
+
+  .locale-assist-copy {
+    font-size: 0.68rem;
+    line-height: 1.35rem;
   }
 }
