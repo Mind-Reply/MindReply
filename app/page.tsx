@@ -1,15 +1,19 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BarChart3,
   Brain,
   CheckCircle2,
   ClipboardList,
   FileText,
   Gauge,
   HeartHandshake,
+  Languages,
   Mail,
   ReceiptText,
+  Scale,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
   Target,
   Zap,
@@ -73,10 +77,34 @@ const authoritySignals = [
   },
 ];
 
+const refinementRows = [
+  {
+    title: "Professional lexicon calibration",
+    copy: "Language is adjusted for the work in front of the buyer: founder updates, client delivery, legal-sensitive wording, finance pressure, or operator follow-up.",
+    icon: Languages,
+  },
+  {
+    title: "Tone calibration",
+    copy: "The reply keeps warmth without surrendering authority, urgency without panic, and clarity without sounding blunt or automated.",
+    icon: SlidersHorizontal,
+  },
+  {
+    title: "Structure optimization",
+    copy: "The output is organized into what happened, what matters, what to do next, and what proof or consent should travel with it.",
+    icon: BarChart3,
+  },
+  {
+    title: "Boundary-aware persuasion",
+    copy: "MindReply helps a message become more convincing while staying inside risk, consent, and professional judgment boundaries.",
+    icon: Scale,
+  },
+];
+
 const proofItems = [
   "Public contact uses info@mind-reply.com only.",
   "MRagent is the first support route; contact is the assisted close when the question needs human follow-up.",
   "Receipts are narrow by design and should not expose raw private pressure in public reports.",
+  "Professional refinement claims stay tied to lexicon, tone, structure, risk, confidence, and receipt fields buyers can inspect.",
   "Revenue, deployment, and integration claims stay tied to real sources instead of optimistic wording.",
 ];
 
@@ -111,6 +139,8 @@ const structuredData = {
     "MRagent pressure read",
     "Website buying-friction rescue",
     "Website Completion Package",
+    "Professional lexicon calibration",
+    "Tone and structure refinement",
     "Ranked action queue",
     "Send-ready copy",
     "Privacy-safe receipt",
@@ -275,6 +305,27 @@ export default function Home() {
                 </article>
               );
             })}
+          </div>
+          <div className="mt-8 grid gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+            <div className="rounded-lg bg-[#122033] p-6 text-[#f8f5f0]">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#91d2c8]">Premium refinement map</p>
+              <h3 className="mt-4 font-serif text-3xl font-bold leading-tight">The deeper value is how the message is made safe, sharp, and professionally usable.</h3>
+              <p className="mt-4 text-sm leading-7 text-[#d9e3e7]">
+                The public offer stays simple. Behind it, the work is stricter: lexicon, tone, structure, persuasion boundary, and receipt discipline.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {refinementRows.map((row) => {
+                const Icon = row.icon;
+                return (
+                  <article key={row.title} className="rounded-lg border border-[#122033]/10 bg-white p-5 shadow-sm shadow-[#122033]/5">
+                    <span className="grid h-11 w-11 place-items-center rounded-lg bg-[#f8f4ec] text-[#2f6f72]"><Icon aria-hidden className="h-5 w-5" /></span>
+                    <h3 className="mt-5 font-serif text-2xl font-bold leading-tight">{row.title}</h3>
+                    <p className="mt-4 text-sm leading-6 text-[#59687b]">{row.copy}</p>
+                  </article>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
