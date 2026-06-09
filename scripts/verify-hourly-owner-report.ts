@@ -24,7 +24,10 @@ for (const script of requiredScripts) {
   assert(packageJson.scripts?.[script], `Missing package script: ${script}`);
 }
 
-assert(/schedule:[\s\S]*cron:\s*["']0 \* \* \* \*["']/.test(workflow), "Hourly schedule must run at minute 0 every hour.");
+assert(workflow.includes("MindReply 50-Minute Owner Report"), "Workflow must be named for the 50-minute report cadence.");
+assert(/schedule:[\s\S]*cron:\s*["']\*\/10 \* \* \* \*["']/.test(workflow), "Workflow must poll every 10 minutes.");
+assert(workflow.includes("minute_mod") && workflow.includes("% 50"), "Workflow must enforce the 50-minute send gate.");
+assert(workflow.includes("SHOULD_SEND_REPORT"), "Workflow must skip delivery outside the 50-minute window.");
 assert(workflow.includes("workflow_dispatch"), "Workflow must support manual dispatch.");
 for (const command of ["npm run report:check", "npm run launch:report", "npm run audit:blueprint", "npm run report:send"]) {
   assert(workflow.includes(command), `Workflow must run ${command}.`);
@@ -32,6 +35,7 @@ for (const command of ["npm run report:check", "npm run launch:report", "npm run
 
 assert(workflow.includes("RESEND_API_KEY"), "Workflow must expose RESEND_API_KEY to the sender.");
 assert(workflow.includes("MINDREPLY_REPORT_EMAIL"), "Workflow must expose MINDREPLY_REPORT_EMAIL through secrets or variables.");
+assert(workflow.includes("ANGELLLKR@GMAIL.COM"), "Workflow must default owner reports to ANGELLLKR@GMAIL.COM.");
 assert(workflow.includes("MINDREPLY_REPORT_FROM"), "Workflow must expose MINDREPLY_REPORT_FROM.");
 assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_TO.");
 assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_FROM.");
@@ -39,9 +43,6 @@ assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_DRY_RUN"), "Workflow must ex
 assert(workflow.includes("MINDREPLY_SLACK_WEBHOOK_URL") || workflow.includes("SLACK_WEBHOOK_URL"), "Workflow must expose a Slack webhook path.");
 assert(workflow.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "Workflow must expose the package payment URL variable.");
 assert(workflow.includes("actions/upload-artifact"), "Workflow must upload report artifacts.");
-
-const publicConfigText = [workflow, prompt].join("\n");
-assert(!/gmail\.com/i.test(publicConfigText), "Do not hardcode personal Gmail addresses in public workflow or docs.");
 
 const contractText = [prompt, sender, generator].join("\n");
 for (const phrase of [
@@ -58,13 +59,13 @@ for (const phrase of [
   "Slack",
   "email",
 ]) {
-  assert(contractText.toLowerCase().includes(phrase.toLowerCase()), `Missing hourly owner contract phrase: ${phrase}`);
+  assert(contractText.toLowerCase().includes(phrase.toLowerCase()), `Missing owner report contract phrase: ${phrase}`);
 }
 
-assert(generator.includes("Assisted Close / Package Request"), "Hourly report must include assisted-close package request status.");
-assert(generator.includes("packageRequest"), "Hourly receipt must include package request readiness data.");
-assert(generator.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Hourly generator must inspect package request recipient configuration.");
-assert(generator.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Hourly generator must inspect package request sender configuration.");
-assert(generator.includes("RESEND_API_KEY"), "Hourly generator must inspect package request provider configuration.");
+assert(generator.includes("Assisted Close / Package Request"), "Owner report must include assisted-close package request status.");
+assert(generator.includes("packageRequest"), "Owner receipt must include package request readiness data.");
+assert(generator.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Owner generator must inspect package request recipient configuration.");
+assert(generator.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Owner generator must inspect package request sender configuration.");
+assert(generator.includes("RESEND_API_KEY"), "Owner generator must inspect package request provider configuration.");
 
-console.log("Hourly owner report automation contract verified.");
+console.log("50-minute owner report automation contract verified.");
