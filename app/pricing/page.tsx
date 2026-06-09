@@ -12,8 +12,25 @@ import {
 } from "lucide-react";
 
 const supportEmail = "info@mind-reply.com";
+const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
+const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
+const packageCtaLabel = packagePaymentUrl ? "Pay for package" : "Request invoice";
 
 const plans = [
+  {
+    name: "Completion",
+    price: "GBP 600 once",
+    audience: "First paid rescue for buying friction",
+    cta: packageCtaLabel,
+    href: packageCtaHref,
+    accent: "bg-[#e2b757] text-[#122033]",
+    features: [
+      "Fix overloaded website messaging and offer copy",
+      "Turn scattered signals into a ranked action queue",
+      "Provide send-ready copy or next-step structure",
+      "Attach a privacy-safe receipt for what was processed",
+    ],
+  },
   {
     name: "Signal",
     price: "Free start",
@@ -47,7 +64,7 @@ const plans = [
     price: "GBP 129/mo",
     audience: "For high-trust operators who need continuity",
     cta: "Ask about Pro",
-    href: "/contact",
+    href: "/contact?intent=pro",
     accent: "bg-[#122033] text-[#f8f5f0]",
     features: [
       "Longer memory and profile direction once approved",
@@ -59,6 +76,7 @@ const plans = [
 ];
 
 const proof = [
+  "The first paid thing is the GBP 600 Website Completion Package, not a vague technology purchase.",
   "Public support uses info@mind-reply.com only.",
   "Raw private text is kept narrow by default and should not be used for public reporting.",
   "No revenue, customer, integration, or compliance claim appears unless a real source supports it.",
@@ -67,12 +85,16 @@ const proof = [
 
 const faqs = [
   {
+    q: "What should I buy first?",
+    a: "Buy the Website Completion Package when the problem is bigger than one reply: homepage clarity, offer copy, contact path, and proof language.",
+  },
+  {
     q: "What does MindReply do?",
-    a: "It helps an overloaded professional turn a tense message, task pile, or reply decision into one clear read and one safer next move.",
+    a: "It helps an overloaded professional turn a tense message, task pile, website offer, or reply decision into one clear read and one safer next move.",
   },
   {
     q: "Do I need setup first?",
-    a: "No. Start with MRagent. Paste the pressure, get the read, then decide whether the result is useful enough to continue.",
+    a: "No. Start with MRagent. Paste the pressure, get the read, then decide whether the result is useful enough to continue or buy the package.",
   },
   {
     q: "Are Slack, email, and memory fully automatic today?",
@@ -94,8 +116,8 @@ export default function PricingPage() {
             <span className="font-serif text-xl font-bold tracking-wide">MindReply</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link href="/capabilities" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
-              Capabilities
+            <Link href="/website-completion-package" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
+              Package
             </Link>
             <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
               Try free
@@ -110,19 +132,19 @@ export default function PricingPage() {
             <p className="inline-flex items-center gap-2 rounded-full border border-[#e2b757]/35 bg-[#e2b757]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#e2b757]">
               <Sparkles aria-hidden className="h-4 w-4" /> Clear path to paid
             </p>
-            <h1 className="mt-7 font-serif text-5xl font-bold leading-[0.96] md:text-7xl">Try the read first. Pay when the relief is real.</h1>
+            <h1 className="mt-7 font-serif text-5xl font-bold leading-[0.96] md:text-7xl">Try the read first. Buy the package when the buying path needs repair.</h1>
           </div>
           <div>
             <p className="max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
-              MindReply should not make a visitor decode clever language before they understand the offer. Start with MRagent, feel the value, then choose the plan that matches how often communication pressure hits.
+              MindReply should not make a visitor decode clever language before they understand the offer. Start with MRagent, feel the value, then use the one-off Website Completion Package before recurring plans.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
                 Try MindReply free <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
-              <Link href="/contact" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
-                Contact after MRagent <Mail aria-hidden className="h-4 w-4" />
-              </Link>
+              <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+                {packageCtaLabel} <Mail aria-hidden className="h-4 w-4" />
+              </a>
             </div>
           </div>
         </div>
@@ -130,7 +152,7 @@ export default function PricingPage() {
 
       <section className="px-4 py-12 md:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-4">
             {plans.map((plan) => (
               <article key={plan.name} className="rounded-lg border border-[#122033]/10 bg-white p-6 shadow-sm shadow-[#122033]/5">
                 <div className={`rounded-lg p-5 ${plan.accent}`}>
@@ -146,9 +168,9 @@ export default function PricingPage() {
                     </div>
                   ))}
                 </div>
-                <Link href={plan.href} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150]">
+                <a href={plan.href} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150]">
                   {plan.cta} <ArrowRight aria-hidden className="h-4 w-4" />
-                </Link>
+                </a>
               </article>
             ))}
           </div>
@@ -182,9 +204,9 @@ export default function PricingPage() {
               <MessageCircle aria-hidden className="h-5 w-5" />
               <p className="text-xs font-bold uppercase tracking-[0.22em]">Activation sequence</p>
             </div>
-            <h2 className="mt-5 font-serif text-3xl font-bold leading-tight">1. Ask MRagent. 2. Use the answer. 3. Upgrade only when the pattern repeats.</h2>
+            <h2 className="mt-5 font-serif text-3xl font-bold leading-tight">1. Ask MRagent. 2. Use the answer. 3. Buy the package if the path still leaks.</h2>
             <p className="mt-4 text-sm leading-7 text-[#d3e5e2]">
-              This is the cleanest revenue path from the audit: free relief first, then Growth for regular use, then Pro for continuity and approved integrations.
+              This is the cleanest revenue path from the audit: free relief first, then the Website Completion Package, then Growth or Pro only when overload becomes recurring.
             </p>
           </div>
           <div className="rounded-lg border border-[#122033]/10 bg-white p-6">
@@ -199,7 +221,7 @@ export default function PricingPage() {
               </div>
               <div className="flex gap-3 rounded-lg border border-[#122033]/10 bg-[#fbfaf6] p-4 text-sm leading-6 text-[#59687b]">
                 <Clock3 aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#d96f4a]" />
-                <span>Do not claim 10 sales/day. Track it when payments are connected; until then, show readiness and next action.</span>
+                <span>Do not claim sales volume. Track it when payments are connected; until then, show readiness and next action.</span>
               </div>
             </div>
           </div>
