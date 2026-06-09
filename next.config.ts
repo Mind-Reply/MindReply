@@ -10,7 +10,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
   "connect-src 'self' https://vitals.vercel-insights.com",
-  "form-action 'self'",
+  "form-action 'self' mailto:",
   "worker-src 'self' blob:",
 ].join("; ");
 
