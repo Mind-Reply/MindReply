@@ -11,6 +11,7 @@
     "decision:verify": "tsx scripts/verify-decision-layer.ts && tsx scripts/verify-production-version-contract.ts",
     "mcp:verify": "tsx scripts/verify-mcp.ts",
     "verify:all": "npm run decision:verify && npm run mcp:verify && npm run typecheck",
+    "verify:live-revenue": "node scripts/verify-live-revenue-surface.mjs",
     "report:check": "tsx scripts/verify-hourly-owner-report.ts",
     "launch:report": "tsx scripts/hourly-owner-report.ts",
     "audit:blueprint": "tsx scripts/verify-hourly-owner-goal.ts",
