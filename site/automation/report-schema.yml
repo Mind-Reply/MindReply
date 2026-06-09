@@ -8,6 +8,42 @@ vercel_guard:
   workflow: .github/workflows/vercel-guard-verify.yml
   command: node scripts/vercel-ignore-build.mjs --self-test
   purpose: Fast GitHub-only check for Vercel quota guard and automation-only skip behavior.
+production_deploy_recovery:
+  workflow: .github/workflows/manual-vercel-production.yml
+  canonical_project: mindreply
+  canonical_project_id: prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3
+  non_production_storage_project: mind-reply
+  required_aliases:
+    - https://www.mind-reply.com
+    - https://mind-reply.com
+  required_steps:
+    - capture Vercel deployment URL
+    - assign public production aliases
+    - verify live production reachability
+    - run npm run verify:live-revenue
+    - attach live proof before owner email and Slack delivery
+  rule: Production is not ready until the public custom domain serves the verified revenue/privacy surface.
+live_revenue_surface:
+  artifact: mindreply-live-revenue-surface.json
+  producer: scripts/verify-live-revenue-surface.mjs
+  command: npm run verify:live-revenue
+  site_env: MINDREPLY_LIVE_VERIFY_URL
+  strict_sha_env: MINDREPLY_REQUIRE_LIVE_SHA_MATCH
+  expected_sha_env: MINDREPLY_EXPECTED_SHA
+  required_checks:
+    - home-reachable
+    - contact-reachable
+    - version-current
+    - version-sha-current when strict SHA match is enabled
+    - health-reachable
+    - package-api-mounted
+    - relief-promise
+    - website-completion-package
+    - package-price
+    - public-mailbox
+    - no-personal-gmail
+    - contact-assisted-close
+  owner_delivery_rule: When MINDREPLY_REPORT_REQUIRE_LIVE_PROOF is true, email and Slack delivery stay blocked until this artifact is attached to the owner report.
 preview_capture_workflow: .github/workflows/mragent-preview-capture.yml
 preview_capture_script: scripts/mragent-preview-capture.mjs
 growth_pulse:
@@ -53,6 +89,13 @@ fields:
     expectedSha: GitHub Actions SHA for the monitor run when available.
     matchesRun: true, false, or null when unavailable.
     data: Full /api/version JSON payload.
+  liveRevenueSurface:
+    status: pass or fail from scripts/verify-live-revenue-surface.mjs.
+    expectedSha: Expected production SHA when strict matching is enabled.
+    liveSha: SHA reported by the live /api/version route.
+    failed: Failed live production checks.
+    checks: Live revenue, privacy, route, and assisted-close checks.
+    surfaces: Per-route response status and JSON metadata.
   functionalChecks:
     agentApi:
       ok: true when /api/agent returns reply, receipt, risk, and one action.
@@ -80,6 +123,7 @@ connection_urls:
   agent: https://www.mind-reply.com/agent
   preferred_agent_api: https://www.mind-reply.com/api/agent
   fallback_intake_api: https://www.mind-reply.com/api/intake
+  package_request_api: https://www.mind-reply.com/api/package-request
   version: https://www.mind-reply.com/api/version
   primary_mcp: https://www.mind-reply.com/mcp
   fallback_mcp: https://www.mind-reply.com/api/mcp
@@ -107,6 +151,7 @@ visibility:
     - active_deployment
     - legacy_quota_context
     - production_version
+    - live_revenue_surface
     - functional_api_checks
     - growth_pulse
     - short_digest
@@ -123,6 +168,7 @@ verification:
     - npm run mcp:verify
     - npm run typecheck
     - npm run build
+    - npm run verify:live-revenue
   rule: Verification runs in GitHub Actions and is separate from Vercel publishing.
 slack_handoff:
   config: site/automation/slack-api.yml
@@ -133,6 +179,8 @@ vercel_handoff:
   rule: Treat upgradeToPro=build-rate-limit as account quota until build logs prove a code failure.
 uses:
   - GitHub Actions summary
+  - private owner email report after live proof is attached
+  - Slack webhook report after live proof is attached
   - future Slack report handoff after workspace channel is connected
   - future Outlook digest handoff after mailbox target is named
   - personal pack status checks
