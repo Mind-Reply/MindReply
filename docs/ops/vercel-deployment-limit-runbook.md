@@ -46,6 +46,32 @@ The command writes `mindreply-launch-readiness.json` and exits successfully by d
 MINDREPLY_REQUIRE_LAUNCH_READY=1 npm run launch:report
 ```
 
+## Status context audit command
+
+Run this read-only command whenever GitHub/Vercel status truth needs to be refreshed:
+
+```bash
+npm run deploy:status-contexts -- <commit-sha>
+```
+
+In GitHub Actions, the SHA can come from `GITHUB_SHA`. Locally, pass the PR head SHA or set `MINDREPLY_STATUS_SHA`:
+
+```bash
+MINDREPLY_STATUS_SHA=<commit-sha> npm run deploy:status-contexts
+```
+
+The command writes `mindreply-vercel-status-audit.json` and exits successfully by default, even if duplicate Vercel contexts remain. To make it fail unless there is exactly one canonical Vercel context, run:
+
+```bash
+MINDREPLY_REQUIRE_SINGLE_VERCEL_CONTEXT=1 npm run deploy:status-contexts -- <commit-sha>
+```
+
+Interpretation:
+
+- `single-canonical`: one Vercel context exists and it targets the canonical `mind-reply` project.
+- `needs-provider-action`: duplicate or quota-linked Vercel contexts still exist and must be disconnected, disabled, or made non-required provider-side.
+- `not-verifiable`: no SHA was provided, GitHub was unreachable, or a token is needed for the repo/status endpoint.
+
 ## What is working now
 
 - The canonical preview alias renders the new MindReply Executive Nervous System surface.
@@ -53,6 +79,7 @@ MINDREPLY_REQUIRE_LAUNCH_READY=1 npm run launch:report
 - `https://www.mind-reply.com/agent` returns `200`.
 - `https://www.mind-reply.com/api/health` returns `200` with the live health payload.
 - The launch report gives a fresh proof artifact instead of relying only on static runbook deployment IDs.
+- The status context audit gives a fresh proof artifact for duplicate Vercel status cleanup.
 
 ## Remaining launch blockers
 
@@ -75,7 +102,7 @@ MINDREPLY_REQUIRE_LAUNCH_READY=1 npm run launch:report
 4. Set the canonical production branch to `main`.
 5. Merge PR #12 only after required GitHub checks are acceptable.
 6. Trigger exactly one clean production deployment from `main` on the canonical `mind-reply` project.
-7. Verify with `npm run launch:report` plus any provider dashboard evidence.
+7. Verify with `npm run launch:report`, `npm run deploy:status-contexts -- <commit-sha>`, and provider dashboard evidence.
 
 ## Canonical project rules
 
@@ -135,8 +162,9 @@ Code cannot upgrade billing, raise account quota, attach payment details, confir
 
 1. Confirm only the canonical `mind-reply` Vercel project remains attached to the repo, or make the duplicate `mindreply` check non-required.
 2. Confirm `npm run launch:report` shows the preview surface and health endpoints ready.
-3. Confirm the custom domains point to the canonical `mind-reply` project.
-4. Confirm GitHub Actions checks run and pass.
-5. Merge PR #12 into `main`.
-6. Redeploy production from `main` once.
-7. Confirm `mind-reply.com` and `www.mind-reply.com` resolve to the canonical project.
+3. Confirm `npm run deploy:status-contexts -- <commit-sha>` reports `single-canonical`.
+4. Confirm the custom domains point to the canonical `mind-reply` project.
+5. Confirm GitHub Actions checks run and pass.
+6. Merge PR #12 into `main`.
+7. Redeploy production from `main` once.
+8. Confirm `mind-reply.com` and `www.mind-reply.com` resolve to the canonical project.
