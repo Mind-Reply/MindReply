@@ -1,0 +1,66 @@
+version: 1
+created: 2026-06-09
+branch: mind-reply
+preserved_from:
+  branch: codex/mindreply-moa-controller
+  path: docs/MINDREPLY_MULTI_AGENT_BLUEPRINT.md
+preservation_type: operating_model_extract
+status: preserved_reference
+purpose: Preserve useful MOA control ideas before retiring old codex branches.
+core_model:
+  master_orchestrator:
+    role: one user-facing control plane
+    rule: user talks to MOA only
+    responsibility:
+      - decompose goals
+      - assign specialist tasks
+      - validate outputs
+      - resolve conflicts
+      - return one unified response
+  specialist_agents:
+    rule: specialists communicate through MOA, not directly to user
+    boundary_rule: no specialist overwrites another domain
+    output_rule: outputs must be structured, actionable, and evidence-backed
+rejection_rules:
+  - reject unclear or incomplete outputs
+  - reject conflicting architecture
+  - reject domain overlap
+  - reject unstable changes
+  - reject naming or contract violations
+agent_layers:
+  core_control:
+    - Master Orchestrator Agent
+  system_infrastructure:
+    - Infrastructure
+    - DevOps / CI-CD
+    - Security
+  product_development:
+    - Frontend
+    - Backend
+    - Database
+  intelligence:
+    - AI Reasoning
+    - AI Content
+    - AI Automation
+  experience_growth:
+    - UX/UI
+    - Growth
+    - Support
+  expansion:
+    - Research
+    - Integration
+    - Business
+fit_for_current_mindreply:
+  keep:
+    - one synthesis and one action as public output rule
+    - separate workstream ownership in internal reports
+    - validate routes, deploys, SEO, privacy, and design before claiming done
+  avoid:
+    - exposing MOA/internal agent language on public pages
+    - adding runtime orchestration code before current MRagent routes deploy cleanly
+    - claiming external integrations are live without credential/runtime proof
+recommended_use:
+  storage: use as internal operating model
+  main: port only short reporting/workstream references if needed
+  public_site: do not expose directly
+short_digest_line: MOA blueprint preserved as internal operating model; not a main/runtime merge candidate.
