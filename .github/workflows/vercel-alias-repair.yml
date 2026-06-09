@@ -12,12 +12,12 @@ on:
         description: Vercel deployment id to alias.
         required: false
         type: string
-        default: dpl_CUCBFk9NdQ4eTYkqf7fm5kREgTeQ
+        default: dpl_FK9VqUruBXUoZgWyY3M546U5zmk1
       deployment_url:
         description: Vercel deployment URL to verify against.
         required: false
         type: string
-        default: https://mindreply-8qfejky4p-angellllkr-engs-projects.vercel.app
+        default: https://mindreply-ickm8ik48-angellllkr-engs-projects.vercel.app
 
 permissions:
   contents: read
@@ -34,9 +34,9 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_TEAM_ID: team_0plIJmQLgZC1wVv9zI2eVf3B
-      GOOD_DEPLOYMENT_ID: ${{ github.event.inputs.deployment_id || 'dpl_CUCBFk9NdQ4eTYkqf7fm5kREgTeQ' }}
-      GOOD_DEPLOYMENT_URL: ${{ github.event.inputs.deployment_url || 'https://mindreply-8qfejky4p-angellllkr-engs-projects.vercel.app' }}
-      GOOD_DEPLOYMENT_SHA: 269a6aa7cd74c594dd0fa5f0b53cf84bf5aed427
+      GOOD_DEPLOYMENT_ID: ${{ github.event.inputs.deployment_id || 'dpl_FK9VqUruBXUoZgWyY3M546U5zmk1' }}
+      GOOD_DEPLOYMENT_URL: ${{ github.event.inputs.deployment_url || 'https://mindreply-ickm8ik48-angellllkr-engs-projects.vercel.app' }}
+      GOOD_DEPLOYMENT_SHA: 8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8
       MINDREPLY_LIVE_VERIFY_URL: https://www.mind-reply.com
       MINDREPLY_LIVE_REVENUE_JSON: mindreply-live-revenue-surface.json
       MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: true
