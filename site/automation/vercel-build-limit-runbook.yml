@@ -33,6 +33,10 @@ skipped_change_scopes:
   - site/design source files
   - site/media source files
   - scripts/mragent-monitor-report.mjs
+  - scripts/mragent-growth-pulse.mjs
+  - scripts/mragent-short-digest.mjs
+  - scripts/production-domain-incident.mjs
+  - scripts/verify-production-version-contract.ts
 checks:
   - confirm latest GitHub commit status
   - open Vercel target URL and verify whether it is quota/rate-limit or code failure
