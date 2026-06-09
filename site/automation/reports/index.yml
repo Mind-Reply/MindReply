@@ -2,26 +2,27 @@ version: 1
 created: 2026-06-09
 updated: 2026-06-09
 branch: mind-reply
-purpose: Central index for storage-branch reports while main/Vercel deployment is rate-limited or pending.
+purpose: Central index for storage-branch reports while main/Vercel deployment state is being tracked.
 canonical_repo: Mind-Reply/MindReply
 canonical_deploy_branch: main
 storage_branch: mind-reply
 latest_checked_main_commit: f589025b154376098a10bca8c11e4471bbe490e1
 current_state:
   production:
-    home_page: live_200
-    agent_page: live_200
-    fallback_intake_api: live_200
-    api_agent: stale_410_until_new_deploy_confirmed
-    api_version: stale_410_until_new_deploy_confirmed
-    mcp: missing_404_until_new_deploy_confirmed
-    manifest: missing_404_until_new_deploy_confirmed
-    opengraph_image: missing_404_until_new_deploy_confirmed
-    sitemap: live_200
-    robots: live_200
+    home_page: live_200_from_prior_check
+    agent_page: deployed_green_latest_commit_public_http_timed_out_from_codex_machine
+    fallback_intake_api: live_200_from_prior_check
+    api_agent: deployed_green_latest_commit_public_http_timed_out_from_codex_machine
+    api_version: needs_browser_recheck
+    mcp: needs_browser_recheck
+    manifest: needs_browser_recheck
+    opengraph_image: needs_browser_recheck
+    sitemap: live_200_from_prior_check
+    robots: live_200_from_prior_check
   deployment:
     vercel_mind_reply: success_on_latest_main_status_check
-    vercel_mindreply: pending_on_latest_main_status_check
+    vercel_mindreply: success_on_latest_main_status_check
+    vercel_deployments_context: success_on_latest_main_status_check
   revenue:
     verified_income: false
     note: No payment, order, or revenue data was available through the current repo/connectors.
@@ -32,8 +33,8 @@ reports:
   - date: 2026-06-09
     type: main_voice_frontend_pass
     path: site/automation/reports/2026-06-09-main-voice-frontend-pass.yml
-    commit: de78505321a25343734482c6bb35feaa681489d9
-    one_line: Main now has runtime and frontend MRagent voice upgrades; one Vercel project is successful, one is pending, revenue is not yet verified.
+    commit: c0294b30f567ba61fe381b17dac2b72c81d3bdf1
+    one_line: Main now has runtime and frontend MRagent voice upgrades; Vercel checks are green, public HTTP checks timed out from this machine, revenue is not yet verified.
   - date: 2026-06-09
     type: storage_status
     path: site/automation/reports/2026-06-09-storage-status.yml
@@ -106,17 +107,16 @@ preserved_extracts:
     commit: 38bb88b7873bb4cc3cc9b13a83cb66cdc4095d9f
     one_line: Old /api/action behavior preserved as storage-only; do not port without receipt/action tests.
 next_report_slots:
-  - type: deployment_recheck
+  - type: browser_preview_recheck
     cadence: next active work pass
-    focus: confirm pending mindreply Vercel status and public route freshness
+    focus: confirm latest public /agent, /api/agent, and /mcp from browser-accessible network
   - type: frontend_full_surface_pass
     cadence: next main implementation pass
-    focus: richer full frontend, observability, conversion tracking, and Figma handoff readiness
+    focus: richer session workspace, receipts, action controls, observability, and conversion tracking
   - type: branch_retirement_ready_check
     cadence: next storage pass
     focus: confirm old branch material coverage and safe delete candidate status
 opinion: >-
-  The useful news is that main now contains real MRagent behavior and frontend voice improvements,
-  not only planning artifacts. The cautious news is that income is not verified yet, and the pending
-  Vercel project must settle before claiming the freshest public preview everywhere.
-short_digest_line: MRagent main voice/frontend pass logged; Vercel mind-reply success, mindreply pending, no verified income yet.
+  There is genuine good news: the latest main commit deployed green across both Vercel project contexts.
+  The revenue answer stays sober until analytics, payments, or order data are wired in and checked.
+short_digest_line: Vercel is green on the latest MRagent voice/frontend commit; revenue is not verified yet.
