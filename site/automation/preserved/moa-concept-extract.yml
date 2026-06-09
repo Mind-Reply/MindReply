@@ -1,0 +1,68 @@
+version: 1
+created: 2026-06-09
+branch: mind-reply
+preserved_from:
+  branch: codex/mindreply-moa-controller
+  path: lib/moa.ts
+preservation_type: concept_extract
+status: preserved_reference
+purpose: Preserve typed multi-agent roster/routing concepts before retiring old codex branches.
+core_types_to_remember:
+  specialist_agent:
+    fields:
+      - id
+      - name
+      - domain
+      - signals
+      - responsibilities
+      - boundary
+      - requiredOutputFormats
+    value: Clear ownership and boundaries per workstream.
+  routed_agent:
+    fields:
+      - status
+      - priority
+      - matchedSignals
+      - output.headline
+      - output.assessment
+      - output.actionItems
+      - output.evidence
+      - output.requiredFormat
+      - output.boundaryCheck
+    value: Turns agent work into evidence-backed visible output.
+  validation_result:
+    fields:
+      - valid
+      - checkedAgents
+      - expectedAgents
+      - missingAgents
+      - inactiveAgents
+      - incompleteOutputs
+      - domainBoundaryViolations
+      - duplicateAgents
+      - confidenceScore
+      - validationSummary
+    value: Useful checklist shape for reports and branch cleanup, not necessarily runtime code.
+  orchestrated_goal:
+    fields:
+      - userGoal
+      - goal
+      - masterOrchestratorAgent
+      - taskRoutingLayer
+      - validation
+      - finalCombinedResult
+    value: Good internal structure for long-running work reports.
+concepts_to_keep:
+  - Every lane has a domain and boundary.
+  - Every lane must return structured output.
+  - Validation checks missing agents, incomplete outputs, boundary violations, and duplicates.
+  - Final output should include summary, primary agents, next actions, visible result, and rollout phase.
+concepts_to_avoid:
+  - Do not add old MOA runtime into main until current MRagent deploy freshness is solved.
+  - Do not expose internal agent roster publicly.
+  - Do not claim inactive external tools or integrations are working.
+possible_current_use:
+  report_schema: Use validation_result fields as inspiration for future report artifacts.
+  storage_branch: Keep as operating model for branch cleanup and multi-workstream reports.
+  main_branch: Port only small report/checklist ideas after Vercel quota clears.
+short_digest_line: MOA typed roster concept preserved as report/checklist inspiration, not runtime code.
