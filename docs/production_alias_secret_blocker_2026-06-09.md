@@ -13,7 +13,9 @@ Repo `main` has continued to improve the sellable surface while production alias
 - Workflow failed at `Require Vercel token` because `VERCEL_TOKEN` is empty.
 - The same run showed owner email and Slack delivery secrets are empty, so delivery is blocked rather than claimed.
 - Current `main` includes `scripts/verify-package-delivery-proof.ts` and wires it into `npm run decision:verify`.
-- Current Vercel commit checks for both `mindreply` and duplicate `mind-reply` are failing with Vercel `build-rate-limit` targets, so new production deployment is capacity-blocked too.
+- Current `main` improves `scripts/vercel-ignore-build.mjs` so docs/report-only commits can be detected from Git when `MRAGENT_CHANGED_FILES` is not provided by Vercel.
+- Duplicate Vercel project `mind-reply` has been observed canceling at the ignored-build step with the reason `Skipping non-canonical Vercel project prj_nETWN2SapvnbSWVXK4O5upJHF6bb`.
+- Current Vercel commit checks for canonical `mindreply` are still failing with Vercel `build-rate-limit` targets, so new production deployment is capacity-blocked.
 - Outlook owner email sending is rate-limited with `ErrorExceededMessageLimit`; an owner update draft was created instead of claiming a sent email.
 
 ## Package Proof Added
@@ -26,6 +28,13 @@ The Website Completion Package page now shows a `Sample delivery receipt` sectio
 - `ownerDecisionNeeded: confirm scope, route invoice or payment link, approve the next close-ready move`
 
 This strengthens the GBP 600 offer by making the delivery object visible and inspectable rather than vague.
+
+## Deployment Capacity Control Added
+The Vercel ignored-build guard now has two protection layers:
+- Skip non-canonical projects when `VERCEL_PROJECT_ID` exposes a project id that is not canonical `mindreply`.
+- Derive changed files from `git diff-tree --no-commit-id --name-only -r --root HEAD` when Vercel does not pass `MRAGENT_CHANGED_FILES`, then skip docs/report-only changes before the full build.
+
+This does not create deployment capacity by itself. It reduces avoidable builds once Vercel can start the ignored-build step.
 
 ## Owner Action Needed
 Add these repository secrets/variables, then rerun the emergency alias repair workflow or wait for the next scheduled run.
