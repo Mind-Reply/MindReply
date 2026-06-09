@@ -1,9 +1,9 @@
-name: MindReply 50-Minute Owner Report
+name: MindReply Hourly Owner Report
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "0 * * * *"
 
 permissions:
   contents: read
@@ -12,7 +12,7 @@ env:
   MINDREPLY_REPORT_ENABLED: "true"
   MINDREPLY_REPORT_DRY_RUN: ${{ vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
   MINDREPLY_REPORT_CHANNELS: ${{ vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
-  MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || vars.MINDREPLY_REPORT_EMAIL || 'ANGELLLKR@GMAIL.COM' }}
+  MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || vars.MINDREPLY_REPORT_EMAIL }}
   MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS }}
   MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || vars.MINDREPLY_REPORT_FROM }}
   MINDREPLY_PACKAGE_REQUEST_TO: ${{ secrets.MINDREPLY_PACKAGE_REQUEST_TO || vars.MINDREPLY_PACKAGE_REQUEST_TO }}
@@ -28,7 +28,7 @@ env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
 concurrency:
-  group: mindreply-50-minute-owner-report
+  group: mindreply-hourly-owner-report
   cancel-in-progress: true
 
 jobs:
@@ -38,66 +38,34 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - name: Enforce 50-minute cadence
-        run: |
-          python3 - <<'PY'
-          import os
-          import time
-
-          should_send = "true"
-          if os.environ.get("GITHUB_EVENT_NAME") == "schedule":
-              # GitHub cron cannot express a true 50-minute interval. Poll every
-              # 10 minutes and send only during the 10-minute window that opens
-              # when Unix epoch minutes are divisible by 50.
-              minute_mod = int(time.time() // 60) % 50
-              should_send = "true" if minute_mod < 10 else "false"
-              print(f"50-minute cadence window: minute_mod={minute_mod}, should_send={should_send}")
-          else:
-              print("Manual dispatch bypasses the cadence gate.")
-
-          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
-              env.write(f"SHOULD_SEND_REPORT={should_send}\n")
-          PY
-
       - name: Checkout
-        if: env.SHOULD_SEND_REPORT == 'true'
         uses: actions/checkout@v4
 
       - name: Setup Node
-        if: env.SHOULD_SEND_REPORT == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install dependencies
-        if: env.SHOULD_SEND_REPORT == 'true'
         run: npm ci || npm install
 
       - name: Check report contract
-        if: env.SHOULD_SEND_REPORT == 'true'
         run: npm run report:check
 
       - name: Generate launch report
-        if: env.SHOULD_SEND_REPORT == 'true'
         run: npm run launch:report
 
       - name: Verify revenue blueprint
-        if: env.SHOULD_SEND_REPORT == 'true'
         run: npm run audit:blueprint
 
       - name: Send owner report
-        if: env.SHOULD_SEND_REPORT == 'true'
         run: npm run report:send
 
-      - name: Skipped by 50-minute cadence gate
-        if: env.SHOULD_SEND_REPORT != 'true'
-        run: echo "Skipped: not in the active 50-minute owner-report send window."
-
       - name: Upload owner report artifacts
-        if: always() && env.SHOULD_SEND_REPORT == 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mindreply-50-minute-owner-report
+          name: mindreply-hourly-owner-report
           path: |
             reports/outbox/hourly-owner-report-*.md
             reports/outbox/hourly-owner-delivery-receipt-*.json
