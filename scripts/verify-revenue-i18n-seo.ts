@@ -22,6 +22,7 @@ const layout = read("app/layout.tsx");
 const robots = read("app/robots.ts");
 const sitemap = read("app/sitemap.ts");
 const localeAssist = read("components/LocaleAssist.tsx");
+const mrAgentChat = read("components/MRAgentChat.tsx");
 const siteFooter = read("components/SiteFooter.tsx");
 const packageRequestForm = read("components/PackageRequestForm.tsx");
 const geoLocale = read("app/api/geo-locale/route.ts");
@@ -44,6 +45,13 @@ includes("homepage", home, "Boundary-aware persuasion");
 includes("homepage", home, "Premium refinement map");
 includes("homepage", home, "Professional refinement claims stay tied to lexicon, tone, structure, risk, confidence, and receipt fields buyers can inspect.");
 includes("homepage", home, "Public contact uses info@mind-reply.com only.");
+
+includes("MRagent chat", mrAgentChat, "Upgrade trigger");
+includes("MRagent chat", mrAgentChat, "If this pressure is bigger than one reply, move it into the GBP 600 Website Completion Package.");
+includes("MRagent chat", mrAgentChat, "website buying friction, repeated client follow-up, offer confusion");
+includes("MRagent chat", mrAgentChat, "If the same overload repeats every week, review Growth or Pro after proof.");
+includes("MRagent chat", mrAgentChat, "Request GBP 600 package invoice");
+includes("MRagent chat", mrAgentChat, "See upgrade path");
 
 includes("contact page", contact, "info@mind-reply.com");
 includes("contact page", contact, "Ask MRagent first");
@@ -138,4 +146,4 @@ includes("owner security", ownerSecurity, "Defensive Security Boundary");
 includes("owner security", ownerSecurity, "Owner Decision Format");
 assert(!/ANGELLLKR@GMAIL\.COM/i.test(ownerSecurity), "owner security doc must not expose the private Gmail directly.");
 
-console.log("Revenue, 10-language surface i18n, SEO, assisted close, footer handoff, and security boundary verification passed.");
+console.log("Revenue, 10-language surface i18n, SEO, MRagent upgrade trigger, assisted close, footer handoff, and security boundary verification passed.");
