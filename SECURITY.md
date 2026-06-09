@@ -31,6 +31,21 @@ Send security reports to `info@mind-reply.com` with:
 
 Do not include live secrets in the report. If a secret may be compromised, rotate it in the provider first, then update GitHub/Vercel secrets.
 
+## Owner Decision Desk
+
+Security work reports to the owner decision desk before any change that affects behavior, access, data retention, delivery, billing, or production rollout.
+
+Owner decision packets must include:
+
+- affected surface;
+- evidence from files, commands, logs, live endpoints, or connector results;
+- impact and likelihood;
+- recommended decision: patch, hold, rotate, rollback, configure, or escalate;
+- rollback or rotation note;
+- delivery status for email and Slack when configured.
+
+The security pack may send all non-secret decision data by email. It must not send raw secrets, access tokens, private pressure text, credentials, or unredacted sensitive records. Urgent containment can pause exposure first, but the owner report still records what changed and why.
+
 ## Defensive Scope
 
 Allowed:
@@ -52,14 +67,15 @@ Not allowed:
 
 1. Acknowledge and classify the report.
 2. Check whether raw pressure, receipts, secrets, or delivery channels are affected.
-3. Patch in GitHub on a scoped branch or direct `main` only for urgent low-risk fixes.
-4. Verify with build, typecheck, MCP checks, and route checks.
-5. Deploy through Vercel and confirm runtime logs.
-6. Send an activation/security pack report after mitigation.
+3. Prepare the owner decision packet for behavior, access, data, billing, delivery, or production changes.
+4. Patch in GitHub on a scoped branch or direct `main` only for urgent low-risk fixes.
+5. Verify with build, typecheck, MCP checks, and route checks.
+6. Deploy through Vercel and confirm runtime logs.
+7. Send an activation/security pack report after mitigation.
 
 ## Security Pack Automation
 
-`npm run report:security-pack` emits the 8-lane defensive security pack.
+`npm run report:security-pack` emits the 8-lane defensive security pack with owner-decision routing.
 
 `npm run report:activation-pack` emits the combined 8-lane security pack plus 28-lane promotion-readiness pack. The scheduled workflow is `.github/workflows/activation-pack-report.yml` and runs every 30 minutes by default.
 
