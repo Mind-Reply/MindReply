@@ -2,26 +2,74 @@
 
 ## Current verified state
 
-GitHub currently reports two Vercel contexts on PR #12:
+The active code path is PR #12:
 
-- `Vercel - mind-reply`: passing on the canonical preview project.
-- `Vercel - mindreply`: stale or duplicate provider-side context that links to `upgradeToPro=build-rate-limit`.
-
-The passing project for this branch is:
-
+- PR: `https://github.com/Mind-Reply/MindReply/pull/12`
+- Branch: `codex/executive-nervous-system-main-sync`
 - Vercel project: `mind-reply`
 - Project ID: `prj_nETWN2SapvnbSWVXK4O5upJHF6bb`
 - Team ID: `team_0plIJmQLgZC1wVv9zI2eVf3B`
-- Latest manually verified PR head before the launch-report addition: `12abee691dba149bb9e5c983c55a33998326086b`
-- Latest manually verified preview deployment: `dpl_6jPe4d99jvDe2ponqDbMLTG2giXX`
-- Deployment URL: `https://mind-reply-2n0cpzkac-angellllkr-engs-projects.vercel.app`
-- Branch alias: `https://mind-reply-git-codex-executive-90aec2-angellllkr-engs-projects.vercel.app`
 
-The duplicate or stale `mindreply` context points to:
+The failing or stale provider target observed during recovery was:
 
 `https://vercel.com/mr-64b2efc9?upgradeToPro=build-rate-limit`
 
-That is an account, project, or GitHub-integration condition. Repository code can reduce future waste, but it cannot remove the active billing/rate-limit block, upgrade the account, or disconnect a provider-side project integration.
+That is an account, project, or GitHub-integration condition. Repository code can reduce future waste, but it cannot upgrade billing, attach a payment method, or disconnect a provider-side project integration without owner/provider access.
+
+## Automatic deployment policy
+
+`vercel.json` now uses Vercel's `git.deploymentEnabled` gate:
+
+```json
+"git": {
+  "deploymentEnabled": {
+    "main": true,
+    "codex/**": false,
+    "mind-reply": false,
+    "*": false
+  }
+}
+```
+
+Effect:
+
+- `main` is the only branch eligible for automatic Vercel deployments.
+- `codex/*` branches do not create automatic preview deployments.
+- `mind-reply` remains storage/reference only and does not deploy.
+- Manual Vercel deploys remain available through the GitHub Actions workflow below.
+
+This is the main repo-side fix for the quota spiral. The ignored build step remains useful, but `git.deploymentEnabled` is stricter because it prevents branch deployments from starting.
+
+## Manual production deployment
+
+A manual workflow exists at:
+
+`.github/workflows/manual-vercel-production.yml`
+
+Use it only after PR #12 is merged or after the target branch is intentionally selected for production.
+
+Required GitHub Actions secrets:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+Manual deploy steps:
+
+1. Open GitHub repo `Mind-Reply/MindReply`.
+2. Go to **Actions**.
+3. Select **Manual Vercel Production Deploy**.
+4. Click **Run workflow**.
+5. Confirm the selected branch is `main` for production.
+6. Let the workflow run:
+   - `npm ci`
+   - `npm run verify:all`
+   - `vercel pull --environment=production`
+   - `vercel build --prod`
+   - `vercel deploy --prebuilt --prod`
+7. Smoke-check production after deployment.
+
+This gives one deliberate deployment instead of one deployment per commit.
 
 ## Launch readiness command
 
@@ -74,35 +122,38 @@ Interpretation:
 
 ## What is working now
 
-- The canonical preview alias renders the new MindReply Executive Nervous System surface.
-- Preview `/api/health` returns `200` and reports Intake, Action, Memory, MRagent MCP tools, and privacy defaults ready.
+- The canonical PR preview previously rendered the new MindReply Executive Nervous System surface.
+- Preview `/api/health` previously returned `200` and reported Intake, Action, Memory, MRagent MCP tools, and privacy defaults ready.
 - `https://www.mind-reply.com/agent` returns `200`.
 - `https://www.mind-reply.com/api/health` returns `200` with the live health payload.
 - The launch report gives a fresh proof artifact instead of relying only on static runbook deployment IDs.
 - The status context audit gives a fresh proof artifact for duplicate Vercel status cleanup.
+- Latest PR branch commits stopped receiving Vercel status entries after the `git.deploymentEnabled` gate, consistent with automatic PR deploy suppression.
 
 ## Remaining launch blockers
 
 1. `https://www.mind-reply.com/` still serves the older `MindReply | Private Decision Support for Work Messages` production homepage, not the PR preview surface.
 2. `mind-reply.com` and `www.mind-reply.com` still need to be attached or promoted to the canonical production project after merge/deploy readiness is confirmed.
 3. The passing `mind-reply` project provider state has reported `live: false`.
-4. The duplicate `mindreply` Vercel context still appears as a failing or stale GitHub status context because of the build-rate-limit link.
+4. The duplicate or wrong Vercel provider target `mr-64b2efc9` must be disconnected, disabled, or made non-required provider-side.
 5. Provider-backed model replies and receipt persistence remain fallback until production env vars are configured in Vercel.
+6. PR #12 must be synced/rebased with latest `main` before merge.
 
 ## Immediate recovery
 
-1. Open the failing `Vercel - mindreply` status link from GitHub.
+1. Open the failing Vercel status link from GitHub if it appears again.
 2. Decide one provider-side path:
-   - Preferred: disconnect or disable the duplicate `mindreply` Vercel project/context from the GitHub repo.
+   - Preferred: disconnect or disable the duplicate/wrong Vercel project/context from the GitHub repo.
    - Alternative: make the duplicate context non-required if it must temporarily remain attached.
-   - Billing path: upgrade that project/team to Pro only if the owner confirms it must remain active and paid.
+   - Billing path: upgrade the Vercel team to Pro only if immediate deployment beyond the Free quota is required.
 3. In the valid `mind-reply` Vercel project, attach or promote these domains:
    - `mind-reply.com`
    - `www.mind-reply.com`
 4. Set the canonical production branch to `main`.
-5. Merge PR #12 only after required GitHub checks are acceptable.
-6. Trigger exactly one clean production deployment from `main` on the canonical `mind-reply` project.
-7. Verify with `npm run launch:report`, `npm run deploy:status-contexts -- <commit-sha>`, and provider dashboard evidence.
+5. Sync/rebase PR #12 with current `main`.
+6. Merge PR #12 only after required GitHub checks are acceptable.
+7. Trigger exactly one clean production deployment from `main` using either Vercel's automatic main deployment or the manual workflow.
+8. Verify with `npm run launch:report`, `npm run deploy:status-contexts -- <commit-sha>`, and provider dashboard evidence.
 
 ## Canonical project rules
 
@@ -119,27 +170,15 @@ Disconnect duplicate projects that point to stale repos, stale branches, or old 
 
 ## Build quota guard
 
-`vercel.json` uses `ignoreCommand`:
+`vercel.json` still uses `ignoreCommand`:
 
 ```bash
 node scripts/vercel-ignore-build.mjs
 ```
 
-The guard allows builds for:
+The guard skips reporting/docs/workflow-only changes when Vercel reaches the ignored build step. The branch deployment gate runs earlier and is the stronger protection against preview quota burn.
 
-- production deployments
-- `main`
-- `codex/executive-nervous-system-main-sync`
-- branches starting with `release/`
-- branches starting with `deploy/`
-- extra branches listed in `MINDREPLY_VERCEL_BUILD_BRANCHES`
-
-It skips unrelated preview branches so old experiments stop consuming build quota.
-
-To force a one-off build from the dashboard, set one of these env vars to `1` for that deployment context:
-
-- `MINDREPLY_FORCE_VERCEL_BUILD`
-- `VERCEL_FORCE_BUILD`
+To force a one-off build from the dashboard or CLI, use an intentional manual deployment path rather than changing the gate permanently.
 
 ## Upload scope guard
 
@@ -160,9 +199,9 @@ Code cannot upgrade billing, raise account quota, attach payment details, confir
 
 ## After recovery
 
-1. Confirm only the canonical `mind-reply` Vercel project remains attached to the repo, or make the duplicate `mindreply` check non-required.
-2. Confirm `npm run launch:report` shows the preview surface and health endpoints ready.
-3. Confirm `npm run deploy:status-contexts -- <commit-sha>` reports `single-canonical`.
+1. Confirm only the canonical `mind-reply` Vercel project remains attached to the repo, or make the duplicate check non-required.
+2. Confirm `npm run launch:report` shows the production surface and health endpoints ready.
+3. Confirm `npm run deploy:status-contexts -- <commit-sha>` reports `single-canonical` or no duplicate Vercel contexts.
 4. Confirm the custom domains point to the canonical `mind-reply` project.
 5. Confirm GitHub Actions checks run and pass.
 6. Merge PR #12 into `main`.
