@@ -36,6 +36,12 @@ includes("homepage", home, "website buying-friction rescue");
 includes("homepage", home, "Discipline-specific language");
 includes("homepage", home, "Behavioral expression read");
 includes("homepage", home, "Measurable communication structure");
+includes("homepage", home, "Professional lexicon calibration");
+includes("homepage", home, "Tone calibration");
+includes("homepage", home, "Structure optimization");
+includes("homepage", home, "Boundary-aware persuasion");
+includes("homepage", home, "Premium refinement map");
+includes("homepage", home, "Professional refinement claims stay tied to lexicon, tone, structure, risk, confidence, and receipt fields buyers can inspect.");
 includes("homepage", home, "Public contact uses info@mind-reply.com only.");
 
 includes("contact page", contact, "info@mind-reply.com");
@@ -116,4 +122,4 @@ includes("owner security", ownerSecurity, "Defensive Security Boundary");
 includes("owner security", ownerSecurity, "Owner Decision Format");
 assert(!/ANGELLLKR@GMAIL\.COM/i.test(ownerSecurity), "owner security doc must not expose the private Gmail directly.");
 
-console.log("Revenue, 10-language i18n, SEO, assisted close, and security boundary verification passed.");
+console.log("Revenue, 10-language i18n, SEO, premium authority, assisted close, and security boundary verification passed.");
