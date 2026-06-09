@@ -8,7 +8,7 @@ Checked: 2026-06-09
 - `https://www.mind-reply.com/api/health`: `200 OK`.
 - `https://www.mind-reply.com/api/version`: `410 Gone`.
 
-The `410 Gone` version endpoint means production is still behind the local repo, because the local app contains `app/api/version/route.ts`.
+The `410 Gone` version endpoint means production is still behind the repo state that includes `app/api/version/route.ts`.
 
 ## Vercel Project
 
@@ -20,17 +20,23 @@ The latest inspected ready production deployment was created from `main` at comm
 
 Recent Vercel history also showed multiple automatic, errored, or canceled deployments. The repo now reduces that churn by disabling Vercel Git deployments and forcing production deployment through owner-approved paths only.
 
+## Current GitHub Controls
+
+- `vercel.json` has `git.deploymentEnabled=false`.
+- `MindReply Manual Vercel Production Deploy` is `workflow_dispatch` only.
+- The manual deploy requires the exact confirmation phrase `deploy-production`.
+- The manual deploy verifies the Vercel team id, project id, app contract, and live `/api/version` endpoint.
+
 ## Next Production Action
 
-1. Push the current repo changes to GitHub.
-2. Confirm GitHub Actions secrets:
+1. Confirm GitHub Actions secrets:
    - `VERCEL_TOKEN`
    - `VERCEL_ORG_ID`
    - `VERCEL_PROJECT_ID`
-3. Open GitHub Actions.
-4. Run `MindReply Manual Vercel Production Deploy`.
-5. Type `deploy-production`.
-6. Confirm the workflow live checks pass and `/api/version` returns `200`.
+2. Open GitHub Actions.
+3. Run `MindReply Manual Vercel Production Deploy` on `main`.
+4. Type `deploy-production`.
+5. Confirm the workflow live checks pass and `/api/version` returns `200`.
 
 ## Limit Position
 
