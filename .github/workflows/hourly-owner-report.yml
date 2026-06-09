@@ -16,22 +16,13 @@ on:
   push:
     branches:
       - main
-    paths:
-      - ".github/workflows/hourly-owner-report.yml"
-      - "scripts/hourly-owner-report.ts"
-      - "scripts/send-hourly-owner-report.ts"
-      - "scripts/verify-hourly-owner-report.ts"
-      - "scripts/verify-hourly-owner-goal.ts"
-      - "docs/hourly_owner_goal_prompt.md"
-      - "package.json"
-      - "package-lock.json"
 
 permissions:
   contents: read
 
 concurrency:
-  group: mindreply-hourly-owner-report
-  cancel-in-progress: false
+  group: mindreply-hourly-owner-report-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   owner-report:
@@ -92,4 +83,4 @@ jobs:
             reports/outbox/hourly-owner-report-*.md
             reports/outbox/hourly-owner-delivery-receipt-*.json
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7
