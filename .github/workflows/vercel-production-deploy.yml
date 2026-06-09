@@ -2,6 +2,21 @@ name: Vercel Production Deploy
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "public/**"
+      - "scripts/**"
+      - "package.json"
+      - "package-lock.json"
+      - "next.config.*"
+      - "tailwind.config.*"
+      - "tsconfig.json"
+      - ".github/workflows/vercel-production-deploy.yml"
 
 permissions:
   contents: read
