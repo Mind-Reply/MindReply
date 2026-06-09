@@ -26,6 +26,7 @@ const automationOnlyFiles = new Set([
   "mindreply-launch-readiness.json",
   "mindreply-vercel-status-audit.json",
   "scripts/activation-pack-report.ts",
+  "scripts/hourly-owner-report.ts",
   "scripts/mragent-monitor-report.mjs",
   "scripts/mragent-growth-pulse.mjs",
   "scripts/mragent-short-digest.mjs",
@@ -33,7 +34,10 @@ const automationOnlyFiles = new Set([
   "scripts/production-domain-incident.mjs",
   "scripts/promotion-pack-report.ts",
   "scripts/security-pack-report.ts",
+  "scripts/send-hourly-owner-report.ts",
   "scripts/vercel-ignore-build.mjs",
+  "scripts/verify-hourly-owner-goal.ts",
+  "scripts/verify-hourly-owner-report.ts",
   "scripts/verify-production-version-contract.ts",
 ]);
 
@@ -131,6 +135,15 @@ function selfTest() {
       MRAGENT_CHANGED_FILES: "scripts/activation-pack-report.ts\nscripts/security-pack-report.ts\nreports/owner.md",
     }).build === false,
     "Reporting-only script and report changes must be skipped.",
+  );
+  assert(
+    shouldBuild({
+      VERCEL_ENV: "production",
+      VERCEL_GIT_COMMIT_REF: "main",
+      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
+      MRAGENT_CHANGED_FILES: "scripts/hourly-owner-report.ts\nscripts/send-hourly-owner-report.ts\n.github/workflows/hourly-owner-report.yml",
+    }).build === false,
+    "Hourly owner report changes must be skipped.",
   );
   assert(
     shouldBuild({
