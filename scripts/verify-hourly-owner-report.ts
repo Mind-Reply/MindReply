@@ -33,6 +33,9 @@ for (const command of ["npm run report:check", "npm run launch:report", "npm run
 assert(workflow.includes("RESEND_API_KEY"), "Workflow must expose RESEND_API_KEY to the sender.");
 assert(workflow.includes("MINDREPLY_REPORT_EMAIL"), "Workflow must expose MINDREPLY_REPORT_EMAIL through secrets or variables.");
 assert(workflow.includes("MINDREPLY_REPORT_FROM"), "Workflow must expose MINDREPLY_REPORT_FROM.");
+assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_TO.");
+assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_FROM.");
+assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_DRY_RUN"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_DRY_RUN.");
 assert(workflow.includes("MINDREPLY_SLACK_WEBHOOK_URL") || workflow.includes("SLACK_WEBHOOK_URL"), "Workflow must expose a Slack webhook path.");
 assert(workflow.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "Workflow must expose the package payment URL variable.");
 assert(workflow.includes("actions/upload-artifact"), "Workflow must upload report artifacts.");
@@ -45,6 +48,10 @@ for (const phrase of [
   "Website Completion Package",
   "revenue system",
   "assisted close",
+  "package request",
+  "/api/package-request",
+  "rawContentRedacted",
+  "fallback email",
   "payment",
   "invoice",
   "defensive security boundary",
@@ -53,5 +60,11 @@ for (const phrase of [
 ]) {
   assert(contractText.toLowerCase().includes(phrase.toLowerCase()), `Missing hourly owner contract phrase: ${phrase}`);
 }
+
+assert(generator.includes("Assisted Close / Package Request"), "Hourly report must include assisted-close package request status.");
+assert(generator.includes("packageRequest"), "Hourly receipt must include package request readiness data.");
+assert(generator.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Hourly generator must inspect package request recipient configuration.");
+assert(generator.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Hourly generator must inspect package request sender configuration.");
+assert(generator.includes("RESEND_API_KEY"), "Hourly generator must inspect package request provider configuration.");
 
 console.log("Hourly owner report automation contract verified.");
