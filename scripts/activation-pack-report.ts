@@ -1,3 +1,5 @@
+export {};
+
 type Channel = "console" | "slack" | "email";
 
 type SendResult = {
@@ -12,6 +14,8 @@ const dryRun = env.MINDREPLY_REPORT_DRY_RUN !== "false";
 const requireDelivery = env.MINDREPLY_REPORT_REQUIRE_DELIVERY === "true";
 const personalOnly = env.MINDREPLY_REPORT_PERSONAL_ONLY !== "false";
 const requestedChannels = parseChannels(env.MINDREPLY_REPORT_CHANNELS || "console");
+const ownerEmail = env.MINDREPLY_SECURITY_OWNER_EMAIL || "angelllkr@gmail.com";
+const publicSecurityEmail = env.MINDREPLY_SECURITY_PUBLIC_EMAIL || "info@mind-reply.com";
 
 const securityLanes = [
   "Headers and browser hardening",
@@ -105,9 +109,17 @@ function reportMarkdown() {
     "- Defensive review, backup readiness, reporting, and approved promotion preparation only.",
     "- No unauthorized access, credential theft, stealth posting, scraping, spam, or third-party attack activity.",
     "- No revenue, conversion, or audience claims without a connected verified source.",
+    "- All security data sent in reports must be evidence-first and redacted: no raw secrets, tokens, private pressure text, or credentials.",
+    "",
+    "## Owner Decision Desk",
+    `- Owner route: ${ownerEmail}`,
+    `- Public security route: ${publicSecurityEmail}`,
+    "- Security findings become owner decision packets before changes that affect behavior, access, data retention, delivery, billing, or production rollout.",
+    "- Each packet includes affected surface, evidence, impact, recommended decision, rollback or rotation note, and whether email or Slack delivery succeeded.",
+    "- Urgent containment can pause exposure first, then the owner report records what changed and why.",
     "",
     "## Security Team - 8 lanes",
-    ...securityLanes.map((lane, index) => `- ${String(index + 1).padStart(2, "0")} ${lane}: active watch, report findings, escalate only authorized fixes.`),
+    ...securityLanes.map((lane, index) => `- ${String(index + 1).padStart(2, "0")} ${lane}: active watch, prepare owner decision packet, escalate only authorized fixes.`),
     "",
     "## Social And Ad Team - 28 lanes",
     ...promotionLanes.map((lane, index) => `- ${String(index + 1).padStart(2, "0")} ${lane}: prepare, review, and wait for connected account permission before external send.`),
