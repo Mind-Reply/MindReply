@@ -35,33 +35,42 @@ async function main() {
   const iso = nowIso();
   await mkdir(outboxDir, { recursive: true });
 
-  const [homePage, packPage, contactPage, workflow, prompt] = await Promise.all([
+  const [homePage, packPage, contactPage, canonicalPackagePage, pricingPage, workflow, prompt] = await Promise.all([
     readOptional(path.join(root, "app", "page.tsx")),
     readOptional(path.join(root, "app", "pack", "page.tsx")),
     readOptional(path.join(root, "app", "contact", "page.tsx")),
+    readOptional(path.join(root, "app", "website-completion-package", "page.tsx")),
+    readOptional(path.join(root, "app", "pricing", "page.tsx")),
     readOptional(path.join(root, ".github", "workflows", "hourly-owner-report.yml")),
     readOptional(path.join(root, "docs", "hourly_owner_goal_prompt.md")),
   ]);
 
   const blockers: string[] = [];
+  const paymentConfigured = Boolean(process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL);
+
   if (!homePage) blockers.push("Missing required route: homepage.");
   if (!packPage) blockers.push("Missing required route: /pack.");
+  if (!canonicalPackagePage) blockers.push("Missing required route: /website-completion-package.");
   if (!contactPage) blockers.push("Missing required route: /contact.");
+  if (!pricingPage) blockers.push("Missing required route: /pricing.");
   if (!workflow) blockers.push("Missing required workflow: hourly owner report.");
   if (!prompt) blockers.push("Missing owner goal prompt.");
   if (!process.env.MINDREPLY_REPORT_EMAIL && !process.env.MINDREPLY_REPORT_EMAILS) blockers.push("Owner email secret is not configured.");
   if (!process.env.RESEND_API_KEY) blockers.push("RESEND_API_KEY is not configured; email delivery will be blocked.");
   if (!process.env.MINDREPLY_SLACK_WEBHOOK_URL && !process.env.SLACK_WEBHOOK_URL) blockers.push("Slack webhook secret is not configured; Slack delivery will be blocked.");
   if (!process.env.VERCEL_TOKEN) blockers.push("VERCEL_TOKEN is not configured; Vercel deploy status is limited to GitHub/Vercel environment context.");
+  if (!paymentConfigured) blockers.push("Website Completion Package payment link is not configured; invoice request fallback remains active.");
 
-  const packageReady = hasAll(homePage + packPage + contactPage, [
+  const commercialPages = homePage + packPage + canonicalPackagePage + contactPage + pricingPage;
+  const packageReady = hasAll(commercialPages, [
     "Website Completion Package",
     "GBP 600",
     "info@mind-reply.com",
     "MRagent",
+    "NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL",
   ]);
 
-  if (!packageReady) blockers.push("Website Completion Package language is incomplete across homepage, pack, and contact routes.");
+  if (!packageReady) blockers.push("Website Completion Package language or payment fallback is incomplete across revenue routes.");
 
   const status = statusFrom(blockers);
   const topBlocker = blockers[0] ?? "No current blocker detected by the hourly report generator.";
@@ -81,7 +90,7 @@ Status: ${status.toUpperCase()}
 
 - Revenue system check ran on branch ${process.env.GITHUB_REF_NAME || "main"} at commit ${process.env.GITHUB_SHA || "unknown"}.
 - Website Completion Package positioning is treated as the first paid object.
-- Homepage authority layer, trust proof, assisted close, and public mailbox policy were inspected from the repo.
+- Homepage relief promise, authority layer, trust proof, assisted close, pricing order, and payment route were inspected from the repo.
 
 ## Top Blocker
 
@@ -89,18 +98,20 @@ ${topBlocker}
 
 ## Next Revenue Move
 
-Push the Website Completion Package as the immediate paid offer: MRagent first, then GBP 600 package request through /pack or /contact when the issue is broader than one reply.
+Push the Website Completion Package as the immediate paid offer: MRagent first, then GBP 600 payment or invoice request when the issue is broader than one reply.
 
 ## Owner Decision Needed
 
-Confirm the private owner report email, Resend sender, and Slack webhook secrets in GitHub Actions. Keep the owner inbox out of public files and public pages.
+Confirm the private owner report email, Resend sender, Slack webhook, and Website Completion Package payment URL in GitHub Actions/Vercel configuration. Keep the owner inbox out of public files and public pages.
 
 ## Website Completion Package Progress
 
 - Package language present: ${packageReady ? "yes" : "no"}
 - Offer price: GBP 600
 - Public route: info@mind-reply.com
-- Assisted close: MRagent first, then contact/package request
+- Payment link configured: ${paymentConfigured ? "yes" : "no"}
+- Invoice fallback active: yes
+- Assisted close: MRagent first, then payment/invoice/contact route
 
 ## Vercel Deploy Status
 
@@ -127,6 +138,10 @@ Owner reports are private and redacted. Do not include secrets, tokens, raw priv
     reportEnabled,
     dryRun,
     channels: channels.split(",").map((channel) => channel.trim()).filter(Boolean),
+    paymentRoute: {
+      configured: paymentConfigured,
+      invoiceFallbackActive: true,
+    },
     delivery: {
       email: { status: "pending", recipientConfigured: Boolean(process.env.MINDREPLY_REPORT_EMAIL || process.env.MINDREPLY_REPORT_EMAILS), providerConfigured: Boolean(process.env.RESEND_API_KEY) },
       slack: { status: "pending", webhookConfigured: Boolean(process.env.MINDREPLY_SLACK_WEBHOOK_URL || process.env.SLACK_WEBHOOK_URL) },
