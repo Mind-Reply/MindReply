@@ -148,14 +148,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
 
       - name: Send optional owner repair report
         if: always()
         continue-on-error: true
         shell: bash
         run: |
-          npm ci
+          npm install
           npm run launch:report || true
           npm run report:send || true
 
