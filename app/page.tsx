@@ -53,7 +53,7 @@ const packageRows = [
 const authoritySignals = [
   {
     title: "Discipline-specific language",
-    copy: "MindReply does not sell generic productivity. It refines how founders, operators, and client-facing teams explain high-pressure work.",
+    copy: "MindReply does not sell generic output volume. It refines how founders, operators, and client-facing teams explain high-pressure work.",
     icon: FileText,
   },
   {
