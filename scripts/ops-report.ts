@@ -44,6 +44,7 @@ const requiredFiles = [
   "src/chatgpt-app/mragent-tools.json",
   "chatgpt-app-submission.json",
   "scripts/angel-pack-report.ts",
+  "scripts/verify-playbooks.ts",
   "scripts/vercel-ignore-build.mjs",
   "docs/ops/8-workstream-agent-map.md",
   "docs/ops/azure-vm-infrastructure-plan.md",
@@ -80,12 +81,13 @@ const missingRequired = requiredFiles.filter((file) => !existsSync(join(root, fi
 const publicLeakHits = publicFiles.flatMap(forbiddenHits);
 const playbookDir = join(root, "playbooks", "seed");
 const playbookCount = existsSync(playbookDir) ? readdirSync(playbookDir).filter((file) => file.endsWith(".json")).length : 0;
+const playbookVerifierPresent = existsSync(join(root, "scripts", "verify-playbooks.ts"));
 const redirectedRouteCount = redirectedPublicPaths.length;
 const providerBlocks = [
   "Vercel build/deployment limits are account-side and require dashboard billing/quota action before blocked builds can resume.",
   "The Vercel ignored-build guard is configured to reduce stale preview build usage, not to bypass active account limits.",
   "The Vercel upload ignore file keeps support artifacts out of runtime deployments, reducing wasted transfer and build context.",
-  "The Angel Pack report can send to Slack/email only after SLACK_WEBHOOK_URL, OPS_REPORT_WEBHOOK_URL, or RESEND_API_KEY plus OPS_REPORT_EMAIL_TO are configured as GitHub secrets.",
+  "The Angel Pack report can send to Slack/email only after report delivery is enabled and Slack/email secrets are configured.",
   "SLACK_APP_FIELD_ID can be stored as a GitHub variable for labeling, but it is not a credential and cannot send messages alone.",
   "OPENAI_API_KEY controls live MRagent model replies; fallback remains deterministic without it.",
   "BLOB_READ_WRITE_TOKEN controls receipt persistence; raw input remains redacted by default.",
@@ -105,17 +107,18 @@ const report = [
   "",
   `Sub-agent briefs: ${statusLine(subAgentFiles.every((file) => existsSync(join(root, file))))}`,
   `Playbooks: ${playbookCount} seed files found.`,
+  `Playbook schema verifier: ${statusLine(playbookVerifierPresent)}.`,
   `Redirected legacy public routes: ${redirectedRouteCount}.`,
   "",
   "Provider-side blockers:",
   ...providerBlocks.map((item) => `- ${item}`),
   "",
   "Next action:",
-  "- Clear the Vercel dashboard build-rate-limit, redeploy PR #12, then verify /, /agent, /api/health, /api/intake, and /mcp.",
+  "- Clear the stale or duplicate Vercel status context, then verify /, /agent, /api/health, /api/intake, and /mcp on the canonical project.",
 ].join("\n");
 
 console.log(report);
 
-if (publicLeakHits.length || missingRequired.length || playbookCount < 12) {
+if (publicLeakHits.length || missingRequired.length || playbookCount < 12 || !playbookVerifierPresent) {
   process.exitCode = 1;
 }
