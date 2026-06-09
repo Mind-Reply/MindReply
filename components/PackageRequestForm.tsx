@@ -9,10 +9,23 @@ type PackageReceipt = {
   id: string;
   timestamp: string;
   intent: string;
+  actionKind: string;
+  riskLevel: string;
+  confidence: string;
+  playbookVersion: string;
   packageName: string;
   packageValue: string;
+  fallbackEmail: string;
   inputHash: string;
   rawContentRedacted: boolean;
+  assistedClose: {
+    status: "queued" | "fallback";
+    nextStep: string;
+    expectedReplyWindow: string;
+    ownerDecisionNeeded: string;
+    buyerPromise: string;
+    paymentPath: string;
+  };
   delivery: {
     status: DeliveryStatus;
     detail: string;
@@ -142,7 +155,7 @@ export default function PackageRequestForm({ mailtoHref, supportEmail }: Package
           className="inline-flex items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150] disabled:cursor-not-allowed disabled:opacity-45"
         >
           {loading ? <Loader2 aria-hidden className="h-4 w-4 animate-spin" /> : <ArrowRight aria-hidden className="h-4 w-4" />}
-          Submit package request
+          Submit GBP 600 package request
         </button>
       </div>
 
@@ -155,6 +168,11 @@ export default function PackageRequestForm({ mailtoHref, supportEmail }: Package
           <div className="mt-3 grid gap-2">
             <p>Receipt: {receipt.id}</p>
             <p>Package: {receipt.packageName}, {receipt.packageValue}</p>
+            <p>Next step: {receipt.assistedClose.nextStep}</p>
+            <p>Reply window: {receipt.assistedClose.expectedReplyWindow}</p>
+            <p>Owner decision needed: {receipt.assistedClose.ownerDecisionNeeded}</p>
+            <p>Payment path: {receipt.assistedClose.paymentPath}</p>
+            <p>Risk: {receipt.riskLevel}; confidence: {receipt.confidence}; playbook: {receipt.playbookVersion}</p>
             <p>Input hash: {receipt.inputHash}</p>
             <p>Raw content redacted: {receipt.rawContentRedacted ? "yes" : "no"}</p>
             <p>Delivery: {receipt.delivery.detail}</p>
