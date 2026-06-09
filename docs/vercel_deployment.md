@@ -14,7 +14,19 @@ Required GitHub Actions secrets for the manual production deploy:
 - `VERCEL_ORG_ID`: `team_0plIJmQLgZC1wVv9zI2eVf3B`
 - `VERCEL_PROJECT_ID`: `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`
 
-Deploy flow:
+## Guarded Git Deployment
+
+`vercel.json` allows Git deployments. The quota protection now lives in `scripts/vercel-ignore-build.mjs`:
+
+- Preview deployments are skipped.
+- Non-main branches are skipped.
+- Duplicate Vercel production projects are skipped.
+- Docs-only and report-only changes are skipped.
+- App or deployment-config changes on `main` are allowed to build the canonical production project.
+
+This keeps urgent public-site fixes deployable while still suppressing the noisy deployment loop that was consuming capacity.
+
+## CircleCI Deploy Flow
 
 1. `verify_mindreply` installs dependencies, checks reports, typechecks, runs Python tests, and builds the Next app.
 2. `npm run release:audit` verifies report config, outbox delivery, decision-layer behavior, live deployment health, and Vercel deploy preflight state.
@@ -24,7 +36,7 @@ Deploy flow:
 6. CircleCI runs `vercel pull`, `vercel build --prod`, and `vercel deploy --prebuilt --prod`.
 7. `npm run deploy:verify-live` checks the production home page, health API, intake API, robots.txt, and sitemap.xml.
 
-Manual GitHub deploy flow:
+## Manual GitHub Deploy Flow
 
 1. Open GitHub Actions.
 2. Run `MindReply Manual Vercel Production Deploy`.
@@ -33,17 +45,17 @@ Manual GitHub deploy flow:
 5. The workflow runs `vercel pull`, `vercel build --prod`, and `vercel deploy --prebuilt --prod`.
 6. The workflow checks `/`, `/api/health`, and `/api/version`, then sends the private owner deployment report when delivery secrets exist.
 
-Quota control:
+## Quota Control
 
-- `vercel.json` sets `git.deploymentEnabled` to `false`, so automatic Vercel Git deployments do not burn deploy quota.
-- CircleCI verification runs on pushes, but production deploy waits at `hold_production_deploy` until the owner approves one intentional deploy.
-- GitHub deployment is `workflow_dispatch` only and requires the exact confirmation phrase `deploy-production`.
-- The Free-plan `api-deployments-free-per-day` limit cannot be removed in code. It is reduced by disabling automatic deploys, avoided by deploying only after verification, and eliminated only by Vercel plan/account changes outside this repo.
-- Vercel Pro cannot be enabled from source code. The owner must upgrade the Vercel account/team billing plan in the Vercel dashboard, then rerun the approved deploy.
+- `scripts/vercel-ignore-build.mjs` is the primary Git deployment quota guard.
+- CircleCI production deployment still waits at `hold_production_deploy` until owner approval.
+- GitHub manual deployment is `workflow_dispatch` only and requires the exact confirmation phrase `deploy-production`.
+- The Free-plan `api-deployments-free-per-day` limit cannot be removed in code. It is reduced by suppressing low-value deploys, avoided by deploying only after verification when manual deploy is used, and eliminated only by Vercel plan/account changes outside this repo.
+- Vercel Pro cannot be enabled from source code. The owner must upgrade the Vercel account/team billing plan in the Vercel dashboard, then rerun or allow the deploy.
 
 See `docs/vercel_limit_resolution.md` for the owner-side quota decision.
 
-Vercel source check: `https://vercel.com/docs/limits/overview` lists `Deployments Created per Day` as `100` on Hobby and `6000` on Pro. Keep production deploys manual unless the account is upgraded and the owner explicitly re-enables automatic deployment.
+Vercel source check: `https://vercel.com/docs/limits/overview` lists `Deployments Created per Day` as `100` on Hobby and `6000` on Pro. Keep low-value deploys suppressed unless the account is upgraded and owner reports show green production verification.
 
 Live verification after deploy:
 
