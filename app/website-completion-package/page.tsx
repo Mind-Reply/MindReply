@@ -13,6 +13,11 @@ import {
   Timer,
 } from "lucide-react";
 
+const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
+const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
+const packageCtaLabel = packagePaymentUrl ? "Pay for package" : "Request invoice";
+const packagePaymentStatus = packagePaymentUrl ? "Direct payment link configured" : "Invoice request path active";
+
 const outcomes = [
   "A ranked action queue for the most urgent website, message, reply, or follow-up friction.",
   "Send-ready copy for the next step: page section, reply, offer block, or assisted-close note.",
@@ -55,12 +60,12 @@ export default function WebsiteCompletionPackagePage() {
             <span className="font-serif text-xl font-bold tracking-wide">MindReply</span>
           </Link>
           <nav className="flex items-center gap-2">
-            <Link href="/agents" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
-              Agents
+            <Link href="/agent" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
+              MRagent
             </Link>
-            <Link href="/contact" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
-              Request package
-            </Link>
+            <a href={packageCtaHref} className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
+              {packageCtaLabel}
+            </a>
           </nav>
         </div>
       </header>
@@ -73,21 +78,21 @@ export default function WebsiteCompletionPackagePage() {
             </p>
             <h1 className="mt-7 font-serif text-5xl font-bold leading-[0.96] md:text-7xl">Website Completion Package</h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
-              A focused rescue pass for overloaded websites, offers, replies, and follow-ups. MindReply turns scattered pressure into a ranked action queue, send-ready copy, and a narrow receipt.
+              A focused GBP 600 rescue pass for overloaded websites, offers, replies, and follow-ups. MindReply turns scattered pressure into a ranked action queue, send-ready copy, and a narrow receipt.
             </p>
           </div>
           <div className="rounded-lg border border-white/10 bg-white/[0.045] p-6">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#91d2c8]">Price framing</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#91d2c8]">Price and route</p>
             <div className="mt-4 flex items-end gap-3">
               <BadgePoundSterling aria-hidden className="mb-2 h-8 w-8 text-[#e2b757]" />
-              <p className="font-serif text-5xl font-bold">600</p>
+              <p className="font-serif text-5xl font-bold">GBP 600</p>
             </div>
             <p className="mt-4 text-sm leading-7 text-[#d9e3e7]">
-              Entry package framing. Keep this tied to a verified payment path before calling it sold, recurring, or booked.
+              {packagePaymentStatus}. Keep revenue claims tied to verified payment or invoice sources before calling anything sold, recurring, or booked.
             </p>
-            <Link href="/contact" className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-              Request assisted close <ArrowRight aria-hidden className="h-4 w-4" />
-            </Link>
+            <a href={packageCtaHref} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
+              {packageCtaLabel} <ArrowRight aria-hidden className="h-4 w-4" />
+            </a>
           </div>
         </div>
       </section>
@@ -186,9 +191,9 @@ export default function WebsiteCompletionPackagePage() {
             <p className="mt-4 text-sm leading-7 text-[#d9e3e7]">
               MindReply returns a ranked action queue, one send-ready asset, and a narrow receipt so the next commercial move is visible.
             </p>
-            <Link href="/contact" className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-              Start assisted close <ArrowRight aria-hidden className="h-4 w-4" />
-            </Link>
+            <a href={packageCtaHref} className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
+              {packageCtaLabel} <ArrowRight aria-hidden className="h-4 w-4" />
+            </a>
           </div>
         </div>
       </section>
