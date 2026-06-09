@@ -25,6 +25,7 @@ const incidentWorkflow = read(".github/workflows/mragent-domain-incident.yml");
 const growthPulse = read("scripts/mragent-growth-pulse.mjs");
 const growthWorkflow = read(".github/workflows/mragent-growth-pulse.yml");
 const shortDigest = read("scripts/mragent-short-digest.mjs");
+const vercelIgnore = read("scripts/vercel-ignore-build.mjs");
 const reportSchema = read("site/automation/report-schema.yml");
 const vercelRunbook = read("site/automation/vercel-build-limit-runbook.yml");
 
@@ -76,6 +77,11 @@ includes("short digest", shortDigest, "MRagent short digest");
 includes("short digest", shortDigest, "Blocker:");
 includes("short digest", shortDigest, "Promise:");
 includes("short digest", shortDigest, "Next:");
+includes("vercel ignore", vercelIgnore, "scripts/mragent-monitor-report.mjs");
+includes("vercel ignore", vercelIgnore, "scripts/mragent-growth-pulse.mjs");
+includes("vercel ignore", vercelIgnore, "scripts/mragent-short-digest.mjs");
+includes("vercel ignore", vercelIgnore, "scripts/production-domain-incident.mjs");
+includes("vercel ignore", vercelIgnore, "Reporting-only script changes must be skipped.");
 includes("report schema", reportSchema, "productionVersion:");
 includes("report schema", reportSchema, "functionalChecks:");
 includes("report schema", reportSchema, "growth_pulse:");
@@ -88,5 +94,7 @@ includes("report schema", reportSchema, "https://www.mind-reply.com/api/version"
 includes("vercel runbook", vercelRunbook, "incident_probe:");
 includes("vercel runbook", vercelRunbook, ".github/workflows/mragent-domain-incident.yml");
 includes("vercel runbook", vercelRunbook, "scripts/production-domain-incident.mjs");
+includes("vercel runbook", vercelRunbook, "scripts/mragent-growth-pulse.mjs");
+includes("vercel runbook", vercelRunbook, "scripts/mragent-short-digest.mjs");
 
 console.log("Production version contract verification passed.");
