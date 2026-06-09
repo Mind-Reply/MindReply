@@ -1,3 +1,5 @@
+import { execSync } from "node:child_process";
+
 const canonicalProjectId = process.env.MR_CANONICAL_VERCEL_PROJECT_ID || "prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3";
 
 const automationOnlyPrefixes = [
@@ -17,16 +19,32 @@ const automationOnlyFiles = new Set([
   "mindreply-vercel-status-audit.json",
 ]);
 
-function changedFiles(env = process.env) {
-  if (!env.MRAGENT_CHANGED_FILES) return [];
-  return env.MRAGENT_CHANGED_FILES.split("\n").map((file) => file.trim()).filter(Boolean);
+function parseChangedFiles(value) {
+  return value.split("\n").map((file) => file.trim()).filter(Boolean);
+}
+
+function changedFilesFromGit() {
+  try {
+    const output = execSync("git diff-tree --no-commit-id --name-only -r --root HEAD", {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    return parseChangedFiles(output);
+  } catch {
+    return [];
+  }
+}
+
+function changedFiles(env = process.env, gitReader = changedFilesFromGit) {
+  if (env.MRAGENT_CHANGED_FILES) return parseChangedFiles(env.MRAGENT_CHANGED_FILES);
+  return gitReader();
 }
 
 function isAutomationOnly(file) {
   return automationOnlyFiles.has(file) || automationOnlyPrefixes.some((prefix) => file.startsWith(prefix));
 }
 
-export function shouldBuild(env = process.env) {
+export function shouldBuild(env = process.env, gitReader = changedFilesFromGit) {
   const vercelEnv = env.VERCEL_ENV || "";
   const commitRef = env.VERCEL_GIT_COMMIT_REF || "";
   const projectId = env.VERCEL_PROJECT_ID || env.NEXT_PUBLIC_VERCEL_PROJECT_ID || "";
@@ -44,7 +62,7 @@ export function shouldBuild(env = process.env) {
     return { build: false, reason: `Skipping non-main branch ${commitRef || "unknown"}.` };
   }
 
-  const files = changedFiles(env);
+  const files = changedFiles(env, gitReader);
   if (files.length > 0 && files.every(isAutomationOnly)) {
     return { build: false, reason: `Skipping docs/report-only change: ${files.join(", ")}.` };
   }
@@ -74,7 +92,18 @@ function selfTest() {
       VERCEL_PROJECT_ID: canonicalProjectId,
       MRAGENT_CHANGED_FILES: "README.md\ndocs/front_end_operating_pack.md",
     }).build === false,
-    "Docs-only changes must be skipped.",
+    "Docs-only changes must be skipped when explicitly provided.",
+  );
+  assert(
+    shouldBuild(
+      {
+        VERCEL_ENV: "production",
+        VERCEL_GIT_COMMIT_REF: "main",
+        VERCEL_PROJECT_ID: canonicalProjectId,
+      },
+      () => ["docs/production_alias_secret_blocker_2026-06-09.md"],
+    ).build === false,
+    "Docs-only changes discovered from Git must be skipped.",
   );
   assert(
     shouldBuild({
@@ -90,7 +119,7 @@ function selfTest() {
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
       VERCEL_PROJECT_ID: canonicalProjectId,
-    }).build === true,
+    }, () => []).build === true,
     "Production main must build on the canonical project when change scope is unknown.",
   );
   console.log("Vercel ignore-build guard verification passed.");
