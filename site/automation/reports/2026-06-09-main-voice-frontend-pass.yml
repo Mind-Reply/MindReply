@@ -1,5 +1,6 @@
 version: 1
 created: 2026-06-09
+updated: 2026-06-09
 branch: mind-reply
 report_type: main_voice_frontend_pass
 canonical_repo: Mind-Reply/MindReply
@@ -22,7 +23,9 @@ main_commits:
 current_status:
   latest_main_commit: f589025b154376098a10bca8c11e4471bbe490e1
   vercel_mind_reply: success_on_latest_status_check
-  vercel_mindreply: pending_on_latest_status_check
+  vercel_mindreply: success_on_latest_status_check
+  vercel_deployments_context: success_on_latest_status_check
+  public_http_check_from_codex_machine: timed_out
   revenue_verified: false
   revenue_note: No payment, order, or revenue connector data was available in this work pass.
 implementation_notes:
@@ -36,9 +39,9 @@ implementation_notes:
   design_system:
     - Voice dictionary provides shared product language for future Figma, Remotion, ads, and automation packs.
 open_items:
-  - Recheck pending Vercel statuses until mindreply either succeeds or returns a failure reason.
+  - Recheck public route freshness from a browser because direct HTTP checks from this Codex machine timed out.
   - Add analytics/conversion instrumentation before making any revenue claims.
   - Create Figma file only after a Figma planKey or target Figma design URL is provided.
   - Code Connect requires published Figma components and node-specific URLs.
   - Recurring 30-minute automation needs the automation tool to be exposed; it was not available in the current tool search.
-short_digest_line: Main now has runtime and frontend MRagent voice upgrades; one Vercel project is successful, one is pending, revenue is not yet verified.
+short_digest_line: Main now has runtime and frontend MRagent voice upgrades; Vercel checks are green, public HTTP checks timed out from this machine, revenue is not yet verified.
