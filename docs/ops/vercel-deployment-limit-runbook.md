@@ -56,7 +56,7 @@ MINDREPLY_REQUIRE_LAUNCH_READY=1 npm run launch:report
 
 ## Remaining launch blockers
 
-1. `https://www.mind-reply.com/` still serves the older Executive Communication Intelligence production homepage, not the PR preview surface.
+1. `https://www.mind-reply.com/` still serves the older `MindReply | Private Decision Support for Work Messages` production homepage, not the PR preview surface.
 2. `mind-reply.com` and `www.mind-reply.com` still need to be attached or promoted to the canonical production project after merge/deploy readiness is confirmed.
 3. The passing `mind-reply` project provider state has reported `live: false`.
 4. The duplicate `mindreply` Vercel context still appears as a failing or stale GitHub status context because of the build-rate-limit link.
