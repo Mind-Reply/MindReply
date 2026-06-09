@@ -93,9 +93,11 @@ Sending is disabled by default. Console preview is safe without secrets.
 Owner decision routing:
 
 ```bash
-MINDREPLY_SECURITY_OWNER_EMAIL=angelllkr@gmail.com
+MINDREPLY_SECURITY_OWNER_EMAIL=
 MINDREPLY_SECURITY_PUBLIC_EMAIL=info@mind-reply.com
 ```
+
+Set `MINDREPLY_SECURITY_OWNER_EMAIL` only in private GitHub/Vercel secrets. Do not commit personal owner mailboxes into public files.
 
 Decision packets include affected surface, evidence, impact, recommended decision, rollback or rotation note, and delivery status. They may include all non-secret security data needed for owner decisions, but they must not include raw secrets, access tokens, credentials, private pressure text, or unredacted sensitive records.
 
@@ -119,8 +121,8 @@ Email delivery uses GitHub or deployment secrets:
 
 ```bash
 RESEND_API_KEY=
-MINDREPLY_REPORT_EMAILS=angelllkr@gmail.com,info@mind-reply.com
-MINDREPLY_REPORT_EMAIL_ALLOWLIST=angelllkr@gmail.com,info@mind-reply.com
+MINDREPLY_REPORT_EMAILS=info@mind-reply.com
+MINDREPLY_REPORT_EMAIL_ALLOWLIST=info@mind-reply.com
 MINDREPLY_REPORT_FROM=
 ```
 
