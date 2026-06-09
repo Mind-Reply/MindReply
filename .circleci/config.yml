@@ -28,6 +28,9 @@ jobs:
           name: Verify MCP submission surface
           command: npm run mcp:verify
       - run:
+          name: Verify playbooks
+          command: npm run playbooks:verify
+      - run:
           name: Verify ops report
           command: npm run ops:report
       - run:
