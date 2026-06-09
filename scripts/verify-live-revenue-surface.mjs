@@ -62,7 +62,7 @@ function includes(text, phrase) {
 }
 
 const generatedAt = new Date().toISOString();
-const [home, contact, version, health, packageRequest] = await Promise.all([
+const [home, contact, version, health, packageRequest, robots, sitemap, geoLocale] = await Promise.all([
   request("/"),
   request("/contact"),
   request("/api/version"),
@@ -72,6 +72,9 @@ const [home, contact, version, health, packageRequest] = await Promise.all([
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),
   }),
+  request("/robots.txt"),
+  request("/sitemap.xml"),
+  request("/api/geo-locale"),
 ]);
 
 const publicText = `${home.text}\n${contact.text}`;
@@ -109,6 +112,13 @@ check(checks, "no-personal-gmail", !/gmail\.com/i.test(publicText), "Live public
 check(checks, "no-stale-executive-nervous-system", !includes(publicText, "Executive Nervous System"), "Live public surface must not serve the retired Executive Nervous System page.");
 check(checks, "contact-assisted-close", includes(contact.text, "Package request") || includes(contact.text, "Submit package request"), "Contact page must expose assisted close, not only a passive email link.");
 
+check(checks, "footer-market-strip", includes(home.text, "Auto language and priority markets"), "Live footer must expose the quiet auto-language and market strip.");
+check(checks, "market-priority-meta", includes(home.text, "target-market-priority") && includes(home.text, "UK > US > UAE"), "Live metadata must include the current target-market priority.");
+check(checks, "geo-locale-market-profiles", geoLocale.status === 200 && Array.isArray(geoLocale.json?.marketProfiles) && geoLocale.json.marketProfiles.length >= 10, `Geo locale status ${geoLocale.status}; market profiles ${geoLocale.json?.marketProfiles?.length ?? "missing"}.`);
+check(checks, "geo-locale-brazil", includes(geoLocale.text, "Brazil") && includes(geoLocale.text, "pt"), "Geo locale must include Brazil Portuguese targeting.");
+check(checks, "robots-no-stale-public-routes", robots.status === 200 && !/allow:\s*\/agents|allow:\s*\/pack/i.test(robots.text), "Robots must not allow retired /agents or /pack surfaces.");
+check(checks, "sitemap-no-stale-public-routes", sitemap.status === 200 && !sitemap.text.includes("<loc>https://www.mind-reply.com/agents</loc>") && !sitemap.text.includes("<loc>https://www.mind-reply.com/pack</loc>"), "Sitemap must not index retired /agents or /pack routes.");
+
 const failed = checks.filter((item) => !item.pass && item.severity === "error");
 const warnings = checks.filter((item) => !item.pass && item.severity !== "error");
 const report = {
@@ -124,7 +134,7 @@ const report = {
   failed: failed.map((item) => item.id),
   warnings: warnings.map((item) => item.id),
   checks,
-  surfaces: [home, contact, version, health, packageRequest].map(({ path, url, ok, status, contentType, latencyMs, json, deploymentIds, error }) => ({
+  surfaces: [home, contact, version, health, packageRequest, robots, sitemap, geoLocale].map(({ path, url, ok, status, contentType, latencyMs, json, deploymentIds, error }) => ({
     path,
     url,
     ok,
