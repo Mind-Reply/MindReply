@@ -78,6 +78,15 @@ NEXT_PUBLIC_PACK_REVENUE_NOTE=No connected transaction source yet.
 
 The scheduled workflow is `.github/workflows/personal-pack-report.yml`. It can be run manually with `workflow_dispatch` or by cron. The workflow uses `*/30 * * * *`, which runs twice an hour.
 
+## Activation Pack Reports
+
+`npm run report:activation-pack` generates the activated security and promotion pack:
+
+- 8-lane defensive security team: headers, routes, secrets, receipt privacy, dependencies, deployment protection, runtime observability, incident response.
+- 28-lane social/ad preparation team: positioning, launch copy, channel drafts, Figma/Remotion queue, analytics readiness, revenue truth, distribution permission checks, and next move.
+
+The scheduled workflow is `.github/workflows/activation-pack-report.yml` and also runs every 30 minutes. It prepares and reports. It does not post externally, scrape audiences, run ads, attack systems, or claim revenue without connected and approved sources.
+
 Sending is disabled by default. Console preview is safe without secrets.
 
 Required opt-in variables:
@@ -116,6 +125,9 @@ npm ci
 npm run decision:verify
 npm run mcp:verify
 npm run report:personal-pack
+npm run report:security-pack
+npm run report:promotion-pack
+npm run report:activation-pack
 npm run typecheck
 npm run build
 python -m unittest discover src
