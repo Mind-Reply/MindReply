@@ -17,6 +17,8 @@ on:
       - "tailwind.config.*"
       - "tsconfig.json"
       - ".github/workflows/vercel-production-deploy.yml"
+      - ".github/workflows/manual-vercel-production.yml"
+      - ".github/workflows/mragent-verify.yml"
 
 permissions:
   contents: read
@@ -45,10 +47,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --fund=false --progress=false
 
       - name: Verify revenue, i18n, SEO, and decision layer
         run: npm run decision:verify
@@ -65,7 +66,7 @@ jobs:
           fi
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: npm install --global vercel@latest --no-audit --fund=false --progress=false
 
       - name: Pull Vercel production environment
         run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
