@@ -1,21 +1,17 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BadgeCheck,
   Brain,
   CheckCircle2,
   ClipboardList,
   FileText,
   Gauge,
   HeartHandshake,
-  LockKeyhole,
   Mail,
-  MessageCircle,
   ReceiptText,
   ShieldCheck,
   Sparkles,
   Target,
-  Workflow,
   Zap,
 } from "lucide-react";
 import MRAgentChat from "@/components/MRAgentChat";
