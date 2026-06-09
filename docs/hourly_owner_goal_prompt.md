@@ -25,6 +25,8 @@ The buying path must stay concrete:
 
 - Use `NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL` for a public payment link when one is configured.
 - If no payment link exists, keep the invoice request route active through `/contact?intent=website-completion`.
+- Use the package request API at `/api/package-request` from the contact page when a visitor needs a human handoff, and return a redacted receipt instead of storing raw pressure text in public artifacts.
+- If the package request API is blocked by missing recipient, sender, or provider secrets, keep fallback email visible and mark delivery as blocked in the owner report.
 - Never claim revenue, bookings, or paid customers unless a connected payment or invoice source proves it.
 
 ## Homepage Model
@@ -52,8 +54,9 @@ The close path is:
 
 1. Ask MRagent first.
 2. If the issue is broader than one reply, pay for or request the Website Completion Package.
-3. If MRagent cannot solve it, contact MindReply through the public mailbox or contact page.
-4. Security and owner decisions route privately and stay redacted.
+3. If the visitor needs a human handoff, submit the package request API from the contact page with consent and redacted context.
+4. If the API cannot send, use fallback email through the public mailbox.
+5. Security and owner decisions route privately and stay redacted.
 
 ## Internal Agent Lanes
 
@@ -78,6 +81,7 @@ Every hourly report must include:
 - owner decision needed;
 - Website Completion Package progress;
 - payment link or invoice fallback status;
+- package request API, recipient, sender, provider, dry-run, receipt, and fallback email status;
 - Vercel deploy status;
 - Slack/email delivery receipt.
 
