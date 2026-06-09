@@ -72,8 +72,17 @@ jobs:
           fi
           echo "deployment_url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
 
+      - name: Explicitly alias production domains
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOY_URL="${{ steps.deploy.outputs.deployment_url }}"
+          echo "Aliasing $DEPLOY_URL to www.mind-reply.com and mind-reply.com"
+          vercel alias set "$DEPLOY_URL" www.mind-reply.com --token="$VERCEL_TOKEN"
+          vercel alias set "$DEPLOY_URL" mind-reply.com --token="$VERCEL_TOKEN"
+
       - name: Wait for domain propagation
-        run: sleep 45
+        run: sleep 60
 
       - name: Verify live production domain
         env:
