@@ -55,6 +55,9 @@ export default function Home() {
             <span className="font-serif text-xl font-bold tracking-wide">MindReply</span>
           </Link>
           <div className="flex items-center gap-2">
+            <Link href="/pack" className="hidden rounded-full border border-[#162033]/15 px-4 py-2 text-sm font-semibold text-[#162033] transition hover:border-[#e2b757] sm:inline-flex">
+              Personal Pack
+            </Link>
             <Link href="/agent" className="rounded-full bg-[#162033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#22314d]">
               Open MRagent
             </Link>
@@ -118,9 +121,14 @@ export default function Home() {
               <span className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d8deea]">{step}</span>
             </div>
           ))}
-          <Link href="/agent" className="rounded-full bg-[#f8f5f0] px-5 py-3 text-sm font-bold text-[#162033] transition hover:bg-[#e2b757]">
-            Try the Mind Read
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link href="/agent" className="rounded-full bg-[#f8f5f0] px-5 py-3 text-center text-sm font-bold text-[#162033] transition hover:bg-[#e2b757]">
+              Try the Mind Read
+            </Link>
+            <Link href="/pack" className="rounded-full border border-[#f8f5f0]/30 px-5 py-3 text-center text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+              See the Pack
+            </Link>
+          </div>
         </div>
       </section>
     </main>
