@@ -4,6 +4,7 @@ const countryLocale: Record<string, string> = {
   AE: "ar",
   AR: "es",
   AT: "de",
+  AU: "en",
   BE: "fr",
   BR: "pt",
   CA: "en",
@@ -15,18 +16,24 @@ const countryLocale: Record<string, string> = {
   ES: "es",
   FR: "fr",
   GB: "en",
+  HK: "zh",
   IE: "en",
+  IN: "hi",
   IT: "it",
   JP: "ja",
   KR: "ko",
   MX: "es",
+  MY: "en",
   NL: "en",
+  NZ: "en",
   PT: "pt",
   SA: "ar",
+  SG: "en",
+  TW: "zh",
   US: "en",
 };
 
-const supportedLocales = ["en", "es", "fr", "de", "it", "pt", "ar", "ja", "ko", "zh"];
+const supportedLocales = ["en", "es", "fr", "de", "it", "pt", "ar", "hi", "ja", "ko", "zh"];
 
 function normalizeLocale(value: string | null) {
   if (!value) return "en";
