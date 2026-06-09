@@ -11,17 +11,31 @@ export type PackageRequestInput = {
   consent: boolean;
 };
 
+export type PackageRequestAssistedClose = {
+  status: "queued" | "fallback";
+  nextStep: string;
+  expectedReplyWindow: "one business day";
+  ownerDecisionNeeded: string;
+  buyerPromise: string;
+  paymentPath: string;
+};
+
 export type PackageRequestReceipt = {
   id: string;
   timestamp: string;
   intent: PackageRequestIntent;
   actionKind: "package_request";
+  riskLevel: "low";
+  confidence: "medium";
+  playbookVersion: "website-completion-2026-06";
   packageName: "Website Completion Package";
   packageValue: "GBP 600";
   contactRoute: "api";
+  fallbackEmail: "info@mind-reply.com";
   inputHash: string;
   rawContentRedacted: true;
   consentCaptured: boolean;
+  assistedClose: PackageRequestAssistedClose;
   delivery: {
     status: PackageRequestDeliveryStatus;
     channel: "email";
@@ -62,6 +76,21 @@ function recipients() {
     .filter(Boolean);
 }
 
+function assistedClose(delivery: PackageRequestReceipt["delivery"]): PackageRequestAssistedClose {
+  const fallback = delivery.status !== "sent";
+
+  return {
+    status: fallback ? "fallback" : "queued",
+    nextStep: fallback
+      ? "Send the receipt id to info@mind-reply.com with redacted context so the close can continue manually."
+      : "MindReply reviews the redacted request and sends the next close-ready reply route.",
+    expectedReplyWindow: "one business day",
+    ownerDecisionNeeded: "Confirm scope, invoice/payment route, or decline/refine with one clear reason.",
+    buyerPromise: "Website Completion Package request: GBP 600 once for ranked fixes, send-ready copy, and buyer path cleanup.",
+    paymentPath: "Scope first, then invoice or payment link after acceptance.",
+  };
+}
+
 export function parsePackageRequest(body: unknown): { input?: PackageRequestInput; error?: string } {
   if (!body || typeof body !== "object") return { error: "Request body is required." };
   const record = body as Record<string, unknown>;
@@ -91,12 +120,17 @@ export function makePackageReceipt(input: PackageRequestInput, delivery: Package
     timestamp: new Date().toISOString(),
     intent: input.intent,
     actionKind: "package_request",
+    riskLevel: "low",
+    confidence: "medium",
+    playbookVersion: "website-completion-2026-06",
     packageName: "Website Completion Package",
     packageValue: "GBP 600",
     contactRoute: "api",
+    fallbackEmail: "info@mind-reply.com",
     inputHash: inputHash(input),
     rawContentRedacted: true,
     consentCaptured: input.consent,
+    assistedClose: assistedClose(delivery),
     delivery,
   };
 }
@@ -146,6 +180,9 @@ export async function deliverPackageRequest(input: PackageRequestInput): Promise
     `Intent: ${input.intent}`,
     `Package: Website Completion Package, GBP 600`,
     `Reply-to: ${input.email}`,
+    "Owner decision needed: confirm scope, invoice/payment route, or decline/refine with one clear reason.",
+    "Payment path: scope first, then invoice or payment link after acceptance.",
+    "Expected reply window: one business day.",
     "",
     "Redacted context:",
     input.context,
