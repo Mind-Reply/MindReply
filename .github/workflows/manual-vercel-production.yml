@@ -22,13 +22,14 @@ jobs:
     timeout-minutes: 30
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || vars.VERCEL_PROJECT_ID }}
       MINDREPLY_REPORT_ENABLED: ${{ vars.MINDREPLY_REPORT_ENABLED || 'true' }}
       MINDREPLY_REPORT_DRY_RUN: ${{ vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
       MINDREPLY_REPORT_CHANNELS: ${{ vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
-      MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || secrets.OPS_REPORT_EMAIL_TO || vars.REPORT_TO_EMAIL }}
-      MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || vars.MINDREPLY_REPORT_FROM }}
+      MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || secrets.OPS_REPORT_EMAIL_TO || vars.MINDREPLY_REPORT_EMAIL || vars.REPORT_TO_EMAIL }}
+      MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS }}
+      MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || secrets.OPS_REPORT_EMAIL_FROM || vars.MINDREPLY_REPORT_FROM || vars.RESEND_FROM }}
       MINDREPLY_REPORT_EMAIL_ALLOWLIST: ${{ secrets.MINDREPLY_REPORT_EMAIL_ALLOWLIST || secrets.OPS_REPORT_EMAIL_ALLOWLIST || vars.REPORT_EMAIL_ALLOWLIST }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL || secrets.SLACK_WEBHOOK_URL }}
@@ -97,7 +98,7 @@ jobs:
 
       - name: Send owner deployment report
         if: always()
-        run: npm run report:send
+        run: npm run report:send || true
 
       - name: Upload owner report artifacts
         if: always()
