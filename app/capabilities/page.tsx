@@ -49,11 +49,11 @@ const teams = [
     worksNow: ["production project link", "deployment history", "custom domain ownership", "build failure visibility"],
   },
   {
-    name: "AI Elements front end",
+    name: "Generated-message front end",
     status: "Partial",
     signal: "Markdown renderer target",
     icon: MonitorSmartphone,
-    copy: "The right direction is AI Elements message rendering for generated text. The capability is planned around source components, not a black-box widget.",
+    copy: "The right direction is structured message rendering for generated text. The capability is planned around source components, not a black-box widget.",
     worksNow: ["chat component surface", "message rendering target", "React/Next.js structure", "compact and full app modes"],
   },
   {
@@ -85,11 +85,11 @@ const teams = [
     status: "Not deployed",
     signal: "Runtime missing locally",
     icon: Cpu,
-    copy: "AIQ is powerful for a research backend, but real deployment needs Git plus Docker/Python/uv or Kubernetes, and private NVIDIA/search keys.",
+    copy: "NVIDIA AIQ is powerful for a research backend, but real deployment needs Git plus Docker/Python/uv or Kubernetes, and private NVIDIA/search keys.",
     worksNow: ["deployment plan known", "server URL handoff model", "secret rules", "runtime prerequisites mapped"],
   },
   {
-    name: "Physical AI / reconstruction",
+    name: "Physical simulation / reconstruction",
     status: "Concept-ready",
     signal: "Needs assets and GPU path",
     icon: Network,
