@@ -3,6 +3,8 @@ file: mragent-monitor-status.json
 producer: scripts/mragent-monitor-report.mjs
 workflow: .github/workflows/mragent-monitor.yml
 verification_workflow: .github/workflows/mragent-verify.yml
+preview_capture_workflow: .github/workflows/mragent-preview-capture.yml
+preview_capture_script: scripts/mragent-preview-capture.mjs
 cadence: every 15 minutes and manual workflow_dispatch
 purpose: Give humans and future personal-pack automation the same compact state snapshot.
 fields:
@@ -42,6 +44,13 @@ visibility:
   live_copy_sync: site/growth/live-copy-sync.yml
   preview_qa: site/growth/preview-qa.yml
   preview_results: site/growth/preview-results.yml
+  preview_capture:
+    workflow: .github/workflows/mragent-preview-capture.yml
+    script: scripts/mragent-preview-capture.mjs
+    artifacts:
+      - mragent-preview-results/agent-desktop.png
+      - mragent-preview-results/agent-mobile.png
+      - mragent-preview-results/preview-results.json
   ads: site/ads/messaging.yml
   ad_copy_tests: site/ads/copy-tests.yml
   report_fields:
@@ -72,3 +81,4 @@ uses:
   - future Slack report handoff after workspace channel is connected
   - future Outlook digest handoff after mailbox target is named
   - personal pack status checks
+  - manual preview capture artifacts from MRagent Preview Capture
