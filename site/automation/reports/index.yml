@@ -1,5 +1,6 @@
 version: 1
 created: 2026-06-09
+updated: 2026-06-09
 branch: mind-reply
 purpose: Central index for storage-branch reports while main/Vercel deployment is rate-limited.
 canonical_repo: Mind-Reply/MindReply
@@ -39,18 +40,23 @@ reports:
     path: site/automation/reports/2026-06-09-route-recovery.yml
     commit: bdfe91c755a08ec3ef7f6c7eb90245b6c15d9594
     one_line: Missing public routes exist in GitHub main, so the gap is deployment freshness.
+  - date: 2026-06-09
+    type: design_rebuild_brief
+    path: site/automation/reports/2026-06-09-design-rebuild-brief.yml
+    commit: fe4d0c47db07f8a5ab6e948fc031b92bb9ebe126
+    one_line: Product-first redesign plan is ready for the next main pass after Vercel quota clears.
 next_report_slots:
   - type: daily_short_digest
     cadence: every active work pass while quota is limited
     focus: live route state, Vercel state, one next action
-  - type: design_rebuild_brief
-    cadence: next storage pass
-    focus: redo website direction without triggering main deploy
   - type: branch_cleanup_followup
     cadence: after delete/ref tooling or user confirmation
     focus: keep only main and mind-reply after preserving useful files
+  - type: implementation_readiness_pack
+    cadence: next storage pass
+    focus: exact files and acceptance checks for the first post-quota main change
 opinion: >-
   The storage branch is now the right place for planning, growth, SEO, ad, and recovery reports.
   Main should stay quiet until Vercel can build again, because the source already contains the
   missing app routes and the remaining problem is deployment freshness.
-short_digest_line: Storage reports are indexed; main remains build-rate-limited, with /agent and /api/intake live but /api/version and /mcp stale.
+short_digest_line: Storage reports are indexed; design rebuild brief is ready; main remains build-rate-limited with /agent and /api/intake live but /api/version and /mcp stale.
