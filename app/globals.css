@@ -8,6 +8,11 @@
   --font-playfair: 'Playfair Display', serif;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   background: hsl(40 20% 96%);
   color: hsl(220 45% 13%);
@@ -25,4 +30,20 @@ body {
   background: linear-gradient(to right, hsl(43 80% 60%), hsl(43 90% 70%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 640px) {
+  h1,
+  h2,
+  h3,
+  p,
+  a,
+  button,
+  span {
+    overflow-wrap: anywhere;
+  }
+
+  .min-h-\[43rem\] {
+    min-height: 34rem !important;
+  }
 }
