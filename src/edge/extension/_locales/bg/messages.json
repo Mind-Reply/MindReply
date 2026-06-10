@@ -1,0 +1,6 @@
+{
+  "extName": { "message": "MindReply слой за решения" },
+  "extDescription": { "message": "Вход на място, едно препоръчано действие и тихо обновяване на паметта." },
+  "extActionTitle": { "message": "MindReply" },
+  "contextClarifyNextMove": { "message": "MindReply: изясни следващата стъпка" }
+}
