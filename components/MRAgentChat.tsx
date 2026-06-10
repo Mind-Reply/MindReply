@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ArrowUp, Feather, HeartHandshake, Loader2, LockKeyhole, RotateCcw, ShieldCheck, Sparkles, TimerReset } from "lucide-react";
 import { MessageResponse } from "@/components/ai-elements/message";
 import type { DecisionResponse } from "@/lib/decision-layer";
@@ -25,6 +25,10 @@ type MRAgentChatProps = {
   compact?: boolean;
 };
 
+type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
+
+const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
+
 const starter: ChatMessage = {
   id: "mra-welcome",
   role: "assistant",
@@ -37,6 +41,24 @@ const minimumReadingMs = 1400;
 const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
 const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
 const packageCtaLabel = packagePaymentUrl ? "Pay for Website Completion Package" : "Request GBP 600 package invoice";
+
+function isLocale(value: string): value is LocaleCode {
+  return supportedLocales.includes(value as LocaleCode);
+}
+
+function localeFromEnvironment(): LocaleCode {
+  if (typeof window === "undefined") return "en";
+  const pathLocale = window.location.pathname.split("/").filter(Boolean)[0] || "";
+  if (isLocale(pathLocale)) return pathLocale;
+  const queryLocale = new URLSearchParams(window.location.search).get("lang") || "";
+  if (isLocale(queryLocale)) return queryLocale;
+  const savedLocale = window.localStorage.getItem("mindreply-locale") || "";
+  if (isLocale(savedLocale)) return savedLocale;
+  const htmlLocale = document.documentElement.lang.split("-")[0] || "";
+  if (isLocale(htmlLocale)) return htmlLocale;
+  const browserLocale = navigator.language.split("-")[0] || "";
+  return isLocale(browserLocale) ? browserLocale : "en";
+}
 
 function makeId(prefix: string) {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -75,11 +97,11 @@ function adaptIntakeResponse(decision: DecisionResponse): AgentResponse {
   };
 }
 
-async function requestMindRead(text: string): Promise<Partial<AgentResponse> & { error?: string }> {
+async function requestMindRead(text: string, locale: LocaleCode): Promise<Partial<AgentResponse> & { error?: string }> {
   const agentResponse = await fetch("/api/agent", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text, source: "manual" }),
+    body: JSON.stringify({ message: text, source: "manual", locale }),
   });
   const agentData = (await readJson(agentResponse)) as Partial<AgentResponse> & { error?: string };
 
@@ -90,7 +112,7 @@ async function requestMindRead(text: string): Promise<Partial<AgentResponse> & {
   const intakeResponse = await fetch("/api/intake", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ input: text, source: "manual" }),
+    body: JSON.stringify({ input: text, source: "manual", locale }),
   });
   const intakeData = (await readJson(intakeResponse)) as Partial<DecisionResponse> & { error?: string };
 
@@ -107,8 +129,19 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
   const [loading, setLoading] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [error, setError] = useState("");
+  const [locale, setLocale] = useState<LocaleCode>("en");
 
   const lastDecision = useMemo(() => [...messages].reverse().find((message) => message.decision)?.decision, [messages]);
+
+  useEffect(() => {
+    setLocale(localeFromEnvironment());
+    const onLocaleChange = (event: Event) => {
+      const nextLocale = (event as CustomEvent<{ locale?: string }>).detail?.locale;
+      if (nextLocale && isLocale(nextLocale)) setLocale(nextLocale);
+    };
+    window.addEventListener("mindreply:locale-change", onLocaleChange);
+    return () => window.removeEventListener("mindreply:locale-change", onLocaleChange);
+  }, []);
 
   async function submit(textOverride?: string) {
     const text = (textOverride ?? input).trim();
@@ -125,7 +158,7 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
       const startedAt = Date.now();
       const phaseOne = window.setTimeout(() => setPhaseIndex(1), 520);
       const phaseTwo = window.setTimeout(() => setPhaseIndex(2), 980);
-      const data = await requestMindRead(text).finally(() => {
+      const data = await requestMindRead(text, locale).finally(() => {
         window.clearTimeout(phaseOne);
         window.clearTimeout(phaseTwo);
       });
