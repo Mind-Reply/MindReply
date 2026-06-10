@@ -16,6 +16,9 @@ function assert(condition: unknown, message: string) {
 const prompt = readRequired("docs/hourly_owner_goal_prompt.md");
 const blueprint = readRequired("docs/website_audit_action_blueprint.md");
 const launchEvidence = readRequired("docs/launch_evidence_bundle.md");
+const packageJson = readRequired("package.json");
+const deployPreflight = readRequired("scripts/vercel-deploy-preflight.ts");
+const deployPreflightVerifier = readRequired("scripts/verify-vercel-deploy-preflight.ts");
 const home = readRequired("app/page.tsx");
 const pack = readRequired("app/pack/page.tsx");
 const canonicalPackage = readRequired("app/website-completion-package/page.tsx");
@@ -99,12 +102,43 @@ for (const phrase of [
   "website buying-friction rescue",
   "privacy-safe receipt",
   "api-deployments-free-per-day",
+  "npm run deploy:preflight",
+  "prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3",
   "source-side proof",
   "live production proof",
   "delivery proof",
   "source advanced; production pending",
 ]) {
   assert(launchEvidence.includes(phrase), `Launch evidence bundle must include: ${phrase}`);
+}
+
+for (const phrase of [
+  "deploy:preflight",
+  "deploy:preflight:verify",
+  "scripts/vercel-deploy-preflight.ts",
+  "scripts/verify-vercel-deploy-preflight.ts",
+]) {
+  assert(packageJson.includes(phrase), `package.json must include deploy preflight command: ${phrase}`);
+}
+
+for (const phrase of [
+  "MINDREPLY_VERCEL_PROJECT_NAME",
+  "MINDREPLY_VERCEL_PROJECT_ID",
+  "mindreply",
+  "prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3",
+  "Linked Vercel project name must be",
+  "Linked Vercel project id must be",
+]) {
+  assert(deployPreflight.includes(phrase), `Deploy preflight must include: ${phrase}`);
+}
+
+for (const phrase of [
+  "mindreply-launch-evidence",
+  "Expected wrong Vercel project name to fail clearly.",
+  "Expected wrong Vercel project id to fail clearly.",
+  "Vercel deploy preflight verifier passed.",
+]) {
+  assert(deployPreflightVerifier.includes(phrase), `Deploy preflight verifier must include: ${phrase}`);
 }
 
 assert(home.includes("Reclaim 2+ hours daily within 24 hours"), "Homepage must preserve the immediate operational relief promise.");

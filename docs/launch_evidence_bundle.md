@@ -55,6 +55,8 @@ Sitemap and robots must allow the money pages while keeping private API, MCP, ag
 
 Current blocker: Vercel production deployment is capped by the free daily deployment limit when CLI deploy returns `api-deployments-free-per-day`.
 
+Before any manual or automated production deploy, run `npm run deploy:preflight` from the deploy worktree. The preflight must prove the local `.vercel/project.json` is bound to the real `mindreply` project with project id `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`; otherwise stop before running `vercel deploy --prod`.
+
 Do not call production green when:
 
 - GitHub `main` is ahead of `/api/version`.
