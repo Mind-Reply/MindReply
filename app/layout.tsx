@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import GoogleTranslateProvider from "@/components/GoogleTranslateProvider";
 import LocaleAssist from "@/components/LocaleAssist";
 import SiteFooter from "@/components/SiteFooter";
 import "./globals.css";
@@ -118,6 +119,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <SiteFooter />
         <LocaleAssist />
+        <GoogleTranslateProvider />
         <SpeedInsights />
       </body>
     </html>
