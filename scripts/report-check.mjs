@@ -3,7 +3,7 @@ import { CHECK_PATH, reportSettings, writeJson } from "./report-shared.mjs";
 const settings = reportSettings();
 const payload = {
   ...settings,
-  required_owner: "ANGELLLKR@GMAIL.COM",
+  required_owners: ["angellllkr@gmail.com", "info@mind-reply.com"],
   required_channels: ["email", "slack"],
   revenue_rule: "Website Completion Package first",
   security_boundary: "private redacted owner evidence only",

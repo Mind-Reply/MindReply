@@ -3,6 +3,7 @@ import {
   buildOwnerReport,
   ensureReportDir,
   OWNER_EMAIL,
+  OWNER_EMAILS,
   postJson,
   RECEIPT_PATH,
   REPORT_PATH,
@@ -19,6 +20,7 @@ const receipt = {
   created_at: new Date().toISOString(),
   status: settings.status,
   owner_email: OWNER_EMAIL,
+  owner_emails: OWNER_EMAILS,
   blockers: [...settings.blockers],
   channels: {},
   security_boundary: "private redacted owner evidence only",
@@ -27,15 +29,15 @@ const receipt = {
 async function sendEmail() {
   if (!settings.channels.includes("email")) return { status: "skipped", reason: "channel not selected" };
   if (!settings.enabled) return { status: "blocked", reason: "report lane disabled" };
-  if (settings.dry_run) return { status: "dry_run", to: OWNER_EMAIL };
-  if (!settings.email_ready) return { status: "blocked", reason: "email secret missing", to: OWNER_EMAIL };
+  if (settings.dry_run) return { status: "dry_run", to: OWNER_EMAILS };
+  if (!settings.email_ready) return { status: "blocked", reason: "email secret missing", to: OWNER_EMAILS };
 
   const result = await postJson(
     "https://api.resend.com/emails",
     { Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
     {
       from: process.env.MINDREPLY_REPORT_FROM,
-      to: [OWNER_EMAIL],
+      to: OWNER_EMAILS,
       subject: "MindReply owner report",
       text: reportText,
     },
@@ -43,7 +45,7 @@ async function sendEmail() {
 
   return {
     status: result.ok ? "sent" : "failed",
-    to: OWNER_EMAIL,
+    to: OWNER_EMAILS,
     provider_status: result.status_code,
     provider_body: result.body,
   };

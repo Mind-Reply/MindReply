@@ -9,7 +9,15 @@ export const REPORT_PATH = path.join(REPORT_DIR, "latest_owner_report.md");
 export const RECEIPT_PATH = path.join(REPORT_DIR, "delivery_receipt.json");
 export const CHECK_PATH = path.join(REPORT_DIR, "report_check.json");
 export const AUDIT_PATH = path.join(REPORT_DIR, "blueprint_audit.json");
-export const OWNER_EMAIL = process.env.MINDREPLY_REPORT_EMAIL || "ANGELLLKR@GMAIL.COM";
+export const OWNER_EMAILS = (
+  process.env.MINDREPLY_REPORT_EMAILS ||
+  process.env.MINDREPLY_REPORT_EMAIL ||
+  "angellllkr@gmail.com,info@mind-reply.com"
+)
+  .split(",")
+  .map((email) => email.trim().toLowerCase())
+  .filter(Boolean);
+export const OWNER_EMAIL = OWNER_EMAILS[0] || "angellllkr@gmail.com";
 
 export function ensureReportDir() {
   fs.mkdirSync(REPORT_DIR, { recursive: true });
@@ -36,7 +44,7 @@ export function reportSettings() {
     .map((channel) => channel.trim().toLowerCase())
     .filter(Boolean);
 
-  const emailReady = Boolean(process.env.RESEND_API_KEY && process.env.MINDREPLY_REPORT_FROM && OWNER_EMAIL);
+  const emailReady = Boolean(process.env.RESEND_API_KEY && process.env.MINDREPLY_REPORT_FROM && OWNER_EMAILS.length > 0);
   const slackUrl = process.env.MINDREPLY_SLACK_WEBHOOK_URL || process.env.SLACK_WEBHOOK_URL || "";
   const slackReady = Boolean(slackUrl);
   const enabled = boolEnv("MINDREPLY_REPORT_ENABLED", false);
@@ -50,6 +58,7 @@ export function reportSettings() {
   return {
     timestamp: new Date().toISOString(),
     owner_email: OWNER_EMAIL,
+    owner_emails: OWNER_EMAILS,
     channels,
     enabled,
     dry_run: dryRun,

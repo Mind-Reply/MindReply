@@ -1,7 +1,7 @@
-title: "MindReply | Private Decision Layer for High-Stakes Messages"
-description: "MindReply helps leaders handle sensitive work messages with one synthesis, one recommended action, quiet memory, and legal-grade privacy."
+title: "MindReply | Reply Overload Cleanup for High-Stakes Messages"
+description: "MindReply turns messy client and prospect threads into an action queue, send-ready reply, risk flag, and private receipt."
 canonical: "https://www.mind-reply.com/"
-primary_offer: "Private Decision Layer"
+primary_offer: "Reply Overload Cleanup"
 highest_demand:
   - "Sensitive replies before they leave the inbox"
   - "Founder, C-suite, investor, legal, sales, and client communication"
@@ -23,8 +23,8 @@ languages:
     - uk
     - ar
 open_graph:
-  title: "MindReply | Private Decision Layer"
-  description: "One synthesis, one recommended action, quiet memory, legal-grade privacy."
+  title: "MindReply | Reply Overload Cleanup"
+  description: "Paste one messy thread and get the next action, send-ready reply, risk flag, and private receipt."
   type: "website"
 privacy:
   default: "minimal-retention"

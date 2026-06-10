@@ -7,14 +7,14 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.mind-reply.com"),
   title: {
-    default: "MindReply | Private Decision Layer for High-Stakes Messages",
+    default: "MindReply | Reply Overload Cleanup for High-Stakes Messages",
     template: "%s | MindReply",
   },
   description:
-    "MindReply helps leaders handle sensitive work messages with one synthesis, one recommended action, quiet memory, and legal-grade privacy.",
+    "MindReply helps founders, operators, and client-facing teams turn messy threads into an action queue, send-ready reply, risk flag, and private receipt.",
   keywords: [
     "executive communication support",
-    "private decision layer",
+    "reply overload cleanup",
     "chief of staff support",
     "sensitive message review",
     "founder communication",
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "MindReply | Private Decision Layer",
+    title: "MindReply | Reply Overload Cleanup",
     description:
-      "One synthesis, one recommended action, quiet memory, and legal-grade privacy for sensitive executive messages.",
+      "Paste one messy thread and get the next action, send-ready reply, risk flag, and private receipt.",
     siteName: "MindReply",
     type: "website",
     url: "https://www.mind-reply.com/",
@@ -55,13 +55,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MindReply | Private Decision Layer",
-    description: "Private decision support for high-stakes messages.",
+    title: "MindReply | Reply Overload Cleanup",
+    description: "Action queues and send-ready replies for high-stakes messages.",
   },
   category: "technology",
   other: {
-    "service:primary": "Private Decision Layer",
-    "service:positioning": "Executive Nervous System",
+    "service:primary": "Reply Overload Cleanup",
+    "service:positioning": "Action queue and send-ready replies",
     "privacy:default": "minimal retention",
   },
 };
