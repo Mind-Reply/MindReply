@@ -25,6 +25,23 @@ for (const expected of [
   "present; raw text absent",
   "ownerDecisionNeeded",
   "confirm scope, route invoice or payment link, approve the next close-ready move",
+  "Assisted-close assets",
+  "DM 1",
+  "DM 5",
+  "Cold email set",
+  "Three emails for buyers who need proof before a call.",
+  "Your page is explaining more than it is closing",
+  "One focused rescue pass for the buying path",
+  "A faster way to make the offer inspectable",
+  "Two follow-ups",
+  "Follow-up 1",
+  "Follow-up 2",
+  "Booking page line",
+  "Objection handling",
+  "We do not need a redesign.",
+  "We are not ready to share sensitive details.",
+  "Why pay before seeing the work?",
+  "Is this for startups or service businesses?",
 ]) {
   assert(packagePage.includes(expected), `Package delivery proof must include: ${expected}`);
 }
