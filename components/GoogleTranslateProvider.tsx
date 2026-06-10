@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
+type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk";
 
 type TranslateResponse = {
   configured?: boolean;
@@ -10,7 +10,7 @@ type TranslateResponse = {
   translations?: string[];
 };
 
-const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
+const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
 const originalText = new WeakMap<Text, string>();
 
 function isLocale(value: string): value is LocaleCode {
@@ -42,7 +42,7 @@ function shouldSkipElement(element: Element | null) {
 }
 
 function collectTextNodes() {
-  const roots = Array.from(document.querySelectorAll("main, footer"));
+  const roots = Array.from(document.querySelectorAll("body"));
   const nodes: Text[] = [];
 
   for (const root of roots) {

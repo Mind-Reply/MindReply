@@ -99,7 +99,6 @@ const fallbackCopy: Record<
   ja: { read: "明確な読み取り", move: "次の一手", receipt: "記録", risk: "リスク" },
   zh: { read: "清晰判断", move: "下一步", receipt: "回执", risk: "风险" },
   uk: { read: "Чітке прочитання", move: "Наступний крок", receipt: "Квитанція", risk: "Ризик" },
-  bg: { read: "Ясен прочит", move: "Следваща стъпка", receipt: "Разписка", risk: "Риск" },
 };
 
 function normalizeSource(source: unknown): IntakeSource {

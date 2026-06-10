@@ -9,7 +9,6 @@ const chromeLabels = {
   ja: { risk: "リスク", receipt: "記録" },
   zh: { risk: "风险", receipt: "回执" },
   uk: { risk: "Ризик", receipt: "Квитанція" },
-  bg: { risk: "Риск", receipt: "Разписка" },
 };
 
 function labelSet(locale) {
