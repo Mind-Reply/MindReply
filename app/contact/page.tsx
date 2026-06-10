@@ -4,7 +4,7 @@ import {
   CheckCircle2,
   ClipboardList,
   LockKeyhole,
-  Mail,
+  Mail, 
   MessageCircle,
   ReceiptText,
   ShieldCheck,
