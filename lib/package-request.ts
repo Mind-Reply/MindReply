@@ -5,6 +5,8 @@ export type PackageRequestDeliveryStatus = "sent" | "blocked" | "dry-run" | "fai
 
 export type PackageRequestInput = {
   email: string;
+  billingName?: string;
+  billingEmail?: string;
   intent: PackageRequestIntent;
   context: string;
   triedMRagent?: string;
@@ -18,6 +20,13 @@ export type PackageRequestAssistedClose = {
   ownerDecisionNeeded: string;
   buyerPromise: string;
   paymentPath: string;
+};
+
+export type PackageRequestBillingReceipt = {
+  required: boolean;
+  nameCaptured: boolean;
+  emailCaptured: boolean;
+  billingEmailHash: string;
 };
 
 export type PackageRequestReceipt = {
@@ -35,6 +44,7 @@ export type PackageRequestReceipt = {
   inputHash: string;
   rawContentRedacted: true;
   consentCaptured: boolean;
+  billing: PackageRequestBillingReceipt;
   assistedClose: PackageRequestAssistedClose;
   delivery: {
     status: PackageRequestDeliveryStatus;
@@ -47,10 +57,15 @@ export type PackageRequestReceipt = {
 };
 
 const intentValues = new Set<PackageRequestIntent>(["website-completion", "mragent-unresolved", "security-owner", "billing", "pro"]);
+const billingRequiredIntents = new Set<PackageRequestIntent>(["website-completion", "billing", "pro"]);
 
 function clean(value: unknown, limit = 2000) {
   if (typeof value !== "string") return "";
   return value.replace(/\s+/g, " ").trim().slice(0, limit);
+}
+
+function isEmail(value: string) {
+  return /^\S+@\S+\.\S+$/.test(value);
 }
 
 function configuredPackagePaymentUrl() {
@@ -61,21 +76,46 @@ function hasDirectPaymentLink() {
   return Boolean(configuredPackagePaymentUrl());
 }
 
+function requiresBilling(intent: PackageRequestIntent) {
+  return billingRequiredIntents.has(intent);
+}
+
 function ownerDecisionNeeded(directPayment: boolean) {
   return directPayment
     ? "Confirm scope, send the configured payment link, or decline/refine with one clear reason."
-    : "Confirm scope, collect billing name and billing email, then send the invoice request or decline/refine with one clear reason.";
+    : "Confirm scope, use captured billing name and billing email, then send the invoice request or decline/refine with one clear reason.";
 }
 
 function paymentPath(directPayment: boolean) {
   return directPayment
     ? "Direct payment link configured; confirm scope, then send the payment link before delivery."
-    : "Invoice-first route: confirm scope, collect billing name and billing email, then send the invoice request before delivery.";
+    : "Invoice-first route: confirm scope, use captured billing name and billing email, then send the invoice request before delivery.";
+}
+
+function shortHash(value: string, prefix: string) {
+  if (!value) return "";
+  return `${prefix}-${createHash("sha256").update(value).digest("hex").slice(0, 20)}`;
 }
 
 function inputHash(input: PackageRequestInput) {
-  const source = [input.email.toLowerCase(), input.intent, input.context, input.triedMRagent || ""].join("|");
-  return `pkg-${createHash("sha256").update(source).digest("hex").slice(0, 20)}`;
+  const source = [
+    input.email.toLowerCase(),
+    input.billingName || "",
+    input.billingEmail?.toLowerCase() || "",
+    input.intent,
+    input.context,
+    input.triedMRagent || "",
+  ].join("|");
+  return shortHash(source, "pkg");
+}
+
+function billingReceipt(input: PackageRequestInput): PackageRequestBillingReceipt {
+  return {
+    required: requiresBilling(input.intent),
+    nameCaptured: Boolean(input.billingName),
+    emailCaptured: Boolean(input.billingEmail),
+    billingEmailHash: shortHash((input.billingEmail || "").toLowerCase(), "billing"),
+  };
 }
 
 function normalizeIntent(value: unknown): PackageRequestIntent {
@@ -106,7 +146,7 @@ function assistedClose(delivery: PackageRequestReceipt["delivery"]): PackageRequ
       ? "Send the receipt id, redacted context, billing name, and billing email to info@mind-reply.com so the invoice-first close can continue manually."
       : directPayment
         ? "MindReply reviews the redacted request, confirms scope, and sends the configured payment link."
-        : "MindReply reviews the redacted request, confirms scope, and sends the invoice-first route.",
+        : "MindReply reviews the redacted request, confirms scope, and sends the invoice-first route with the captured billing details.",
     expectedReplyWindow: "one business day",
     ownerDecisionNeeded: ownerDecisionNeeded(directPayment),
     buyerPromise: "Website Completion Package request: GBP 600 once for ranked fixes, send-ready copy, and buyer path cleanup.",
@@ -118,18 +158,25 @@ export function parsePackageRequest(body: unknown): { input?: PackageRequestInpu
   if (!body || typeof body !== "object") return { error: "Request body is required." };
   const record = body as Record<string, unknown>;
   const email = clean(record.email, 200).toLowerCase();
+  const billingName = clean(record.billingName, 200);
+  const billingEmail = clean(record.billingEmail, 200).toLowerCase();
+  const intent = normalizeIntent(record.intent);
   const context = clean(record.context, 2400);
   const triedMRagent = clean(record.triedMRagent, 1600);
   const consent = record.consent === true || record.consent === "true" || record.consent === "on";
 
-  if (!email || !/^\S+@\S+\.\S+$/.test(email)) return { error: "A valid email is required." };
+  if (!email || !isEmail(email)) return { error: "A valid email is required." };
+  if (requiresBilling(intent) && billingName.length < 2) return { error: "Billing name is required for invoice-first package requests." };
+  if (requiresBilling(intent) && (!billingEmail || !isEmail(billingEmail))) return { error: "A valid billing email is required for invoice-first package requests." };
   if (!context || context.length < 12) return { error: "Short redacted context is required." };
   if (!consent) return { error: "Consent is required before MindReply reviews the request." };
 
   return {
     input: {
       email,
-      intent: normalizeIntent(record.intent),
+      billingName,
+      billingEmail,
+      intent,
       context,
       triedMRagent,
       consent,
@@ -153,6 +200,7 @@ export function makePackageReceipt(input: PackageRequestInput, delivery: Package
     inputHash: inputHash(input),
     rawContentRedacted: true,
     consentCaptured: input.consent,
+    billing: billingReceipt(input),
     assistedClose: assistedClose(delivery),
     delivery,
   };
@@ -204,6 +252,8 @@ export async function deliverPackageRequest(input: PackageRequestInput): Promise
     `Intent: ${input.intent}`,
     `Package: Website Completion Package, GBP 600`,
     `Reply-to: ${input.email}`,
+    `Billing name: ${input.billingName || "Not provided."}`,
+    `Billing email: ${input.billingEmail || "Not provided."}`,
     `Owner decision needed: ${ownerDecisionNeeded(directPayment)}`,
     `Payment path: ${paymentPath(directPayment)}`,
     "Expected reply window: one business day.",
