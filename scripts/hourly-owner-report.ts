@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
@@ -40,6 +40,40 @@ function statusFrom(blockers: string[]) {
 
 function configured(...names: string[]) {
   return names.some((name) => Boolean(process.env[name]));
+}
+
+const slackSecretPatterns = [
+  /join\.slack\.com/i,
+  /slack\.com\/join/i,
+  /slack\.com\/invite/i,
+  /shareDM\/zt-/i,
+  /hooks\.slack\.com\/services/i,
+  /xox[baprs]-[A-Za-z0-9-]+/i,
+];
+
+const scanSkipDirs = new Set([".git", ".next", "node_modules", "reports", ".vercel"]);
+const scanTextExts = new Set([".md", ".ts", ".tsx", ".js", ".mjs", ".json", ".yml", ".yaml", ".txt"]);
+
+async function scanForSlackSecrets(dir = root): Promise<string[]> {
+  const matches: string[] = [];
+  const entries = await readdir(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (scanSkipDirs.has(entry.name)) continue;
+    const fullPath = path.join(dir, entry.name);
+    const relativePath = path.relative(root, fullPath).replace(/\\/g, "/");
+
+    if (entry.isDirectory()) {
+      matches.push(...(await scanForSlackSecrets(fullPath)));
+      continue;
+    }
+
+    if (!entry.isFile() || !scanTextExts.has(path.extname(entry.name).toLowerCase())) continue;
+    const content = await readFile(fullPath, "utf8").catch(() => "");
+    if (slackSecretPatterns.some((pattern) => pattern.test(content))) matches.push(relativePath);
+  }
+
+  return matches;
 }
 
 async function main() {
@@ -84,6 +118,8 @@ async function main() {
   const packageProviderConfigured = reportProviderConfigured;
   const packageDryRun = process.env.MINDREPLY_PACKAGE_REQUEST_DRY_RUN === "true";
   const fallbackEmailActive = contactPage.includes("mailto:") || packageForm.includes("mailtoHref");
+  const slackSecretMatches = await scanForSlackSecrets();
+  const inviteUrlCommitted = slackSecretMatches.length > 0;
 
   if (!homePage) blockers.push("Missing required route: homepage.");
   if (!packPage) blockers.push("Missing required route: /pack.");
@@ -197,7 +233,7 @@ ${deployStatus}
 - Resend key configured: ${reportProviderConfigured}
 - Slack webhook configured: ${slackConfigured}
 - Slack DM invite handoff available: ${slackDmInviteAvailable}
-- Slack invite URL committed: false
+- Slack invite/webhook URL committed: ${inviteUrlCommitted ? "true" : "false"}
 
 ## Defensive Security Boundary
 
@@ -229,7 +265,13 @@ Owner reports are private and redacted. Do not include secrets, tokens, raw priv
     },
     delivery: {
       email: { status: "pending", recipientConfigured: reportRecipientConfigured, senderConfigured: reportSenderConfigured, providerConfigured: reportProviderConfigured },
-      slack: { status: "pending", webhookConfigured: slackConfigured, dmInviteAvailable: slackDmInviteAvailable, inviteUrlCommitted: false },
+      slack: {
+        status: "pending",
+        webhookConfigured: slackConfigured,
+        dmInviteAvailable: slackDmInviteAvailable,
+        inviteUrlCommitted,
+        redactedMatchCount: slackSecretMatches.length,
+      },
     },
     blockers,
   };

@@ -172,7 +172,7 @@ verification:
   rule: Verification runs in GitHub Actions and is separate from Vercel publishing.
 slack_handoff:
   config: site/automation/slack-api.yml
-  field_id: Xf0B6WHC2SBH
+  field_id_ref: owner_supplied_private_field_id
   dm_invite_status_env: MINDREPLY_SLACK_DM_INVITE_AVAILABLE
   raw_invite_url_rule: never commit, print, or attach private Slack invite URLs in repo files, reports, workflow YAML, or artifacts.
   rule: Use only after Slack connector access and a destination channel or DM are available; DM invite context is onboarding-only and cannot send messages.

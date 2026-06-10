@@ -143,7 +143,7 @@ MINDREPLY_REPORT_AGENT_COUNT=25
 
 When `MINDREPLY_REPORT_REQUIRE_DELIVERY=true`, console output does not count as delivery. At least one Slack or email channel must return `sent`, or the workflow fails loudly.
 
-Slack delivery uses a GitHub secret or deployment secret named `MINDREPLY_SLACK_WEBHOOK_URL`. A Slack app field id such as `Xf0B6WHC2SBH` and a workspace invite link are useful setup context, but they are not enough to send; the runtime needs a webhook URL or a connected Slack write destination. For phone-visible Slack updates, create an incoming webhook in the Mind Reply Slack workspace, point it at the preferred channel or direct-message workflow, and store the webhook URL only as `MINDREPLY_SLACK_WEBHOOK_URL`.
+Slack delivery uses a GitHub secret or deployment secret named `MINDREPLY_SLACK_WEBHOOK_URL`. Owner-supplied Slack field IDs and workspace invite links are setup context only, not send credentials, and must not be committed. For phone-visible Slack updates, create an incoming webhook in the Mind Reply Slack workspace, point it at the preferred channel or direct-message workflow, and store the webhook URL only as `MINDREPLY_SLACK_WEBHOOK_URL`.
 
 Email delivery uses GitHub or deployment secrets:
 

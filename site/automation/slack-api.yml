@@ -1,6 +1,6 @@
 surface: Slack API handoff
 workspace: mind-reply
-field_id: Xf0B6WHC2SBH
+field_id_ref: owner_supplied_private_field_id
 status: configured_without_secret
 purpose: Route MRagent monitor summaries and personal-pack handoffs to Slack when a channel and connector access are available.
 owner_dm_invite:
@@ -20,7 +20,7 @@ required_before_send:
   - explicit user request to send, post, draft, or triage
 report_payload:
   source: mragent-monitor-status.json
-  field_id: Xf0B6WHC2SBH
+  field_id_ref: owner_supplied_private_field_id
   title: MRagent 15-minute report
   include:
     - generatedAt
