@@ -15,6 +15,7 @@ function assert(condition: unknown, message: string) {
 
 const prompt = readRequired("docs/hourly_owner_goal_prompt.md");
 const blueprint = readRequired("docs/website_audit_action_blueprint.md");
+const launchEvidence = readRequired("docs/launch_evidence_bundle.md");
 const home = readRequired("app/page.tsx");
 const pack = readRequired("app/pack/page.tsx");
 const canonicalPackage = readRequired("app/website-completion-package/page.tsx");
@@ -76,6 +77,34 @@ for (const phrase of [
   "Pro trigger:",
 ]) {
   assert(blueprint.includes(phrase), `Website audit blueprint must include: ${phrase}`);
+}
+
+for (const phrase of [
+  "MindReply Launch Evidence Bundle",
+  "Current Live URL",
+  "Health Proof",
+  "Intake Receipt Sample",
+  "SEO Note",
+  "Deployment Status",
+  "Owner Report Rule",
+  "https://www.mind-reply.com",
+  "/api/version",
+  "/website-completion-package",
+  "/products",
+  "/response-overload",
+  "actionKind: website-completion",
+  "rawContentRedacted: true",
+  "inputHash: present; raw text absent",
+  "Website Completion Package",
+  "website buying-friction rescue",
+  "privacy-safe receipt",
+  "api-deployments-free-per-day",
+  "source-side proof",
+  "live production proof",
+  "delivery proof",
+  "source advanced; production pending",
+]) {
+  assert(launchEvidence.includes(phrase), `Launch evidence bundle must include: ${phrase}`);
 }
 
 assert(home.includes("Reclaim 2+ hours daily within 24 hours"), "Homepage must preserve the immediate operational relief promise.");

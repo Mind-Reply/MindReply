@@ -130,6 +130,8 @@ Position the site around high-friction, underserved buyer intent:
 
 The sitemap and robots contract must allow the money pages: `/website-completion-package`, `/pricing`, `/contact`, `/capabilities`, `/agent`, and `/`.
 
+Launch evidence must be maintained in `docs/launch_evidence_bundle.md`. It is the source for live URL, health proof, intake receipt sample, SEO note, deployment status, and owner-report separation between source-side proof and live production proof.
+
 ## Mobile And Visual Quality
 
 Phone views must not feel like an afterthought.
