@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { defaultLocale, localeMeta, normalizeLocale, supportedLocales, type LocaleCode } from "@/lib/locales";
 
 const supportedLocaleSet = new Set<LocaleCode>(supportedLocales);
+const googleLocaleFallbacks: Partial<Record<LocaleCode, string>> = {
+  zh: "zh-CN",
+};
 
 type RequestBody = {
   target?: string;
@@ -69,7 +72,7 @@ export async function POST(req: NextRequest) {
       signal: controller.signal,
       body: JSON.stringify({
         q: texts,
-        target: localeMeta[target].googleLocale,
+        target: googleLocaleFallbacks[target] || localeMeta[target].googleLocale,
         source: defaultLocale,
         format: "text",
       }),

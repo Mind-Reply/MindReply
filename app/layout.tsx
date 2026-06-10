@@ -62,10 +62,9 @@ export const metadata: Metadata = {
     "Spain website conversion copy",
     "China business communication support",
     "Ukraine founder communication support",
-    "Bulgaria executive communication support",
-    "Bulgarian professional reply refinement",
     "IP aware business communication support",
     "visitor matched multilingual support",
+    "visitor matched multilingual website support",
     "Arabic executive communication support",
     "Hindi founder communication support",
     "German risk aware professional replies",
@@ -100,11 +99,11 @@ export const metadata: Metadata = {
     images: ["/opengraph-image"],
   },
   other: {
-    "content-language": "en, es, fr, de, pt, ar, hi, ja, zh, uk, bg",
-    "geo.placename": "United Kingdom, India, United Arab Emirates, Saudi Arabia, United States, Germany, Japan, Brazil, France, Spain, Ukraine, Bulgaria",
-    "target-market": "GB, IN, AE, SA, US, DE, JP, BR, FR, ES, UA, BG",
+    "content-language": "en, es, fr, de, pt, ar, hi, ja, zh, uk",
+    "geo.placename": "Visitor country and browser language matched by request headers",
+    "target-market": "IP-aware multilingual business visitors",
     "target-market-priority": "Visitor IP country > browser language > manual language selector",
-    "localization-priority": "English, Hindi, Arabic, German, Japanese, Portuguese, French, Spanish, Chinese, Ukrainian, Bulgarian",
+    "localization-priority": "Visitor-matched multilingual support through country signal, browser language, manual selector, and Google Translate fallback",
   },
 };
 

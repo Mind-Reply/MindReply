@@ -13,7 +13,6 @@ const priorityMarkets = [
   "France",
   "Spain",
   "Ukraine",
-  "Bulgaria",
 ];
 
 const marketProfiles = [
@@ -90,16 +89,9 @@ const marketProfiles = [
   {
     country: "Ukraine",
     locale: "uk",
-    priority: 11,
+    priority: 10.5,
     demand: "operator-heavy market where bilingual communication pressure is common",
     providerGap: "trust-first Ukrainian communication support remains under-supplied",
-  },
-  {
-    country: "Bulgaria",
-    locale: "bg",
-    priority: 12,
-    demand: "EU services market with rising founder, agency, and cross-border communication demand",
-    providerGap: "Bulgarian-first executive communication support remains thin and easy to own early",
   },
 ];
 

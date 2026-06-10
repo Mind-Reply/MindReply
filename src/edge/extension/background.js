@@ -1,5 +1,5 @@
 const DEFAULT_ENDPOINT = "https://www.mind-reply.com/api/intake";
-const SUPPORTED_LOCALES = new Set(["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"]);
+const SUPPORTED_LOCALES = new Set(["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"]);
 
 function resolveLocale() {
   const uiLocale = chrome.i18n.getUILanguage().toLowerCase().split("-")[0];

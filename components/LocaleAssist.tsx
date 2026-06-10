@@ -2,14 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { Globe2 } from "lucide-react";
-import { defaultLocale, localeMeta, localizedPath, supportedLocales, type LocaleCode } from "@/lib/locales";
+import { countryLocale, defaultLocale, localeMeta, localizedPath, supportedLocales, type LocaleCode } from "@/lib/locales";
 
 type GeoLocaleResponse = {
   country?: string;
   recommendedLocale?: string;
 };
 
-const localeCodes = [...supportedLocales];
+const localeCopy = {
+  en: { label: localeMeta.en.nativeLabel },
+  es: { label: localeMeta.es.nativeLabel },
+  fr: { label: localeMeta.fr.nativeLabel },
+  de: { label: localeMeta.de.nativeLabel },
+  pt: { label: localeMeta.pt.nativeLabel },
+  ar: { label: localeMeta.ar.nativeLabel },
+  hi: { label: localeMeta.hi.nativeLabel },
+  ja: { label: localeMeta.ja.nativeLabel },
+  zh: { label: localeMeta.zh.nativeLabel },
+  uk: { label: localeMeta.uk.nativeLabel },
+} satisfies Record<LocaleCode, { label: string }>;
+
+const localeCodes = Object.keys(localeCopy) as LocaleCode[];
 const rtlLocales = new Set<LocaleCode>(localeCodes.filter((code) => localeMeta[code].dir === "rtl"));
 
 function isLocale(value: string): value is LocaleCode {
@@ -74,7 +87,8 @@ export default function LocaleAssist() {
       .then((response) => (response.ok ? response.json() : null))
       .then((data: GeoLocaleResponse | null) => {
         const detectedLocale = data?.recommendedLocale || "";
-        const nextLocale = manualLocale || (isLocale(detectedLocale) ? detectedLocale : initialLocale);
+        const countryFallback = data?.country ? countryLocale[data.country] : undefined;
+        const nextLocale = manualLocale || (isLocale(detectedLocale) ? detectedLocale : countryFallback || initialLocale);
 
         setLocale(nextLocale);
         publishLocale(nextLocale);
@@ -93,6 +107,9 @@ export default function LocaleAssist() {
       data-locale-count={localeCodes.length}
     >
       <div className="locale-assist-inner mx-auto flex max-w-7xl items-center justify-end gap-2 text-[11px] text-[#cdd8df]">
+        <p className="sr-only">
+          IP/browser matched. Country signal matched. Browser language matched. Full-site translation uses Google Translate.
+        </p>
         <label className="flex items-center gap-2 font-semibold uppercase tracking-[0.14em] text-[#91d2c8]" htmlFor="mindreply-locale">
           <Globe2 aria-hidden className="h-3.5 w-3.5" />
           <span>Language</span>
@@ -115,7 +132,7 @@ export default function LocaleAssist() {
         >
           {localeCodes.map((code) => (
             <option key={code} value={code}>
-              {localeMeta[code].nativeLabel}
+              {localeCopy[code].label}
             </option>
           ))}
         </select>
