@@ -137,15 +137,16 @@ export function GET(req: NextRequest) {
     "US";
   const countryCode = country.toUpperCase();
   const browserLocale = normalizeLocale(req.headers.get("accept-language"));
-  const recommendedLocale = countryLocale[countryCode] || browserLocale;
+  const mappedLocale = countryLocale[countryCode] || null;
+  const recommendedLocale = mappedLocale || browserLocale;
 
   return NextResponse.json({
-    country: countryCode,
+    country: mappedLocale ? countryCode : "GLOBAL",
     recommendedLocale,
     browserLocale,
     supportedLocales,
     priorityMarkets,
     marketProfiles,
-    source: countryLocale[countryCode] ? "country" : "browser",
+    source: mappedLocale ? "country" : "browser",
   });
 }
