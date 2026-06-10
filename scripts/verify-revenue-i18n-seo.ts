@@ -19,6 +19,7 @@ const home = read("app/page.tsx");
 const layout = read("app/layout.tsx");
 const footer = read("components/SiteFooter.tsx");
 const localeAssist = read("components/LocaleAssist.tsx");
+const googleTranslate = read("components/GoogleTranslateProvider.tsx");
 const geoLocale = read("app/api/geo-locale/route.ts");
 const sitemap = read("app/sitemap.ts");
 const robots = read("app/robots.ts");
@@ -28,6 +29,7 @@ const packagePage = read("app/website-completion-package/page.tsx");
 const capabilities = read("app/capabilities/page.tsx");
 const agents = read("app/agents/page.tsx");
 const legacyPack = read("app/pack/page.tsx");
+const mragent = read("lib/mragent.ts");
 
 for (const phrase of [
   "Reclaim 2+ hours daily within 24 hours",
@@ -54,6 +56,7 @@ for (const phrase of [
   "Arabic executive communication support",
   "Japanese business reply refinement",
   "Hindi founder communication support",
+  "GoogleTranslateProvider",
 ]) {
   includes("layout metadata", layout, phrase);
 }
@@ -82,7 +85,9 @@ for (const phrase of [
   "日本語",
   "中文",
   "Українська",
-  "Auto {country}",
+  "Language</span>",
+  "data-detected-country={country}",
+  "mindreply:locale-change",
   "marketCount",
   "setMarketCount",
   "marketProfiles?.length",
@@ -93,6 +98,18 @@ for (const phrase of [
   "priority-chip",
 ]) {
   includes("locale assist", localeAssist, phrase);
+}
+assert(!localeAssist.includes("Auto {country}"), "locale assist must not show raw Auto country label.");
+
+for (const phrase of [
+  "translate.google.com/translate_a/element.js",
+  "googtrans",
+  "googleTranslateElementInit",
+  "mindreply-google-translate",
+  "mindreply:locale-change",
+  "zh-CN",
+]) {
+  includes("google translate provider", googleTranslate, phrase);
 }
 
 for (const phrase of [
@@ -133,6 +150,8 @@ for (const phrase of [
   ".priority-chip",
   ".market-chip",
   "grid-template-columns: minmax(0, 1fr) auto",
+  "#mindreply-google-translate",
+  ".goog-te-banner-frame",
 ]) {
   includes("globals", globals, phrase);
 }
@@ -152,6 +171,17 @@ for (const phrase of [
   includes("site footer", footer, phrase);
 }
 assert(!/mailto:/i.test(footer), "footer should route to contact form, not direct mailto.");
+
+for (const phrase of [
+  "MRAGENT_PROVIDER_BASE_URL",
+  "MRAGENT_PROVIDER_API_KEY",
+  "under 90 words",
+  "2-4 short paragraphs",
+  "Every answer must feel slightly different",
+  "max_output_tokens: 150",
+]) {
+  includes("mragent", mragent, phrase);
+}
 
 includes("contact page", contact, "Ask MRagent first");
 includes("contact page", contact, "info@mind-reply.com");
@@ -182,4 +212,4 @@ for (const broken of ["\u00c3", "\u00e0\u00a4", "\u00e6\u2014", "\u00d0\u00a3"])
   assert(!localeAssist.includes(broken), `locale assist appears to contain mojibake marker ${broken}`);
 }
 
-console.log("Revenue, mobile, priority-market SEO, 10-language country locale, invoice-first close path, package page proof, footer handoff, and public safety verification passed.");
+console.log("Revenue, mobile, Google Translate fallback, priority-market SEO, 10-language country locale, invoice-first close path, package page proof, footer handoff, MRagent behavior, and public safety verification passed.");
