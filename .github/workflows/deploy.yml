@@ -51,4 +51,27 @@ jobs:
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Vercel production
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        id: deploy
+        shell: bash
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          echo "Deployment URL: $DEPLOYMENT_URL"
+
+      - name: Smoke check deployment URL
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOYMENT_URL="${{ steps.deploy.outputs.deployment_url }}"
+          test -n "$DEPLOYMENT_URL"
+          curl --fail --silent --show-error "$DEPLOYMENT_URL/" >/dev/null
+          curl --fail --silent --show-error "$DEPLOYMENT_URL/agent" >/dev/null
+          curl --fail --silent --show-error "$DEPLOYMENT_URL/api/health" >/dev/null
+
+      - name: Smoke check production domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error "$NEXT_PUBLIC_SITE_URL/" >/dev/null
+          curl --fail --silent --show-error "$NEXT_PUBLIC_SITE_URL/agent" >/dev/null
+          curl --fail --silent --show-error "$NEXT_PUBLIC_SITE_URL/api/health" >/dev/null
