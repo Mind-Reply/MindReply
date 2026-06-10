@@ -14,17 +14,23 @@ Required GitHub Actions secrets for the manual production deploy:
 - `VERCEL_ORG_ID`: `team_0plIJmQLgZC1wVv9zI2eVf3B`
 - `VERCEL_PROJECT_ID`: `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`
 
-## Guarded Git Deployment
+## Git Deployment Policy
 
-`vercel.json` allows Git deployments. The quota protection now lives in `scripts/vercel-ignore-build.mjs`:
+`vercel.json` disables Vercel Git auto-deployments with `git.deploymentEnabled: false`.
+This stops duplicate connected Vercel projects from creating deployment statuses and burning
+the daily deployment counter before the repo's ignore script can help.
+
+`scripts/vercel-ignore-build.mjs` remains as a secondary guard for any project or environment
+where Git deployments are manually re-enabled:
 
 - Preview deployments are skipped.
 - Non-main branches are skipped.
 - Duplicate Vercel production projects are skipped.
 - Docs-only and report-only changes are skipped.
-- App or deployment-config changes on `main` are allowed to build the canonical production project.
+- App or deployment-config changes on `main` must ship through the manual canonical deploy workflow.
 
-This keeps urgent public-site fixes deployable while still suppressing the noisy deployment loop that was consuming capacity.
+This keeps urgent public-site fixes deployable through one controlled project while suppressing
+the noisy Vercel Git deployment loop that was consuming capacity.
 
 ## CircleCI Deploy Flow
 
@@ -47,10 +53,11 @@ This keeps urgent public-site fixes deployable while still suppressing the noisy
 
 ## Quota Control
 
-- `scripts/vercel-ignore-build.mjs` is the primary Git deployment quota guard.
+- `vercel.json` is the primary quota guard: Vercel Git auto-deployments are disabled.
+- `scripts/vercel-ignore-build.mjs` is the secondary guard if Git deployments are re-enabled.
 - CircleCI production deployment still waits at `hold_production_deploy` until owner approval.
 - GitHub manual deployment is `workflow_dispatch` only and requires the exact confirmation phrase `deploy-production`.
-- The Free-plan `api-deployments-free-per-day` limit cannot be removed in code. It is reduced by suppressing low-value deploys, avoided by deploying only after verification when manual deploy is used, and eliminated only by Vercel plan/account changes outside this repo.
+- The Free-plan `api-deployments-free-per-day` limit cannot be removed in code. It is reduced by disabling duplicate Git-triggered deploys, avoided by deploying only after verification when manual deploy is used, and eliminated only by Vercel plan/account changes outside this repo.
 - Vercel Pro cannot be enabled from source code. The owner must upgrade the Vercel account/team billing plan in the Vercel dashboard, then rerun or allow the deploy.
 
 See `docs/vercel_limit_resolution.md` for the owner-side quota decision.
