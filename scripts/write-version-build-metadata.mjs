@@ -19,10 +19,15 @@ function git(args, fallback = "") {
   return fallback;
 }
 
-const commitSha = process.env.GITHUB_SHA || process.env.VERCEL_GIT_COMMIT_SHA || git(["rev-parse", "HEAD"], "unknown");
+const commitSha =
+  process.env.GITHUB_SHA ||
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  process.env.NEXT_PUBLIC_MINDREPLY_BUILD_COMMIT_SHA ||
+  git(["rev-parse", "HEAD"], "unknown");
 const branch =
   process.env.GITHUB_REF_NAME ||
   process.env.VERCEL_GIT_COMMIT_REF ||
+  process.env.NEXT_PUBLIC_MINDREPLY_BUILD_BRANCH ||
   git(["rev-parse", "--abbrev-ref", "HEAD"], "main");
 
 const metadata = {
