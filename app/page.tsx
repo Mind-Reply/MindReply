@@ -27,7 +27,7 @@ const packageCtaLabel = packagePaymentUrl ? "Pay for the GBP 600 package" : "Req
 const packageRouteLabel = packagePaymentUrl ? "Direct payment enabled" : "Invoice-first route ready";
 const packageRouteCopy = packagePaymentUrl
   ? "Scope is confirmed first, then the configured payment link is used before delivery."
-  : "No payment link is required to begin. MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice before delivery.";
+  : "No payment link is required to begin. MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice before delivery so the invoice-first route works for B2B buyers.";
 
 const navItems = [
   { label: "Offer", href: "#offer" },
@@ -59,12 +59,12 @@ const packageRows = [
 
 const authoritySignals = [
   {
-    title: "20+ professional lexicons",
+    title: "Discipline-specific language",
     copy: "Founder updates, client delivery, legal-sensitive wording, finance pressure, clinical tone, recruiting replies, and executive messages each need different restraint.",
     icon: FileText,
   },
   {
-    title: "Behavioral communication read",
+    title: "Behavioral expression read",
     copy: "MRagent names the protected feeling, the likely friction, and the next move without turning the answer into a long essay.",
     icon: HeartHandshake,
   },
@@ -140,11 +140,11 @@ const upgradeSteps = [
   },
   {
     title: "Growth",
-    copy: "For recurring weekly overload across inboxes, client replies, follow-ups, and small team message queues.",
+    copy: "For repeated daily overload: customer responses, follow-ups, sales messages, task threads, and small-team communication rhythm.",
   },
   {
     title: "Pro",
-    copy: "For high-trust continuity, sensitive professional tone, approved memory, and integration lanes when credentials exist.",
+    copy: "For sensitive client, sales, hiring, legal-adjacent, founder, finance, and reputation-critical communication that needs deeper refinement and control.",
   },
 ];
 
@@ -231,7 +231,7 @@ export default function Home() {
               Website buying-friction rescue
             </div>
             <h1 className="mt-7 max-w-3xl font-serif text-5xl font-bold leading-[0.94] md:text-7xl">
-              Reclaim 2+ hours daily when your page, inbox, or follow-up path is leaking decisions.
+              Reclaim 2+ hours daily within 24 hours when your page, inbox, or follow-up path is leaking decisions.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
               MindReply turns overloaded pages, replies, and client follow-ups into one ranked action queue or one send-ready message. Start with MRagent. Buy the GBP 600 Website Completion Package when the leak is bigger than one reply.
