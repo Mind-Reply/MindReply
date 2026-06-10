@@ -67,18 +67,18 @@ for (const phrase of [
   "Website Completion and Response Overload Rescue",
   "content-language",
   "target-market-priority",
-  "Bulgaria business communication support",
-  "Bulgarian website completion service",
-  "Bulgarian professional reply support",
-  "bg: \"/?lang=bg\"",
-  "bg_BG",
-  "UK > India > UAE > Saudi Arabia > US > Germany > Japan > Brazil > France > Spain > Bulgaria",
+  "visitor-matched multilingual support",
+  "Visitor IP country > browser language > manual language selector",
+  "IP aware business communication support",
   "GoogleTranslateProvider",
 ]) {
   includes("layout metadata", files.layout, phrase);
 }
+for (const forbidden of ["Bulgaria", "Bulgarian", "bg_BG", "bg: \"/?lang=bg\"", "target-market-priority\": \"UK >"]) {
+  excludes("layout metadata", files.layout, forbidden);
+}
 
-const localeCodes = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
+const localeCodes = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
 for (const locale of localeCodes) {
   includes("locale assist", files.localeAssist, `${locale}: {`);
 }
@@ -91,19 +91,21 @@ for (const phrase of [
   "fetch(\"/api/geo-locale\"",
   "GeoLocaleResponse",
   "countryLocale",
-  "BG: \"bg\"",
-  "Bulgarian",
-  "Bulgaria / Eastern Europe",
   "resolveManualLocale",
   "localeFromBrowser",
   "document.documentElement.lang",
   "document.documentElement.dir",
   "mindreply:locale-change",
   "data-locale-count={localeCodes.length}",
-  "{marketCount} priority markets",
+  "IP/browser matched",
+  "Country signal matched",
+  "Browser language matched",
   "Full-site translation uses Google Translate",
 ]) {
   includes("locale assist", files.localeAssist, phrase);
+}
+for (const forbidden of ["BG: \"bg\"", "Bulgarian", "Bulgaria / Eastern Europe", "11 priority", "11 supported", "priority markets"]) {
+  excludes("locale assist", files.localeAssist, forbidden);
 }
 excludes("locale assist", files.localeAssist, "Auto country signal first");
 excludes("locale assist", files.localeAssist, "Auto {country}");
@@ -117,10 +119,10 @@ for (const phrase of [
   "translateVisibleText",
   "fetch(\"/api/translate\"",
   "target: locale",
-  "\"bg\"",
 ]) {
   includes("google translate provider", files.googleTranslate, phrase);
 }
+excludes("google translate provider", files.googleTranslate, /"bg"|bg:\s*"bg"|bg:\s*"Bulgarian"/);
 
 for (const phrase of [
   "GOOGLE_TRANSLATE_API_KEY",
@@ -129,26 +131,27 @@ for (const phrase of [
   "google-cloud-translate",
   "passthrough",
   "zh-CN",
-  "bg: \"bg\"",
 ]) {
   includes("google translate route", files.translateRoute, phrase);
 }
+excludes("google translate route", files.translateRoute, /"bg"|bg:\s*"bg"/);
 
 for (const phrase of [
-  "BG: \"bg\"",
   "supportedLocales",
-  "Bulgaria",
-  "locale: \"bg\"",
-  "priority: 11",
   "marketProfiles",
   "providerGap",
+  "countryLocale[countryCode] ? \"country\" : \"browser\"",
 ]) {
   includes("geo locale", files.geoLocale, phrase);
 }
+for (const forbidden of ["BG: \"bg\"", "Bulgaria", "locale: \"bg\"", "priority: 11", "\"bg\""]) {
+  excludes("geo locale", files.geoLocale, forbidden);
+}
 
-for (const phrase of ["/products", "/checkout", "/response-overload", "/website-completion-package", "languageParams", "alternates:", "hi", "uk", "bg", "?lang=${locale}"]) {
+for (const phrase of ["/products", "/checkout", "/response-overload", "/website-completion-package", "languageParams", "alternates:", "hi", "uk", "?lang=${locale}"]) {
   includes("sitemap", files.sitemap, phrase);
 }
+excludes("sitemap", files.sitemap, "\"bg\"");
 
 for (const phrase of ["/products", "/checkout", "/website-completion-package", "disallow: [\"/api/\", \"/mcp\", \"/agents\", \"/pack\"]"]) {
   includes("robots", files.robots, phrase);
@@ -172,11 +175,12 @@ for (const phrase of [
   "Language and market fit",
   "Full-site translation uses Google Translate",
   "Google Translate or the visitor's browser",
+  "Visitor IP and browser language",
   "info@mind-reply.com",
-  "Bulgaria",
 ]) {
   includes("site footer", files.footer, phrase);
 }
+excludes("footer", files.footer, "Bulgaria");
 excludes("footer", files.footer, "Auto country signal first");
 excludes("footer", files.footer, "Auto {country}");
 excludes("footer", files.footer, "{AUTO BG}");
@@ -185,15 +189,15 @@ for (const phrase of [
   "MRAGENT_PROVIDER_BASE_URL",
   "MRAGENT_PROVIDER_API_KEY",
   "supportedAgentLanguages",
-  "Bulgarian",
-  "Mirror the user's language",
-  "Supported languages include English, Spanish, French, German, Portuguese, Arabic, Hindi, Japanese, Chinese, Ukrainian, and Bulgarian",
+  "Mirror the user's supported language",
+  "Supported languages include English, Spanish, French, German, Portuguese, Arabic, Hindi, Japanese, Chinese, and Ukrainian",
   "Vary rhythm and wording each time",
   "Use 2-3 short paragraphs, 45-85 words",
   "max_output_tokens: 145",
 ]) {
   includes("mragent", files.mragent, phrase);
 }
+excludes("mragent", files.mragent, "Bulgarian");
 
 for (const phrase of ["Assisted close", "Ask MRagent first", "info@mind-reply.com", "PackageRequestForm"]) {
   includes("contact page", files.contact, phrase);
@@ -267,8 +271,11 @@ for (const phrase of [
   includes("checkout page", files.checkout, phrase);
 }
 
-for (const phrase of ["11 priority languages", "Bulgarian support", "Google Translate fallback", "Bulgarian is included"]) {
+for (const phrase of ["Visitor-matched language", "IP-country route", "browser-language fallback", "Google Translate fallback", "Visitor IP, browser language, and manual selection"]) {
   includes("capabilities", files.capabilities, phrase);
+}
+for (const forbidden of ["11 priority languages", "Bulgarian support", "Bulgarian is included"]) {
+  excludes("capabilities", files.capabilities, forbidden);
 }
 
 for (const phrase of [
@@ -305,5 +312,5 @@ for (const broken of ["\u00c3", "\u00e0\u00a4", "\u00e6\u2014", "\u00d0\u00a3"])
 }
 
 console.log(
-  "Revenue, mobile, Google Translate route, Bulgarian i18n, priority-market SEO, product and checkout routes, invoice-first close path, short multilingual MRagent behavior, hourly owner contract, and public safety verification passed.",
+  "Revenue, mobile, visitor-matched multilingual SEO, Google Translate route, product and checkout routes, invoice-first close path, short multilingual MRagent behavior, hourly owner contract, and public safety verification passed.",
 );

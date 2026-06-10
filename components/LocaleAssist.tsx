@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Globe2 } from "lucide-react";
 
-type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
+type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk";
 
 type LocaleCopy = {
   label: string;
@@ -16,6 +16,8 @@ type LocaleCopy = {
 type GeoLocaleResponse = {
   country?: string;
   recommendedLocale?: string;
+  source?: string;
+  supportedLocales?: string[];
   priorityMarkets?: string[];
   marketProfiles?: Array<{ country: string; locale: string; priority?: number }>;
 };
@@ -91,13 +93,6 @@ const localeCopy: Record<LocaleCode, LocaleCopy> = {
     packageLine: "Website Completion Package, GBP 600.",
     contact: "Try MRagent first. Use the contact form for human support.",
   },
-  bg: {
-    label: "Bulgarian",
-    market: "Bulgaria / Eastern Europe",
-    promise: "Pressure becomes one clear next step.",
-    packageLine: "Website Completion Package, GBP 600.",
-    contact: "Try MRagent first. Use the contact form when human support is needed.",
-  },
 };
 
 const surfaceTranslations = localeCopy;
@@ -130,7 +125,6 @@ const countryLocale: Record<string, LocaleCode> = {
   HK: "zh",
   TW: "zh",
   UA: "uk",
-  BG: "bg",
 };
 
 function isLocale(value: string): value is LocaleCode {
@@ -166,7 +160,7 @@ function resolveManualLocale() {
 
 export default function LocaleAssist() {
   const [locale, setLocale] = useState<LocaleCode>("en");
-  const [marketCount, setMarketCount] = useState(11);
+  const [coverageLabel, setCoverageLabel] = useState("IP/browser matched");
 
   useEffect(() => {
     const manualLocale = resolveManualLocale();
@@ -183,7 +177,7 @@ export default function LocaleAssist() {
           : countryLocale[detectedCountry] || initialLocale;
         const nextLocale = manualLocale || geoLocale;
 
-        setMarketCount(data?.marketProfiles?.length || data?.priorityMarkets?.length || 11);
+        setCoverageLabel(data?.source === "country" ? "Country signal matched" : "Browser language matched");
         setLocale(nextLocale);
         publishLocale(nextLocale);
       })
@@ -231,7 +225,7 @@ export default function LocaleAssist() {
             ))}
           </select>
           <span className="locale-chip market-chip rounded-full border border-white/10 px-2.5 py-1 text-[#9fb0bd]">{activeCopy.market}</span>
-          <span className="locale-chip priority-chip rounded-full border border-white/10 px-2.5 py-1 text-[#9fb0bd]">{marketCount} priority markets</span>
+          <span className="locale-chip priority-chip rounded-full border border-white/10 px-2.5 py-1 text-[#9fb0bd]">{coverageLabel}</span>
         </div>
         <div className="locale-assist-copy max-w-3xl leading-5" aria-live="polite">
           <span>{activeCopy.promise}</span>
