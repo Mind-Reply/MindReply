@@ -20,7 +20,7 @@ Required before launch-ready status:
 - `/products` returns `200`.
 - `/response-overload` returns `200`.
 - The live package page contains `Website Completion Package`, `GBP 600`, `Assisted-close assets`, and `Objection handling`.
-- The live footer does not expose `{AUTO BG}` or personal owner inboxes.
+- The live footer does not expose the legacy auto-background locale marker or personal owner inboxes.
 
 ## Intake Receipt Sample
 
