@@ -5,20 +5,24 @@ This is an owner/reporting artifact, not public marketing copy. It records the m
 ## Current Live URL
 
 - Production domain: `https://www.mind-reply.com`
-- Current verified production deployment: `dpl_BohRakPiHHtXdahTb1JPy3pTxn4q`
-- Current GitHub `main` target: source must be checked from `origin/main` before every report.
-- Status rule: production is current when the required live routes return `200`, the live revenue verifier passes, and the canonical Vercel project owns the production aliases. `/api/version` is healthy but may not expose a commit SHA for CLI deployments.
+- Current verified production source: `35c1b6129377fa0d0c5e0ba6321a452d88ca7a39`
+- Current GitHub `main` target: `35c1b6129377fa0d0c5e0ba6321a452d88ca7a39`
+- Status rule: production is current when the required live routes return `200`, the live revenue verifier passes, and `/api/version` reports the GitHub `main` commit SHA from the canonical production domain.
 
 ## Health Proof
 
 Required before launch-ready status:
 
 - `/api/version` returns `status: ok`.
+- `/api/health` returns `status: ok`.
 - `/` returns `200`.
 - `/pricing` returns `200`.
 - `/website-completion-package` returns `200`.
 - `/products` returns `200`.
 - `/response-overload` returns `200`.
+- `/trust` returns `200`.
+- `/checkout` returns `200`.
+- `/api/package-request` rejects invalid input with HTTP `400`.
 - The live package page contains `Website Completion Package`, `GBP 600`, `Assisted-close assets`, and `Objection handling`.
 - The live footer does not expose the legacy auto-background locale marker or personal owner inboxes.
 
@@ -53,11 +57,13 @@ Sitemap and robots must allow the money pages while keeping private API, MCP, ag
 
 ## Deployment Status
 
-Current status: canonical Vercel production deployment is live and the previously blocked revenue routes return `200`, but the live revenue verifier is not green because the live homepage has not yet picked up the source-side `Try MindReply Free` CTA.
+Current status: canonical Vercel production is green for the website completion surface. The live homepage, products page, checkout, trust page, response-overload page, and Website Completion Package page return `200`. The live revenue verifier passes.
 
-Source status: `main` includes the `/api/version` build metadata fallback. The next successful manual prebuilt deployment should expose non-null commit, branch, environment, URL, and project production URL through `/api/version`.
+Source status: `main` includes the `/api/version` build metadata fallback and `prebuild` metadata generation. The production `/api/version` route returns non-null commit, branch, environment, URL, project production URL, and metadata generation time.
 
-Latest deploy attempt: one canonical CLI deploy was attempted after preflight passed, but Vercel returned `api-deployments-free-per-day`. Do not attempt another deploy until the daily quota resets.
+Latest verified live source: `35c1b6129377fa0d0c5e0ba6321a452d88ca7a39`.
+
+Provider limit note: if a manual CLI deploy returns `api-deployments-free-per-day`, stop further deploy attempts until Vercel capacity resets or the plan/capacity issue is resolved. Use live verification and source-side proof in reports instead of implying a fresh deploy happened.
 
 Before any manual or automated production deploy, run `npm run deploy:preflight` from the deploy worktree. The preflight must prove the local `.vercel/project.json` is bound to the real `mindreply` project with project id `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`; otherwise stop before running `vercel deploy --prod`.
 
