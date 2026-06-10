@@ -55,6 +55,8 @@ Sitemap and robots must allow the money pages while keeping private API, MCP, ag
 
 Current status: canonical Vercel production deployment is live and the previously blocked revenue routes return `200`, but the live revenue verifier is not green because the live homepage has not yet picked up the source-side `Try MindReply Free` CTA.
 
+Source status: `main` includes the `/api/version` build metadata fallback. The next successful manual prebuilt deployment should expose non-null commit, branch, environment, URL, and project production URL through `/api/version`.
+
 Latest deploy attempt: one canonical CLI deploy was attempted after preflight passed, but Vercel returned `api-deployments-free-per-day`. Do not attempt another deploy until the daily quota resets.
 
 Before any manual or automated production deploy, run `npm run deploy:preflight` from the deploy worktree. The preflight must prove the local `.vercel/project.json` is bound to the real `mindreply` project with project id `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`; otherwise stop before running `vercel deploy --prod`.
@@ -63,6 +65,7 @@ Do not call production green when:
 
 - `/products` or `/response-overload` return `404`.
 - `node scripts/verify-live-revenue-surface.mjs` fails `homepage-clear-free-cta`.
+- `/api/version` returns `null` deployment metadata after the next successful deploy.
 - The live package page lacks the current assisted-close asset pack.
 - Payment URL, Resend sender/key, Slack route, or Vercel token are missing and the report does not state the exact missing item.
 

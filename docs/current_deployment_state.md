@@ -25,8 +25,8 @@ Urgent privacy result: sampled public pages do not expose a personal Gmail addre
 
 - Repository: `Mind-Reply/MindReply`
 - Default branch: `main`
-- Latest inspected `main` commit: `1abe7886008150542ca4a3945be5f1b69a7f6f7e`
-- Latest inspected `main` message: `Merge PR #19: Tighten deploy-ready Bulgarian and reporting safety`
+- Latest inspected `main` commit: `3684cc8936338413ae623f1a5826cfa2bf4a7c18`
+- Latest inspected `main` message: `Add version metadata build fallback`
 
 The report-delivery fallbacks in GitHub Actions now use `angellllkr@gmail.com` for owner-only reporting:
 
@@ -34,6 +34,8 @@ The report-delivery fallbacks in GitHub Actions now use `angellllkr@gmail.com` f
 - `.github/workflows/manual-vercel-production.yml`
 
 Local historical outbox reports were also corrected from the wrong uppercase/missing-letter Gmail variants to `angellllkr@gmail.com`.
+
+Source now includes a build-time `/api/version` metadata fallback for manual prebuilt Vercel deployments. The next successful canonical deploy should report non-null commit, branch, environment, URL, and project production URL even when Vercel runtime Git variables are absent.
 
 ## Vercel Project
 
@@ -49,7 +51,7 @@ The deployment has production aliases for `mind-reply.com`, `www.mind-reply.com`
 
 ## Current Risk
 
-The live domain has the needed revenue routes, Bulgarian locale support, response-overload landing page, and public-mailbox privacy fix. It should not be called fully source-current until the homepage `Try MindReply Free` verifier passes and `/api/version` reports non-null deployment metadata.
+The live domain has the needed revenue routes, Bulgarian locale support, response-overload landing page, and public-mailbox privacy fix. It should not be called fully source-current until the homepage `Try MindReply Free` verifier passes and the merged `/api/version` build fallback is present on production.
 
 ## Next Production Action
 
