@@ -2,47 +2,64 @@
 
 Checked: 2026-06-10
 
-## Live Domain
+## Public Production
 
-- `https://www.mind-reply.com/`: reachable.
-- `https://www.mind-reply.com/api/health`: `200 OK` on the last live check.
-- `https://www.mind-reply.com/response-overload`: `404` on the last live check.
+Live production is still behind GitHub `main`.
 
-The `404` response-overload route means production is still behind merged `main` commit
-`0b316420cc9857c88989066af08617685b4096fd`.
+Verified live behavior:
+
+- `https://www.mind-reply.com/`: `200 OK`.
+- `https://www.mind-reply.com/contact`: `200 OK`.
+- `https://www.mind-reply.com/products`: `404 Not Found`.
+- `https://www.mind-reply.com/checkout`: `404 Not Found`.
+- `https://www.mind-reply.com/api/version`: `200 OK`, reporting commit `0957a3c7233801286c27b4edea4fb934bb2833de`.
+- `https://www.mind-reply.com/api/geo-locale`: `200 OK`, still showing supported locales `en, es, fr, de, pt, ar, hi, ja, zh, uk` without deployed `bg` support.
+
+Homepage and contact samples do not expose Gmail, but the live footer still contains the stale auto-language signal that was already removed in source.
+
+## GitHub Source
+
+`main` is ahead of the live production commit by 72 commits when compared against live commit `0957a3c7233801286c27b4edea4fb934bb2833de`.
+
+Source changes present on `main` but not yet live include:
+
+- Shorter, calmer, more varied MRagent behavior in `lib/mragent.ts`.
+- Google-backed translation route in `app/api/translate/route.ts`.
+- Updated locale/market handling with Bulgarian support in source.
+- Cleaned footer copy in `components/SiteFooter.tsx`.
+- Product surface at `app/products/page.tsx`.
+- Checkout surface at `app/checkout/page.tsx`.
+- Fixed `GBP 600` Website Completion Package path and invoice option.
+- Manual production deployment workflow at `.github/workflows/manual-vercel-production.yml`.
 
 ## Vercel Project
+
+Canonical production project:
 
 - Project: `mindreply`
 - Team: `team_0plIJmQLgZC1wVv9zI2eVf3B`
 - Project ID: `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`
+- Latest inspected ready production deployment: `dpl_2rTwzQUoxBPAi2pNp3QDixhKFpuj`
+- Latest ready production deployment URL: `mindreply-qid6qqljd-angellllkr-engs-projects.vercel.app`
+- Latest ready production deployment commit: `0957a3c7233801286c27b4edea4fb934bb2833de`
 
-The latest inspected ready production deployment was created from `main` at commit `0e612d39f58cb6f07094aa464e10a62da1879828`.
+The project metadata still points to the old ready deployment. No newer ready production deployment was visible in the Vercel deployment list at this check.
 
-Recent Vercel/GitHub status history showed three connected Vercel projects trying to deploy
-the same commit and failing with `api-deployments-free-per-day`. The repo now disables Vercel
-Git auto-deployments and uses the manual canonical deploy workflow for production.
+## Pro Account Note
 
-## Current GitHub Controls
+The account may now be Pro, but the inspected Vercel project has not yet produced a new ready production deployment from current `main`. Pro status alone does not update production; the fixed manual workflow still needs to run once.
 
-- `vercel.json` disables Vercel Git auto-deployments with `git.deploymentEnabled: false`.
-- `scripts/vercel-ignore-build.mjs` remains as a secondary guard if Git deployments are re-enabled.
-- App changes on `main` must ship through the canonical manual deploy workflow while the duplicate Vercel projects remain connected.
-- `MindReply Manual Vercel Production Deploy` remains available as a `workflow_dispatch` fallback.
-- The manual deploy requires the exact confirmation phrase `deploy-production`.
-- The manual deploy verifies the Vercel team id, project id, app contract, and live `/api/version` endpoint.
+If the Pro upgrade is active, the next deploy attempt should no longer fail on the previous build-rate limit.
 
 ## Next Production Action
 
-1. Wait for the Vercel daily deployment quota to reset.
-2. Confirm GitHub Actions secrets:
-   - `VERCEL_TOKEN`
-   - `VERCEL_ORG_ID`
-   - `VERCEL_PROJECT_ID`
-3. Run `MindReply Manual Vercel Production Deploy` on `main`.
-4. Type `deploy-production`.
-5. Confirm the workflow live checks pass and `/response-overload` returns `200`.
+Run the canonical manual workflow:
 
-## Limit Position
+1. Open GitHub Actions for `Mind-Reply/MindReply`.
+2. Select `MindReply Manual Vercel Production Deploy`.
+3. Run workflow on `main`.
+4. Enter the confirmation exactly: `deploy-production`.
+5. Confirm the workflow aliases `www.mind-reply.com` and `mind-reply.com`.
+6. Confirm live checks pass for `/`, `/contact`, `/products`, `/checkout`, `/api/version`, `/api/health`, and `/api/geo-locale`.
 
-Vercel's public limits list `Deployments Created per Day` as `100` on Hobby and `6000` on Pro. Source code cannot upgrade the account. The repo can only suppress low-value deployments and make production deployment intentional when quota is constrained.
+Production should not be called fixed until `/api/version` reports the new `main` deployment and `/products` plus `/checkout` return `200 OK`.
