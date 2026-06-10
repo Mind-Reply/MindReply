@@ -8,8 +8,8 @@ function value(name: string) {
 }
 
 export async function GET() {
-  const commitSha = value("VERCEL_GIT_COMMIT_SHA") || value("GITHUB_SHA");
-  const branch = value("VERCEL_GIT_COMMIT_REF") || value("GITHUB_REF_NAME");
+  const commitSha = value("VERCEL_GIT_COMMIT_SHA") || value("GITHUB_SHA") || value("NEXT_PUBLIC_MINDREPLY_BUILD_COMMIT_SHA");
+  const branch = value("VERCEL_GIT_COMMIT_REF") || value("GITHUB_REF_NAME") || value("NEXT_PUBLIC_MINDREPLY_BUILD_BRANCH");
 
   return NextResponse.json({
     status: "ok",
@@ -19,9 +19,9 @@ export async function GET() {
       commitSha,
       shortSha: commitSha ? commitSha.slice(0, 12) : null,
       branch,
-      environment: value("VERCEL_ENV"),
-      url: value("VERCEL_URL"),
-      projectProductionUrl: value("VERCEL_PROJECT_PRODUCTION_URL"),
+      environment: value("VERCEL_ENV") || value("NEXT_PUBLIC_MINDREPLY_BUILD_ENVIRONMENT"),
+      url: value("VERCEL_URL") || value("NEXT_PUBLIC_MINDREPLY_BUILD_URL"),
+      projectProductionUrl: value("VERCEL_PROJECT_PRODUCTION_URL") || value("NEXT_PUBLIC_MINDREPLY_PROJECT_PRODUCTION_URL"),
       region: value("VERCEL_REGION"),
     },
   });

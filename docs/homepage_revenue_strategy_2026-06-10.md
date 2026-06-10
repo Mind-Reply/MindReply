@@ -76,7 +76,7 @@ Headline: Turn one stuck message or leaky page into the next clear move.
 
 Subcopy: Paste the page, reply, objection, or follow-up causing delay. MRagent returns the hidden friction, one send-ready action, risk status, and a private receipt. If the leak is bigger than one message, buy the GBP 600 Website Completion Package.
 
-Primary CTA: Try MRagent
+Primary CTA: Try MindReply Free
 
 Secondary CTA: Checkout or request invoice
 

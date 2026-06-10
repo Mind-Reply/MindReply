@@ -24,12 +24,17 @@ const pack = readRequired("app/pack/page.tsx");
 const canonicalPackage = readRequired("app/website-completion-package/page.tsx");
 const pricing = readRequired("app/pricing/page.tsx");
 const contact = readRequired("app/contact/page.tsx");
+const products = readRequired("app/products/page.tsx");
+const responseOverload = readRequired("app/response-overload/page.tsx");
+const capabilities = readRequired("app/capabilities/page.tsx");
+const siteFooter = readRequired("components/SiteFooter.tsx");
+const localeAssist = readRequired("components/LocaleAssist.tsx");
 const packageApi = readRequired("app/api/package-request/route.ts");
 const packageHelper = readRequired("lib/package-request.ts");
 const packageForm = readRequired("components/PackageRequestForm.tsx");
 const health = readRequired("app/api/health/route.ts");
 
-const publicPages = [home, pack, canonicalPackage, pricing, contact, packageForm].join("\n");
+const publicPages = [home, pack, canonicalPackage, pricing, contact, products, responseOverload, capabilities, siteFooter, localeAssist, packageForm].join("\n");
 const operatingContract = prompt.toLowerCase();
 
 for (const phrase of [
@@ -149,6 +154,12 @@ assert(home.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "Hom
 assert(home.includes("Checkout or request invoice"), "Homepage must preserve invoice fallback when no payment link is configured.");
 assert(home.includes("invoice-first route works for B2B buyers"), "Homepage must explain the invoice-first fallback.");
 assert(home.includes("info@mind-reply.com"), "Homepage must use the public MindReply mailbox.");
+assert(!publicPages.includes("Try MRagent"), "Public CTA labels must use Try MindReply Free instead of Try MRagent.");
+assert(products.includes("Try MindReply Free"), "/products must use the clear free CTA.");
+assert(responseOverload.includes("Try MindReply Free"), "/response-overload must use the clear free CTA.");
+assert(capabilities.includes("Try MindReply Free"), "/capabilities must use the clear free CTA.");
+assert(siteFooter.includes("Try MindReply Free"), "Footer must use the clear free CTA.");
+assert(localeAssist.includes("Try MindReply Free first"), "Locale assist copy must use the clear free CTA.");
 
 assert(pack.includes('redirect("/website-completion-package")'), "/pack must redirect to the canonical Website Completion Package page.");
 assert(pack.includes("index: false"), "/pack legacy redirect must stay non-indexed.");

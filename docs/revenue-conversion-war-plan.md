@@ -37,7 +37,7 @@ Private internal operating document. Do not publish as customer-facing copy.
 
 - Remove public language that sounds theatrical or overly intimate for a B2B buyer.
 - Rewrite generic `AI assistant` language into output language: action queue, send-ready message, high-trust reply, ranked fix, receipt.
-- Rewrite weak CTAs like `learn more` into commercial CTAs: `Try MRagent`, `Request GBP 600 package invoice`, `Buy credits after first output`, `Upgrade to Growth`, `Move to Pro`.
+- Rewrite weak CTAs like `learn more` into commercial CTAs: `Try MindReply Free`, `Request GBP 600 package invoice`, `Buy credits after first output`, `Upgrade to Growth`, `Move to Pro`.
 - Keep internal agent counts, automation language, hidden lanes, and owner-only reports out of public pages.
 
 ## 2. Homepage Strategy In Two Layers
@@ -77,7 +77,7 @@ Reclaim 2+ hours daily within 24 hours when your website, inbox, or follow-up pa
 Paste a page, prospect reply, client note, or overloaded follow-up. MindReply returns one ranked action queue or one send-ready message, with private-by-design handling for sensitive professional communication.
 
 **Primary CTA**
-Try MRagent
+Try MindReply Free
 
 **Secondary CTA**
 Request GBP 600 package invoice

@@ -98,7 +98,7 @@ export default function ResponseOverloadPage() {
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-                Try MRagent free <ArrowRight aria-hidden className="h-4 w-4" />
+                Try MindReply Free <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
               <a href={packageHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
                 {packageLabel} <Mail aria-hidden className="h-4 w-4" />

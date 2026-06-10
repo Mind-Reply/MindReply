@@ -39,7 +39,7 @@ const products = [
       "Privacy-safe receipt shape without public raw text",
       "Upgrade trigger when the issue is bigger than one reply",
     ],
-    primary: { label: "Try MRagent", href: "/agent" },
+    primary: { label: "Try MindReply Free", href: "/agent" },
     secondary: { label: "See more", href: "/agent" },
   },
   {
@@ -72,7 +72,7 @@ const products = [
       "Priority support through info@mind-reply.com",
       "Best when the same overload returns weekly",
     ],
-    primary: { label: "Start with MRagent", href: "/agent" },
+    primary: { label: "Try MindReply Free", href: "/agent" },
     secondary: { label: "See more", href: "/pricing" },
   },
   {
@@ -225,7 +225,7 @@ export default function ProductsPage() {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-              Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
+              Try MindReply Free <ArrowRight aria-hidden className="h-4 w-4" />
             </Link>
             <Link href={checkoutHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
               Checkout or invoice <Mail aria-hidden className="h-4 w-4" />

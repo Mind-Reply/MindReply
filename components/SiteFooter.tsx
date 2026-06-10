@@ -94,7 +94,7 @@ export default function SiteFooter() {
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#e2b757]">Next step</p>
             <div className="mt-4 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-4 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-                Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
+                Try MindReply Free <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
               <Link href="/checkout?package=website-completion" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
                 Checkout <ShoppingBag aria-hidden className="h-4 w-4" />
