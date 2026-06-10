@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run version:metadata",
     "build": "next build",
     "start": "next start",
     "lint": "npm run typecheck",
