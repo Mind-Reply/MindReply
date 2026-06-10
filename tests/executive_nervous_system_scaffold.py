@@ -238,6 +238,24 @@ class ExecutiveNervousSystemTests(unittest.TestCase):
         self.assertIn("homepage_cta_first_reply_clicked", strategy)
         self.assertIn("Claim discipline:", strategy)
 
+    def test_cloudflare_durable_memory_contract_is_documented(self) -> None:
+        worker = (ROOT / "src" / "edge" / "cloudflare" / "memory_durable_object.ts").read_text(encoding="utf-8")
+        wrangler = (ROOT / "wrangler.mindreply.example.jsonc").read_text(encoding="utf-8")
+        plan = (ROOT / "docs" / "cloudflare_durable_objects_plan.md").read_text(encoding="utf-8")
+
+        self.assertIn("export class WorkspaceMemory", worker)
+        self.assertIn("WORKSPACE_MEMORY", worker)
+        self.assertIn("getByName(workspaceKey)", worker)
+        self.assertIn("CREATE TABLE IF NOT EXISTS memory_records", worker)
+        self.assertIn("signal_hash", worker)
+        self.assertNotIn("raw_signal", worker)
+        self.assertIn("setAlarm", worker)
+        self.assertIn("deleteAlarm", worker)
+        self.assertIn("new_sqlite_classes", wrangler)
+        self.assertIn("WorkspaceMemory", wrangler)
+        self.assertIn("FigJam board: https://www.figma.com/board/YG4m53BsnwFSVDQCftc5Bz", plan)
+        self.assertIn("one `WorkspaceMemory` object per workspace key", plan)
+
 
 if __name__ == "__main__":
     unittest.main()
