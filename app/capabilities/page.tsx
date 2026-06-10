@@ -52,23 +52,23 @@ const serviceLanes = [
     status: "In use",
     signal: "Warm authority",
     icon: FileText,
-    copy: "MindReply’s language stays calm, premium, and practical: clearer structure, better tone, sharper boundaries, and less hesitation.",
+    copy: "MindReply's language stays calm, premium, and practical: clearer structure, better tone, sharper boundaries, and less hesitation.",
     proof: ["lexicon-aware copy", "tone calibration", "structure optimization", "boundary-aware persuasion"],
   },
   {
     name: "Multilingual surface",
     status: "Active layer",
-    signal: "10 priority languages",
+    signal: "11 priority languages",
     icon: Gauge,
-    copy: "Country and browser signals set the first language gently, with a subtle manual selector for priority English, European, Gulf, Indian, Japanese, Chinese, and Ukrainian visitors.",
-    proof: ["IP-country route", "manual selector", "RTL support", "localized revenue copy"],
+    copy: "Country and browser signals set the first language gently, with a subtle manual selector for priority English, European, Gulf, Indian, Japanese, Chinese, Ukrainian, and Bulgarian visitors.",
+    proof: ["IP-country route", "manual selector", "Google Translate fallback", "Bulgarian support", "RTL support"],
   },
 ];
 
 const readinessRows = [
   {
     label: "Ready for visitors",
-    copy: "MRagent, Website Completion Package, pricing, contact, privacy, sitemap, metadata, and the footer handoff are the public surfaces that should carry sales now.",
+    copy: "MRagent, Website Completion Package, products, checkout, pricing, contact, privacy, sitemap, metadata, and the footer handoff are the public surfaces that should carry sales now.",
   },
   {
     label: "Needs account connection",
@@ -84,6 +84,7 @@ const proofItems = [
   "Public contact routes through MRagent and the contact form.",
   "The footer keeps the main CTA simple on desktop and phone.",
   "Language detection is helpful but gentle; visitors can change it without a loud widget.",
+  "Bulgarian is included in the selector, geo locale, sitemap, metadata, and Google Translate provider.",
   "Revenue and provider claims are shown only when connected evidence exists.",
 ];
 
@@ -131,7 +132,7 @@ export default function CapabilitiesPage() {
             </div>
             <div className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Language layer</p>
-              <p className="mt-3 text-lg font-bold">10 priority markets</p>
+              <p className="mt-3 text-lg font-bold">11 priority languages</p>
             </div>
           </div>
         </div>
