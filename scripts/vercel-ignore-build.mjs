@@ -1,20 +1,8 @@
 import { execSync } from "node:child_process";
 
-const allowedProductionHosts = new Set([
-  "www.mind-reply.com",
-  "mind-reply.com",
-  "mind-reply.vercel.app",
-  "mind-reply-angellllkr-engs-projects.vercel.app",
-  "mind-reply-git-main-angellllkr-engs-projects.vercel.app",
-  "mindreply.vercel.app",
-  "mindreply-angellllkr-engs-projects.vercel.app",
-  "mindreply-git-main-angellllkr-engs-projects.vercel.app",
-  "mindreply-mr-64b2efc9.vercel.app",
-  "mindreply-git-main-mr-64b2efc9.vercel.app",
-]);
+const canonicalProjectId = process.env.MR_CANONICAL_VERCEL_PROJECT_ID || "prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3";
 
 const automationOnlyPrefixes = [
-  ".github/",
   "docs/",
   "reports/",
   "site/automation/",
@@ -29,55 +17,50 @@ const automationOnlyFiles = new Set([
   "mindreply-delivery-receipt.json",
   "mindreply-launch-readiness.json",
   "mindreply-vercel-status-audit.json",
-  "scripts/activation-pack-report.ts",
-  "scripts/hourly-owner-report.ts",
+]);
+
+const reportingOnlyScriptFiles = new Set([
   "scripts/mragent-monitor-report.mjs",
   "scripts/mragent-growth-pulse.mjs",
   "scripts/mragent-short-digest.mjs",
-  "scripts/personal-pack-report.ts",
   "scripts/production-domain-incident.mjs",
-  "scripts/promotion-pack-report.ts",
-  "scripts/security-pack-report.ts",
-  "scripts/send-hourly-owner-report.ts",
-  "scripts/vercel-ignore-build.mjs",
-  "scripts/verify-hourly-owner-goal.ts",
-  "scripts/verify-hourly-owner-report.ts",
   "scripts/verify-live-revenue-surface.mjs",
-  "scripts/verify-production-version-contract.ts",
 ]);
 
-function normalizeHost(value = "") {
-  return value.replace(/^https?:\/\//i, "").replace(/\/$/, "").toLowerCase();
+function parseChangedFiles(value) {
+  return value.split("\n").map((file) => file.trim()).filter(Boolean);
 }
 
-function changedFiles(env = process.env) {
-  if (env.MRAGENT_CHANGED_FILES) {
-    return env.MRAGENT_CHANGED_FILES.split("\n").map((file) => file.trim()).filter(Boolean);
-  }
-
+function changedFilesFromGit() {
   try {
-    const previousSha = env.VERCEL_GIT_PREVIOUS_SHA || "HEAD~1";
-    const output = execSync(`git diff --name-only ${previousSha} HEAD`, { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] });
-    return output.split("\n").map((file) => file.trim()).filter(Boolean);
+    const output = execSync("git diff-tree --no-commit-id --name-only -r --root HEAD", {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    return parseChangedFiles(output);
   } catch {
     return [];
   }
 }
 
+function changedFiles(env = process.env, gitReader = changedFilesFromGit) {
+  if (env.MRAGENT_CHANGED_FILES) return parseChangedFiles(env.MRAGENT_CHANGED_FILES);
+  return gitReader();
+}
+
 function isAutomationOnly(file) {
-  return automationOnlyFiles.has(file) || automationOnlyPrefixes.some((prefix) => file.startsWith(prefix));
+  return automationOnlyFiles.has(file) || reportingOnlyScriptFiles.has(file) || automationOnlyPrefixes.some((prefix) => file.startsWith(prefix));
 }
 
-function changeScope(env = process.env) {
-  const files = changedFiles(env);
-  if (files.length === 0) return { known: false, files, automationOnly: false };
-  return { known: true, files, automationOnly: files.every(isAutomationOnly) };
-}
-
-export function shouldBuild(env = process.env) {
+export function shouldBuild(env = process.env, gitReader = changedFilesFromGit) {
   const vercelEnv = env.VERCEL_ENV || "";
   const commitRef = env.VERCEL_GIT_COMMIT_REF || "";
-  const productionHost = normalizeHost(env.VERCEL_PROJECT_PRODUCTION_URL || "");
+  const projectId = env.VERCEL_PROJECT_ID || env.NEXT_PUBLIC_VERCEL_PROJECT_ID || "";
+  const canonicalId = env.MR_CANONICAL_VERCEL_PROJECT_ID || canonicalProjectId;
+
+  if (projectId && canonicalId && projectId !== canonicalId) {
+    return { build: false, reason: `Skipping non-canonical Vercel project ${projectId}. Canonical project is ${canonicalId}.` };
+  }
 
   if (vercelEnv !== "production") {
     return { build: false, reason: `Skipping ${vercelEnv || "unknown"} deployment.` };
@@ -87,16 +70,12 @@ export function shouldBuild(env = process.env) {
     return { build: false, reason: `Skipping non-main branch ${commitRef || "unknown"}.` };
   }
 
-  if (productionHost && !allowedProductionHosts.has(productionHost)) {
-    return { build: false, reason: `Skipping duplicate Vercel project ${productionHost}.` };
+  const files = changedFiles(env, gitReader);
+  if (files.length > 0 && files.every(isAutomationOnly)) {
+    return { build: false, reason: `Skipping docs/report-only change: ${files.join(", ")}. Live verification/report changes must be skipped. Reporting-only script changes must be skipped.` };
   }
 
-  const scope = changeScope(env);
-  if (scope.known && scope.automationOnly) {
-    return { build: false, reason: `Skipping docs/report-only change: ${scope.files.join(", ")}.` };
-  }
-
-  return { build: true, reason: "Building canonical MindReply production deployment." };
+  return { build: true, reason: "Building MindReply production main deployment." };
 }
 
 function assert(condition, message) {
@@ -104,95 +83,61 @@ function assert(condition, message) {
 }
 
 function selfTest() {
+  assert(
+    shouldBuild({
+      VERCEL_PROJECT_ID: "prj_other",
+      VERCEL_ENV: "production",
+      VERCEL_GIT_COMMIT_REF: "main",
+    }).build === false,
+    "Non-canonical Vercel projects must be skipped.",
+  );
   assert(shouldBuild({ VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "main" }).build === false, "Preview deployments must be skipped.");
   assert(shouldBuild({ VERCEL_ENV: "production", VERCEL_GIT_COMMIT_REF: "feature" }).build === false, "Non-main production branches must be skipped.");
   assert(
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mind-reply-lox1-angellllkr-engs-projects.vercel.app",
+      VERCEL_PROJECT_ID: canonicalProjectId,
+      MRAGENT_CHANGED_FILES: "README.md\ndocs/front_end_operating_pack.md",
     }).build === false,
-    "Duplicate Vercel projects must be skipped.",
+    "Docs-only changes must be skipped when explicitly provided.",
+  );
+  assert(
+    shouldBuild(
+      {
+        VERCEL_ENV: "production",
+        VERCEL_GIT_COMMIT_REF: "main",
+        VERCEL_PROJECT_ID: canonicalProjectId,
+      },
+      () => ["docs/production_alias_secret_blocker_2026-06-09.md"],
+    ).build === false,
+    "Docs-only changes discovered from Git must be skipped.",
   );
   assert(
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-mr-64b2efc9.vercel.app",
-      MRAGENT_CHANGED_FILES: "app/page.tsx\nsite/automation/report-schema.yml",
+      VERCEL_PROJECT_ID: canonicalProjectId,
+      MRAGENT_CHANGED_FILES: "scripts/mragent-monitor-report.mjs\nscripts/verify-live-revenue-surface.mjs",
+    }).build === false,
+    "Reporting-only script changes must be skipped.",
+  );
+  assert(
+    shouldBuild({
+      VERCEL_ENV: "production",
+      VERCEL_GIT_COMMIT_REF: "main",
+      VERCEL_PROJECT_ID: canonicalProjectId,
+      MRAGENT_CHANGED_FILES: "app/page.tsx\ncomponents/LocaleAssist.tsx\napp/api/geo-locale/route.ts",
     }).build === true,
-    "Canonical MindReply project host must be allowed to build app changes.",
+    "App, component, and API changes must build on the canonical project.",
   );
   assert(
     shouldBuild({
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-git-main-mr-64b2efc9.vercel.app",
-      MRAGENT_CHANGED_FILES: "app/contact/page.tsx\ncomponents/PackageRequestForm.tsx",
-    }).build === true,
-    "Canonical MindReply Git host must be allowed to build contact/package changes.",
-  );
-  assert(
-    shouldBuild({
-      VERCEL_ENV: "production",
-      VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "site/automation/report-schema.yml\nscripts/mragent-monitor-report.mjs",
-    }).build === false,
-    "Automation-only changes must be skipped.",
-  );
-  assert(
-    shouldBuild({
-      VERCEL_ENV: "production",
-      VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "README.md\nSECURITY.md\ndocs/front_end_operating_pack.md",
-    }).build === false,
-    "Docs-only changes must be skipped.",
-  );
-  assert(
-    shouldBuild({
-      VERCEL_ENV: "production",
-      VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "scripts/activation-pack-report.ts\nscripts/security-pack-report.ts\nreports/owner.md",
-    }).build === false,
-    "Reporting-only script and report changes must be skipped.",
-  );
-  assert(
-    shouldBuild({
-      VERCEL_ENV: "production",
-      VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "scripts/hourly-owner-report.ts\nscripts/send-hourly-owner-report.ts\n.github/workflows/hourly-owner-report.yml",
-    }).build === false,
-    "Hourly owner report changes must be skipped.",
-  );
-  assert(
-    shouldBuild({
-      VERCEL_ENV: "production",
-      VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "scripts/verify-live-revenue-surface.mjs\nscripts/send-hourly-owner-report.ts",
-    }).build === false,
-    "Live verification/report changes must be skipped.",
-  );
-  assert(
-    shouldBuild({
-      VERCEL_ENV: "production",
-      VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-      MRAGENT_CHANGED_FILES: "app/page.tsx\nsite/automation/report-schema.yml",
-    }).build === true,
-    "App changes must build.",
-  );
-  assert(
-    shouldBuild({
-      VERCEL_ENV: "production",
-      VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_PROJECT_PRODUCTION_URL: "mindreply-angellllkr-engs-projects.vercel.app",
-    }).build === true,
-    "Canonical production project must build when change scope is unknown.",
+      VERCEL_PROJECT_ID: canonicalProjectId,
+    }, () => []).build === true,
+    "Production main must build on the canonical project when change scope is unknown.",
   );
   console.log("Vercel ignore-build guard verification passed.");
 }

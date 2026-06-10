@@ -7,7 +7,9 @@ const allowedApiPaths = new Set([
   "/api/conversion",
   "/api/agent",
   "/api/geo",
+  "/api/geo-locale",
   "/api/mcp",
+  "/api/package-request",
   "/api/seo",
   "/api/version",
 ]);

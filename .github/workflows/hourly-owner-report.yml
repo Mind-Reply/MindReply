@@ -13,9 +13,6 @@ on:
         default: "false"
   schedule:
     - cron: "0 * * * *"
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read
@@ -33,6 +30,7 @@ jobs:
       MINDREPLY_REPORT_ENABLED: ${{ vars.MINDREPLY_REPORT_ENABLED || 'true' }}
       MINDREPLY_REPORT_DRY_RUN: ${{ github.event.inputs.dry_run || vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
       MINDREPLY_REPORT_CHANNELS: ${{ github.event.inputs.channels || vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
+      MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: ${{ vars.MINDREPLY_REPORT_REQUIRE_LIVE_PROOF || 'true' }}
       MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || vars.MINDREPLY_REPORT_EMAIL }}
       MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS }}
       MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || vars.MINDREPLY_REPORT_FROM }}
@@ -69,6 +67,14 @@ jobs:
       - name: Verify revenue blueprint
         run: npm run audit:blueprint
 
+      - name: Capture live production revenue surface
+        continue-on-error: true
+        env:
+          MINDREPLY_LIVE_VERIFY_URL: ${{ env.NEXT_PUBLIC_SITE_URL }}
+          MINDREPLY_REQUIRE_LIVE_SHA_MATCH: "false"
+          MINDREPLY_REQUIRE_LIVE_DEPLOYMENT_MATCH: "false"
+        run: npm run verify:live-revenue
+
       - name: Send owner report
         run: npm run report:send
 
@@ -82,5 +88,6 @@ jobs:
             reports/outbox/hourly-owner-delivery-receipt-latest.json
             reports/outbox/hourly-owner-report-*.md
             reports/outbox/hourly-owner-delivery-receipt-*.json
+            mindreply-live-revenue-surface.json
           if-no-files-found: warn
           retention-days: 7

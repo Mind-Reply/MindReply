@@ -7,8 +7,19 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/agent", "/privacy"],
-        disallow: ["/api/", "/mcp"],
+        allow: [
+          "/",
+          "/agent",
+          "/website-completion-package",
+          "/pricing",
+          "/contact",
+          "/capabilities",
+          "/privacy",
+          "/sitemap.xml",
+          "/manifest.webmanifest",
+          "/opengraph-image",
+        ],
+        disallow: ["/api/", "/mcp", "/agents", "/pack"],
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,

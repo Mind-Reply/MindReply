@@ -9,10 +9,23 @@ type PackageReceipt = {
   id: string;
   timestamp: string;
   intent: string;
+  actionKind: string;
+  riskLevel: string;
+  confidence: string;
+  playbookVersion: string;
   packageName: string;
   packageValue: string;
+  fallbackEmail: string;
   inputHash: string;
   rawContentRedacted: boolean;
+  assistedClose: {
+    status: "queued" | "fallback";
+    nextStep: string;
+    expectedReplyWindow: string;
+    ownerDecisionNeeded: string;
+    buyerPromise: string;
+    paymentPath: string;
+  };
   delivery: {
     status: DeliveryStatus;
     detail: string;
@@ -135,6 +148,10 @@ export default function PackageRequestForm({ mailtoHref, supportEmail }: Package
           />
           <span>I consent to MindReply reviewing this redacted context for follow-up.</span>
         </label>
+        <div className="rounded-lg border border-[#122033]/10 bg-[#fbfaf6] p-4 text-sm leading-6 text-[#59687b]">
+          <p className="font-semibold text-[#122033]">Invoice-first route</p>
+          <p className="mt-1">No payment link is required to submit. MindReply confirms scope first, then sends the invoice request or configured payment link before delivery.</p>
+        </div>
         <button
           type="button"
           disabled={!canSubmit}
@@ -142,7 +159,7 @@ export default function PackageRequestForm({ mailtoHref, supportEmail }: Package
           className="inline-flex items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150] disabled:cursor-not-allowed disabled:opacity-45"
         >
           {loading ? <Loader2 aria-hidden className="h-4 w-4 animate-spin" /> : <ArrowRight aria-hidden className="h-4 w-4" />}
-          Submit package request
+          Submit GBP 600 package request
         </button>
       </div>
 
@@ -155,6 +172,11 @@ export default function PackageRequestForm({ mailtoHref, supportEmail }: Package
           <div className="mt-3 grid gap-2">
             <p>Receipt: {receipt.id}</p>
             <p>Package: {receipt.packageName}, {receipt.packageValue}</p>
+            <p>Next step: {receipt.assistedClose.nextStep}</p>
+            <p>Reply window: {receipt.assistedClose.expectedReplyWindow}</p>
+            <p>Owner decision needed: {receipt.assistedClose.ownerDecisionNeeded}</p>
+            <p>Payment path: {receipt.assistedClose.paymentPath}</p>
+            <p>Risk: {receipt.riskLevel}; confidence: {receipt.confidence}; playbook: {receipt.playbookVersion}</p>
             <p>Input hash: {receipt.inputHash}</p>
             <p>Raw content redacted: {receipt.rawContentRedacted ? "yes" : "no"}</p>
             <p>Delivery: {receipt.delivery.detail}</p>

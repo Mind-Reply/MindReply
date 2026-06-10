@@ -19,10 +19,25 @@ jobs:
           node-version: "20"
 
       - name: Install
-        run: npm install
+        run: npm install --no-audit --fund=false --progress=false
 
-      - name: Verify decision layer
-        run: npm run decision:verify
+      - name: Verify Vercel build guard
+        run: npm run vercel:ignore:verify
+
+      - name: Verify decision layer contract
+        run: npx tsx scripts/verify-decision-layer.ts
+
+      - name: Verify production version contract
+        run: npx tsx scripts/verify-production-version-contract.ts
+
+      - name: Verify revenue i18n SEO surface
+        run: npx tsx scripts/verify-revenue-i18n-seo.ts
+
+      - name: Verify package delivery proof
+        run: npx tsx scripts/verify-package-delivery-proof.ts
+
+      - name: Verify invoice-first close path
+        run: npx tsx scripts/verify-invoice-first-close.ts
 
       - name: Verify MRagent MCP
         run: npm run mcp:verify

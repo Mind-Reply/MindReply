@@ -1,0 +1,132 @@
+name: Vercel Production Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "public/**"
+      - "scripts/**"
+      - "package.json"
+      - "package-lock.json"
+      - "next.config.*"
+      - "tailwind.config.*"
+      - "tsconfig.json"
+      - ".github/workflows/vercel-production-deploy.yml"
+      - ".github/workflows/manual-vercel-production.yml"
+      - ".github/workflows/mragent-verify.yml"
+      - ".github/workflows/ci.yml"
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || vars.VERCEL_ORG_ID || 'team_0plIJmQLgZC1wVv9zI2eVf3B' }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || vars.VERCEL_PROJECT_ID || 'prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3' }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN || secrets.VERCEL_API_TOKEN }}
+  NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://www.mind-reply.com' }}
+  NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL: ${{ vars.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL }}
+
+concurrency:
+  group: mindreply-vercel-production-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Verify and deploy production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --no-audit --fund=false --progress=false
+
+      - name: Verify Vercel build guard
+        run: npm run vercel:ignore:verify
+
+      - name: Verify decision layer contract
+        run: npx tsx scripts/verify-decision-layer.ts
+
+      - name: Verify production version contract
+        run: npx tsx scripts/verify-production-version-contract.ts
+
+      - name: Verify revenue i18n SEO surface
+        run: npx tsx scripts/verify-revenue-i18n-seo.ts
+
+      - name: Verify package delivery proof
+        run: npx tsx scripts/verify-package-delivery-proof.ts
+
+      - name: Verify invoice-first close path
+        run: npx tsx scripts/verify-invoice-first-close.ts
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Guard Vercel token
+        shell: bash
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "Vercel token missing. Add VERCEL_TOKEN, VERCEL_ACCESS_TOKEN, or VERCEL_API_TOKEN in GitHub Actions secrets to enable production deploys."
+            exit 1
+          fi
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest --no-audit --fund=false --progress=false
+
+      - name: Pull Vercel production environment
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build Vercel production artifacts
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy to Vercel production
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOY_OUTPUT="$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")"
+          echo "$DEPLOY_OUTPUT"
+          DEPLOY_URL="$(echo "$DEPLOY_OUTPUT" | grep -Eo 'https://[^ ]+\.vercel\.app' | tail -1 || true)"
+          if [ -z "$DEPLOY_URL" ]; then
+            echo "Could not parse Vercel deployment URL from deploy output."
+            exit 1
+          fi
+          echo "deployment_url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Explicitly alias production domains
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOY_URL="${{ steps.deploy.outputs.deployment_url }}"
+          echo "Aliasing $DEPLOY_URL to www.mind-reply.com and mind-reply.com"
+          vercel alias set "$DEPLOY_URL" www.mind-reply.com --token="$VERCEL_TOKEN"
+          vercel alias set "$DEPLOY_URL" mind-reply.com --token="$VERCEL_TOKEN"
+
+      - name: Wait for domain propagation
+        run: sleep 60
+
+      - name: Verify live production domain
+        env:
+          MINDREPLY_EXPECTED_SHA: ${{ github.sha }}
+          MINDREPLY_REQUIRE_LIVE_SHA_MATCH: "true"
+          MINDREPLY_LIVE_VERIFY_URL: ${{ env.NEXT_PUBLIC_SITE_URL }}
+        run: npm run verify:live-revenue
+
+      - name: Upload live verification artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mindreply-live-revenue-surface
+          path: mindreply-live-revenue-surface.json
+          if-no-files-found: ignore

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
+import { ArrowRight, Languages, Mail, ShieldCheck } from "lucide-react";
 
 const footerLinks = [
   { label: "MRagent", href: "/agent" },
@@ -14,6 +14,19 @@ const demandLanes = [
   "Client follow-up compression",
   "Founder response overload",
   "Privacy-safe assisted close",
+];
+
+const priorityMarkets = [
+  "UK",
+  "US",
+  "UAE",
+  "Saudi Arabia",
+  "Germany",
+  "France",
+  "Japan",
+  "Brazil",
+  "Spain",
+  "India",
 ];
 
 export default function SiteFooter() {
@@ -35,6 +48,15 @@ export default function SiteFooter() {
               </div>
             ))}
           </div>
+          <section className="mt-5 rounded-lg border border-white/10 bg-white/[0.035] p-4">
+            <div className="flex items-center gap-2 text-[#91d2c8]">
+              <Languages aria-hidden className="h-4 w-4" />
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">Auto language and priority markets</p>
+            </div>
+            <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
+              Country signal first, browser language second, manual selector always available. Priority SEO lanes: {priorityMarkets.join(" / ")}.
+            </p>
+          </section>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
@@ -44,7 +66,7 @@ export default function SiteFooter() {
               <p className="text-xs font-bold uppercase tracking-[0.18em]">Evidence rule</p>
             </div>
             <p className="mt-4 text-sm leading-7 text-[#cdd8df]">
-              Public copy stays measured. Delivery, revenue, automation, and security claims are only stated when the files, workflow, endpoint, or connector proof exists.
+              Public copy stays measured. Delivery, revenue, security, and service claims are only stated when file, workflow, endpoint, or connector proof exists.
             </p>
           </section>
 
@@ -54,9 +76,9 @@ export default function SiteFooter() {
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-4 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
                 Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
-              <a href="mailto:info@mind-reply.com?subject=MindReply%20Website%20Completion%20Package" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
-                Email MindReply <Mail aria-hidden className="h-4 w-4" />
-              </a>
+              <Link href="/contact?intent=website-completion" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+                Contact form <Mail aria-hidden className="h-4 w-4" />
+              </Link>
             </div>
           </section>
         </div>

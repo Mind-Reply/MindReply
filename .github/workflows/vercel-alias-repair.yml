@@ -1,0 +1,214 @@
+name: MindReply Emergency Vercel Alias Repair
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      deployment_id:
+        description: Vercel deployment id to alias.
+        required: false
+        type: string
+        default: dpl_FK9VqUruBXUoZgWyY3M546U5zmk1
+      deployment_url:
+        description: Vercel deployment URL to verify against.
+        required: false
+        type: string
+        default: https://mindreply-ickm8ik48-angellllkr-engs-projects.vercel.app
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mindreply-emergency-alias-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    name: Repoint production aliases to verified deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_TEAM_ID: team_0plIJmQLgZC1wVv9zI2eVf3B
+      GOOD_DEPLOYMENT_ID: ${{ github.event.inputs.deployment_id || 'dpl_FK9VqUruBXUoZgWyY3M546U5zmk1' }}
+      GOOD_DEPLOYMENT_URL: ${{ github.event.inputs.deployment_url || 'https://mindreply-ickm8ik48-angellllkr-engs-projects.vercel.app' }}
+      GOOD_DEPLOYMENT_SHA: 8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8
+      MINDREPLY_LIVE_VERIFY_URL: https://www.mind-reply.com
+      MINDREPLY_LIVE_REVENUE_JSON: mindreply-live-revenue-surface.json
+      MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: true
+      MINDREPLY_REPORT_SUBJECT: MindReply emergency alias repair report
+      MINDREPLY_REPORT_ENABLED: ${{ vars.MINDREPLY_REPORT_ENABLED || 'true' }}
+      MINDREPLY_REPORT_DRY_RUN: ${{ vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
+      MINDREPLY_REPORT_CHANNELS: ${{ vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
+      MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || secrets.OPS_REPORT_EMAIL_TO || vars.MINDREPLY_REPORT_EMAIL || vars.REPORT_TO_EMAIL }}
+      MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS }}
+      MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || secrets.OPS_REPORT_EMAIL_FROM || vars.MINDREPLY_REPORT_FROM || vars.RESEND_FROM }}
+      MINDREPLY_REPORT_EMAIL_ALLOWLIST: ${{ secrets.MINDREPLY_REPORT_EMAIL_ALLOWLIST || secrets.OPS_REPORT_EMAIL_ALLOWLIST || vars.REPORT_EMAIL_ALLOWLIST }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL || secrets.SLACK_WEBHOOK_URL }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - name: Check current live production before aliasing
+        shell: bash
+        run: |
+          set +e
+          rm -f /tmp/mindreply-home.html /tmp/mindreply-contact.html /tmp/mindreply-health.json /tmp/mindreply-version.json
+          curl --fail --show-error --silent https://www.mind-reply.com/ > /tmp/mindreply-home.html
+          home_ok=$?
+          curl --fail --show-error --silent https://www.mind-reply.com/contact > /tmp/mindreply-contact.html
+          contact_ok=$?
+          curl --fail --show-error --silent https://www.mind-reply.com/api/health > /tmp/mindreply-health.json
+          health_ok=$?
+          curl --fail --show-error --silent https://www.mind-reply.com/api/version > /tmp/mindreply-version.json
+          version_ok=$?
+          set -e
+
+          if [ "$home_ok" = "0" ] && [ "$contact_ok" = "0" ] && [ "$health_ok" = "0" ] && [ "$version_ok" = "0" ] \
+            && ! grep -qi "gmail.com" /tmp/mindreply-home.html /tmp/mindreply-contact.html \
+            && grep -q "Reclaim 2+ hours daily within 24 hours" /tmp/mindreply-home.html \
+            && grep -q "Website Completion Package" /tmp/mindreply-home.html /tmp/mindreply-contact.html \
+            && grep -q "GBP 600" /tmp/mindreply-home.html /tmp/mindreply-contact.html \
+            && grep -q "info@mind-reply.com" /tmp/mindreply-contact.html \
+            && grep -q '"status":"ok"' /tmp/mindreply-version.json \
+            && grep -q '"status":"ok"' /tmp/mindreply-health.json; then
+            echo "MINDREPLY_SKIP_ALIAS=true" >> "$GITHUB_ENV"
+            cat > mindreply-alias-repair-report.md <<EOF
+          # MindReply Emergency Alias Repair
+
+          Status: green
+          Action: skipped alias assignment because current production already passes.
+          Public domains checked: www.mind-reply.com, mind-reply.com
+          EOF
+            echo "Live production already passes. Skipping alias repair."
+          else
+            echo "Live production does not pass yet. Alias repair will run."
+          fi
+
+      - name: Require Vercel token
+        if: env.MINDREPLY_SKIP_ALIAS != 'true'
+        shell: bash
+        run: test -n "$VERCEL_TOKEN"
+
+      - name: Verify source deployment metadata before aliasing
+        if: env.MINDREPLY_SKIP_ALIAS != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --show-error --silent \
+            --url "https://api.vercel.com/v13/deployments/${GOOD_DEPLOYMENT_ID}?teamId=${VERCEL_TEAM_ID}" \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            > good-deployment.json
+          grep -q "${GOOD_DEPLOYMENT_ID}" good-deployment.json
+          grep -q '"name"[[:space:]]*:[[:space:]]*"mindreply"' good-deployment.json
+          grep -Eq '"(readyState|state)"[[:space:]]*:[[:space:]]*"READY"' good-deployment.json
+          grep -q "${GOOD_DEPLOYMENT_SHA}" good-deployment.json
+
+      - name: Assign public aliases to verified deployment
+        if: env.MINDREPLY_SKIP_ALIAS != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          : > alias-responses.jsonl
+          assign_alias() {
+            local alias_name="$1"
+            local response_file="alias-${alias_name//./-}.json"
+            curl --fail-with-body --show-error --silent \
+              --request POST \
+              --url "https://api.vercel.com/v2/deployments/${GOOD_DEPLOYMENT_ID}/aliases?teamId=${VERCEL_TEAM_ID}" \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"alias\":\"${alias_name}\",\"redirect\":null}" \
+              | tee "$response_file"
+            cat "$response_file" >> alias-responses.jsonl
+            printf '\n' >> alias-responses.jsonl
+          }
+
+          assign_alias "www.mind-reply.com"
+          assign_alias "mind-reply.com"
+          assign_alias "mindreply-mr-64b2efc9.vercel.app"
+
+      - name: Verify live production revenue and privacy surface
+        if: env.MINDREPLY_SKIP_ALIAS != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 12
+          curl --fail --show-error --silent https://www.mind-reply.com/ > /tmp/mindreply-home.html
+          curl --fail --show-error --silent https://www.mind-reply.com/contact > /tmp/mindreply-contact.html
+          curl --fail --show-error --silent https://www.mind-reply.com/api/health > /tmp/mindreply-health.json
+          curl --fail --show-error --silent https://www.mind-reply.com/api/version > /tmp/mindreply-version.json
+
+          if grep -qi "gmail.com" /tmp/mindreply-home.html /tmp/mindreply-contact.html; then
+            echo "Public production still contains gmail.com. Alias repair failed."
+            exit 1
+          fi
+
+          grep -q "Reclaim 2+ hours daily within 24 hours" /tmp/mindreply-home.html
+          grep -q "Website Completion Package" /tmp/mindreply-home.html /tmp/mindreply-contact.html
+          grep -q "GBP 600" /tmp/mindreply-home.html /tmp/mindreply-contact.html
+          grep -q "info@mind-reply.com" /tmp/mindreply-contact.html
+          grep -q '"status":"ok"' /tmp/mindreply-version.json
+          grep -q '"status":"ok"' /tmp/mindreply-health.json
+
+          package_status="$(curl --show-error --silent --output /tmp/mindreply-package-request.json --write-out '%{http_code}' \
+            --request POST https://www.mind-reply.com/api/package-request \
+            --header 'Content-Type: application/json' \
+            --data '{}')"
+          if [ "$package_status" != "400" ]; then
+            echo "Expected /api/package-request invalid input to return 400, got $package_status."
+            cat /tmp/mindreply-package-request.json
+            exit 1
+          fi
+
+          cat > mindreply-alias-repair-report.md <<EOF
+          # MindReply Emergency Alias Repair
+
+          Status: green
+          Deployment aliased: ${GOOD_DEPLOYMENT_ID}
+          Deployment URL: ${GOOD_DEPLOYMENT_URL}
+          Public domains checked: www.mind-reply.com, mind-reply.com
+
+          Live proof:
+          - /contact returned info@mind-reply.com and no gmail.com
+          - /api/version returned status ok
+          - /api/health returned status ok
+          - Homepage returned Website Completion Package, GBP 600, and Reclaim 2+ hours daily within 24 hours
+          - /api/package-request rejected invalid input with 400
+          EOF
+
+      - name: Checkout for optional owner report
+        if: always()
+        uses: actions/checkout@v4
+
+      - name: Setup Node for optional owner report
+        if: always()
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Send optional owner repair report
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          npm install
+          npm run launch:report || true
+          npm run report:send || true
+
+      - name: Upload repair artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mindreply-emergency-alias-repair
+          path: |
+            alias-*.json
+            alias-responses.jsonl
+            good-deployment.json
+            mindreply-alias-repair-report.md
+            mindreply-live-revenue-surface.json
+            reports/outbox/**
+          if-no-files-found: ignore

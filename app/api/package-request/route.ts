@@ -23,8 +23,9 @@ export async function POST(request: Request) {
       packageValue: receipt.packageValue,
       message:
         delivery.status === "sent"
-          ? "MindReply received the package request and will use the public reply route."
-          : "MindReply prepared a receipt. Use the fallback email route if delivery is blocked.",
+          ? "MindReply received the package request. Expect the next close-ready invoice or payment route within one business day."
+          : "MindReply prepared a receipt. Use info@mind-reply.com with the receipt id, billing email, and redacted context if delivery is blocked.",
+      assistedClose: receipt.assistedClose,
       receipt,
     },
     { status: ok ? 200 : 202 },
