@@ -31,7 +31,7 @@ jobs:
       MINDREPLY_REPORT_DRY_RUN: ${{ github.event.inputs.dry_run || vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
       MINDREPLY_REPORT_CHANNELS: ${{ github.event.inputs.channels || vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
       MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || secrets.OPS_REPORT_EMAIL_TO || vars.MINDREPLY_REPORT_EMAIL || vars.REPORT_TO_EMAIL || 'angellllkr@gmail.com' }}
-      MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS || 'angellllkr@gmail.com,info@mind-reply.com' }}
+      MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS || 'angellllkr@gmail.com' }}
       MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || secrets.OPS_REPORT_EMAIL_FROM || vars.MINDREPLY_REPORT_FROM || vars.RESEND_FROM }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL || secrets.SLACK_WEBHOOK_URL }}

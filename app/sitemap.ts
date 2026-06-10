@@ -2,7 +2,19 @@ import type { MetadataRoute } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.mind-reply.com";
 
-const languageParams = ["es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
+const languageParams = [
+  "en",
+  "es",
+  "fr",
+  "de",
+  "pt",
+  "ar",
+  "hi",
+  "ja",
+  "zh",
+  "uk",
+  "bg",
+] as const;
 
 const routes = [
   { path: "/", priority: 1, changeFrequency: "daily" as const, localized: true },
@@ -18,10 +30,7 @@ const routes = [
 ];
 
 function localeAlternates(path: string) {
-  return {
-    en: `${siteUrl}${path}`,
-    ...Object.fromEntries(languageParams.map((locale) => [locale, `${siteUrl}${path}?lang=${locale}`])),
-  };
+  return Object.fromEntries(languageParams.map((locale) => [locale, `${siteUrl}${path}?lang=${locale}`]));
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {

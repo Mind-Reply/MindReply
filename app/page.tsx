@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BarChart3,
   Brain,
   CheckCircle2,
   ClipboardList,
@@ -25,7 +26,7 @@ const packageCtaLabel = packagePaymentUrl ? "Pay GBP 600" : "Checkout or request
 const packageRouteLabel = packagePaymentUrl ? "Direct payment enabled" : "Checkout and invoice route ready";
 const packageRouteCopy = packagePaymentUrl
   ? "Scope is confirmed first, then the configured payment link is used before delivery."
-  : "No payment link is required to begin. MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice before delivery.";
+  : "No payment link is required to begin. MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice before delivery so the invoice-first route works for B2B buyers.";
 
 const navItems = [
   { label: "Offer", href: "#offer" },
@@ -76,12 +77,12 @@ const toolRows = [
 
 const authoritySignals = [
   {
-    title: "20+ professional lexicons",
+    title: "Discipline-specific language",
     copy: "Founder updates, client delivery, legal-sensitive wording, finance pressure, clinical tone, recruiting replies, and executive messages each need different restraint.",
     icon: FileText,
   },
   {
-    title: "Behavioral communication read",
+    title: "Behavioral expression read",
     copy: "MRagent names the protected feeling, the likely friction, and the next move without turning the answer into a long essay.",
     icon: HeartHandshake,
   },
@@ -131,11 +132,11 @@ const upgradeSteps = [
   },
   {
     title: "Growth",
-    copy: "For recurring weekly overload across inboxes, client replies, follow-ups, and small team message queues.",
+    copy: "For repeated daily overload: customer responses, follow-ups, sales messages, task threads, and small-team communication rhythm.",
   },
   {
     title: "Pro",
-    copy: "For high-trust continuity, sensitive professional tone, approved memory, receipt review, and integration lanes when credentials exist.",
+    copy: "For sensitive client, sales, hiring, legal-adjacent, founder, finance, and reputation-critical communication that needs deeper refinement and control.",
   },
 ];
 

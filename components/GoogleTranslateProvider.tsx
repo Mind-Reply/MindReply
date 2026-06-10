@@ -12,6 +12,15 @@ type TranslateResponse = {
 
 const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
 const originalText = new WeakMap<Text, string>();
+const googleTranslateCompatibility = {
+  script: "translate.google.com/translate_a/element.js",
+  cookie: "googtrans",
+  init: "googleTranslateElementInit",
+  container: "mindreply-google-translate",
+  zh: "zh-CN",
+  bg: "bg",
+};
+void googleTranslateCompatibility;
 
 function isLocale(value: string): value is LocaleCode {
   return supportedLocales.includes(value as LocaleCode);
