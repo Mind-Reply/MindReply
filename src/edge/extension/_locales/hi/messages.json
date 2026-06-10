@@ -1,0 +1,6 @@
+{
+  "extName": { "message": "MindReply निर्णय परत" },
+  "extDescription": { "message": "इनलाइन इनपुट, एक अनुशंसित कार्रवाई, और शांत मेमरी अपडेट." },
+  "extActionTitle": { "message": "MindReply" },
+  "contextClarifyNextMove": { "message": "MindReply: अगला कदम स्पष्ट करें" }
+}
