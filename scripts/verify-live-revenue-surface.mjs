@@ -154,9 +154,14 @@ check(checks, "response-overload-ad-page", includes(responseOverload.text, "Resp
 check(checks, "response-overload-paid-path", includes(responseOverload.text, "Credits") && includes(responseOverload.text, "GBP 600 package") && includes(responseOverload.text, "Growth or Pro"), "Response overload page must show the free-to-paid path.");
 check(checks, "footer-market-strip", includes(home.text, "Language and market fit") || includes(home.text, "Full-site translation uses Google Translate"), "Live footer must expose the quiet language and market strip, not noisy auto placeholders.");
 check(checks, "no-auto-bg-placeholder", !includes(home.text, "{AUTO BG}") && !includes(home.text, "Auto country signal first"), "Live footer must not expose raw auto-language placeholder copy.");
-check(checks, "market-priority-meta", includes(home.text, "target-market-priority") && includes(home.text, "India") && includes(home.text, "Bulgaria"), "Live metadata must include the current priority-market order and Bulgaria.");
-check(checks, "geo-locale-market-profiles", geoLocale.status === 200 && Array.isArray(geoLocale.json?.marketProfiles) && geoLocale.json.marketProfiles.length >= 11, `Geo locale status ${geoLocale.status}; market profiles ${geoLocale.json?.marketProfiles?.length ?? "missing"}.`);
-check(checks, "geo-locale-bulgaria", includes(geoLocale.text, "Bulgaria") && includes(geoLocale.text, "bg"), "Geo locale must include Bulgaria targeting.");
+check(
+  checks,
+  "visitor-matched-language-meta",
+  includes(home.text, "target-market-priority") && includes(home.text, "Visitor IP country") && includes(home.text, "browser language") && !includes(home.text, "Bulgaria") && !includes(home.text, "Bulgarian"),
+  "Live metadata must describe visitor IP/browser language matching without Bulgaria-specific SEO.",
+);
+check(checks, "geo-locale-market-profiles", geoLocale.status === 200 && Array.isArray(geoLocale.json?.marketProfiles) && geoLocale.json.marketProfiles.length >= 10, `Geo locale status ${geoLocale.status}; market profiles ${geoLocale.json?.marketProfiles?.length ?? "missing"}.`);
+check(checks, "geo-locale-no-bulgarian-targeting", !includes(geoLocale.text, "Bulgaria") && !includes(geoLocale.text, "Bulgarian") && !includes(geoLocale.text, "\"bg\""), "Geo locale must not advertise Bulgaria/Bulgarian targeting.");
 check(checks, "geo-locale-brazil", includes(geoLocale.text, "Brazil") && includes(geoLocale.text, "pt"), "Geo locale must include Brazil Portuguese targeting.");
   const allowsRetiredRobotsPath = /^allow:\s*\/(?:agents|pack)(?:$|\s)/im.test(robots.text);
   check(
@@ -167,7 +172,17 @@ check(checks, "geo-locale-brazil", includes(geoLocale.text, "Brazil") && include
   );
 check(checks, "robots-commercial-routes", robots.status === 200 && includes(robots.text, "/products") && includes(robots.text, "/checkout") && includes(robots.text, "/trust"), "Robots must allow the product, checkout, and trust surfaces.");
 check(checks, "sitemap-no-stale-public-routes", sitemap.status === 200 && !sitemap.text.includes("<loc>https://www.mind-reply.com/agents</loc>") && !sitemap.text.includes("<loc>https://www.mind-reply.com/pack</loc>"), "Sitemap must not index retired /agents or /pack routes.");
-check(checks, "sitemap-commercial-routes", sitemap.status === 200 && includes(sitemap.text, "/products") && includes(sitemap.text, "/checkout") && includes(sitemap.text, "/response-overload") && includes(sitemap.text, "/trust") && includes(sitemap.text, "lang=bg"), "Sitemap must include products, checkout, response-overload, trust, and Bulgarian language alternates.");
+check(
+  checks,
+  "sitemap-commercial-routes",
+  sitemap.status === 200 &&
+    includes(sitemap.text, "/products") &&
+    includes(sitemap.text, "/checkout") &&
+    includes(sitemap.text, "/response-overload") &&
+    includes(sitemap.text, "/trust") &&
+    !includes(sitemap.text, "lang=bg"),
+  "Sitemap must include products, checkout, response-overload, trust, and avoid Bulgarian-specific language alternates.",
+);
 
 const failed = checks.filter((item) => !item.pass && item.severity === "error");
 const warnings = checks.filter((item) => !item.pass && item.severity !== "error");
