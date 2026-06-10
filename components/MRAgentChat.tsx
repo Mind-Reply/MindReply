@@ -32,7 +32,7 @@ const starter: ChatMessage = {
     "Come here. Put the charged thing down for a second. I will read the pressure beneath it, name what your mind is protecting, and hand you one composed move.",
 };
 
-const readingPhases = ["listening under the words", "finding the pressure pattern", "checking the risk gate", "choosing one clean move"];
+const readingPhases = ["Reading", "Preparing reply"];
 const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
 const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
 const packageCtaLabel = packagePaymentUrl ? "Pay for Website Completion Package" : "Request GBP 600 package invoice";
@@ -42,10 +42,6 @@ function makeId(prefix: string) {
     return `${prefix}-${crypto.randomUUID()}`;
   }
   return `${prefix}-${Date.now().toString(36)}`;
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function confidenceText(value?: number) {
@@ -121,12 +117,8 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
     setPhaseIndex(0);
 
     try {
-      for (let index = 0; index < readingPhases.length; index += 1) {
-        setPhaseIndex(index);
-        await sleep(index === 0 ? 420 : 560);
-      }
-
-      const data = await requestMindRead(text);
+      const phaseTimer = window.setTimeout(() => setPhaseIndex(1), 550);
+      const data = await requestMindRead(text).finally(() => window.clearTimeout(phaseTimer));
 
       if (typeof data.reply !== "string" || !data.decision) {
         setError(data.error ?? "MRagent could not read that cleanly. Bring the pressure a little closer.");
@@ -293,7 +285,7 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
               <ArrowUp size={18} />
             </button>
           </div>
-          <p className="mt-2 text-xs text-[#8fa0b8]">Ctrl+Enter sends. MRagent slows the moment before it moves.</p>
+          <p className="mt-2 text-xs text-[#8fa0b8]">Ctrl+Enter sends. One read, one next move, one receipt.</p>
         </div>
       </div>
     </section>
