@@ -4,7 +4,7 @@ import {
   CheckCircle2,
   ClipboardList,
   LockKeyhole,
-  Mail, 
+  Mail,
   MessageCircle,
   ReceiptText,
   ShieldCheck,
@@ -101,13 +101,13 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="px-4 py-12 md:px-8">
+      <section className="px-4 py-12 md:px-8" data-package-request-route="/api/package-request">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.72fr_1.28fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">When to contact</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Use this page for buying friction, not vague browsing.</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
-              The clean route is simple: MRagent resolves the pressure when it can. Contact handles package requests, billing, security owner decisions, and anything that needs a human answer.
+              The clean route is simple: MRagent resolves the pressure when it can. Contact form handles package requests, billing, security owner decisions, and anything that needs a human answer.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">

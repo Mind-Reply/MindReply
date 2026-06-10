@@ -231,10 +231,10 @@ export default function Home() {
               Website buying-friction rescue
             </div>
             <h1 className="mt-7 max-w-3xl font-serif text-5xl font-bold leading-[0.94] md:text-7xl">
-              Reclaim 2+ hours daily within 24 hours when your page, inbox, or follow-up path is leaking decisions.
+              Reclaim 2+ hours daily when your page, inbox, or follow-up path is leaking decisions.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
-              MindReply turns overloaded pages, replies, and client follow-ups into one ranked action queue or one send-ready message. Start with MRagent. Buy the GBP 600 Website Completion Package when the leak is bigger than one reply.
+              MindReply turns overloaded pages, replies, and client follow-ups into one ranked action queue or one send-ready message within 24 hours. Start with MRagent. Buy the GBP 600 Website Completion Package when the leak is bigger than one reply.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">

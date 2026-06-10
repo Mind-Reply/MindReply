@@ -6,6 +6,7 @@ const countryLocale: Record<string, string> = {
   AT: "de",
   AU: "en",
   BE: "fr",
+  BG: "bg",
   BR: "pt",
   CA: "en",
   CH: "de",
@@ -35,7 +36,7 @@ const countryLocale: Record<string, string> = {
   US: "en",
 };
 
-const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
+const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
 
 const priorityMarkets = [
   "United Kingdom",
@@ -48,6 +49,7 @@ const priorityMarkets = [
   "Brazil",
   "France",
   "Spain",
+  "Bulgaria",
 ];
 
 const marketProfiles = [
@@ -120,6 +122,13 @@ const marketProfiles = [
     priority: 10,
     demand: "Spanish-language gateway for sales objection and agency follow-up use cases",
     providerGap: "clear entry into Spanish-speaking markets without overbuilding every route first",
+  },
+  {
+    country: "Bulgaria",
+    locale: "bg",
+    priority: 11,
+    demand: "Bulgarian professional-services, founders, and client-facing operators needing precise business communication support",
+    providerGap: "localized Bulgarian decision-support and website-completion positioning is less crowded than broad English AI writing tools",
   },
 ];
 

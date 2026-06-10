@@ -31,6 +31,7 @@ const priorityMarkets = [
   "Brazil",
   "France",
   "Spain",
+  "Bulgaria",
 ];
 
 export default function SiteFooter() {
@@ -58,7 +59,7 @@ export default function SiteFooter() {
               <p className="text-xs font-bold uppercase tracking-[0.18em]">Quiet language assist</p>
             </div>
             <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
-                Auto country signal first, browser language second. The manual selector stays available, and Google Translate or the visitor's browser can handle full-page translation when needed. High-demand regions: {priorityMarkets.join(" / ")}.
+                Language and market fit stays quiet. Country signal guides the first suggestion, then browser language refines it. The manual selector stays available, and Google Translate or the visitor's browser can handle full-page translation when needed. High-demand regions: {priorityMarkets.join(" / ")}.
             </p>
             <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
                 Public contact uses {supportEmail}. For package scope, use the contact form or checkout path first.
