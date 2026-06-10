@@ -114,6 +114,12 @@ jobs:
 
       - name: Build production artifact
         if: steps.live.outputs.current != 'true'
+        env:
+          NEXT_PUBLIC_MINDREPLY_BUILD_COMMIT_SHA: ${{ github.sha }}
+          NEXT_PUBLIC_MINDREPLY_BUILD_BRANCH: ${{ github.ref_name }}
+          NEXT_PUBLIC_MINDREPLY_BUILD_ENVIRONMENT: production
+          NEXT_PUBLIC_MINDREPLY_BUILD_URL: https://www.mind-reply.com
+          NEXT_PUBLIC_MINDREPLY_PROJECT_PRODUCTION_URL: https://www.mind-reply.com
         run: vercel build --prod --token "$VERCEL_TOKEN"
 
       - name: Deploy prebuilt artifact to production
