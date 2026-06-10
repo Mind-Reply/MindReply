@@ -139,6 +139,37 @@ const upgradeSteps = [
   },
 ];
 
+const firstSessionPath = [
+  {
+    label: "First user action",
+    copy: "Paste one tense reply, overloaded page section, client follow-up, or objection into MRagent.",
+  },
+  {
+    label: "First output",
+    copy: "Get one direct read: hidden friction, next move, confidence, risk, and a narrow receipt marker.",
+  },
+  {
+    label: "Aha moment",
+    copy: "The buyer sees the message or page does not need more wording; it needs a cleaner decision path.",
+  },
+  {
+    label: "Credit trigger",
+    copy: "Buy credits when several replies need the same quick polish but the website offer is not leaking buyers.",
+  },
+  {
+    label: "Package trigger",
+    copy: "Buy the GBP 600 package when the homepage, pricing, contact route, or offer copy needs repair.",
+  },
+  {
+    label: "Growth trigger",
+    copy: "Move to Growth when the same overload repeats every week across inbox, clients, or small team work.",
+  },
+  {
+    label: "Pro trigger",
+    copy: "Move to Pro when approved memory, receipt review, integration planning, or sensitive continuity is required.",
+  },
+];
+
 const proofItems = [
   "Public contact uses info@mind-reply.com only.",
   "MRagent is the first support route; contact is the assisted close when the question needs human follow-up.",
@@ -422,6 +453,26 @@ export default function Home() {
               <article key={step.title} className="rounded-lg border border-[#122033]/10 bg-[#f8f4ec] p-5">
                 <h3 className="font-serif text-2xl font-bold leading-tight">{step.title}</h3>
                 <p className="mt-4 text-sm leading-6 text-[#59687b]">{step.copy}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#122033]/10 bg-[#103b39] px-4 py-14 text-[#f8f5f0] md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#91d2c8]">First-session conversion logic</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The first session should make the next purchase obvious.</h2>
+            <p className="mt-5 text-sm leading-7 text-[#d3e5e2]">
+              MindReply does not need a long demo to sell. It needs one useful read, one visible next move, and a clear trigger for credits, the package, Growth, or Pro.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {firstSessionPath.map((item) => (
+              <article key={item.label} className="rounded-lg border border-white/10 bg-white/[0.06] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#e2b757]">{item.label}</p>
+                <p className="mt-3 text-sm leading-6 text-[#d3e5e2]">{item.copy}</p>
               </article>
             ))}
           </div>
