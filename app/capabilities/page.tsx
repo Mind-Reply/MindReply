@@ -102,7 +102,7 @@ export default function CapabilitiesPage() {
               Package
             </Link>
             <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
-              Try MRagent
+              Try MindReply Free
             </Link>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function CapabilitiesPage() {
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">First move</p>
-              <p className="mt-3 text-lg font-bold">Try MRagent</p>
+              <p className="mt-3 text-lg font-bold">Try MindReply Free</p>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Paid offer</p>

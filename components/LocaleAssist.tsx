@@ -68,14 +68,14 @@ const localeCopy: Record<LocaleCode, LocaleCopy> = {
     market: "India",
     promise: "Pressure becomes one clear next step.",
     packageLine: "Website Completion Package, GBP 600.",
-    contact: "Try MRagent first. Use the contact form when human help is needed.",
+    contact: "Try MindReply Free first. Use the contact form when human help is needed.",
   },
   ja: {
     label: "Japanese",
     market: "Japan",
     promise: "Heavy context becomes one clear next move.",
     packageLine: "Website Completion Package, GBP 600.",
-    contact: "Try MRagent first. Use the contact form when a human handoff is needed.",
+    contact: "Try MindReply Free first. Use the contact form when a human handoff is needed.",
   },
   zh: {
     label: "Chinese",
@@ -89,14 +89,14 @@ const localeCopy: Record<LocaleCode, LocaleCopy> = {
     market: "Ukraine / Eastern Europe",
     promise: "Pressure becomes one clear next step.",
     packageLine: "Website Completion Package, GBP 600.",
-    contact: "Try MRagent first. Use the contact form for human support.",
+    contact: "Try MindReply Free first. Use the contact form for human support.",
   },
   bg: {
     label: "Bulgarian",
     market: "Bulgaria / Eastern Europe",
     promise: "Pressure becomes one clear next step.",
     packageLine: "Website Completion Package, GBP 600.",
-    contact: "Try MRagent first. Use the contact form when human support is needed.",
+    contact: "Try MindReply Free first. Use the contact form when human support is needed.",
   },
 };
 
