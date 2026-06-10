@@ -18,8 +18,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: mindreply-hourly-owner-report
-  cancel-in-progress: false
+  group: mindreply-hourly-owner-report-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   owner-report:
@@ -30,9 +30,13 @@ jobs:
       MINDREPLY_REPORT_ENABLED: ${{ vars.MINDREPLY_REPORT_ENABLED || 'true' }}
       MINDREPLY_REPORT_DRY_RUN: ${{ github.event.inputs.dry_run || vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
       MINDREPLY_REPORT_CHANNELS: ${{ github.event.inputs.channels || vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
+      MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: ${{ vars.MINDREPLY_REPORT_REQUIRE_LIVE_PROOF || 'true' }}
       MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || secrets.OPS_REPORT_EMAIL_TO || vars.MINDREPLY_REPORT_EMAIL || vars.REPORT_TO_EMAIL }}
       MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS }}
       MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || secrets.OPS_REPORT_EMAIL_FROM || vars.MINDREPLY_REPORT_FROM || vars.RESEND_FROM }}
+      MINDREPLY_PACKAGE_REQUEST_TO: ${{ secrets.MINDREPLY_PACKAGE_REQUEST_TO || vars.MINDREPLY_PACKAGE_REQUEST_TO }}
+      MINDREPLY_PACKAGE_REQUEST_FROM: ${{ secrets.MINDREPLY_PACKAGE_REQUEST_FROM || vars.MINDREPLY_PACKAGE_REQUEST_FROM }}
+      MINDREPLY_PACKAGE_REQUEST_DRY_RUN: ${{ vars.MINDREPLY_PACKAGE_REQUEST_DRY_RUN || 'false' }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL || secrets.SLACK_WEBHOOK_URL }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -66,6 +70,14 @@ jobs:
       - name: Verify language and SEO positioning
         run: npm run seo:i18n:verify
 
+      - name: Capture live production revenue surface
+        continue-on-error: true
+        env:
+          MINDREPLY_LIVE_VERIFY_URL: ${{ env.NEXT_PUBLIC_SITE_URL }}
+          MINDREPLY_REQUIRE_LIVE_SHA_MATCH: "false"
+          MINDREPLY_REQUIRE_LIVE_DEPLOYMENT_MATCH: "false"
+        run: npm run verify:live-revenue
+
       - name: Send hourly owner report
         run: npm run report:send
 
@@ -79,4 +91,6 @@ jobs:
             reports/outbox/hourly-owner-delivery-receipt-latest.json
             reports/outbox/hourly-owner-report-*.md
             reports/outbox/hourly-owner-delivery-receipt-*.json
+            mindreply-live-revenue-surface.json
           if-no-files-found: warn
+          retention-days: 7
