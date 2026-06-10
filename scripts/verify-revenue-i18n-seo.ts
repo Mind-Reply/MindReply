@@ -28,6 +28,7 @@ const files = {
   googleTranslate: read("components/GoogleTranslateProvider.tsx"),
   translateRoute: read("app/api/translate/route.ts"),
   geoLocale: read("app/api/geo-locale/route.ts"),
+  locales: read("lib/locales.ts"),
   sitemap: read("app/sitemap.ts"),
   robots: read("app/robots.ts"),
   globals: read("app/globals.css"),
@@ -71,20 +72,20 @@ for (const phrase of [
   "visitor-matched multilingual support",
   "Visitor IP country > browser language > manual language selector",
   "IP aware business communication support",
+  "Bulgaria business communication support",
+  "Bulgarian professional reply support",
+  "content-language\": \"en, es, fr, de, pt, ar, hi, ja, zh, uk, bg",
   "GoogleTranslateProvider",
 ]) {
   includes("layout metadata", files.layout, phrase);
 }
-for (const forbidden of ["Bulgaria", "Bulgarian", "bg_BG", "bg: \"/?lang=bg\"", "target-market-priority\": \"UK >"]) {
+for (const forbidden of ["target-market-priority\": \"UK >"]) {
   excludes("layout metadata", files.layout, forbidden);
 }
 
-const localeCodes = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
+const localeCodes = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
 for (const locale of localeCodes) {
-  includes("locale assist", files.localeAssist, `${locale}: {`);
-}
-for (const locale of localeCodes.filter((locale) => locale !== "en")) {
-  includes("sitemap language params", files.sitemap, `\"${locale}\"`);
+  includes("shared locales", files.locales, `${locale}: {`);
 }
 
 for (const phrase of [
@@ -105,7 +106,7 @@ for (const phrase of [
 ]) {
   includes("locale assist", files.localeAssist, phrase);
 }
-for (const forbidden of ["BG: \"bg\"", "Bulgarian", "Bulgaria / Eastern Europe", "11 priority", "11 supported", "priority markets"]) {
+for (const forbidden of ["Bulgaria / Eastern Europe", "11 priority", "11 supported", "priority markets"]) {
   excludes("locale assist", files.localeAssist, forbidden);
 }
 excludes("locale assist", files.localeAssist, "Auto country signal first");
@@ -123,7 +124,6 @@ for (const phrase of [
 ]) {
   includes("google translate provider", files.googleTranslate, phrase);
 }
-excludes("google translate provider", files.googleTranslate, /"bg"|bg:\s*"bg"|bg:\s*"Bulgarian"/);
 
 for (const phrase of [
   "GOOGLE_TRANSLATE_API_KEY",
@@ -146,14 +146,30 @@ for (const phrase of [
 ]) {
   includes("geo locale", files.geoLocale, phrase);
 }
-for (const forbidden of ["BG: \"bg\"", "Bulgaria", "locale: \"bg\"", "priority: 11", "\"bg\""]) {
-  excludes("geo locale", files.geoLocale, forbidden);
+for (const phrase of [
+  "Bulgaria",
+  "locale: \"bg\"",
+  "Bulgarian-first professional reply and decision-support coverage remains thin",
+  "priority: 10.75",
+]) {
+  includes("geo locale", files.geoLocale, phrase);
 }
 
-for (const phrase of ["/products", "/checkout", "/response-overload", "/website-completion-package", "/trust", "languageParams", "alternates:", "hi", "uk", "?lang=${locale}"]) {
+for (const phrase of [
+  "/products",
+  "/checkout",
+  "/response-overload",
+  "/website-completion-package",
+  "/trust",
+  "supportedLocales",
+  "localeAlternates",
+  "localizedPath",
+  "languageParams",
+  "const alternates",
+  "?lang=${locale}",
+]) {
   includes("sitemap", files.sitemap, phrase);
 }
-excludes("sitemap", files.sitemap, "\"bg\"");
 
 for (const phrase of ["/products", "/checkout", "/website-completion-package", "/trust", "disallow: [\"/api/\", \"/mcp\", \"/agents\", \"/pack\"]"]) {
   includes("robots", files.robots, phrase);
@@ -192,15 +208,16 @@ for (const phrase of [
   "MRAGENT_PROVIDER_BASE_URL",
   "MRAGENT_PROVIDER_API_KEY",
   "supportedAgentLanguages",
-  "Mirror the user's supported language",
-  "Supported languages include English, Spanish, French, German, Portuguese, Arabic, Hindi, Japanese, Chinese, and Ukrainian",
+  "Reply in ${locale.label}",
+  "Bulgarian",
+  "Supported languages: ${supportedAgentLanguages.join",
   "Vary rhythm and wording each time",
+  "slightly slower pace",
   "Use 2-3 short paragraphs, 45-85 words",
   "max_output_tokens: 145",
 ]) {
   includes("mragent", files.mragent, phrase);
 }
-excludes("mragent", files.mragent, "Bulgarian");
 
 for (const phrase of ["Assisted close", "Ask MRagent first", "info@mind-reply.com", "PackageRequestForm"]) {
   includes("contact page", files.contact, phrase);
@@ -277,7 +294,7 @@ for (const phrase of [
 for (const phrase of ["Visitor-matched language", "IP-country route", "browser-language fallback", "Google Translate fallback", "Visitor IP, browser language, and manual selection"]) {
   includes("capabilities", files.capabilities, phrase);
 }
-for (const forbidden of ["11 priority languages", "Bulgarian support", "Bulgarian is included"]) {
+for (const forbidden of ["11 priority languages"]) {
   excludes("capabilities", files.capabilities, forbidden);
 }
 

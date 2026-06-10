@@ -157,8 +157,12 @@ check(checks, "no-auto-bg-placeholder", !includes(home.text, "{AUTO BG}") && !in
 check(
   checks,
   "visitor-matched-language-meta",
-  includes(home.text, "target-market-priority") && includes(home.text, "Visitor IP country") && includes(home.text, "browser language") && !includes(home.text, "Bulgaria") && !includes(home.text, "Bulgarian"),
-  "Live metadata must describe visitor IP/browser language matching without Bulgaria-specific SEO.",
+  includes(home.text, "target-market-priority") &&
+    includes(home.text, "Visitor IP country") &&
+    includes(home.text, "browser language") &&
+    includes(home.text, "Bulgaria business communication support") &&
+    includes(home.text, "Bulgarian professional reply support"),
+  "Live metadata must describe visitor IP/browser language matching and include the Bulgarian support signals.",
 );
 check(checks, "geo-locale-market-profiles", geoLocale.status === 200 && Array.isArray(geoLocale.json?.marketProfiles) && geoLocale.json.marketProfiles.length >= 10, `Geo locale status ${geoLocale.status}; market profiles ${geoLocale.json?.marketProfiles?.length ?? "missing"}.`);
 const geoSupportedLocales = Array.isArray(geoLocale.json?.supportedLocales) ? geoLocale.json.supportedLocales : [];
@@ -171,9 +175,9 @@ const hasBulgarianLanguageTarget =
   });
 check(
   checks,
-  "geo-locale-no-bulgarian-targeting",
-  geoLocale.status === 200 && !hasBulgarianLanguageTarget && !includes(geoLocale.text, "Bulgaria") && !includes(geoLocale.text, "Bulgarian"),
-  "Geo locale may report visitor country code BG, but must not advertise Bulgaria/Bulgarian language targeting.",
+  "geo-locale-bulgarian-targeting",
+  geoLocale.status === 200 && hasBulgarianLanguageTarget && includes(geoLocale.text, "Bulgaria") && includes(geoLocale.text, "Bulgarian"),
+  "Geo locale must expose Bulgarian support through shared supported locales and the Bulgaria market profile.",
 );
 check(checks, "geo-locale-brazil", includes(geoLocale.text, "Brazil") && includes(geoLocale.text, "pt"), "Geo locale must include Brazil Portuguese targeting.");
   const allowsRetiredRobotsPath = /^allow:\s*\/(?:agents|pack)(?:$|\s)/im.test(robots.text);
@@ -193,8 +197,8 @@ check(
     includes(sitemap.text, "/checkout") &&
     includes(sitemap.text, "/response-overload") &&
     includes(sitemap.text, "/trust") &&
-    !includes(sitemap.text, "lang=bg"),
-  "Sitemap must include products, checkout, response-overload, trust, and avoid Bulgarian-specific language alternates.",
+    includes(sitemap.text, "lang=bg"),
+  "Sitemap must include products, checkout, response-overload, trust, and Bulgarian language alternates.",
 );
 
 const failed = checks.filter((item) => !item.pass && item.severity === "error");
