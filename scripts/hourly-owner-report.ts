@@ -78,6 +78,7 @@ async function main() {
   const reportSenderConfigured = configured("MINDREPLY_REPORT_FROM");
   const reportProviderConfigured = configured("RESEND_API_KEY");
   const slackConfigured = configured("MINDREPLY_SLACK_WEBHOOK_URL", "SLACK_WEBHOOK_URL");
+  const slackDmInviteAvailable = process.env.MINDREPLY_SLACK_DM_INVITE_AVAILABLE === "true";
   const packageRecipientConfigured = configured("MINDREPLY_PACKAGE_REQUEST_TO", "MINDREPLY_REPORT_EMAIL", "MINDREPLY_REPORT_EMAILS");
   const packageSenderConfigured = configured("MINDREPLY_PACKAGE_REQUEST_FROM", "MINDREPLY_REPORT_FROM");
   const packageProviderConfigured = reportProviderConfigured;
@@ -195,6 +196,8 @@ ${deployStatus}
 - Report sender configured: ${reportSenderConfigured}
 - Resend key configured: ${reportProviderConfigured}
 - Slack webhook configured: ${slackConfigured}
+- Slack DM invite handoff available: ${slackDmInviteAvailable}
+- Slack invite URL committed: false
 
 ## Defensive Security Boundary
 
@@ -226,7 +229,7 @@ Owner reports are private and redacted. Do not include secrets, tokens, raw priv
     },
     delivery: {
       email: { status: "pending", recipientConfigured: reportRecipientConfigured, senderConfigured: reportSenderConfigured, providerConfigured: reportProviderConfigured },
-      slack: { status: "pending", webhookConfigured: slackConfigured },
+      slack: { status: "pending", webhookConfigured: slackConfigured, dmInviteAvailable: slackDmInviteAvailable, inviteUrlCommitted: false },
     },
     blockers,
   };

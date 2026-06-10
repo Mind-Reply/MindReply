@@ -18,6 +18,9 @@ const workflow = readRequired(".github/workflows/hourly-owner-report.yml");
 const prompt = readRequired("docs/hourly_owner_goal_prompt.md");
 const sender = readRequired("scripts/send-hourly-owner-report.ts");
 const generator = readRequired("scripts/hourly-owner-report.ts");
+const slackOps = readRequired("docs/ops/slack-email-reporting.md");
+const slackApi = readRequired("site/automation/slack-api.yml");
+const reportSchema = readRequired("site/automation/report-schema.yml");
 
 const requiredScripts = ["report:check", "launch:report", "audit:blueprint", "report:send", "verify:live-revenue"];
 for (const script of requiredScripts) {
@@ -48,13 +51,15 @@ assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Workflow must expose 
 assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_FROM.");
 assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_DRY_RUN"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_DRY_RUN.");
 assert(workflow.includes("MINDREPLY_SLACK_WEBHOOK_URL") || workflow.includes("SLACK_WEBHOOK_URL"), "Workflow must expose a Slack webhook path.");
+assert(workflow.includes("MINDREPLY_SLACK_DM_INVITE_AVAILABLE"), "Workflow must expose the non-secret Slack DM invite availability flag.");
 assert(workflow.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "Workflow must expose the package payment URL variable.");
 assert(workflow.includes("actions/upload-artifact"), "Workflow must upload report artifacts.");
 
-const publicConfigText = [workflow, prompt].join("\n");
+const publicConfigText = [workflow, prompt, slackOps, slackApi, reportSchema].join("\n");
 assert(!/gmail\.com/i.test(publicConfigText), "Do not hardcode personal Gmail addresses in public workflow or docs.");
+assert(!/join\.slack\.com/i.test(publicConfigText), "Do not commit private Slack invite URLs in workflow or docs.");
 
-const contractText = [prompt, sender, generator, workflow].join("\n");
+const contractText = [prompt, sender, generator, workflow, slackOps, slackApi, reportSchema].join("\n");
 for (const phrase of [
   "Website Completion Package",
   "revenue system",
@@ -67,6 +72,8 @@ for (const phrase of [
   "invoice",
   "defensive security boundary",
   "Slack",
+  "Slack DM invite",
+  "MINDREPLY_SLACK_DM_INVITE_AVAILABLE",
   "email",
   "Live Production Revenue Surface",
 ]) {
@@ -81,5 +88,7 @@ assert(generator.includes("RESEND_API_KEY"), "Hourly generator must inspect pack
 assert(sender.includes("readLiveRevenueProof"), "Sender must attach live revenue proof when available.");
 assert(sender.includes("MINDREPLY_REPORT_REQUIRE_LIVE_PROOF"), "Sender must be able to block delivery when live proof is missing.");
 assert(sender.includes("liveRevenueSurface"), "Delivery receipt must include live revenue surface status.");
+assert(generator.includes("dmInviteAvailable"), "Hourly receipt must include Slack DM invite availability status.");
+assert(generator.includes("inviteUrlCommitted: false"), "Hourly receipt must prove the raw Slack invite URL was not committed.");
 
 console.log("Hourly owner report automation contract verified.");

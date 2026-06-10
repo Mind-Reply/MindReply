@@ -9,6 +9,7 @@ This document defines how MindReply operating reports leave GitHub Actions. It d
 - Thread/log proof: every run writes the report to the GitHub Actions log.
 - Artifact proof: every run uploads `reports/outbox/hourly-owner-report-latest.md` and `reports/outbox/hourly-owner-delivery-receipt-latest.json`.
 - Slack: `MINDREPLY_SLACK_WEBHOOK_URL` or `SLACK_WEBHOOK_URL` repository secret.
+- Slack DM onboarding: owner may provide a Slack direct-message invite out of band; record only its availability with `MINDREPLY_SLACK_DM_INVITE_AVAILABLE=true`, never the raw invite URL.
 - Email through Resend: `RESEND_API_KEY`, `MINDREPLY_REPORT_EMAIL`, and `MINDREPLY_REPORT_FROM`.
 - Required delivery email: the owner address stored in `MINDREPLY_REPORT_EMAIL`.
 
@@ -27,6 +28,7 @@ Secrets:
 
 Variables:
 
+- `MINDREPLY_SLACK_DM_INVITE_AVAILABLE`
 - `MINDREPLY_REPORT_ENABLED`
 - `MINDREPLY_REPORT_DRY_RUN`
 - `MINDREPLY_REPORT_CHANNELS`
@@ -47,6 +49,8 @@ External Slack or email delivery happens only when all of these are true:
 ## Slack Notes
 
 A Slack field ID is not a credential and cannot send messages by itself. Slack delivery needs an incoming webhook URL or an authorized Slack app connection.
+
+If the owner provides a Slack DM invite link in chat, use it only for manual connector/workspace onboarding. Do not paste it into source, reports, public pages, workflow YAML, or artifacts. After the DM is connected or a Slack destination is ready, set `MINDREPLY_SLACK_DM_INVITE_AVAILABLE=true` and configure `MINDREPLY_SLACK_WEBHOOK_URL` or `SLACK_WEBHOOK_URL` for persistent workflow delivery.
 
 The workflow uses Slack only when a Slack webhook secret exists and the `slack` channel is requested. Without that secret, the report still appears in the log and artifact.
 
@@ -70,6 +74,7 @@ Each run writes `reports/outbox/hourly-owner-delivery-receipt-latest.json` with:
 - dry-run status
 - email recipient configured status
 - Slack webhook configured status
+- Slack DM invite availability status
 - per-channel status: `sent`, `dry-run`, `blocked`, `failed`, `disabled`, or `skipped`
 
 This proves whether the provider accepted the report. It does not prove that Gmail, Slack, or a downstream inbox rendered it.
