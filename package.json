@@ -12,6 +12,7 @@
     "deploy:preflight": "tsx scripts/vercel-deploy-preflight.ts",
     "deploy:preflight:verify": "tsx scripts/verify-vercel-deploy-preflight.ts",
     "seo:i18n:verify": "tsx scripts/verify-revenue-i18n-seo.ts",
+    "version:metadata": "node scripts/write-version-build-metadata.mjs",
     "version:fallback:verify": "node scripts/verify-version-build-fallback.mjs",
     "decision:verify": "npm run vercel:ignore:verify && tsx scripts/verify-decision-layer.ts && tsx scripts/verify-production-version-contract.ts && npm run version:fallback:verify && tsx scripts/verify-revenue-i18n-seo.ts && tsx scripts/verify-package-delivery-proof.ts && tsx scripts/verify-invoice-first-close.ts",
     "mcp:verify": "tsx scripts/verify-mcp.ts",
