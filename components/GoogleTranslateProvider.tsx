@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk";
+type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
 
 type GoogleWindow = Window & {
   googleTranslateElementInit?: () => void;
@@ -13,7 +13,7 @@ type GoogleWindow = Window & {
   };
 };
 
-const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
+const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
 const googleLocaleMap: Record<LocaleCode, string> = {
   en: "en",
   es: "es",
@@ -25,6 +25,7 @@ const googleLocaleMap: Record<LocaleCode, string> = {
   ja: "ja",
   zh: "zh-CN",
   uk: "uk",
+  bg: "bg",
 };
 
 function isLocale(value: string): value is LocaleCode {
