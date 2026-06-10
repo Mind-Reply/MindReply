@@ -166,6 +166,54 @@ class ExecutiveNervousSystemTests(unittest.TestCase):
         self.assertIn("Website Completion Package", layout)
         self.assertIn("schema.org", page)
 
+    def test_revenue_homepage_strategy_contract_is_complete(self) -> None:
+        strategy = (ROOT / "docs" / "revenue_homepage_strategy.md").read_text(encoding="utf-8")
+
+        required_sections = (
+            "## Ruthless Diagnosis",
+            "### What Converts",
+            "### What Is Still Vague",
+            "### What Weakens Trust",
+            "### What Weakens Upgrade Pressure",
+            "### Remove Or Rewrite Immediately",
+            "## Homepage Strategy In Two Layers",
+            "### Layer 1: Immediate Relief And Operational Value",
+            "### Layer 2: Premium Authority And Communication Intelligence Depth",
+            "## New Hero Section",
+            "## Trust Block",
+            "## How It Works Block",
+            "## Pricing And Paid Path Block",
+            "## Growth And Pro Upgrade Block",
+            "## Authority Block",
+            "## Five Outbound DMs",
+            "## Three Cold Emails",
+            "## Two Follow-Ups",
+            "## Call Booking Message",
+            "## Objections Handling",
+            "## First-Session Conversion Logic",
+        )
+        for section in required_sections:
+            with self.subTest(section=section):
+                self.assertIn(section, strategy)
+
+        for trigger in (
+            "First user action:",
+            "First output:",
+            "Aha moment:",
+            "Credit purchase trigger:",
+            "Growth trigger:",
+            "Pro trigger:",
+        ):
+            with self.subTest(trigger=trigger):
+                self.assertIn(trigger, strategy)
+
+        self.assertEqual(len(re.findall(r"^\d\. [^:\n]+:", strategy, flags=re.MULTILINE)), 5)
+        self.assertEqual(len(re.findall(r"^### Cold Email ", strategy, flags=re.MULTILINE)), 3)
+        self.assertEqual(len(re.findall(r"^### Follow-Up ", strategy, flags=re.MULTILINE)), 2)
+        self.assertIn("20+ professional categories and lexicons", strategy)
+        self.assertIn("10 refinement tools", strategy)
+        self.assertIn("Private by design", strategy)
+
 
 if __name__ == "__main__":
     unittest.main()
