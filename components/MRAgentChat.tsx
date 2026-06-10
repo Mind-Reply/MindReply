@@ -29,10 +29,11 @@ const starter: ChatMessage = {
   id: "mra-welcome",
   role: "assistant",
   content:
-    "Come here. Put the charged thing down for a second. I will read the pressure beneath it, name what your mind is protecting, and hand you one composed move.",
+    "Paste the message, page, or follow-up carrying pressure.\n\nMRagent will slow it down, name the friction, and return one clear next move.",
 };
 
-const readingPhases = ["Reading", "Preparing reply"];
+const readingPhases = ["Reading carefully", "Holding the tone", "Preparing one move"];
+const minimumReadingMs = 1400;
 const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
 const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
 const packageCtaLabel = packagePaymentUrl ? "Pay for Website Completion Package" : "Request GBP 600 package invoice";
@@ -49,6 +50,10 @@ function confidenceText(value?: number) {
   if (value >= 0.82) return "clear read";
   if (value >= 0.72) return "careful read";
   return "gentle read";
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 async function readJson(response: Response) {
@@ -117,8 +122,17 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
     setPhaseIndex(0);
 
     try {
-      const phaseTimer = window.setTimeout(() => setPhaseIndex(1), 550);
-      const data = await requestMindRead(text).finally(() => window.clearTimeout(phaseTimer));
+      const startedAt = Date.now();
+      const phaseOne = window.setTimeout(() => setPhaseIndex(1), 520);
+      const phaseTwo = window.setTimeout(() => setPhaseIndex(2), 980);
+      const data = await requestMindRead(text).finally(() => {
+        window.clearTimeout(phaseOne);
+        window.clearTimeout(phaseTwo);
+      });
+      const elapsed = Date.now() - startedAt;
+      if (elapsed < minimumReadingMs) {
+        await wait(minimumReadingMs - elapsed);
+      }
 
       if (typeof data.reply !== "string" || !data.decision) {
         setError(data.error ?? "MRagent could not read that cleanly. Bring the pressure a little closer.");
