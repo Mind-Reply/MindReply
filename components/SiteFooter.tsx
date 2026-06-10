@@ -7,6 +7,7 @@ const footerLinks = [
   { label: "Website Completion Package", href: "/website-completion-package" },
   { label: "Checkout", href: "/checkout?package=website-completion" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Trust", href: "/trust" },
   { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/privacy" },
 ];

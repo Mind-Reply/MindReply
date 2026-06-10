@@ -27,6 +27,7 @@ const contact = readRequired("app/contact/page.tsx");
 const products = readRequired("app/products/page.tsx");
 const responseOverload = readRequired("app/response-overload/page.tsx");
 const capabilities = readRequired("app/capabilities/page.tsx");
+const trust = readRequired("app/trust/page.tsx");
 const siteFooter = readRequired("components/SiteFooter.tsx");
 const localeAssist = readRequired("components/LocaleAssist.tsx");
 const packageApi = readRequired("app/api/package-request/route.ts");
@@ -34,7 +35,7 @@ const packageHelper = readRequired("lib/package-request.ts");
 const packageForm = readRequired("components/PackageRequestForm.tsx");
 const health = readRequired("app/api/health/route.ts");
 
-const publicPages = [home, pack, canonicalPackage, pricing, contact, products, responseOverload, capabilities, siteFooter, localeAssist, packageForm].join("\n");
+const publicPages = [home, pack, canonicalPackage, pricing, contact, products, responseOverload, capabilities, trust, siteFooter, localeAssist, packageForm].join("\n");
 const operatingContract = prompt.toLowerCase();
 
 for (const phrase of [
@@ -160,6 +161,12 @@ assert(responseOverload.includes("Try MindReply Free"), "/response-overload must
 assert(capabilities.includes("Try MindReply Free"), "/capabilities must use the clear free CTA.");
 assert(siteFooter.includes("Try MindReply Free"), "Footer must use the clear free CTA.");
 assert(localeAssist.includes("Try MindReply Free first"), "Locale assist copy must use the clear free CTA.");
+assert(trust.includes("Trust and Data Handling | MindReply"), "/trust must expose a buyer-facing trust surface.");
+assert(trust.includes("Raw private text is not public proof"), "/trust must make raw-text redaction inspectable.");
+assert(trust.includes("Memory requires explicit approval"), "/trust must explain consent-gated memory.");
+assert(trust.includes("No borrowed trust badges. No invented proof."), "/trust must avoid unsupported compliance or testimonial claims.");
+assert(trust.includes("No customer count, revenue, staff, compliance badge, payment status, or integration status is stated without evidence."), "/trust must state claim discipline.");
+assert(siteFooter.includes("Trust"), "Footer must link to the trust surface.");
 
 assert(pack.includes('redirect("/website-completion-package")'), "/pack must redirect to the canonical Website Completion Package page.");
 assert(pack.includes("index: false"), "/pack legacy redirect must stay non-indexed.");
