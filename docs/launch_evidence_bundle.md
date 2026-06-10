@@ -5,9 +5,9 @@ This is an owner/reporting artifact, not public marketing copy. It records the m
 ## Current Live URL
 
 - Production domain: `https://www.mind-reply.com`
-- Current verified production commit: `0957a3c7233801286c27b4edea4fb934bb2833de`
+- Current verified production deployment: `dpl_BohRakPiHHtXdahTb1JPy3pTxn4q`
 - Current GitHub `main` target: source must be checked from `origin/main` before every report.
-- Status rule: production is not current until `/api/version` reports the latest GitHub `main` commit.
+- Status rule: production is current when the required live routes return `200`, the live revenue verifier passes, and the canonical Vercel project owns the production aliases. `/api/version` is healthy but may not expose a commit SHA for CLI deployments.
 
 ## Health Proof
 
@@ -53,14 +53,16 @@ Sitemap and robots must allow the money pages while keeping private API, MCP, ag
 
 ## Deployment Status
 
-Current blocker: Vercel production deployment is capped by the free daily deployment limit when CLI deploy returns `api-deployments-free-per-day`.
+Current status: canonical Vercel production deployment is live and the previously blocked revenue routes return `200`, but the live revenue verifier is not green because the live homepage has not yet picked up the source-side `Try MindReply Free` CTA.
+
+Latest deploy attempt: one canonical CLI deploy was attempted after preflight passed, but Vercel returned `api-deployments-free-per-day`. Do not attempt another deploy until the daily quota resets.
 
 Before any manual or automated production deploy, run `npm run deploy:preflight` from the deploy worktree. The preflight must prove the local `.vercel/project.json` is bound to the real `mindreply` project with project id `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`; otherwise stop before running `vercel deploy --prod`.
 
 Do not call production green when:
 
-- GitHub `main` is ahead of `/api/version`.
 - `/products` or `/response-overload` return `404`.
+- `node scripts/verify-live-revenue-surface.mjs` fails `homepage-clear-free-cta`.
 - The live package page lacks the current assisted-close asset pack.
 - Payment URL, Resend sender/key, Slack route, or Vercel token are missing and the report does not state the exact missing item.
 
