@@ -1,0 +1,6 @@
+{
+  "extName": { "message": "MindReply 决策层" },
+  "extDescription": { "message": "内联输入，一个推荐动作，安静更新记忆。" },
+  "extActionTitle": { "message": "MindReply" },
+  "contextClarifyNextMove": { "message": "MindReply：明确下一步" }
+}
