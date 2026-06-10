@@ -1,6 +1,8 @@
 name: MindReply Hourly Owner Report
 
 on:
+  schedule:
+    - cron: "0 * * * *"
   workflow_dispatch:
     inputs:
       channels:
@@ -11,41 +13,33 @@ on:
         description: "Set true to write receipts without sending"
         required: false
         default: "false"
-  schedule:
-    - cron: "0 * * * *"
 
 permissions:
   contents: read
 
 concurrency:
-  group: mindreply-hourly-owner-report-${{ github.ref }}
-  cancel-in-progress: true
+  group: mindreply-hourly-owner-report
+  cancel-in-progress: false
 
 jobs:
   owner-report:
-    name: Owner revenue report
+    name: Generate and deliver owner report
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       MINDREPLY_REPORT_ENABLED: ${{ vars.MINDREPLY_REPORT_ENABLED || 'true' }}
       MINDREPLY_REPORT_DRY_RUN: ${{ github.event.inputs.dry_run || vars.MINDREPLY_REPORT_DRY_RUN || 'false' }}
       MINDREPLY_REPORT_CHANNELS: ${{ github.event.inputs.channels || vars.MINDREPLY_REPORT_CHANNELS || 'email,slack' }}
-      MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: ${{ vars.MINDREPLY_REPORT_REQUIRE_LIVE_PROOF || 'true' }}
-      MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || vars.MINDREPLY_REPORT_EMAIL }}
-      MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS }}
-      MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || vars.MINDREPLY_REPORT_FROM }}
-      MINDREPLY_PACKAGE_REQUEST_TO: ${{ secrets.MINDREPLY_PACKAGE_REQUEST_TO || vars.MINDREPLY_PACKAGE_REQUEST_TO }}
-      MINDREPLY_PACKAGE_REQUEST_FROM: ${{ secrets.MINDREPLY_PACKAGE_REQUEST_FROM || vars.MINDREPLY_PACKAGE_REQUEST_FROM }}
-      MINDREPLY_PACKAGE_REQUEST_DRY_RUN: ${{ vars.MINDREPLY_PACKAGE_REQUEST_DRY_RUN || 'false' }}
+      MINDREPLY_REPORT_EMAIL: ${{ secrets.MINDREPLY_REPORT_EMAIL || secrets.OPS_REPORT_EMAIL_TO || vars.MINDREPLY_REPORT_EMAIL || vars.REPORT_TO_EMAIL || 'angellllkr@gmail.com' }}
+      MINDREPLY_REPORT_EMAILS: ${{ secrets.MINDREPLY_REPORT_EMAILS || vars.MINDREPLY_REPORT_EMAILS || 'angellllkr@gmail.com,info@mind-reply.com' }}
+      MINDREPLY_REPORT_FROM: ${{ secrets.MINDREPLY_REPORT_FROM || secrets.OPS_REPORT_EMAIL_FROM || vars.MINDREPLY_REPORT_FROM || vars.RESEND_FROM }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL }}
+      MINDREPLY_SLACK_WEBHOOK_URL: ${{ secrets.MINDREPLY_SLACK_WEBHOOK_URL || secrets.SLACK_WEBHOOK_URL }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://www.mind-reply.com' }}
       NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL: ${{ vars.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL }}
-      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID || 'prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3' }}
-      VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID || 'team_0plIJmQLgZC1wVv9zI2eVf3B' }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || vars.VERCEL_PROJECT_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,32 +47,27 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm install --no-audit --no-fund
 
-      - name: Check report contract
+      - name: Check report configuration
         run: npm run report:check
 
-      - name: Generate launch report
+      - name: Generate hourly owner report
         run: npm run launch:report
 
       - name: Verify revenue blueprint
         run: npm run audit:blueprint
 
-      - name: Capture live production revenue surface
-        continue-on-error: true
-        env:
-          MINDREPLY_LIVE_VERIFY_URL: ${{ env.NEXT_PUBLIC_SITE_URL }}
-          MINDREPLY_REQUIRE_LIVE_SHA_MATCH: "false"
-          MINDREPLY_REQUIRE_LIVE_DEPLOYMENT_MATCH: "false"
-        run: npm run verify:live-revenue
+      - name: Verify language and SEO positioning
+        run: npm run seo:i18n:verify
 
-      - name: Send owner report
+      - name: Send hourly owner report
         run: npm run report:send
 
-      - name: Upload owner report artifacts
+      - name: Upload report artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -88,6 +77,4 @@ jobs:
             reports/outbox/hourly-owner-delivery-receipt-latest.json
             reports/outbox/hourly-owner-report-*.md
             reports/outbox/hourly-owner-delivery-receipt-*.json
-            mindreply-live-revenue-surface.json
           if-no-files-found: warn
-          retention-days: 7
