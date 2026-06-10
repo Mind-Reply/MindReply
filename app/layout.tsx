@@ -4,9 +4,10 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import GoogleTranslateProvider from "@/components/GoogleTranslateProvider";
 import LocaleAssist from "@/components/LocaleAssist";
 import SiteFooter from "@/components/SiteFooter";
+import { localeAlternates, localeMeta, supportedLocales } from "@/lib/locales";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.mind-reply.com";
@@ -18,21 +19,10 @@ export const metadata: Metadata = {
     template: "%s | MindReply",
   },
   description:
-    "MindReply turns website buying friction, client follow-up pressure, and response overload into one clear next move, a ranked action queue, and privacy-safe assisted close with visitor-matched multilingual support.",
+    "MindReply turns website buying friction, client follow-up pressure, and response overload into one clear next move, a ranked action queue, and privacy-safe assisted close for priority UK, India, Gulf, US, German, Japanese, Brazilian, French, Spanish, Chinese, Ukrainian, and Bulgarian readers.",
   alternates: {
     canonical: "/",
-    languages: {
-      en: "/",
-      es: "/?lang=es",
-      fr: "/?lang=fr",
-      de: "/?lang=de",
-      pt: "/?lang=pt",
-      ar: "/?lang=ar",
-      hi: "/?lang=hi",
-      ja: "/?lang=ja",
-      zh: "/?lang=zh",
-      uk: "/?lang=uk",
-    },
+    languages: localeAlternates(siteUrl, "/"),
   },
   manifest: "/manifest.webmanifest",
   robots: {
@@ -72,8 +62,9 @@ export const metadata: Metadata = {
     "Spain website conversion copy",
     "China business communication support",
     "Ukraine founder communication support",
-    "visitor matched multilingual website support",
-    "IP aware business communication support",
+    "Bulgaria business communication support",
+    "Bulgarian website completion service",
+    "Bulgarian professional reply support",
     "Arabic executive communication support",
     "Hindi founder communication support",
     "German risk aware professional replies",
@@ -89,7 +80,9 @@ export const metadata: Metadata = {
     siteName: "MindReply",
     type: "website",
     locale: "en_GB",
-    alternateLocale: ["hi_IN", "ar_AE", "ar_SA", "en_US", "de_DE", "ja_JP", "pt_BR", "fr_FR", "es_ES", "zh_CN", "uk_UA"],
+    alternateLocale: supportedLocales
+      .map((locale) => localeMeta[locale].ogLocale)
+      .filter((locale) => locale !== "en_GB"),
     images: [
       {
         url: "/opengraph-image",
@@ -106,11 +99,11 @@ export const metadata: Metadata = {
     images: ["/opengraph-image"],
   },
   other: {
-    "content-language": "en, es, fr, de, pt, ar, hi, ja, zh, uk",
-    "geo.placename": "Visitor country and browser language matched by request headers",
-    "target-market": "IP-aware multilingual business visitors",
-    "target-market-priority": "Visitor IP country > browser language > manual language selector",
-    "localization-priority": "Visitor-matched multilingual support through country signal, browser language, manual selector, and Google Translate fallback",
+    "content-language": "en, es, fr, de, pt, ar, hi, ja, zh, uk, bg",
+    "geo.placename": "United Kingdom, India, United Arab Emirates, Saudi Arabia, United States, Germany, Japan, Brazil, France, Spain, Bulgaria",
+    "target-market": "GB, IN, AE, SA, US, DE, JP, BR, FR, ES, BG",
+    "target-market-priority": "UK > India > UAE > Saudi Arabia > US > Germany > Japan > Brazil > France > Spain > Bulgaria",
+    "localization-priority": "English, Hindi, Arabic, German, Japanese, Portuguese, French, Spanish, Chinese, Ukrainian, Bulgarian",
   },
 };
 
