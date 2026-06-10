@@ -9,6 +9,8 @@ const footerLinks = [
   { label: "Privacy", href: "/privacy" },
 ];
 
+const supportEmail = "info@mind-reply.com";
+
 const demandLanes = [
   "Website buying-friction rescue",
   "Client follow-up compression",
@@ -51,10 +53,13 @@ export default function SiteFooter() {
           <section className="mt-5 rounded-lg border border-white/10 bg-white/[0.028] p-4">
             <div className="flex items-center gap-2 text-[#91d2c8]">
               <Languages aria-hidden className="h-4 w-4" />
-              <p className="text-xs font-bold uppercase tracking-[0.18em]">Quiet language assist</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">Language and markets</p>
             </div>
             <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
-              Auto country signal first, browser language second, manual selector always available. Priority demand lanes: {priorityMarkets.join(" / ")}.
+              Language can be changed manually. Country and browser signals only suggest a starting preference; full-page translation should use the visitor's browser or Google Translate. Priority demand lanes: {priorityMarkets.join(" / ")}.
+            </p>
+            <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
+              Public contact: <a href={`mailto:${supportEmail}`} className="font-bold text-[#e2b757] hover:underline">{supportEmail}</a>.
             </p>
           </section>
         </div>
