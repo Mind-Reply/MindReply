@@ -122,6 +122,7 @@ check(checks, "health-reachable", health.status === 200 && health.json?.status =
 check(checks, "package-api-mounted", packageRequest.status === 400 && /email|required|request body/i.test(packageRequest.text), `Package request invalid-body probe status ${packageRequest.status}.`);
 
 check(checks, "relief-promise", includes(home.text, "Reclaim 2+ hours daily within 24 hours") && includes(home.text, "Reclaim 2+ hours daily when"), "Homepage must keep the immediate relief promise and explain the operational leak.");
+check(checks, "homepage-clear-free-cta", includes(home.text, "Try MindReply Free"), "Homepage must use the clear Try MindReply Free CTA.");
 check(checks, "website-completion-package", includes(publicText, "Website Completion Package"), "Live public surface must sell the Website Completion Package.");
 check(checks, "package-price", includes(publicText, "GBP 600"), "Live public surface must show the GBP 600 entry offer.");
 check(checks, "public-mailbox", includes(publicText, "info@mind-reply.com"), "Live public surface must use the public MindReply mailbox.");

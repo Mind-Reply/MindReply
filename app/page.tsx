@@ -264,7 +264,7 @@ export default function Home() {
               Products
             </Link>
             <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
-              Try MRagent
+              Try MindReply Free
             </Link>
           </div>
         </div>
@@ -294,7 +294,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-                Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
+                Try MindReply Free <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
               <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
                 {packageCtaLabel} <Target aria-hidden className="h-4 w-4" />
@@ -527,7 +527,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-              Try MRagent <Zap aria-hidden className="h-4 w-4" />
+              Try MindReply Free <Zap aria-hidden className="h-4 w-4" />
             </Link>
             <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
               {packageCtaLabel} <Mail aria-hidden className="h-4 w-4" />
