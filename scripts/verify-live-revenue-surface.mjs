@@ -153,7 +153,13 @@ check(checks, "market-priority-meta", includes(home.text, "target-market-priorit
 check(checks, "geo-locale-market-profiles", geoLocale.status === 200 && Array.isArray(geoLocale.json?.marketProfiles) && geoLocale.json.marketProfiles.length >= 11, `Geo locale status ${geoLocale.status}; market profiles ${geoLocale.json?.marketProfiles?.length ?? "missing"}.`);
 check(checks, "geo-locale-bulgaria", includes(geoLocale.text, "Bulgaria") && includes(geoLocale.text, "bg"), "Geo locale must include Bulgaria targeting.");
 check(checks, "geo-locale-brazil", includes(geoLocale.text, "Brazil") && includes(geoLocale.text, "pt"), "Geo locale must include Brazil Portuguese targeting.");
-check(checks, "robots-no-stale-public-routes", robots.status === 200 && !/allow:\s*\/agents|allow:\s*\/pack/i.test(robots.text), "Robots must not allow retired /agents or /pack surfaces.");
+  const allowsRetiredRobotsPath = /^allow:\s*\/(?:agents|pack)(?:$|\s)/im.test(robots.text);
+  check(
+    checks,
+    "robots-no-stale-public-routes",
+    robots.status === 200 && !allowsRetiredRobotsPath && /disallow:\s*\/agents(?:$|\s)/im.test(robots.text) && /disallow:\s*\/pack(?:$|\s)/im.test(robots.text),
+    "Robots must disallow retired /agents and /pack surfaces without confusing /agent for /agents.",
+  );
 check(checks, "robots-commercial-routes", robots.status === 200 && includes(robots.text, "/products") && includes(robots.text, "/checkout"), "Robots must allow the product and checkout surfaces.");
 check(checks, "sitemap-no-stale-public-routes", sitemap.status === 200 && !sitemap.text.includes("<loc>https://www.mind-reply.com/agents</loc>") && !sitemap.text.includes("<loc>https://www.mind-reply.com/pack</loc>"), "Sitemap must not index retired /agents or /pack routes.");
 check(checks, "sitemap-commercial-routes", sitemap.status === 200 && includes(sitemap.text, "/products") && includes(sitemap.text, "/checkout") && includes(sitemap.text, "/response-overload") && includes(sitemap.text, "lang=bg"), "Sitemap must include products, checkout, response-overload, and Bulgarian language alternates.");
