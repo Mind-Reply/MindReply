@@ -12,12 +12,12 @@ on:
         description: Vercel deployment id to alias.
         required: false
         type: string
-        default: dpl_FK9VqUruBXUoZgWyY3M546U5zmk1
+        default: dpl_72icCX4XbgMfbdYVnHCgJnaK6Qpw
       deployment_url:
         description: Vercel deployment URL to verify against.
         required: false
         type: string
-        default: https://mindreply-ickm8ik48-angellllkr-engs-projects.vercel.app
+        default: https://mindreply-cfdpmroo4-angellllkr-engs-projects.vercel.app
 
 permissions:
   contents: read
@@ -32,11 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN || secrets.VERCEL_API_TOKEN }}
       VERCEL_TEAM_ID: team_0plIJmQLgZC1wVv9zI2eVf3B
-      GOOD_DEPLOYMENT_ID: ${{ github.event.inputs.deployment_id || 'dpl_FK9VqUruBXUoZgWyY3M546U5zmk1' }}
-      GOOD_DEPLOYMENT_URL: ${{ github.event.inputs.deployment_url || 'https://mindreply-ickm8ik48-angellllkr-engs-projects.vercel.app' }}
-      GOOD_DEPLOYMENT_SHA: 8c8de8aba7c6ee20bbdbf4801a26b27122bbaac8
+      GOOD_DEPLOYMENT_ID: ${{ github.event.inputs.deployment_id || 'dpl_72icCX4XbgMfbdYVnHCgJnaK6Qpw' }}
+      GOOD_DEPLOYMENT_URL: ${{ github.event.inputs.deployment_url || 'https://mindreply-cfdpmroo4-angellllkr-engs-projects.vercel.app' }}
+      GOOD_DEPLOYMENT_SHA: 5cd4c6862d8e6b3a971db3f7a54fd8fad86cb5fb
       MINDREPLY_LIVE_VERIFY_URL: https://www.mind-reply.com
       MINDREPLY_LIVE_REVENUE_JSON: mindreply-live-revenue-surface.json
       MINDREPLY_REPORT_REQUIRE_LIVE_PROOF: true
@@ -73,6 +73,7 @@ jobs:
             && grep -q "Website Completion Package" /tmp/mindreply-home.html /tmp/mindreply-contact.html \
             && grep -q "GBP 600" /tmp/mindreply-home.html /tmp/mindreply-contact.html \
             && grep -q "info@mind-reply.com" /tmp/mindreply-contact.html \
+            && grep -q "Delivery, revenue, security, and service claims" /tmp/mindreply-home.html \
             && grep -q '"status":"ok"' /tmp/mindreply-version.json \
             && grep -q '"status":"ok"' /tmp/mindreply-health.json; then
             echo "MINDREPLY_SKIP_ALIAS=true" >> "$GITHUB_ENV"
@@ -80,12 +81,12 @@ jobs:
           # MindReply Emergency Alias Repair
 
           Status: green
-          Action: skipped alias assignment because current production already passes.
+          Action: skipped alias assignment because current production already passes the latest footer deploy contract.
           Public domains checked: www.mind-reply.com, mind-reply.com
           EOF
-            echo "Live production already passes. Skipping alias repair."
+            echo "Live production already passes latest footer contract. Skipping alias repair."
           else
-            echo "Live production does not pass yet. Alias repair will run."
+            echo "Live production does not pass latest footer contract yet. Alias repair will run."
           fi
 
       - name: Require Vercel token
@@ -151,6 +152,7 @@ jobs:
           grep -q "Website Completion Package" /tmp/mindreply-home.html /tmp/mindreply-contact.html
           grep -q "GBP 600" /tmp/mindreply-home.html /tmp/mindreply-contact.html
           grep -q "info@mind-reply.com" /tmp/mindreply-contact.html
+          grep -q "Delivery, revenue, security, and service claims" /tmp/mindreply-home.html
           grep -q '"status":"ok"' /tmp/mindreply-version.json
           grep -q '"status":"ok"' /tmp/mindreply-health.json
 
@@ -176,7 +178,7 @@ jobs:
           - /contact returned info@mind-reply.com and no gmail.com
           - /api/version returned status ok
           - /api/health returned status ok
-          - Homepage returned Website Completion Package, GBP 600, and Reclaim 2+ hours daily within 24 hours
+          - Homepage returned Website Completion Package, GBP 600, Reclaim 2+ hours daily within 24 hours, and latest footer evidence copy
           - /api/package-request rejected invalid input with 400
           EOF
 
