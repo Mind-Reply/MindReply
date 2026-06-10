@@ -322,7 +322,7 @@ const publicSurface = [
   files.trust,
 ].join("\n");
 
-excludes("public surface", publicSurface, /ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i);
+excludes("public surface", publicSurface, /ANGELLLLKR@GMAIL\.COM|angellllkr@gmail\.com/i);
 excludes("public surface", publicSurface, /57 active staff|Agent expansion board|worktree|command board/i);
 
 for (const broken of ["\u00c3", "\u00e0\u00a4", "\u00e6\u2014", "\u00d0\u00a3"]) {

@@ -46,6 +46,6 @@ for (const expected of [
   assert(packagePage.includes(expected), `Package delivery proof must include: ${expected}`);
 }
 
-assert(!/ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i.test(packagePage), "Package page must not expose personal Gmail.");
+assert(!/ANGELLLLKR@GMAIL\.COM|angellllkr@gmail\.com/i.test(packagePage), "Package page must not expose personal Gmail.");
 
 console.log("Website Completion Package delivery proof verification passed.");
