@@ -13,7 +13,6 @@ const languageParams = [
   "ja",
   "zh",
   "uk",
-  "bg",
 ] as const;
 
 const routes = [

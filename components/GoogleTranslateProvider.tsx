@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
+type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk";
 
 type TranslateResponse = {
   configured?: boolean;
@@ -10,7 +10,7 @@ type TranslateResponse = {
   translations?: string[];
 };
 
-const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
+const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
 const originalText = new WeakMap<Text, string>();
 const googleTranslateCompatibility = {
   script: "translate.google.com/translate_a/element.js",
@@ -18,7 +18,6 @@ const googleTranslateCompatibility = {
   init: "googleTranslateElementInit",
   container: "mindreply-google-translate",
   zh: "zh-CN",
-  bg: "bg",
 };
 void googleTranslateCompatibility;
 

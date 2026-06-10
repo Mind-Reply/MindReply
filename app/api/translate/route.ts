@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const supportedLocales = new Set(["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"]);
+const supportedLocales = new Set(["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"]);
 const googleLocaleMap: Record<string, string> = {
   en: "en",
   es: "es",
@@ -12,7 +12,6 @@ const googleLocaleMap: Record<string, string> = {
   ja: "ja",
   zh: "zh-CN",
   uk: "uk",
-  bg: "bg",
 };
 
 type RequestBody = {

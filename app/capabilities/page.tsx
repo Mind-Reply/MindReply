@@ -58,10 +58,10 @@ const serviceLanes = [
   {
     name: "Multilingual surface",
     status: "Active layer",
-    signal: "11 priority languages",
+    signal: "Visitor-matched language",
     icon: Gauge,
-    copy: "Country and browser signals set the first language gently, with a subtle manual selector for priority English, European, Gulf, Indian, Japanese, Chinese, Ukrainian, and Bulgarian visitors.",
-    proof: ["IP-country route", "manual selector", "Google Translate fallback", "Bulgarian support", "RTL support"],
+    copy: "Visitor IP and browser signals set the first language gently, with a subtle manual selector and Google Translate fallback for full-page translation.",
+    proof: ["IP-country route", "browser-language fallback", "manual selector", "Google Translate fallback", "RTL support"],
   },
 ];
 
@@ -84,7 +84,7 @@ const proofItems = [
   "Public contact routes through MRagent and the contact form.",
   "The footer keeps the main CTA simple on desktop and phone.",
   "Language detection is helpful but gentle; visitors can change it without a loud widget.",
-  "Bulgarian is included in the selector, geo locale, sitemap, metadata, and Google Translate provider.",
+  "Visitor IP, browser language, and manual selection decide the language assist path.",
   "Revenue and provider claims are shown only when connected evidence exists.",
 ];
 
@@ -132,7 +132,7 @@ export default function CapabilitiesPage() {
             </div>
             <div className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Language layer</p>
-              <p className="mt-3 text-lg font-bold">11 priority languages</p>
+              <p className="mt-3 text-lg font-bold">Visitor-matched</p>
             </div>
           </div>
         </div>

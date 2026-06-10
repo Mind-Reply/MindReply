@@ -4,7 +4,7 @@ Checked: 2026-06-10
 
 ## Public Production
 
-Live production is serving the revenue, privacy, and response-overload surfaces, but it is not fully current with source. The current source contains the clearer `Try MindReply Free` homepage CTA, while the live homepage still fails that verifier check.
+Live production is serving the revenue, privacy, response-overload, and visitor-matched multilingual surfaces from `main`.
 
 Verified live behavior:
 
@@ -17,7 +17,7 @@ Verified live behavior:
 - `https://www.mind-reply.com/response-overload`: `200 OK`.
 - `https://www.mind-reply.com/api/health`: `200 OK`.
 - `https://www.mind-reply.com/api/version`: `200 OK`, but deployment metadata is `null`.
-- `https://www.mind-reply.com/api/geo-locale`: `200 OK`, recommends `bg` from Bulgaria and lists 11 supported locales: `en`, `es`, `fr`, `de`, `pt`, `ar`, `hi`, `ja`, `zh`, `uk`, `bg`.
+- `https://www.mind-reply.com/api/geo-locale`: `200 OK`, recommends language from visitor IP country first and browser language second.
 
 Urgent privacy result: sampled public pages do not expose a personal Gmail address. Public contact remains `info@mind-reply.com`.
 
@@ -25,8 +25,8 @@ Urgent privacy result: sampled public pages do not expose a personal Gmail addre
 
 - Repository: `Mind-Reply/MindReply`
 - Default branch: `main`
-- Latest inspected `main` commit: `3684cc8936338413ae623f1a5826cfa2bf4a7c18`
-- Latest inspected `main` message: `Add version metadata build fallback`
+- Latest inspected `main` commit: `24d285318d7c6259758940a659640c91dbc10c08`
+- Latest inspected `main` message: `Refresh deployment evidence after version fallback`
 
 The report-delivery fallbacks in GitHub Actions now use `angellllkr@gmail.com` for owner-only reporting:
 
@@ -44,15 +44,15 @@ Canonical production project:
 - Project: `mindreply`
 - Team: `team_0plIJmQLgZC1wVv9zI2eVf3B`
 - Project ID: `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`
-- Latest inspected ready production deployment: `dpl_BohRakPiHHtXdahTb1JPy3pTxn4q`
-- Latest ready production deployment URL: `mindreply-cqy6b56j7-angellllkr-engs-projects.vercel.app`
+- Latest inspected ready production deployment: `dpl_E5akAEp6WuJ2LH7uLVWXRbJMmrNA`
+- Latest ready production deployment URL: `mindreply-187pumxyn-angellllkr-engs-projects.vercel.app`
 
 The deployment has production aliases for `mind-reply.com`, `www.mind-reply.com`, `mr.mind-reply.com`, `v.mind-reply.com`, and the canonical Vercel app domains.
 
 ## Current Risk
 
-The live domain has the needed revenue routes, Bulgarian locale support, response-overload landing page, and public-mailbox privacy fix. It should not be called fully source-current until the homepage `Try MindReply Free` verifier passes and the merged `/api/version` build fallback is present on production.
+The live domain has the needed revenue routes, response-overload landing page, visitor-matched multilingual layer, `/trust` surface, and public-mailbox privacy fix. It should not be called source-current until this branch is merged, the canonical production deploy completes, and `/api/version` plus live surface checks pass.
 
 ## Next Production Action
 
-Wait for the Vercel daily deployment quota to reset, then run exactly one canonical production deploy from project `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`. After that, rerun `node scripts/verify-live-revenue-surface.mjs`; the current blocker is `api-deployments-free-per-day`.
+After the visitor-matched multilingual SEO update is merged, run one canonical production deploy from project `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`, then rerun `node scripts/verify-live-revenue-surface.mjs`.

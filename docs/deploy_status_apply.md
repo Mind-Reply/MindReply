@@ -50,7 +50,7 @@ A local Windows scheduled task exists:
 4. Verify public copy no longer contains stale footer/MRagent text:
    - `MRagent slows the moment before it moves`
    - `Auto country signal first`
-   - `{AUTO BG}`
+   - legacy auto-background locale marker
 
 ## Completion Rule
 
