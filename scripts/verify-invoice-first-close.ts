@@ -40,6 +40,11 @@ for (const expected of [
 for (const expected of [
   "Invoice-first route",
   "billing name and billing email",
+  "billingName",
+  "billingEmail",
+  "billingEmailHash",
+  "Billing name is required for invoice-first package requests.",
+  "A valid billing email is required for invoice-first package requests.",
   "configured payment link",
   "send the invoice request before delivery",
   "Website Completion Package request: GBP 600 once",
@@ -50,6 +55,11 @@ for (const expected of [
 for (const expected of [
   "Invoice-first route",
   "No payment link is required to submit",
+  "Billing name",
+  "Billing email",
+  "Billing captured",
+  "billingEmailHash",
+  "billingIntents",
   "configured payment link before delivery",
   "Payment path:",
 ]) {
@@ -58,7 +68,7 @@ for (const expected of [
 
 for (const expected of [
   "next close-ready invoice or payment route",
-  "billing email",
+  "billing name, billing email",
   "fallback-required",
 ]) {
   includes("package request route", packageRoute, expected);
