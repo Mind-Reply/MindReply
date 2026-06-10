@@ -177,7 +177,7 @@ class ExecutiveNervousSystemTests(unittest.TestCase):
         self.assertIn("schema.org", page)
 
     def test_revenue_homepage_strategy_contract_is_complete(self) -> None:
-        strategy = (ROOT / "docs" / "revenue_homepage_strategy.md").read_text(encoding="utf-8")
+        strategy = (ROOT / "docs" / "homepage_strategy.md").read_text(encoding="utf-8")
 
         required_sections = (
             "## Ruthless Diagnosis",
@@ -195,12 +195,13 @@ class ExecutiveNervousSystemTests(unittest.TestCase):
             "## Pricing And Paid Path Block",
             "## Growth And Pro Upgrade Block",
             "## Authority Block",
-            "## Five Outbound DMs",
-            "## Three Cold Emails",
-            "## Two Follow-Ups",
+            "## Outbound DMs",
+            "## Cold Emails",
+            "## Follow-Ups",
             "## Call Booking Message",
             "## Objections Handling",
             "## First-Session Conversion Logic",
+            "## Homepage Implementation Checklist",
         )
         for section in required_sections:
             with self.subTest(section=section):
@@ -211,8 +212,11 @@ class ExecutiveNervousSystemTests(unittest.TestCase):
             "First output:",
             "Aha moment:",
             "Credit purchase trigger:",
+            "Pack trigger:",
             "Growth trigger:",
             "Pro trigger:",
+            "Trigger hierarchy:",
+            "First-session measurement events:",
         ):
             with self.subTest(trigger=trigger):
                 self.assertIn(trigger, strategy)
@@ -223,6 +227,16 @@ class ExecutiveNervousSystemTests(unittest.TestCase):
         self.assertIn("20+ professional categories and lexicons", strategy)
         self.assertIn("10 refinement tools", strategy)
         self.assertIn("Private by design", strategy)
+        self.assertIn("GBP 600 completion pack", strategy)
+        self.assertIn("Get my first send-ready reply", strategy)
+        self.assertIn("3+ urgent threads", strategy)
+        self.assertIn("Reply copied", strategy)
+        self.assertIn("Proof strip UI:", strategy)
+        self.assertIn("Trust UI:", strategy)
+        self.assertIn("Layout:", strategy)
+        self.assertIn("Card title: GBP 600 Completion Pack", strategy)
+        self.assertIn("homepage_cta_first_reply_clicked", strategy)
+        self.assertIn("Claim discipline:", strategy)
 
 
 if __name__ == "__main__":
