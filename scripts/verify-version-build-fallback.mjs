@@ -21,6 +21,7 @@ assert(packageJson.includes('"version:metadata"'), "package.json must expose the
 assert(packageJson.includes('"prebuild": "npm run version:metadata"'), "npm build must generate fresh version metadata before Next.js builds.");
 assert(generator.includes("gitCandidates"), "metadata generator must support multiple git executable candidates.");
 assert(generator.includes("rev-parse"), "metadata generator must read git commit fallback.");
+assert(generator.includes("existingMetadata"), "metadata generator must preserve committed metadata when Git is unavailable.");
 assert(generator.includes('"lib", "build-metadata.ts"'), "metadata generator must write lib/build-metadata.ts.");
 assert(metadata.includes("commitSha"), "committed build metadata must include commitSha.");
 assert(metadata.includes("projectProductionUrl"), "committed build metadata must include production URL.");

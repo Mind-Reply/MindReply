@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 const gitCandidates = [
@@ -19,11 +19,31 @@ function git(args, fallback = "") {
   return fallback;
 }
 
-const commitSha = process.env.GITHUB_SHA || process.env.VERCEL_GIT_COMMIT_SHA || git(["rev-parse", "HEAD"], "unknown");
+function existingMetadata(target) {
+  try {
+    const text = readFileSync(target, "utf8");
+    const commitSha = text.match(/"commitSha":\s*"([^"]+)"/)?.[1];
+    const branch = text.match(/"branch":\s*"([^"]+)"/)?.[1];
+    return { commitSha, branch };
+  } catch {
+    return {};
+  }
+}
+
+const target = join(process.cwd(), "lib", "build-metadata.ts");
+const existing = existingMetadata(target);
+const commitSha =
+  process.env.GITHUB_SHA ||
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  git(["rev-parse", "HEAD"], "") ||
+  existing.commitSha ||
+  "unknown";
 const branch =
   process.env.GITHUB_REF_NAME ||
   process.env.VERCEL_GIT_COMMIT_REF ||
-  git(["rev-parse", "--abbrev-ref", "HEAD"], "main");
+  git(["rev-parse", "--abbrev-ref", "HEAD"], "") ||
+  existing.branch ||
+  "main";
 
 const metadata = {
   commitSha,
@@ -34,7 +54,6 @@ const metadata = {
   generatedAt: new Date().toISOString(),
 };
 
-const target = join(process.cwd(), "lib", "build-metadata.ts");
 mkdirSync(dirname(target), { recursive: true });
 writeFileSync(
   target,

@@ -141,7 +141,8 @@ for (const phrase of [
   "supportedLocales",
   "marketProfiles",
   "providerGap",
-  "countryLocale[countryCode] ? \"country\" : \"browser\"",
+  "country: mappedLocale ? countryCode : \"GLOBAL\"",
+  "source: mappedLocale ? \"country\" : \"browser\"",
 ]) {
   includes("geo locale", files.geoLocale, phrase);
 }
