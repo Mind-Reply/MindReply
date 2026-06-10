@@ -1,13 +1,17 @@
 import Link from "next/link";
-import { ArrowRight, Languages, Mail, ShieldCheck } from "lucide-react";
+import { ArrowRight, Languages, Mail, ShieldCheck, ShoppingBag } from "lucide-react";
 
 const footerLinks = [
   { label: "MRagent", href: "/agent" },
+  { label: "Products", href: "/products" },
   { label: "Website Completion Package", href: "/website-completion-package" },
+  { label: "Checkout", href: "/checkout?package=website-completion" },
   { label: "Pricing", href: "/pricing" },
   { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/privacy" },
 ];
+
+const supportEmail = "info@mind-reply.com";
 
 const demandLanes = [
   "Website buying-friction rescue",
@@ -51,10 +55,13 @@ export default function SiteFooter() {
           <section className="mt-5 rounded-lg border border-white/10 bg-white/[0.028] p-4">
             <div className="flex items-center gap-2 text-[#91d2c8]">
               <Languages aria-hidden className="h-4 w-4" />
-              <p className="text-xs font-bold uppercase tracking-[0.18em]">Quiet language assist</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">Language and market fit</p>
             </div>
             <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
-              Auto country signal first, browser language second, manual selector always available. Priority demand lanes: {priorityMarkets.join(" / ")}.
+              Region and browser language only guide the first suggestion. The manual selector stays available, and Google Translate or the visitor's browser can handle full-page translation when needed. High-demand regions: {priorityMarkets.join(" / ")}.
+            </p>
+            <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
+              Public contact: <a href={`mailto:${supportEmail}`} className="font-bold text-[#e2b757] hover:underline">{supportEmail}</a>. For package scope, use the contact form or checkout path first.
             </p>
           </section>
         </div>
@@ -76,6 +83,9 @@ export default function SiteFooter() {
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-4 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
                 Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
+              <Link href="/checkout?package=website-completion" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
+                Checkout <ShoppingBag aria-hidden className="h-4 w-4" />
+              </Link>
               <Link href="/contact?intent=website-completion" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
                 Contact form <Mail aria-hidden className="h-4 w-4" />
               </Link>
@@ -85,7 +95,7 @@ export default function SiteFooter() {
       </div>
 
       <div className="mx-auto mt-7 flex max-w-7xl flex-col gap-4 border-t border-white/10 pt-6 text-xs text-[#9fb0bd] md:flex-row md:items-center md:justify-between">
-        <p>© {new Date().getFullYear()} MindReply. Pressure in. One clear move out.</p>
+        <p>(c) {new Date().getFullYear()} MindReply. Pressure in. One clear move out.</p>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2">
           {footerLinks.map((link) => (
             <Link key={link.href} href={link.href} className="transition hover:text-[#e2b757]">
