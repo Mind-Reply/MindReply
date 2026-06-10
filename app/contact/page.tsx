@@ -127,7 +127,7 @@ export default function ContactPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Contact form</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Website Completion Package, GBP 600.</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
-              The package turns overloaded website messaging, scattered launch notes, or reply pressure into a ranked action queue and send-ready copy.
+              The package turns overloaded website messaging, scattered launch notes, or reply pressure into a ranked action queue and send-ready copy. The secure contact form posts through /api/package-request.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
