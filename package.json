@@ -9,6 +9,7 @@
     "lint": "npm run typecheck",
     "typecheck": "next typegen && tsc --noEmit",
     "vercel:ignore:verify": "node scripts/vercel-ignore-build.mjs --self-test",
+    "seo:i18n:verify": "tsx scripts/verify-revenue-i18n-seo.ts",
     "decision:verify": "npm run vercel:ignore:verify && tsx scripts/verify-decision-layer.ts && tsx scripts/verify-production-version-contract.ts && tsx scripts/verify-revenue-i18n-seo.ts && tsx scripts/verify-package-delivery-proof.ts && tsx scripts/verify-invoice-first-close.ts",
     "mcp:verify": "tsx scripts/verify-mcp.ts",
     "verify:all": "npm run decision:verify && npm run mcp:verify && npm run typecheck",
