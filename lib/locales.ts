@@ -1,4 +1,4 @@
-export const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"] as const;
+export const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"] as const;
 
 export type LocaleCode = (typeof supportedLocales)[number];
 
@@ -31,9 +31,9 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
   es: {
     code: "es",
     label: "Spanish",
-    nativeLabel: "Español",
+    nativeLabel: "Espa\u00f1ol",
     market: "Spain / LatAm",
-    line: "La presión se convierte en un paso claro.",
+    line: "La presi\u00f3n se convierte en un paso claro.",
     htmlLang: "es",
     ogLocale: "es_ES",
     googleLocale: "es",
@@ -42,7 +42,7 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
   fr: {
     code: "fr",
     label: "French",
-    nativeLabel: "Français",
+    nativeLabel: "Fran\u00e7ais",
     market: "France",
     line: "La pression devient une action claire.",
     htmlLang: "fr",
@@ -64,9 +64,9 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
   pt: {
     code: "pt",
     label: "Portuguese",
-    nativeLabel: "Português",
+    nativeLabel: "Portugu\u00eas",
     market: "Brazil / Portugal",
-    line: "A pressão vira um próximo passo claro.",
+    line: "A press\u00e3o vira um pr\u00f3ximo passo claro.",
     htmlLang: "pt",
     ogLocale: "pt_BR",
     googleLocale: "pt",
@@ -75,9 +75,9 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
   ar: {
     code: "ar",
     label: "Arabic",
-    nativeLabel: "العربية",
+    nativeLabel: "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
     market: "UAE / Saudi Arabia",
-    line: "يتحوّل الضغط إلى خطوة واحدة واضحة.",
+    line: "\u064a\u062a\u062d\u0648\u0651\u0644 \u0627\u0644\u0636\u063a\u0637 \u0625\u0644\u0649 \u062e\u0637\u0648\u0629 \u0648\u0627\u062d\u062f\u0629 \u0648\u0627\u0636\u062d\u0629.",
     htmlLang: "ar",
     ogLocale: "ar_AE",
     googleLocale: "ar",
@@ -86,9 +86,9 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
   hi: {
     code: "hi",
     label: "Hindi",
-    nativeLabel: "हिन्दी",
+    nativeLabel: "\u0939\u093f\u0928\u094d\u0926\u0940",
     market: "India",
-    line: "दबाव एक साफ अगले कदम में बदलता है।",
+    line: "\u0926\u092c\u093e\u0935 \u090f\u0915 \u0938\u093e\u092b \u0905\u0917\u0932\u0947 \u0915\u0926\u092e \u092e\u0947\u0902 \u092c\u0926\u0932\u0924\u093e \u0939\u0948\u0964",
     htmlLang: "hi",
     ogLocale: "hi_IN",
     googleLocale: "hi",
@@ -97,9 +97,9 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
   ja: {
     code: "ja",
     label: "Japanese",
-    nativeLabel: "日本語",
+    nativeLabel: "\u65e5\u672c\u8a9e",
     market: "Japan",
-    line: "重い文脈を、ひとつの明確な次の一手へ。",
+    line: "\u91cd\u3044\u6587\u8108\u3092\u3001\u3072\u3068\u3064\u306e\u660e\u78ba\u306a\u6b21\u306e\u4e00\u624b\u3078\u3002",
     htmlLang: "ja",
     ogLocale: "ja_JP",
     googleLocale: "ja",
@@ -108,9 +108,9 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
   zh: {
     code: "zh",
     label: "Chinese",
-    nativeLabel: "中文",
+    nativeLabel: "\u4e2d\u6587",
     market: "China / Hong Kong / Taiwan",
-    line: "把压力整理成一个清晰的下一步。",
+    line: "\u628a\u538b\u529b\u6574\u7406\u6210\u4e00\u4e2a\u6e05\u6670\u7684\u4e0b\u4e00\u6b65\u3002",
     htmlLang: "zh",
     ogLocale: "zh_CN",
     googleLocale: "zh-CN",
@@ -119,12 +119,23 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
   uk: {
     code: "uk",
     label: "Ukrainian",
-    nativeLabel: "Українська",
+    nativeLabel: "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430",
     market: "Ukraine",
-    line: "Тиск перетворюється на один чіткий наступний крок.",
+    line: "\u0422\u0438\u0441\u043a \u043f\u0435\u0440\u0435\u0442\u0432\u043e\u0440\u044e\u0454\u0442\u044c\u0441\u044f \u043d\u0430 \u043e\u0434\u0438\u043d \u0447\u0456\u0442\u043a\u0438\u0439 \u043d\u0430\u0441\u0442\u0443\u043f\u043d\u0438\u0439 \u043a\u0440\u043e\u043a.",
     htmlLang: "uk",
     ogLocale: "uk_UA",
     googleLocale: "uk",
+    dir: "ltr",
+  },
+  bg: {
+    code: "bg",
+    label: "Bulgarian",
+    nativeLabel: "\u0411\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438",
+    market: "Bulgaria",
+    line: "\u041d\u0430\u043f\u0440\u0435\u0436\u0435\u043d\u0438\u0435\u0442\u043e \u0441\u0442\u0430\u0432\u0430 \u0435\u0434\u043d\u0430 \u044f\u0441\u043d\u0430 \u0441\u043b\u0435\u0434\u0432\u0430\u0449\u0430 \u0441\u0442\u044a\u043f\u043a\u0430.",
+    htmlLang: "bg",
+    ogLocale: "bg_BG",
+    googleLocale: "bg",
     dir: "ltr",
   },
 };
@@ -135,6 +146,7 @@ export const countryLocale: Record<string, LocaleCode> = {
   AT: "de",
   AU: "en",
   BE: "fr",
+  BG: "bg",
   BR: "pt",
   CA: "en",
   CH: "de",
