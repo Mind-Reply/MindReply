@@ -23,7 +23,7 @@ import MRAgentChat from "@/components/MRAgentChat";
 const supportEmail = "info@mind-reply.com";
 const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
 const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
-const packageCtaLabel = packagePaymentUrl ? "Pay for the package" : "Request invoice";
+const packageCtaLabel = packagePaymentUrl ? "Pay for the GBP 600 package" : "Request GBP 600 package invoice";
 const packageRouteLabel = packagePaymentUrl ? "Direct payment enabled" : "Invoice-first route ready";
 const packageRouteCopy = packagePaymentUrl
   ? "Scope is confirmed first, then the configured payment link is used before delivery."
@@ -31,8 +31,8 @@ const packageRouteCopy = packagePaymentUrl
 
 const navItems = [
   { label: "Offer", href: "#offer" },
-  { label: "Authority", href: "#authority" },
-  { label: "Proof", href: "#proof" },
+  { label: "How it works", href: "#how" },
+  { label: "Trust", href: "#proof" },
   { label: "Pricing", href: "/pricing" },
 ];
 
@@ -40,42 +40,42 @@ const packageRows = [
   {
     title: "Overloaded website messaging",
     value: "GBP 200",
-    copy: "The scattered homepage, offer, and contact story are read as one commercial system, then tightened into buyer-ready language.",
+    copy: "The homepage, offer, contact path, and buyer hesitation points are read as one sales path, then tightened into clearer language.",
     icon: Brain,
   },
   {
     title: "Ranked action queue",
     value: "GBP 200",
-    copy: "You receive the next fixes in commercial order: what removes confusion, what builds trust, and what pushes the visitor toward action.",
+    copy: "You receive the fixes in commercial order: what removes confusion, what builds trust, and what pushes the visitor toward action.",
     icon: ClipboardList,
   },
   {
     title: "Send-ready copy and receipt",
     value: "GBP 200",
-    copy: "The package includes usable website copy, a reply or next-step structure, memory consent wording, and a privacy-safe receipt.",
+    copy: "You get usable page copy, reply structure, next-step wording, privacy consent language, and a narrow receipt for what changed.",
     icon: ReceiptText,
   },
 ];
 
 const authoritySignals = [
   {
-    title: "Discipline-specific language",
-    copy: "MindReply does not sell generic output volume. It refines how founders, operators, and client-facing teams explain high-pressure work.",
+    title: "20+ professional lexicons",
+    copy: "Founder updates, client delivery, legal-sensitive wording, finance pressure, clinical tone, recruiting replies, and executive messages each need different restraint.",
     icon: FileText,
   },
   {
-    title: "Behavioral expression read",
-    copy: "MRagent names what the pressure is really about, where the reflex is coming from, and which move protects the relationship and the outcome.",
+    title: "Behavioral communication read",
+    copy: "MRagent names the protected feeling, the likely friction, and the next move without turning the answer into a long essay.",
     icon: HeartHandshake,
   },
   {
-    title: "Measurable communication structure",
-    copy: "Outputs are shaped as a synthesis, action, risk level, confidence, and receipt so the result can be inspected instead of admired vaguely.",
+    title: "10 refinement tools",
+    copy: "Clarity, brevity, warmth, firmness, risk reduction, empathy, structure, polish, de-escalation, and next-step framing support the final output.",
     icon: Gauge,
   },
   {
-    title: "Trust before expansion",
-    copy: "Slack, email, memory, and security lanes are treated as approved capabilities. They are not advertised as active until credentials and consent exist.",
+    title: "Sensitive-work restraint",
+    copy: "Private material stays redacted by default. Human handoff, memory, and integrations require consent and configuration before being claimed as active.",
     icon: ShieldCheck,
   },
 ];
@@ -111,21 +111,40 @@ const proofItems = [
   "Revenue, deployment, and integration claims stay tied to real sources instead of optimistic wording.",
 ];
 
-const closeSteps = [
+const howSteps = [
   {
     step: "01",
-    title: "Try the read",
-    copy: "Paste the pressure into MRagent and get one synthesis, one action, and the risk gate before paying.",
+    title: "Paste the pressure",
+    copy: "Use MRagent with a page section, prospect reply, email, Slack note, objection, or follow-up that is slowing action.",
   },
   {
     step: "02",
-    title: "Confirm scope and invoice",
-    copy: "No payment link is required to begin. If direct payment is not configured, MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice.",
+    title: "Get one read",
+    copy: "MindReply returns the hidden friction, one recommended move, risk level, and a receipt marker without making you choose from a menu.",
   },
   {
     step: "03",
-    title: "Receive the queue",
-    copy: "The delivery is concrete: ranked fixes, send-ready copy, a visible reply artifact, consent wording, and a receipt.",
+    title: "Buy when the leak is bigger",
+    copy: "Use the free read for one moment. Request the GBP 600 package when the website, offer, or follow-up path needs a full rescue.",
+  },
+];
+
+const upgradeSteps = [
+  {
+    title: "Free first read",
+    copy: "Proves relief before checkout: one synthesis, one next move, one receipt marker.",
+  },
+  {
+    title: "GBP 600 package",
+    copy: "For website buying friction, repeated follow-up confusion, offer clarity, and page sections that need send-ready copy.",
+  },
+  {
+    title: "Growth",
+    copy: "For recurring weekly overload across inboxes, client replies, follow-ups, and small team message queues.",
+  },
+  {
+    title: "Pro",
+    copy: "For high-trust continuity, sensitive professional tone, approved memory, and integration lanes when credentials exist.",
   },
 ];
 
@@ -142,7 +161,8 @@ const structuredData = {
     "MRagent pressure read",
     "Website buying-friction rescue",
     "Website Completion Package",
-    "Professional lexicon calibration",
+    "20+ professional lexicons",
+    "10 refinement tools",
     "Tone and structure refinement",
     "Ranked action queue",
     "Send-ready copy",
@@ -188,7 +208,7 @@ export default function Home() {
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/website-completion-package" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
-              Website Package
+              See package
             </Link>
             <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
               Try MRagent
@@ -208,20 +228,17 @@ export default function Home() {
           <div className="py-4">
             <div className="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-[#e2b757]/35 bg-[#e2b757]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#e2b757]">
               <Sparkles aria-hidden className="h-4 w-4" />
-              High-demand lane: website buying-friction rescue
+              Website buying-friction rescue
             </div>
             <h1 className="mt-7 max-w-3xl font-serif text-5xl font-bold leading-[0.94] md:text-7xl">
-              Reclaim 2+ hours daily within 24 hours.
+              Reclaim 2+ hours daily when your page, inbox, or follow-up path is leaking decisions.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
-              MindReply helps overloaded operators, founders, and client-facing teams turn emails, Slack notes, tasks, follow-ups, and website confusion into one action queue or send-ready message with no long setup.
-            </p>
-            <p className="mt-4 max-w-2xl text-sm font-semibold leading-7 text-[#91d2c8]">
-              The highest-demand gap is the last mile: buyers are almost ready, but the page, reply, or follow-up does not close cleanly.
+              MindReply turns overloaded pages, replies, and client follow-ups into one ranked action queue or one send-ready message. Start with MRagent. Buy the GBP 600 Website Completion Package when the leak is bigger than one reply.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-                Try the Mind Read <ArrowRight aria-hidden className="h-4 w-4" />
+                Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
               <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
                 {packageCtaLabel} <Target aria-hidden className="h-4 w-4" />
@@ -229,16 +246,16 @@ export default function Home() {
             </div>
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Demand wedge</p>
-                <p className="mt-3 text-sm font-semibold">Website buying-friction rescue</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">First output</p>
-                <p className="mt-3 text-sm font-semibold">Action queue or send-ready message</p>
+                <p className="mt-3 text-sm font-semibold">One read before checkout</p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Paid offer</p>
-                <p className="mt-3 text-sm font-semibold">GBP 600 Website Completion Package. {packageRouteLabel}.</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Delivery</p>
+                <p className="mt-3 text-sm font-semibold">Action queue or send-ready copy</p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/[0.055] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#91d2c8]">Paid path</p>
+                <p className="mt-3 text-sm font-semibold">GBP 600 package. {packageRouteLabel}.</p>
                 <p className="mt-3 text-xs leading-5 text-[#d9e3e7]">{packageRouteCopy}</p>
               </div>
             </div>
@@ -256,16 +273,21 @@ export default function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Paid entry offer</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Website Completion Package</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
-              This is the first thing to sell: clarity for overloaded websites and communication queues. It is not a technology pitch; it is a fixed-scope rescue for messaging, action order, and send-ready language.
+              This is the first thing to buy when the page, reply, or follow-up path is doing too much explaining and not enough closing.
             </p>
             <div className="mt-6 rounded-lg border border-[#122033]/10 bg-[#f8f4ec] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#9b7430]">Package total</p>
               <p className="mt-3 font-serif text-5xl font-bold">GBP 600</p>
               <p className="mt-3 text-sm leading-6 text-[#59687b]">Three concrete rows. One clear receipt. No long setup.</p>
               <p className="mt-3 text-sm font-semibold leading-6 text-[#2f6f72]">{packageRouteCopy}</p>
-              <a href={packageCtaHref} className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150]">
-                {packageCtaLabel} <ArrowRight aria-hidden className="h-4 w-4" />
-              </a>
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150]">
+                  {packageCtaLabel} <ArrowRight aria-hidden className="h-4 w-4" />
+                </a>
+                <Link href="/website-completion-package" className="inline-flex items-center justify-center gap-2 rounded-full border border-[#122033]/15 px-5 py-3 text-sm font-bold text-[#122033] transition hover:border-[#2f6f72]">
+                  See more <ArrowRight aria-hidden className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -286,17 +308,38 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="how" className="bg-[#103b39] px-4 py-14 text-[#f8f5f0] md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.74fr_1.26fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#91d2c8]">How it works</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The commercial path is deliberately short.</h2>
+            <p className="mt-5 text-sm leading-7 text-[#d3e5e2]">
+              The buyer should not decode a platform. They should feel the pressure loosen, see the next move, then know whether to buy the package or stay on the free read.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {howSteps.map((item) => (
+              <article key={item.step} className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#e2b757]">{item.step}</span>
+                <h3 className="mt-4 font-serif text-2xl font-bold leading-tight">{item.title}</h3>
+                <p className="mt-4 text-sm leading-6 text-[#d3e5e2]">{item.copy}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="authority" className="px-4 py-14 md:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Authority layer</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Premium depth</p>
               <h2 className="mt-4 max-w-2xl font-serif text-4xl font-bold leading-tight md:text-5xl">
-                Decision Infrastructure, explained without fog.
+                Behavioral communication intelligence, tied to buying behavior.
               </h2>
             </div>
             <p className="max-w-md text-sm leading-7 text-[#59687b]">
-              MindReply sells relief first, then earns authority by showing how language, behavior, risk, consent, analytics shape, and receipts work together.
+              The page sells relief first. The depth explains why the output is safer, sharper, and more usable than generic writing help.
             </p>
           </div>
           <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -313,10 +356,10 @@ export default function Home() {
           </div>
           <div className="mt-8 grid gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
             <div className="rounded-lg bg-[#122033] p-6 text-[#f8f5f0]">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#91d2c8]">Premium refinement map</p>
-              <h3 className="mt-4 font-serif text-3xl font-bold leading-tight">The deeper value is how the message is made safe, sharp, and professionally usable.</h3>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#91d2c8]">Refinement engine</p>
+              <h3 className="mt-4 font-serif text-3xl font-bold leading-tight">Professional replies need more than speed. They need judgment.</h3>
               <p className="mt-4 text-sm leading-7 text-[#d9e3e7]">
-                The public offer stays simple. Behind it, the work is stricter: lexicon, tone, structure, persuasion boundary, and receipt discipline.
+                MindReply improves communication quality; it does not replace professional judgment or invent compliance claims.
               </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
@@ -335,21 +378,23 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#103b39] px-4 py-14 text-[#f8f5f0] md:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.74fr_1.26fr]">
+      <section className="border-y border-[#122033]/10 bg-white px-4 py-14 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.72fr_1.28fr]">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#91d2c8]">Assisted close</p>
-            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The commercial path is deliberately short.</h2>
-            <p className="mt-5 text-sm leading-7 text-[#d3e5e2]">
-              The buyer should not have to decode a platform. They should feel the pressure loosen, see a concrete package, and know exactly where to pay or how the invoice-first route works.
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Pricing path</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Free relief first. Paid continuity after proof.</h2>
+            <p className="mt-5 text-sm leading-7 text-[#59687b]">
+              The upgrade pressure is simple: if one read is enough, use it. If the pattern repeats or the page is leaking buyers, buy the next level.
             </p>
+            <Link href="/pricing" className="mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-[#122033]/15 px-5 py-3 text-sm font-bold text-[#122033] transition hover:border-[#2f6f72]">
+              See more pricing <ArrowRight aria-hidden className="h-4 w-4" />
+            </Link>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {closeSteps.map((item) => (
-              <article key={item.step} className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#e2b757]">{item.step}</span>
-                <h3 className="mt-4 font-serif text-2xl font-bold leading-tight">{item.title}</h3>
-                <p className="mt-4 text-sm leading-6 text-[#d3e5e2]">{item.copy}</p>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {upgradeSteps.map((step) => (
+              <article key={step.title} className="rounded-lg border border-[#122033]/10 bg-[#f8f4ec] p-5">
+                <h3 className="font-serif text-2xl font-bold leading-tight">{step.title}</h3>
+                <p className="mt-4 text-sm leading-6 text-[#59687b]">{step.copy}</p>
               </article>
             ))}
           </div>
@@ -360,7 +405,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Trust proof</p>
-            <h2 className="mt-4 max-w-2xl font-serif text-4xl font-bold leading-tight md:text-5xl">Warm, premium, and strict about evidence.</h2>
+            <h2 className="mt-4 max-w-2xl font-serif text-4xl font-bold leading-tight md:text-5xl">Private by design for sensitive professional communication.</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
               Serious buyers do not need theatre. They need a believable promise, a clear payment or invoice route, and claims that survive inspection.
             </p>
@@ -380,7 +425,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl flex-col gap-5 rounded-lg bg-[#122033] p-6 text-[#f8f5f0] md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#91d2c8]">Next revenue move</p>
-            <h2 className="mt-3 font-serif text-3xl font-bold leading-tight">Start with MRagent. Escalate to the Website Completion Package when the queue needs a full rescue.</h2>
+            <h2 className="mt-3 font-serif text-3xl font-bold leading-tight">Start with MRagent. Request the GBP 600 package when the buying path needs a full rescue.</h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
