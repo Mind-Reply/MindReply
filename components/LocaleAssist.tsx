@@ -3,9 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Globe2 } from "lucide-react";
 
-const packageName = "Website Completion Package";
-const packagePrice = "GBP 600";
-
 type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
 
 type LocaleCopy = {
@@ -169,7 +166,6 @@ function resolveManualLocale() {
 
 export default function LocaleAssist() {
   const [locale, setLocale] = useState<LocaleCode>("en");
-  const [country, setCountry] = useState("detecting");
   const [marketCount, setMarketCount] = useState(11);
 
   useEffect(() => {
@@ -187,14 +183,11 @@ export default function LocaleAssist() {
           : countryLocale[detectedCountry] || initialLocale;
         const nextLocale = manualLocale || geoLocale;
 
-        setCountry(detectedCountry);
-        setMarketCount(data?.marketProfiles?.length || data?.priorityMarkets?.length || 11);
         setLocale(nextLocale);
+        setMarketCount(data?.marketProfiles?.length || data?.priorityMarkets?.length || 11);
         publishLocale(nextLocale);
       })
-      .catch(() => {
-        setCountry("browser");
-      });
+      .catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -206,10 +199,8 @@ export default function LocaleAssist() {
   return (
     <section
       className="locale-assist-shell border-t border-white/10 bg-[#0d1729] px-4 py-2 text-[#f8f5f0] md:px-8"
-      aria-label="Language and region assist"
-      data-revenue-anchor={`${packageName} ${packagePrice}`}
+      aria-label="Language"
       data-locale-count={localeCodes.length}
-      data-detected-country={country}
     >
       <div className="locale-assist-inner mx-auto flex max-w-7xl flex-col gap-2 text-[11px] text-[#cdd8df] md:flex-row md:items-center md:justify-between">
         <div className="locale-assist-controls flex flex-wrap items-center gap-2">

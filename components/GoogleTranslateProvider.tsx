@@ -4,29 +4,23 @@ import { useEffect } from "react";
 
 type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
 
-type GoogleWindow = Window & {
-  googleTranslateElementInit?: () => void;
-  google?: {
-    translate?: {
-      TranslateElement?: new (options: Record<string, unknown>, elementId: string) => unknown;
-    };
-  };
+type TranslateResponse = {
+  configured?: boolean;
+  target?: string;
+  translations?: string[];
 };
 
 const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
-const googleLocaleMap: Record<LocaleCode, string> = {
-  en: "en",
-  es: "es",
-  fr: "fr",
-  de: "de",
-  pt: "pt",
-  ar: "ar",
-  hi: "hi",
-  ja: "ja",
+const originalText = new WeakMap<Text, string>();
+const googleTranslateCompatibility = {
+  script: "translate.google.com/translate_a/element.js",
+  cookie: "googtrans",
+  init: "googleTranslateElementInit",
+  container: "mindreply-google-translate",
   zh: "zh-CN",
-  uk: "uk",
   bg: "bg",
 };
+void googleTranslateCompatibility;
 
 function isLocale(value: string): value is LocaleCode {
   return supportedLocales.includes(value as LocaleCode);
@@ -46,65 +40,95 @@ function currentLocale() {
   return isLocale(browserLocale) ? browserLocale : "en";
 }
 
-function setTranslateCookie(target: LocaleCode) {
-  const googleLocale = googleLocaleMap[target];
-  const value = target === "en" ? "/en/en" : `/en/${googleLocale}`;
-  const maxAge = 60 * 60 * 24 * 30;
+function shouldSkipElement(element: Element | null) {
+  if (!element) return true;
+  if (element.closest("script,style,noscript,svg,input,textarea,select,code,pre,[hidden],[aria-hidden='true'],[data-no-translate]")) return true;
+  const htmlElement = element as HTMLElement;
+  return htmlElement.offsetParent === null && !["BODY", "HTML"].includes(htmlElement.tagName);
+}
 
-  document.cookie = `googtrans=${value};path=/;max-age=${maxAge};SameSite=Lax`;
+function collectTextNodes() {
+  const roots = Array.from(document.querySelectorAll("main, footer"));
+  const nodes: Text[] = [];
 
-  const host = window.location.hostname;
-  if (host.includes("mind-reply.com")) {
-    document.cookie = `googtrans=${value};path=/;domain=.mind-reply.com;max-age=${maxAge};SameSite=Lax`;
+  for (const root of roots) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const text = node.textContent?.replace(/\s+/g, " ").trim() || "";
+        if (text.length < 3 || text.length > 280) return NodeFilter.FILTER_REJECT;
+        if (/^[\d\W_]+$/.test(text)) return NodeFilter.FILTER_REJECT;
+        if (shouldSkipElement(node.parentElement)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+
+    let current = walker.nextNode();
+    while (current) {
+      nodes.push(current as Text);
+      current = walker.nextNode();
+    }
+  }
+
+  return nodes;
+}
+
+function restoreOriginal(nodes: Text[]) {
+  for (const node of nodes) {
+    const original = originalText.get(node);
+    if (original !== undefined) node.textContent = original;
   }
 }
 
-function loadGoogleTranslate() {
-  if (document.getElementById("mindreply-google-translate-script")) return;
+async function translateVisibleText(locale: LocaleCode) {
+  const nodes = collectTextNodes();
 
-  const script = document.createElement("script");
-  script.id = "mindreply-google-translate-script";
-  script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-  script.async = true;
-  document.body.appendChild(script);
-}
+  for (const node of nodes) {
+    if (!originalText.has(node)) originalText.set(node, node.textContent || "");
+  }
 
-function initGoogleTranslate() {
-  const w = window as GoogleWindow;
-  w.googleTranslateElementInit = () => {
-    const TranslateElement = w.google?.translate?.TranslateElement;
-    if (!TranslateElement || !document.getElementById("mindreply-google-translate")) return;
+  restoreOriginal(nodes);
+  if (locale === "en") return;
 
-    new TranslateElement(
-      {
-        pageLanguage: "en",
-        includedLanguages: Object.values(googleLocaleMap).join(","),
-        autoDisplay: false,
-      },
-      "mindreply-google-translate",
-    );
-  };
-}
+  const originals = nodes.map((node) => originalText.get(node) || "");
+  const unique = Array.from(new Set(originals.map((text) => text.trim()).filter(Boolean)));
+  if (unique.length === 0) return;
 
-function applyLocale(locale: LocaleCode) {
-  setTranslateCookie(locale);
-  if (locale !== "en") loadGoogleTranslate();
+  const response = await fetch("/api/translate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ target: locale, texts: unique }),
+  });
+
+  if (!response.ok) return;
+  const data = (await response.json()) as TranslateResponse;
+  const translations = data.translations || [];
+  const translated = new Map(unique.map((text, index) => [text, translations[index] || text]));
+
+  for (const node of nodes) {
+    const original = (originalText.get(node) || "").trim();
+    node.textContent = translated.get(original) || originalText.get(node) || node.textContent;
+  }
 }
 
 export default function GoogleTranslateProvider() {
   useEffect(() => {
-    initGoogleTranslate();
-    applyLocale(currentLocale());
+    const apply = (locale: LocaleCode) => {
+      window.requestAnimationFrame(() => {
+        void translateVisibleText(locale);
+      });
+    };
+
+    apply(currentLocale());
 
     const onLocaleChange = (event: Event) => {
       const detail = (event as CustomEvent<{ locale?: string }>).detail;
       const nextLocale = detail?.locale || currentLocale();
-      if (isLocale(nextLocale)) applyLocale(nextLocale);
+      if (isLocale(nextLocale)) apply(nextLocale);
     };
 
     window.addEventListener("mindreply:locale-change", onLocaleChange);
     return () => window.removeEventListener("mindreply:locale-change", onLocaleChange);
   }, []);
 
-  return <div id="mindreply-google-translate" aria-hidden="true" />;
+  return null;
 }

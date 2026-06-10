@@ -20,19 +20,7 @@ const demandLanes = [
   "Privacy-safe assisted close",
 ];
 
-const priorityMarkets = [
-  "UK",
-  "India",
-  "UAE",
-  "Saudi Arabia",
-  "US",
-  "Germany",
-  "Japan",
-  "Brazil",
-  "France",
-  "Spain",
-  "Bulgaria",
-];
+const priorityMarkets = ["UK", "India", "UAE", "Saudi Arabia", "Brazil", "Bulgaria"];
 
 export default function SiteFooter() {
   return (
