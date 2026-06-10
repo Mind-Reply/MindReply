@@ -93,12 +93,15 @@ for (const phrase of [
   "countryLocale",
   "BG: \"bg\"",
   "Bulgarian",
+  "Bulgaria / Eastern Europe",
   "resolveManualLocale",
   "localeFromBrowser",
   "document.documentElement.lang",
   "document.documentElement.dir",
   "mindreply:locale-change",
   "data-locale-count={localeCodes.length}",
+  "{marketCount} priority markets",
+  "Full-site translation uses Google Translate",
 ]) {
   includes("locale assist", files.localeAssist, phrase);
 }
@@ -109,7 +112,7 @@ excludes("locale assist", files.localeAssist, "{AUTO BG}");
 for (const phrase of [
   "supportedLocales",
   "collectTextNodes",
-  "document.querySelectorAll(\"main, footer\")",
+  "document.querySelectorAll(\"body\")",
   "mindreply:locale-change",
   "translateVisibleText",
   "fetch(\"/api/translate\"",
