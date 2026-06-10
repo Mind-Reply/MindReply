@@ -52,6 +52,7 @@ export type MRAgentPreparation = {
 
 const sources: IntakeSource[] = ["manual", "gmail", "calendar", "extension"];
 const defaultModel = "gpt-5";
+const fallbackStyles = ["composed", "tender", "spare", "warm", "firm"] as const;
 
 function normalizeSource(source: unknown): IntakeSource {
   return typeof source === "string" && sources.includes(source as IntakeSource) ? (source as IntakeSource) : "manual";
@@ -111,15 +112,27 @@ function actionLine(decision: DecisionResponse) {
   return decision.recommendedAction.label;
 }
 
+function styleIndex(seed: string) {
+  return [...seed].reduce((total, char) => total + char.charCodeAt(0), 0) % fallbackStyles.length;
+}
+
 export function fallbackReply(decision: DecisionResponse) {
+  const style = fallbackStyles[styleIndex(decision.receipt.id)];
+  const action = actionLine(decision);
+
+  const openers = {
+    composed: "Slowly: this is smaller than the pressure is making it feel.",
+    tender: "I hear the squeeze in it. Let us not let urgency write this for you.",
+    spare: "Clean read: this needs less force and more poise.",
+    warm: "You can stay kind here without becoming vague.",
+    firm: "Hold your line gently. That is the whole move.",
+  } as const;
+
   return [
-    "I am with you. Let us slow the room down before the pressure chooses for you.",
-    `This is really about: ${decision.mindRead.reallyAbout}`,
-    `What your mind is protecting: ${decision.mindRead.mindsetProtection}`,
-    `The composed move: ${decision.mindRead.calmerMove}`,
-    `One clear move: ${decision.recommendedAction.label}.`,
-    actionLine(decision),
-    "Keep your warmth; keep your edge. You do not need extra sentences to prove care.",
+    openers[style],
+    `What it is really about: ${decision.mindRead.reallyAbout}`,
+    `One move: ${decision.recommendedAction.label}. ${action}`,
+    "Keep it short. Warmth lands better when it is not begging to be believed.",
   ].join("\n\n");
 }
 
@@ -158,9 +171,14 @@ function tokenUsageFromResponse(data: unknown): TokenUsage | null {
   return { inputTokens, outputTokens, totalTokens };
 }
 
+function providerEndpoint() {
+  const baseUrl = process.env.MRAGENT_PROVIDER_BASE_URL || process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
+  return `${baseUrl.replace(/\/$/, "")}/responses`;
+}
+
 async function providerReply(decision: DecisionResponse, generationId: string): Promise<ProviderResult> {
   const model = process.env.MRAGENT_MODEL || defaultModel;
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.MRAGENT_PROVIDER_API_KEY || process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
     return {
@@ -172,7 +190,7 @@ async function providerReply(decision: DecisionResponse, generationId: string): 
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await fetch(providerEndpoint(), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -180,17 +198,18 @@ async function providerReply(decision: DecisionResponse, generationId: string): 
       },
       body: JSON.stringify({
         model,
-        max_output_tokens: 360,
+        max_output_tokens: 150,
         input: [
           {
             role: "system",
             content:
-              "You are MRagent for MindReply. Read the pressure pattern before answering the words. Sound like a warm best friend with a spine: emotionally close, polished, quietly firm, and never generic. Return only the final prepared reply. Use one refined word at a time, such as lucid, tender, composed, unhurried, poise, or ballast. Name the protected feeling, keep one synthesis, keep one action, and do not offer menus. Never flatter, never diagnose, never over-explain, and never make the reply colder than the moment needs.",
+              "You are MRagent for MindReply. Reply like a warm, observant human: short, slow, emotionally intelligent, and quietly confident. Every answer must feel slightly different in rhythm and vocabulary. Never use long essays. Use 2-4 short paragraphs only, under 90 words. No numbered menus unless the user explicitly asks. Name the protected feeling, give one synthesis, and one next move. No hype, no diagnosis, no provider talk, no internal strategy. Keep uncommon words understandable: poise, ballast, tender, lucid, composed, unhurried.",
           },
           {
             role: "user",
             content: JSON.stringify({
               generationId,
+              variationSeed: decision.receipt.id,
               synthesis: decision.synthesis,
               mindRead: decision.mindRead,
               risk: decision.risk,
