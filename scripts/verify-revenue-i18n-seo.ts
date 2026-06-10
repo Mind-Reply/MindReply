@@ -49,10 +49,11 @@ for (const phrase of [
   "Website Completion and Response Overload Rescue",
   "content-language",
   "target-market-priority",
-  "UK > US > UAE > Saudi Arabia > Germany > France > Japan > Brazil > Spain > India",
+  "UK > India > UAE > Saudi Arabia > US > Germany > Japan > Brazil > France > Spain",
   "Brazil Portuguese business communication support",
   "Arabic executive communication support",
   "Japanese business reply refinement",
+  "Hindi founder communication support",
 ]) {
   includes("layout metadata", layout, phrase);
 }
@@ -76,6 +77,11 @@ for (const phrase of [
   "document.documentElement.lang",
   "document.documentElement.dir",
   "surfaceTranslations",
+  "العربية",
+  "हिन्दी",
+  "日本語",
+  "中文",
+  "Українська",
   "Auto {country}",
   "marketCount",
   "setMarketCount",
@@ -83,6 +89,8 @@ for (const phrase of [
   "data-locale-count={localeCodes.length}",
   "{marketCount} priority markets",
   "Contact form",
+  "market-chip",
+  "priority-chip",
 ]) {
   includes("locale assist", localeAssist, phrase);
 }
@@ -95,11 +103,15 @@ for (const phrase of [
   "JP: \"ja\"",
   "UA: \"uk\"",
   "United Kingdom",
-  "United States",
+  "India",
   "United Arab Emirates",
   "Saudi Arabia",
+  "United States",
   "Brazil",
   "marketProfiles",
+  "providerGap",
+  "priority: 1",
+  "priority: 10",
 ]) {
   includes("geo locale", geoLocale, phrase);
 }
@@ -118,6 +130,9 @@ for (const phrase of [
   ".locale-assist-copy",
   ".locale-assist-controls select",
   ".locale-chip",
+  ".priority-chip",
+  ".market-chip",
+  "grid-template-columns: minmax(0, 1fr) auto",
 ]) {
   includes("globals", globals, phrase);
 }
@@ -126,9 +141,10 @@ for (const phrase of [
   "Contact form",
   "/contact?intent=website-completion",
   "Try MRagent",
-  "Auto language and priority markets",
-  "Country signal first, browser language second",
+  "Quiet language assist",
+  "Auto country signal first, browser language second",
   "UK",
+  "India",
   "UAE",
   "Saudi Arabia",
   "Brazil",
@@ -166,4 +182,4 @@ for (const broken of ["\u00c3", "\u00e0\u00a4", "\u00e6\u2014", "\u00d0\u00a3"])
   assert(!localeAssist.includes(broken), `locale assist appears to contain mojibake marker ${broken}`);
 }
 
-console.log("Revenue, mobile, market SEO, 10-language country locale, invoice-first close path, package page proof, footer handoff, and public safety verification passed.");
+console.log("Revenue, mobile, priority-market SEO, 10-language country locale, invoice-first close path, package page proof, footer handoff, and public safety verification passed.");
