@@ -1,41 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const countryLocale: Record<string, string> = {
-  AE: "ar",
-  AR: "es",
-  AT: "de",
-  AU: "en",
-  BE: "fr",
-  BR: "pt",
-  CA: "en",
-  CH: "de",
-  CL: "es",
-  CN: "zh",
-  CO: "es",
-  DE: "de",
-  ES: "es",
-  FR: "fr",
-  GB: "en",
-  HK: "zh",
-  IE: "en",
-  IN: "hi",
-  JP: "ja",
-  KW: "ar",
-  MX: "es",
-  MY: "en",
-  NZ: "en",
-  OM: "ar",
-  PT: "pt",
-  QA: "ar",
-  SA: "ar",
-  SG: "en",
-  TW: "zh",
-  UA: "uk",
-  UK: "en",
-  US: "en",
-};
-
-const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
+import { countryLocale, normalizeLocale, supportedLocales } from "@/lib/locales";
 
 const priorityMarkets = [
   "United Kingdom",
@@ -48,6 +12,8 @@ const priorityMarkets = [
   "Brazil",
   "France",
   "Spain",
+  "Ukraine",
+  "Bulgaria",
 ];
 
 const marketProfiles = [
@@ -121,13 +87,21 @@ const marketProfiles = [
     demand: "Spanish-language gateway for sales objection and agency follow-up use cases",
     providerGap: "clear entry into Spanish-speaking markets without overbuilding every route first",
   },
+  {
+    country: "Ukraine",
+    locale: "uk",
+    priority: 11,
+    demand: "operator-heavy market where bilingual communication pressure is common",
+    providerGap: "trust-first Ukrainian communication support remains under-supplied",
+  },
+  {
+    country: "Bulgaria",
+    locale: "bg",
+    priority: 12,
+    demand: "EU services market with rising founder, agency, and cross-border communication demand",
+    providerGap: "Bulgarian-first executive communication support remains thin and easy to own early",
+  },
 ];
-
-function normalizeLocale(value: string | null) {
-  if (!value) return "en";
-  const locale = value.split(",")[0]?.trim().toLowerCase().split("-")[0] || "en";
-  return supportedLocales.includes(locale) ? locale : "en";
-}
 
 export function GET(req: NextRequest) {
   const country =
