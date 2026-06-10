@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { defaultLocale, localeMeta, normalizeLocale, supportedLocales, type LocaleCode } from "@/lib/locales";
 
-const supportedLocales = new Set(["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"]);
-const googleLocaleMap: Record<string, string> = {
-  en: "en",
-  es: "es",
-  fr: "fr",
-  de: "de",
-  pt: "pt",
-  ar: "ar",
-  hi: "hi",
-  ja: "ja",
-  zh: "zh-CN",
-  uk: "uk",
-};
+const supportedLocaleSet = new Set<LocaleCode>(supportedLocales);
 
 type RequestBody = {
   target?: string;
@@ -28,8 +17,8 @@ type GoogleTranslationResponse = {
 };
 
 function normalizeTarget(value: string | undefined) {
-  const target = (value || "en").toLowerCase().split("-")[0];
-  return supportedLocales.has(target) ? target : "en";
+  const target = normalizeLocale(value);
+  return supportedLocaleSet.has(target) ? target : defaultLocale;
 }
 
 function normalizeTexts(body: RequestBody) {
@@ -41,7 +30,7 @@ function normalizeTexts(body: RequestBody) {
     .map((value) => value.slice(0, 280));
 }
 
-function passthrough(target: string, texts: string[], configured: boolean, reason?: string) {
+function passthrough(target: LocaleCode, texts: string[], configured: boolean, reason?: string) {
   return NextResponse.json({
     configured,
     provider: configured ? "google-cloud-translate" : "passthrough",
@@ -62,8 +51,10 @@ export async function POST(req: NextRequest) {
 
   const target = normalizeTarget(body.target);
   const texts = normalizeTexts(body);
+  const configured = Boolean(process.env.GOOGLE_TRANSLATE_API_KEY || process.env.GOOGLE_CLOUD_TRANSLATE_API_KEY);
+
   if (texts.length === 0) return NextResponse.json({ configured: false, target, translated: false, translations: [] });
-  if (target === "en") return passthrough(target, texts, Boolean(process.env.GOOGLE_TRANSLATE_API_KEY || process.env.GOOGLE_CLOUD_TRANSLATE_API_KEY), "English selected.");
+  if (target === defaultLocale) return passthrough(target, texts, configured, "Default language selected.");
 
   const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY || process.env.GOOGLE_CLOUD_TRANSLATE_API_KEY || "";
   if (!apiKey) return passthrough(target, texts, false, "GOOGLE_TRANSLATE_API_KEY is not configured.");
@@ -78,8 +69,8 @@ export async function POST(req: NextRequest) {
       signal: controller.signal,
       body: JSON.stringify({
         q: texts,
-        target: googleLocaleMap[target] || target,
-        source: "en",
+        target: localeMeta[target].googleLocale,
+        source: defaultLocale,
         format: "text",
       }),
     });
