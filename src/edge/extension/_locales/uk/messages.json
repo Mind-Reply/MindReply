@@ -1,0 +1,6 @@
+{
+  "extName": { "message": "Рівень рішень MindReply" },
+  "extDescription": { "message": "Вбудований ввід, одна рекомендована дія і тиха зміна пам’яті." },
+  "extActionTitle": { "message": "MindReply" },
+  "contextClarifyNextMove": { "message": "MindReply: прояснити наступний крок" }
+}
