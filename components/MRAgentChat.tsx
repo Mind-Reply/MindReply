@@ -152,7 +152,7 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
   const latestUserText = [...messages].reverse().find((message) => message.role === "user")?.content ?? input;
 
   return (
-    <section className={compact ? "h-full bg-[#0d1729] text-[#f8f5f0]" : "mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-7xl gap-6 px-4 py-6 md:grid-cols-[0.72fr_1.28fr] md:px-8"}>
+    <section className={compact ? "h-full min-w-0 max-w-full overflow-hidden bg-[#0d1729] text-[#f8f5f0]" : "mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-7xl gap-6 px-4 py-6 md:grid-cols-[0.72fr_1.28fr] md:px-8"}>
       {!compact ? (
         <aside className="flex flex-col justify-between rounded-2xl bg-[#162033] p-6 text-[#f8f5f0] shadow-2xl shadow-[#162033]/20 md:p-8">
           <div>
@@ -182,9 +182,9 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
         </aside>
       ) : null}
 
-      <div className={compact ? "flex h-full min-h-[42rem] flex-col bg-[#0d1729]" : "flex min-h-[42rem] flex-col rounded-2xl border border-[#162033]/10 bg-[#0d1729] shadow-2xl shadow-[#162033]/15"}>
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-          <div>
+      <div className={compact ? "flex h-full min-h-[42rem] min-w-0 max-w-full flex-col bg-[#0d1729]" : "flex min-h-[42rem] flex-col rounded-2xl border border-[#162033]/10 bg-[#0d1729] shadow-2xl shadow-[#162033]/15"}>
+        <div className="flex min-w-0 items-center justify-between gap-3 border-b border-white/10 px-4 py-4 md:px-5">
+          <div className="min-w-0">
             <p className="flex items-center gap-2 text-sm font-semibold text-[#f8f5f0]"><Sparkles size={15} className="text-[#e2b757]" /> MRagent session</p>
             <p className="mt-1 text-xs text-[#8fa0b8]">pressure-first read, warm voice, one move</p>
           </div>
@@ -195,14 +195,14 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
           ) : null}
         </div>
 
-        <div className="flex-1 space-y-4 overflow-y-auto px-4 py-5 md:px-6">
+        <div className="min-w-0 flex-1 space-y-4 overflow-y-auto px-4 py-5 md:px-6">
           {messages.map((message) => (
-            <article key={message.id} className={message.role === "user" ? "ml-auto max-w-[86%]" : "mr-auto max-w-[94%]"}>
+            <article key={message.id} className={message.role === "user" ? "ml-auto max-w-full sm:max-w-[86%]" : "mr-auto max-w-full sm:max-w-[94%]"}>
               <div
                 className={
                   message.role === "user"
-                    ? "rounded-2xl bg-[#f4efe4] px-5 py-4 text-[#162033]"
-                    : "rounded-2xl border border-white/10 bg-white/[0.055] px-5 py-4 text-[#f8f5f0]"
+                    ? "min-w-0 overflow-hidden rounded-2xl bg-[#f4efe4] px-5 py-4 text-[#162033]"
+                    : "min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.055] px-5 py-4 text-[#f8f5f0]"
                 }
               >
                 {message.role === "assistant" ? <MessageResponse>{message.content}</MessageResponse> : <p className="whitespace-pre-wrap leading-7">{message.content}</p>}
@@ -270,7 +270,7 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
         ) : null}
 
         <div className="border-t border-white/10 p-4 md:p-5">
-          <div className="flex gap-3 rounded-2xl border border-white/10 bg-[#081121] p-2">
+          <div className="flex min-w-0 gap-2 rounded-2xl border border-white/10 bg-[#081121] p-2 md:gap-3">
             <textarea
               value={input}
               onChange={(event) => setInput(event.target.value)}
@@ -280,7 +280,7 @@ export default function MRAgentChat({ compact = false }: MRAgentChatProps) {
                 }
               }}
               rows={compact ? 2 : 3}
-              className="min-h-14 flex-1 resize-none bg-transparent px-3 py-2 text-sm leading-6 text-[#f8f5f0] outline-none placeholder:text-[#70819b]"
+              className="min-h-14 min-w-0 flex-1 resize-none bg-transparent px-3 py-2 text-sm leading-6 text-[#f8f5f0] outline-none placeholder:text-[#70819b]"
               placeholder="Drop the message, hesitation, or charged moment here."
             />
             <button
