@@ -35,7 +35,6 @@ const mragent = read("lib/mragent.ts");
 const hourlyPrompt = read("docs/hourly_owner_goal_prompt.md");
 
 for (const phrase of [
-  "Reclaim 2+ hours daily when your page, inbox, or follow-up path is leaking decisions.",
   "Website Completion Package",
   "GBP 600",
   "Website buying-friction rescue",
@@ -52,44 +51,42 @@ for (const phrase of [
   "Website Completion and Response Overload Rescue",
   "content-language",
   "target-market-priority",
-  "UK > India > UAE > Saudi Arabia > US > Germany > Japan > Brazil > France > Spain",
-  "Brazil Portuguese business communication support",
-  "Arabic executive communication support",
-  "Japanese business reply refinement",
-  "Hindi founder communication support",
+  "Bulgaria business communication support",
+  "Bulgarian website completion service",
+  "Bulgarian professional reply support",
+  "bg: \"/?lang=bg\"",
+  "bg_BG",
+  "en, es, fr, de, pt, ar, hi, ja, zh, uk, bg",
+  "UK > India > UAE > Saudi Arabia > US > Germany > Japan > Brazil > France > Spain > Bulgaria",
   "GoogleTranslateProvider",
 ]) {
   includes("layout metadata", layout, phrase);
 }
 
-for (const locale of ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"]) {
+for (const locale of ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"]) {
   includes("locale assist", localeAssist, `${locale}: {`);
 }
 
 for (const phrase of [
-  "type LocaleCode = \"en\" | \"es\" | \"fr\" | \"de\" | \"pt\" | \"ar\" | \"hi\" | \"ja\" | \"zh\" | \"uk\"",
+  "type LocaleCode = \"en\" | \"es\" | \"fr\" | \"de\" | \"pt\" | \"ar\" | \"hi\" | \"ja\" | \"zh\" | \"uk\" | \"bg\"",
   "fetch(\"/api/geo-locale\"",
   "GeoLocaleResponse",
   "countryLocale",
-  "BR: \"pt\"",
-  "AE: \"ar\"",
-  "IN: \"hi\"",
-  "JP: \"ja\"",
-  "UA: \"uk\"",
+  "BG: \"bg\"",
+  "Bulgarian",
+  "Bulgaria / Eastern Europe",
   "resolveManualLocale",
   "localeFromBrowser",
   "document.documentElement.lang",
   "document.documentElement.dir",
-  "surfaceTranslations",
-  "Language</span>",
-  "data-detected-country={country}",
   "mindreply:locale-change",
   "data-locale-count={localeCodes.length}",
   "{marketCount} priority markets",
-  "Contact form",
+  "Full-site translation uses Google Translate",
 ]) {
   includes("locale assist", localeAssist, phrase);
 }
+assert(!localeAssist.includes("Auto country signal first"), "locale assist must not use noisy auto-language wording.");
 assert(!localeAssist.includes("Auto {country}"), "locale assist must not show raw Auto country label.");
 
 for (const phrase of [
@@ -99,32 +96,25 @@ for (const phrase of [
   "mindreply-google-translate",
   "mindreply:locale-change",
   "zh-CN",
+  "bg: \"bg\"",
+  "\"bg\"",
 ]) {
   includes("google translate provider", googleTranslate, phrase);
 }
 
 for (const phrase of [
-  "BR: \"pt\"",
-  "AE: \"ar\"",
-  "SA: \"ar\"",
-  "IN: \"hi\"",
-  "JP: \"ja\"",
-  "UA: \"uk\"",
-  "United Kingdom",
-  "India",
-  "United Arab Emirates",
-  "Saudi Arabia",
-  "United States",
-  "Brazil",
+  "BG: \"bg\"",
+  "supportedLocales = [\"en\", \"es\", \"fr\", \"de\", \"pt\", \"ar\", \"hi\", \"ja\", \"zh\", \"uk\", \"bg\"]",
+  "Bulgaria",
+  "locale: \"bg\"",
+  "priority: 11",
   "marketProfiles",
   "providerGap",
-  "priority: 1",
-  "priority: 10",
 ]) {
   includes("geo locale", geoLocale, phrase);
 }
 
-for (const phrase of ["/products", "/checkout", "/website-completion-package", "languageParams", "alternates:", "hi", "uk"]) {
+for (const phrase of ["/products", "/checkout", "/website-completion-package", "languageParams", "alternates:", "hi", "uk", "bg"]) {
   includes("sitemap", sitemap, phrase);
 }
 
@@ -156,13 +146,7 @@ for (const phrase of [
   "Language and market fit",
   "Google Translate or the visitor's browser",
   "info@mind-reply.com",
-  "Contact form",
-  "Try MRagent",
-  "UK",
-  "India",
-  "UAE",
-  "Saudi Arabia",
-  "Brazil",
+  "Bulgaria",
 ]) {
   includes("site footer", footer, phrase);
 }
@@ -172,10 +156,12 @@ assert(!footer.includes("Auto {country}"), "footer must not expose raw Auto coun
 for (const phrase of [
   "MRAGENT_PROVIDER_BASE_URL",
   "MRAGENT_PROVIDER_API_KEY",
-  "under 90 words",
-  "2-4 short paragraphs",
+  "supportedAgentLanguages",
+  "Bulgarian",
+  "Mirror the user's language",
+  "Supported response languages include English, Spanish, French, German, Portuguese, Arabic, Hindi, Japanese, Chinese, Ukrainian, and Bulgarian",
   "Every answer must feel slightly different",
-  "max_output_tokens: 150",
+  "max_output_tokens: 220",
 ]) {
   includes("mragent", mragent, phrase);
 }
@@ -227,6 +213,15 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "11 priority languages",
+  "Bulgarian visitors",
+  "Bulgarian support",
+  "Google Translate fallback",
+]) {
+  includes("capabilities", capabilities, phrase);
+}
+
+for (const phrase of [
   "Website Completion Package first",
   "Layer 1: immediate operational relief through MRagent",
   "Layer 2: premium authority",
@@ -237,7 +232,6 @@ for (const phrase of [
   includes("hourly owner prompt", hourlyPrompt, phrase);
 }
 
-includes("capabilities", capabilities, "Service readiness");
 includes("agents redirect", agents, "redirect(\"/capabilities\")");
 includes("legacy pack redirect", legacyPack, "redirect(\"/website-completion-package\")");
 
@@ -249,4 +243,4 @@ for (const broken of ["\u00c3", "\u00e0\u00a4", "\u00e6\u2014", "\u00d0\u00a3"])
   assert(!localeAssist.includes(broken), `locale assist appears to contain mojibake marker ${broken}`);
 }
 
-console.log("Revenue, mobile, Google Translate fallback, priority-market SEO, product and checkout routes, invoice-first close path, MRagent behavior, hourly owner contract, and public safety verification passed.");
+console.log("Revenue, mobile, Google Translate whole-site fallback, Bulgarian i18n, priority-market SEO, product and checkout routes, invoice-first close path, MRagent multilingual behavior, hourly owner contract, and public safety verification passed.");
