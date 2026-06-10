@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {
-  ArrowRight, 
+  ArrowRight,
   BarChart3,
   Brain,
   CheckCircle2,

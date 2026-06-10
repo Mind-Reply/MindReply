@@ -55,13 +55,13 @@ export default function SiteFooter() {
           <section className="mt-5 rounded-lg border border-white/10 bg-white/[0.028] p-4">
             <div className="flex items-center gap-2 text-[#91d2c8]">
               <Languages aria-hidden className="h-4 w-4" />
-              <p className="text-xs font-bold uppercase tracking-[0.18em]">Language and market fit</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">Quiet language assist</p>
             </div>
             <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
-              Region and browser language only guide the first suggestion. The manual selector stays available, and Google Translate or the visitor's browser can handle full-page translation when needed. High-demand regions: {priorityMarkets.join(" / ")}.
+                Auto country signal first, browser language second. The manual selector stays available, and Google Translate or the visitor's browser can handle full-page translation when needed. High-demand regions: {priorityMarkets.join(" / ")}.
             </p>
             <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
-              Public contact: <a href={`mailto:${supportEmail}`} className="font-bold text-[#e2b757] hover:underline">{supportEmail}</a>. For package scope, use the contact form or checkout path first.
+                Public contact uses {supportEmail}. For package scope, use the contact form or checkout path first.
             </p>
           </section>
         </div>
