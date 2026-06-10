@@ -18,6 +18,12 @@ type PackageReceipt = {
   fallbackEmail: string;
   inputHash: string;
   rawContentRedacted: boolean;
+  billing: {
+    required: boolean;
+    nameCaptured: boolean;
+    emailCaptured: boolean;
+    billingEmailHash: string;
+  };
   assistedClose: {
     status: "queued" | "fallback";
     nextStep: string;
@@ -39,11 +45,15 @@ type PackageRequestFormProps = {
 
 const initialForm = {
   email: "",
+  billingName: "",
+  billingEmail: "",
   intent: "website-completion",
   context: "",
   triedMRagent: "",
   consent: false,
 };
+
+const billingIntents = new Set(["website-completion", "billing", "pro"]);
 
 function fallbackReason(status?: DeliveryStatus) {
   if (status === "sent") return "Request delivered";
@@ -52,13 +62,22 @@ function fallbackReason(status?: DeliveryStatus) {
   return "Fallback email available";
 }
 
+function validEmail(value: string) {
+  return /^\S+@\S+\.\S+$/.test(value.trim());
+}
+
 export default function PackageRequestForm({ mailtoHref, supportEmail }: PackageRequestFormProps) {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [receipt, setReceipt] = useState<PackageReceipt | null>(null);
 
-  const canSubmit = useMemo(() => form.email.trim() && form.context.trim().length >= 12 && form.consent && !loading, [form, loading]);
+  const billingRequired = billingIntents.has(form.intent);
+  const billingReady = !billingRequired || (form.billingName.trim().length >= 2 && validEmail(form.billingEmail));
+  const canSubmit = useMemo(
+    () => form.email.trim() && form.context.trim().length >= 12 && billingReady && form.consent && !loading,
+    [billingReady, form, loading],
+  );
 
   async function submit() {
     if (!canSubmit) return;
@@ -104,6 +123,30 @@ export default function PackageRequestForm({ mailtoHref, supportEmail }: Package
             className="rounded-lg border border-[#122033]/15 bg-[#fbfaf6] px-4 py-3 text-[#122033] outline-none transition focus:border-[#2f6f72]"
           />
         </label>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="grid gap-2 text-sm font-semibold text-[#39485b]">
+            Billing name
+            <input
+              value={form.billingName}
+              onChange={(event) => setForm((current) => ({ ...current, billingName: event.target.value }))}
+              type="text"
+              required={billingRequired}
+              className="rounded-lg border border-[#122033]/15 bg-[#fbfaf6] px-4 py-3 text-[#122033] outline-none transition focus:border-[#2f6f72]"
+              placeholder="For invoice-first package requests"
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-semibold text-[#39485b]">
+            Billing email
+            <input
+              value={form.billingEmail}
+              onChange={(event) => setForm((current) => ({ ...current, billingEmail: event.target.value }))}
+              type="email"
+              required={billingRequired}
+              className="rounded-lg border border-[#122033]/15 bg-[#fbfaf6] px-4 py-3 text-[#122033] outline-none transition focus:border-[#2f6f72]"
+              placeholder="Used for invoice/payment route"
+            />
+          </label>
+        </div>
         <label className="grid gap-2 text-sm font-semibold text-[#39485b]">
           What do you need?
           <select
@@ -150,7 +193,7 @@ export default function PackageRequestForm({ mailtoHref, supportEmail }: Package
         </label>
         <div className="rounded-lg border border-[#122033]/10 bg-[#fbfaf6] p-4 text-sm leading-6 text-[#59687b]">
           <p className="font-semibold text-[#122033]">Invoice-first route</p>
-          <p className="mt-1">No payment link is required to submit. MindReply confirms scope first, then sends the invoice request or configured payment link before delivery.</p>
+          <p className="mt-1">No payment link is required to submit. Billing name and billing email are collected before the invoice route. MindReply confirms scope first, then sends the invoice request or configured payment link before delivery.</p>
         </div>
         <button
           type="button"
@@ -176,6 +219,8 @@ export default function PackageRequestForm({ mailtoHref, supportEmail }: Package
             <p>Reply window: {receipt.assistedClose.expectedReplyWindow}</p>
             <p>Owner decision needed: {receipt.assistedClose.ownerDecisionNeeded}</p>
             <p>Payment path: {receipt.assistedClose.paymentPath}</p>
+            <p>Billing captured: {receipt.billing.nameCaptured && receipt.billing.emailCaptured ? "yes" : "not yet"}</p>
+            <p>Billing email hash: {receipt.billing.billingEmailHash || "not captured"}</p>
             <p>Risk: {receipt.riskLevel}; confidence: {receipt.confidence}; playbook: {receipt.playbookVersion}</p>
             <p>Input hash: {receipt.inputHash}</p>
             <p>Raw content redacted: {receipt.rawContentRedacted ? "yes" : "no"}</p>
