@@ -53,29 +53,56 @@ body {
     overflow-wrap: anywhere;
   }
 
+  main section {
+    scroll-margin-top: 1rem;
+  }
+
   .min-h-\[43rem\] {
     min-height: 34rem !important;
   }
 
   .locale-assist-shell {
+    padding-block: 0.65rem;
     padding-inline: 0.875rem;
   }
 
-  .locale-assist-inner,
+  .locale-assist-inner {
+    gap: 0.55rem;
+  }
+
   .locale-assist-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     gap: 0.45rem;
   }
 
+  .locale-assist-controls label {
+    letter-spacing: 0.08em;
+  }
+
   .locale-assist-controls select {
-    max-width: 8.5rem;
+    max-width: 9.4rem;
   }
 
   .locale-chip {
     max-width: 100%;
   }
 
+  .priority-chip {
+    display: none;
+  }
+
+  .market-chip {
+    grid-column: 1 / -1;
+    width: fit-content;
+    max-width: 100%;
+    opacity: 0.78;
+  }
+
   .locale-assist-copy {
     font-size: 0.68rem;
     line-height: 1.35rem;
+    opacity: 0.9;
   }
 }
