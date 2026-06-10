@@ -19,6 +19,71 @@ Layer 2: premium authority.
 - Explain discipline-specific language, behavioral expression refinement, measurable communication structure, privacy-safe receipts, and risk/confidence labels.
 - Avoid abstract platform theatre. Authority must make the buyer trust the package, not decode a vague ecosystem.
 
+## Ruthless Diagnosis
+
+What converts:
+
+- The outcome promise is concrete: reclaim time quickly.
+- The audience is commercially useful: overloaded operators, founders, consultants, and client-facing teams.
+- The first-use promise works when it shows a ranked action queue, send-ready message, or quiet receipt before checkout.
+- Private-by-design positioning fits sensitive communication work when it stays specific.
+- The Website Completion Package gives the site one clear paid object instead of spreading attention across vague SaaS options.
+
+What is still vague:
+
+- Communication intelligence must be explained as a visible output: one read, one reply, one next move, one receipt.
+- Growth and Pro must show trigger conditions, not just plan names.
+- Credits must stay secondary until the buyer knows when credits beat the package or subscription.
+- Integrations, memory, and premium depth must be described as consent-gated capabilities, not implied active status.
+
+What weakens trust:
+
+- Abstract platform language without a concrete input/output example.
+- Cosmetic metrics such as clarity scores, refinement counts, or risk labels that are not tied to real evidence.
+- Any public claim of certifications, customer counts, guaranteed sales volume, or integrations before source proof exists.
+- Personal owner inboxes, private audit evidence, secrets, or internal agent language on public pages.
+
+What weakens upgrade pressure:
+
+- Asking for payment before the free output proves the friction.
+- Treating Growth and Pro as generic tiers instead of recurring-overload and sensitive-continuity triggers.
+- Hiding the GBP 600 package route, invoice option, or exact buyer deliverables.
+- Selling redesign language when the sharper offer is buying-friction rescue.
+
+Rewrite immediately:
+
+- Replace `Process 10 Urgent Items` with `Try MindReply Free` where the user has not learned the product yet.
+- Replace `executive communication intelligence` with `turn one sensitive reply, task mess, or page section into one clear next move`.
+- Replace `MR Guidance Layer` with `MRagent reads the pressure, ranks the next action, and drafts the safer reply`.
+- Replace decorative metrics with proof the buyer can inspect: input type, output type, privacy boundary, route to pay, and receipt.
+
+## Required Public Blocks
+
+- Hero: `Reclaim 2+ hours daily within 24 hours` plus a plain input/output explanation and `Try MindReply Free`.
+- Trust block: private-by-design, raw private text not used as public proof, memory requires consent, revenue claims tied to verified sources.
+- How it works block: paste one item, receive one read, choose free/credits/package/Growth/Pro.
+- Pricing and paid path block: free first read, credits for repeated quick reads, GBP 600 Website Completion Package, Growth, Pro.
+- Upgrade block: Growth when overload repeats every week; Pro when sensitive continuity, approved memory, receipt review, or integrations are needed.
+- Authority block: 20+ professional lexicons, 10 refinement tools, and high-trust professional communication without unverified compliance claims.
+
+## Required Sales Assets
+
+- 5 high-converting outbound DMs that name the leak and offer one focused rescue.
+- 3 cold emails that sell the Website Completion Package without redesign fluff.
+- 2 follow-ups that make the next step smaller and clearer.
+- 1 call or booking message that asks for the page, message, or follow-up path leaking the sale.
+- 1 objection handling section covering redesign resistance, privacy hesitation, proof-before-payment, and fit.
+
+## First-Session Conversion Logic
+
+- First user action: paste one tense reply, task pile, page section, objection, or follow-up path into MRagent.
+- First output: one pressure read, one ranked next move, one send-ready line or reply, and one quiet receipt marker.
+- Aha moment: the buyer sees the bottleneck named in plain language and gets a usable next step without a long setup.
+- Credit purchase trigger: several messages need the same quick treatment, but the website offer is not the problem.
+- Website Completion Package trigger: the homepage, offer, trust proof, contact path, checkout, or follow-up sequence is leaking buyer action.
+- Growth trigger: the same communication overload repeats every week across inbox, clients, or small team work.
+- Pro trigger: sensitive continuity, approved memory, receipt review, integration planning, or reputation-critical communication is required.
+
 ## Paid Entry Offer
 
 Use `Website Completion Package` as the neutral delivery bundle.

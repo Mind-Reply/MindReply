@@ -14,6 +14,7 @@ function assert(condition: unknown, message: string) {
 }
 
 const prompt = readRequired("docs/hourly_owner_goal_prompt.md");
+const blueprint = readRequired("docs/website_audit_action_blueprint.md");
 const home = readRequired("app/page.tsx");
 const pack = readRequired("app/pack/page.tsx");
 const canonicalPackage = readRequired("app/website-completion-package/page.tsx");
@@ -42,18 +43,51 @@ for (const phrase of [
   assert((prompt + publicPages).toLowerCase().includes(phrase.toLowerCase()), `Missing revenue-first phrase: ${phrase}`);
 }
 
+for (const phrase of [
+  "Ruthless Diagnosis",
+  "What converts:",
+  "What is still vague:",
+  "What weakens trust:",
+  "What weakens upgrade pressure:",
+  "Rewrite immediately:",
+  "Two-Layer Homepage Model",
+  "Layer 1: immediate operational relief.",
+  "Layer 2: premium authority.",
+  "Required Public Blocks",
+  "Hero:",
+  "Trust block:",
+  "How it works block:",
+  "Pricing and paid path block:",
+  "Upgrade block:",
+  "Authority block:",
+  "Required Sales Assets",
+  "5 high-converting outbound DMs",
+  "3 cold emails",
+  "2 follow-ups",
+  "1 call or booking message",
+  "1 objection handling section",
+  "First-Session Conversion Logic",
+  "First user action:",
+  "First output:",
+  "Aha moment:",
+  "Credit purchase trigger:",
+  "Website Completion Package trigger:",
+  "Growth trigger:",
+  "Pro trigger:",
+]) {
+  assert(blueprint.includes(phrase), `Website audit blueprint must include: ${phrase}`);
+}
+
 assert(home.includes("Reclaim 2+ hours daily within 24 hours"), "Homepage must preserve the immediate operational relief promise.");
 assert(home.includes("Website Completion Package"), "Homepage must name the Website Completion Package.");
 assert(home.includes("GBP 600"), "Homepage must show the GBP 600 paid package.");
 assert(home.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "Homepage must support the package payment URL variable.");
-assert(home.includes("Request invoice"), "Homepage must preserve invoice fallback when no payment link is configured.");
+assert(home.includes("Checkout or request invoice"), "Homepage must preserve invoice fallback when no payment link is configured.");
+assert(home.includes("invoice-first route works for B2B buyers"), "Homepage must explain the invoice-first fallback.");
 assert(home.includes("info@mind-reply.com"), "Homepage must use the public MindReply mailbox.");
 
-assert(pack.includes("Website Completion Package"), "/pack must sell the Website Completion Package.");
-assert(pack.includes("Revenue truth"), "/pack must keep revenue claims evidence-bound.");
-assert(pack.includes("GBP 600"), "/pack must show the GBP 600 total.");
-assert(pack.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "/pack must support the package payment URL variable.");
-assert(pack.includes("Request invoice"), "/pack must preserve invoice fallback.");
+assert(pack.includes('redirect("/website-completion-package")'), "/pack must redirect to the canonical Website Completion Package page.");
+assert(pack.includes("index: false"), "/pack legacy redirect must stay non-indexed.");
 
 assert(canonicalPackage.includes("Website Completion Package"), "/website-completion-package must sell the Website Completion Package.");
 assert(canonicalPackage.includes("GBP 600"), "/website-completion-package must show the GBP 600 total.");
