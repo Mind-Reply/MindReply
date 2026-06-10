@@ -20,7 +20,19 @@ const demandLanes = [
   "Privacy-safe assisted close",
 ];
 
-const priorityMarkets = ["UK", "India", "UAE", "Saudi Arabia", "Brazil", "Bulgaria"];
+const targetMarkets = [
+  "UK",
+  "India",
+  "UAE",
+  "Saudi Arabia",
+  "US",
+  "Germany",
+  "Japan",
+  "Brazil",
+  "France",
+  "Spain",
+  "Bulgaria",
+];
 
 export default function SiteFooter() {
   return (
@@ -47,7 +59,7 @@ export default function SiteFooter() {
               <p className="text-xs font-bold uppercase tracking-[0.18em]">Quiet language assist</p>
             </div>
             <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
-                Language and market fit stays quiet. Country signal guides the first suggestion, then browser language refines it. The manual selector stays available, and Google Translate or the visitor's browser can handle full-page translation when needed. High-demand regions: {priorityMarkets.join(" / ")}.
+                Language and market fit stays quiet. Country signal guides the first suggestion, then browser language refines it. The manual selector stays available, and Google Translate or the visitor's browser can handle full-page translation when needed. High-demand regions: {targetMarkets.join(" / ")}.
             </p>
             <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
                 Public contact uses {supportEmail}. For package scope, use the contact form or checkout path first.
@@ -63,6 +75,19 @@ export default function SiteFooter() {
             </div>
             <p className="mt-4 text-sm leading-7 text-[#cdd8df]">
               Public copy stays measured. Delivery, revenue, security, and service claims are only stated when file, workflow, endpoint, or connector proof exists.
+            </p>
+          </section>
+
+          <section className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
+            <div className="flex items-center gap-2 text-[#e2b757]">
+              <Languages aria-hidden className="h-4 w-4" />
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">Language and market fit</p>
+            </div>
+            <p className="mt-4 text-sm leading-7 text-[#cdd8df]">
+              Region and browser language guide the first suggestion. Full-site translation uses Google Translate, and Google Translate or the visitor's browser can handle the whole website when needed.
+            </p>
+            <p className="mt-3 text-xs font-semibold leading-6 text-[#9fb0bd]">
+              Priority markets: {targetMarkets.slice(0, 6).join(" / ")}. Wider coverage: {targetMarkets.slice(6).join(" / ")}.
             </p>
           </section>
 

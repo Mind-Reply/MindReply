@@ -83,6 +83,34 @@ const proof = [
   "MRagent is the first support route; contact is the fallback when the agent cannot solve the question.",
 ];
 
+const buyingTriggers = [
+  {
+    label: "Use the free read",
+    trigger: "One tense reply, one unclear follow-up, or one page section needs a quick read.",
+    next: "Paste it into MRagent and use the answer if the next move is obvious.",
+  },
+  {
+    label: "Buy credits",
+    trigger: "Several messages need the same quick treatment, but the website offer is not the problem.",
+    next: "Use credits for repeated reply polish, pressure reads, and next-step wording.",
+  },
+  {
+    label: "Buy the GBP 600 package",
+    trigger: "The homepage, pricing path, contact route, or offer copy is still leaking buyers.",
+    next: "Request invoice or pay when the payment link is configured; the package fixes the buying path.",
+  },
+  {
+    label: "Upgrade to Growth",
+    trigger: "The same overload returns every week across inboxes, client replies, or small team work.",
+    next: "Use Growth when repeated communication pressure costs time every week.",
+  },
+  {
+    label: "Upgrade to Pro",
+    trigger: "Sensitive continuity, approved memory, receipt review, or integration planning becomes necessary.",
+    next: "Use Pro only when the work needs deeper context and stronger operating controls.",
+  },
+];
+
 const faqs = [
   {
     q: "What should I buy first?",
@@ -171,6 +199,29 @@ export default function PricingPage() {
                 <a href={plan.href} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#122033] px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:bg-[#1c3150]">
                   {plan.cta} <ArrowRight aria-hidden className="h-4 w-4" />
                 </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-[#122033]/10 bg-[#fbfaf6] px-4 py-12 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">What to buy next</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The paid path should remove doubt, not add another decision.</h2>
+            <p className="mt-5 text-sm leading-7 text-[#59687b]">
+              MindReply uses one rule: prove value first, then move the buyer to the smallest paid option that fixes the actual leak.
+            </p>
+          </div>
+          <div className="grid gap-3">
+            {buyingTriggers.map((item) => (
+              <article key={item.label} className="grid gap-4 rounded-lg border border-[#122033]/10 bg-white p-5 shadow-sm shadow-[#122033]/5 md:grid-cols-[0.42fr_0.58fr]">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#2f6f72]">{item.label}</p>
+                  <p className="mt-3 text-sm leading-6 text-[#59687b]">{item.trigger}</p>
+                </div>
+                <div className="rounded-lg bg-[#f7f4ed] p-4 text-sm font-semibold leading-6 text-[#122033]">{item.next}</div>
               </article>
             ))}
           </div>

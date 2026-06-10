@@ -62,10 +62,12 @@ function includes(text, phrase) {
 }
 
 const generatedAt = new Date().toISOString();
-const [home, contact, packagePage, version, health, packageRequest, robots, sitemap, geoLocale] = await Promise.all([
+const [home, contact, packagePage, products, checkout, version, health, packageRequest, robots, sitemap, geoLocale] = await Promise.all([
   request("/"),
   request("/contact"),
   request("/website-completion-package"),
+  request("/products"),
+  request("/checkout"),
   request("/api/version"),
   request("/api/health"),
   request("/api/package-request", {
@@ -78,14 +80,24 @@ const [home, contact, packagePage, version, health, packageRequest, robots, site
   request("/api/geo-locale"),
 ]);
 
-const publicText = `${home.text}\n${contact.text}\n${packagePage.text}`;
+const publicText = `${home.text}\n${contact.text}\n${packagePage.text}\n${products.text}\n${checkout.text}`;
 const checks = [];
 const liveSha = version.json?.deployment?.commitSha || "";
-const renderedDeploymentIds = [...new Set([...home.deploymentIds, ...contact.deploymentIds, ...packagePage.deploymentIds])];
+const renderedDeploymentIds = [
+  ...new Set([
+    ...home.deploymentIds,
+    ...contact.deploymentIds,
+    ...packagePage.deploymentIds,
+    ...products.deploymentIds,
+    ...checkout.deploymentIds,
+  ]),
+];
 
 check(checks, "home-reachable", home.status === 200, `Homepage status ${home.status}.`);
 check(checks, "contact-reachable", contact.status === 200, `Contact status ${contact.status}.`);
 check(checks, "package-page-reachable", packagePage.status === 200, `Package page status ${packagePage.status}.`);
+check(checks, "products-reachable", products.status === 200, `Products status ${products.status}.`);
+check(checks, "checkout-reachable", checkout.status === 200, `Checkout status ${checkout.status}.`);
 check(checks, "version-current", version.status === 200 && version.json?.status === "ok" && version.json?.deployment, `Version status ${version.status}; retired/stale production returns 410.`);
 check(
   checks,
@@ -106,7 +118,7 @@ check(
 check(checks, "health-reachable", health.status === 200 && health.json?.status === "ok", `Health status ${health.status}.`);
 check(checks, "package-api-mounted", packageRequest.status === 400 && /email|required|request body/i.test(packageRequest.text), `Package request invalid-body probe status ${packageRequest.status}.`);
 
-check(checks, "relief-promise", includes(home.text, "Reclaim 2+ hours daily within 24 hours"), "Homepage must keep the immediate relief promise.");
+check(checks, "relief-promise", includes(home.text, "Reclaim 2+ hours daily within 24 hours") && includes(home.text, "Reclaim 2+ hours daily when"), "Homepage must keep the immediate relief promise and explain the operational leak.");
 check(checks, "website-completion-package", includes(publicText, "Website Completion Package"), "Live public surface must sell the Website Completion Package.");
 check(checks, "package-price", includes(publicText, "GBP 600"), "Live public surface must show the GBP 600 entry offer.");
 check(checks, "public-mailbox", includes(publicText, "info@mind-reply.com"), "Live public surface must use the public MindReply mailbox.");
@@ -121,12 +133,23 @@ check(checks, "package-billing-fields", includes(packagePage.text, "billing name
 check(checks, "package-scope-first", includes(packagePage.text, "Scope first, invoice/payment before delivery"), "Package page must keep the scope-first close guard.");
 check(checks, "package-payment-path-receipt", includes(packagePage.text, "paymentPath") && includes(packagePage.text, "invoice-first unless a configured direct payment link is present"), "Package page must show the receipt paymentPath proof.");
 
-check(checks, "footer-market-strip", includes(home.text, "Auto language and priority markets"), "Live footer must expose the quiet auto-language and market strip.");
-check(checks, "market-priority-meta", includes(home.text, "target-market-priority") && includes(home.text, "UK > US > UAE"), "Live metadata must include the current target-market priority.");
-check(checks, "geo-locale-market-profiles", geoLocale.status === 200 && Array.isArray(geoLocale.json?.marketProfiles) && geoLocale.json.marketProfiles.length >= 10, `Geo locale status ${geoLocale.status}; market profiles ${geoLocale.json?.marketProfiles?.length ?? "missing"}.`);
+check(checks, "products-title", includes(products.text, "Products | MindReply") || includes(products.text, "MindReply products"), "Products page must expose the product route title.");
+check(checks, "products-paid-path", includes(products.text, "GBP 600 fixed") && includes(products.text, "Checkout or invoice"), "Products page must expose the fixed-price package path.");
+check(checks, "products-upgrade-depth", includes(products.text, "Growth") && includes(products.text, "Pro") && includes(products.text, "See more"), "Products page must show Growth, Pro, and compact See more paths.");
+check(checks, "checkout-title", includes(checkout.text, "Checkout | MindReply") || includes(checkout.text, "Fixed-price checkout"), "Checkout page must expose the checkout title.");
+check(checks, "checkout-invoice-path", includes(checkout.text, "Website Completion Package, GBP 600") && includes(checkout.text, "Request invoice") && includes(checkout.text, "Invoice option"), "Checkout page must show fixed price and invoice option.");
+
+check(checks, "homepage-authority-depth", includes(home.text, "20+ professional lexicons") && includes(home.text, "10 refinement tools"), "Homepage must show premium authority depth above generic productivity copy.");
+check(checks, "footer-market-strip", includes(home.text, "Language and market fit") || includes(home.text, "Full-site translation uses Google Translate"), "Live footer must expose the quiet language and market strip, not noisy auto placeholders.");
+check(checks, "no-auto-bg-placeholder", !includes(home.text, "{AUTO BG}") && !includes(home.text, "Auto country signal first"), "Live footer must not expose raw auto-language placeholder copy.");
+check(checks, "market-priority-meta", includes(home.text, "target-market-priority") && includes(home.text, "India") && includes(home.text, "Bulgaria"), "Live metadata must include the current priority-market order and Bulgaria.");
+check(checks, "geo-locale-market-profiles", geoLocale.status === 200 && Array.isArray(geoLocale.json?.marketProfiles) && geoLocale.json.marketProfiles.length >= 11, `Geo locale status ${geoLocale.status}; market profiles ${geoLocale.json?.marketProfiles?.length ?? "missing"}.`);
+check(checks, "geo-locale-bulgaria", includes(geoLocale.text, "Bulgaria") && includes(geoLocale.text, "bg"), "Geo locale must include Bulgaria targeting.");
 check(checks, "geo-locale-brazil", includes(geoLocale.text, "Brazil") && includes(geoLocale.text, "pt"), "Geo locale must include Brazil Portuguese targeting.");
 check(checks, "robots-no-stale-public-routes", robots.status === 200 && !/allow:\s*\/agents|allow:\s*\/pack/i.test(robots.text), "Robots must not allow retired /agents or /pack surfaces.");
+check(checks, "robots-commercial-routes", robots.status === 200 && includes(robots.text, "/products") && includes(robots.text, "/checkout"), "Robots must allow the product and checkout surfaces.");
 check(checks, "sitemap-no-stale-public-routes", sitemap.status === 200 && !sitemap.text.includes("<loc>https://www.mind-reply.com/agents</loc>") && !sitemap.text.includes("<loc>https://www.mind-reply.com/pack</loc>"), "Sitemap must not index retired /agents or /pack routes.");
+check(checks, "sitemap-commercial-routes", sitemap.status === 200 && includes(sitemap.text, "/products") && includes(sitemap.text, "/checkout") && includes(sitemap.text, "lang=bg"), "Sitemap must include products, checkout, and Bulgarian language alternates.");
 
 const failed = checks.filter((item) => !item.pass && item.severity === "error");
 const warnings = checks.filter((item) => !item.pass && item.severity !== "error");
@@ -143,7 +166,7 @@ const report = {
   failed: failed.map((item) => item.id),
   warnings: warnings.map((item) => item.id),
   checks,
-  surfaces: [home, contact, packagePage, version, health, packageRequest, robots, sitemap, geoLocale].map(({ path, url, ok, status, contentType, latencyMs, json, deploymentIds, error }) => ({
+  surfaces: [home, contact, packagePage, products, checkout, version, health, packageRequest, robots, sitemap, geoLocale].map(({ path, url, ok, status, contentType, latencyMs, json, deploymentIds, error }) => ({
     path,
     url,
     ok,
