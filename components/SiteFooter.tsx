@@ -31,6 +31,7 @@ const priorityMarkets = [
   "Brazil",
   "France",
   "Spain",
+  "Bulgaria",
 ];
 
 export default function SiteFooter() {
