@@ -19,6 +19,7 @@ const languageParams = [
 const routes = [
   { path: "/", priority: 1, changeFrequency: "daily" as const, localized: true },
   { path: "/agent", priority: 0.95, changeFrequency: "daily" as const, localized: true },
+  { path: "/response-overload", priority: 0.945, changeFrequency: "daily" as const, localized: true },
   { path: "/products", priority: 0.94, changeFrequency: "daily" as const, localized: true },
   { path: "/website-completion-package", priority: 0.92, changeFrequency: "daily" as const, localized: true },
   { path: "/checkout", priority: 0.9, changeFrequency: "weekly" as const, localized: true },

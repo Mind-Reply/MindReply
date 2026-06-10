@@ -124,7 +124,7 @@ export default function ContactPage() {
       <section className="border-y border-[#122033]/10 bg-white px-4 py-12 md:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.78fr_1.22fr]">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Package request</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Contact form</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Website Completion Package, GBP 600.</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
               The package turns overloaded website messaging, scattered launch notes, or reply pressure into a ranked action queue and send-ready copy.
