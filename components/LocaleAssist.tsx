@@ -262,9 +262,10 @@ function localeFromBrowser() {
   return isLocale(browserLocale) ? browserLocale : "en";
 }
 
-function applyDocumentLocale(nextLocale: LocaleCode) {
+function publishLocale(nextLocale: LocaleCode) {
   document.documentElement.lang = nextLocale;
   document.documentElement.dir = rtlLocales.has(nextLocale) ? "rtl" : "ltr";
+  window.dispatchEvent(new CustomEvent("mindreply:locale-change", { detail: { locale: nextLocale } }));
 }
 
 function applySurfaceLocale(nextLocale: LocaleCode) {
@@ -301,7 +302,7 @@ export default function LocaleAssist() {
     const manualLocale = resolveManualLocale();
     const initialLocale = manualLocale || localeFromBrowser();
     setLocale(initialLocale);
-    applyDocumentLocale(initialLocale);
+    publishLocale(initialLocale);
 
     fetch("/api/geo-locale", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : null))
@@ -315,7 +316,7 @@ export default function LocaleAssist() {
         setCountry(detectedCountry);
         setMarketCount(data?.marketProfiles?.length || data?.priorityMarkets?.length || 10);
         setLocale(nextLocale);
-        applyDocumentLocale(nextLocale);
+        publishLocale(nextLocale);
       })
       .catch(() => {
         setCountry("browser");
@@ -323,7 +324,7 @@ export default function LocaleAssist() {
   }, []);
 
   useEffect(() => {
-    applyDocumentLocale(locale);
+    publishLocale(locale);
     applySurfaceLocale(locale);
   }, [locale]);
 
@@ -335,12 +336,13 @@ export default function LocaleAssist() {
       aria-label="Language and region assist"
       data-revenue-anchor={`${packageName} ${packagePrice}`}
       data-locale-count={localeCodes.length}
+      data-detected-country={country}
     >
       <div className="locale-assist-inner mx-auto flex max-w-7xl flex-col gap-2 text-[11px] text-[#cdd8df] md:flex-row md:items-center md:justify-between">
         <div className="locale-assist-controls flex flex-wrap items-center gap-2">
           <label className="flex items-center gap-2 font-semibold uppercase tracking-[0.14em] text-[#91d2c8]" htmlFor="mindreply-locale">
             <Globe2 aria-hidden className="h-3.5 w-3.5" />
-            <span>Auto {country}</span>
+            <span>Language</span>
           </label>
           <select
             id="mindreply-locale"
@@ -350,7 +352,7 @@ export default function LocaleAssist() {
               if (!isLocale(nextLocale)) return;
               setLocale(nextLocale);
               window.localStorage.setItem("mindreply-locale", nextLocale);
-              applyDocumentLocale(nextLocale);
+              publishLocale(nextLocale);
               const url = new URL(window.location.href);
               url.searchParams.set("lang", nextLocale);
               window.history.replaceState(null, "", url);
