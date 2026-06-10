@@ -142,6 +142,7 @@ for (const phrase of [
 }
 
 assert(home.includes("Reclaim 2+ hours daily within 24 hours"), "Homepage must preserve the immediate operational relief promise.");
+assert(home.includes("Try MindReply Free"), "Homepage must use the clear Try MindReply Free CTA.");
 assert(home.includes("Website Completion Package"), "Homepage must name the Website Completion Package.");
 assert(home.includes("GBP 600"), "Homepage must show the GBP 600 paid package.");
 assert(home.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "Homepage must support the package payment URL variable.");
