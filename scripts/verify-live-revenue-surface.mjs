@@ -116,9 +116,13 @@ check(
 check(
   checks,
   "rendered-deployment-current",
-  !requireDeploymentMatch || (expectedDeploymentId && renderedDeploymentIds.includes(expectedDeploymentId)),
+  !requireDeploymentMatch ||
+    (expectedDeploymentId && renderedDeploymentIds.includes(expectedDeploymentId)) ||
+    (requireShaMatch && expectedSha && liveSha === expectedSha && renderedDeploymentIds.length === 0),
   requireDeploymentMatch
-    ? `Rendered deployment ids ${renderedDeploymentIds.join(", ") || "missing"}; expected ${expectedDeploymentId || "missing"}.`
+    ? renderedDeploymentIds.length > 0
+      ? `Rendered deployment ids ${renderedDeploymentIds.join(", ")}; expected ${expectedDeploymentId || "missing"}.`
+      : `Rendered deployment ids missing; live SHA ${liveSha || "missing"} proves current release when HTML does not expose deployment id.`
     : `Rendered deployment ids ${renderedDeploymentIds.join(", ") || "not detected"}.`,
 );
 check(checks, "health-reachable", health.status === 200 && health.json?.status === "ok", `Health status ${health.status}.`);
