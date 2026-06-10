@@ -161,7 +161,20 @@ check(
   "Live metadata must describe visitor IP/browser language matching without Bulgaria-specific SEO.",
 );
 check(checks, "geo-locale-market-profiles", geoLocale.status === 200 && Array.isArray(geoLocale.json?.marketProfiles) && geoLocale.json.marketProfiles.length >= 10, `Geo locale status ${geoLocale.status}; market profiles ${geoLocale.json?.marketProfiles?.length ?? "missing"}.`);
-check(checks, "geo-locale-no-bulgarian-targeting", !includes(geoLocale.text, "Bulgaria") && !includes(geoLocale.text, "Bulgarian") && !includes(geoLocale.text, "\"bg\""), "Geo locale must not advertise Bulgaria/Bulgarian targeting.");
+const geoSupportedLocales = Array.isArray(geoLocale.json?.supportedLocales) ? geoLocale.json.supportedLocales : [];
+const geoMarketProfiles = Array.isArray(geoLocale.json?.marketProfiles) ? geoLocale.json.marketProfiles : [];
+const hasBulgarianLanguageTarget =
+  geoSupportedLocales.includes("bg") ||
+  geoMarketProfiles.some((profile) => {
+    const serialized = JSON.stringify(profile);
+    return profile?.locale === "bg" || /Bulgaria|Bulgarian/i.test(serialized);
+  });
+check(
+  checks,
+  "geo-locale-no-bulgarian-targeting",
+  geoLocale.status === 200 && !hasBulgarianLanguageTarget && !includes(geoLocale.text, "Bulgaria") && !includes(geoLocale.text, "Bulgarian"),
+  "Geo locale may report visitor country code BG, but must not advertise Bulgaria/Bulgarian language targeting.",
+);
 check(checks, "geo-locale-brazil", includes(geoLocale.text, "Brazil") && includes(geoLocale.text, "pt"), "Geo locale must include Brazil Portuguese targeting.");
   const allowsRetiredRobotsPath = /^allow:\s*\/(?:agents|pack)(?:$|\s)/im.test(robots.text);
   check(
