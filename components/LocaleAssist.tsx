@@ -9,20 +9,7 @@ type GeoLocaleResponse = {
   recommendedLocale?: string;
 };
 
-const localeCopy = {
-  en: { label: localeMeta.en.nativeLabel },
-  es: { label: localeMeta.es.nativeLabel },
-  fr: { label: localeMeta.fr.nativeLabel },
-  de: { label: localeMeta.de.nativeLabel },
-  pt: { label: localeMeta.pt.nativeLabel },
-  ar: { label: localeMeta.ar.nativeLabel },
-  hi: { label: localeMeta.hi.nativeLabel },
-  ja: { label: localeMeta.ja.nativeLabel },
-  zh: { label: localeMeta.zh.nativeLabel },
-  uk: { label: localeMeta.uk.nativeLabel },
-} satisfies Record<LocaleCode, { label: string }>;
-
-const localeCodes = Object.keys(localeCopy) as LocaleCode[];
+const localeCodes = supportedLocales;
 const rtlLocales = new Set<LocaleCode>(localeCodes.filter((code) => localeMeta[code].dir === "rtl"));
 
 function isLocale(value: string): value is LocaleCode {
@@ -132,7 +119,7 @@ export default function LocaleAssist() {
         >
           {localeCodes.map((code) => (
             <option key={code} value={code}>
-              {localeCopy[code].label}
+              {localeMeta[code].nativeLabel}
             </option>
           ))}
         </select>
