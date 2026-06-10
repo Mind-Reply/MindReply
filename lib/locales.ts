@@ -1,4 +1,4 @@
-export const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"] as const;
+export const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"] as const;
 
 export type LocaleCode = (typeof supportedLocales)[number];
 
@@ -127,6 +127,17 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
     googleLocale: "uk",
     dir: "ltr",
   },
+  bg: {
+    code: "bg",
+    label: "Bulgarian",
+    nativeLabel: "Български",
+    market: "Bulgaria",
+    line: "Напрежението става една ясна следваща стъпка.",
+    htmlLang: "bg",
+    ogLocale: "bg_BG",
+    googleLocale: "bg",
+    dir: "ltr",
+  },
 };
 
 export const countryLocale: Record<string, LocaleCode> = {
@@ -135,6 +146,7 @@ export const countryLocale: Record<string, LocaleCode> = {
   AT: "de",
   AU: "en",
   BE: "fr",
+  BG: "bg",
   BR: "pt",
   CA: "en",
   CH: "de",
