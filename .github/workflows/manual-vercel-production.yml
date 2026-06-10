@@ -49,7 +49,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
 
       - name: Check live production commit
         id: live
@@ -68,7 +67,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.live.outputs.current != 'true'
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Check owner report configuration
         if: steps.live.outputs.current != 'true'
