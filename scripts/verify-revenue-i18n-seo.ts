@@ -33,6 +33,7 @@ const files = {
   globals: read("app/globals.css"),
   contact: read("app/contact/page.tsx"),
   packagePage: read("app/website-completion-package/page.tsx"),
+  responseOverload: read("app/response-overload/page.tsx"),
   products: read("app/products/page.tsx"),
   checkout: read("app/checkout/page.tsx"),
   capabilities: read("app/capabilities/page.tsx"),
@@ -49,6 +50,12 @@ for (const phrase of [
   "20+ professional lexicons",
   "10 refinement tools",
   "Private by design",
+  "Data handling proof",
+  "First-session conversion logic",
+  "Credit trigger",
+  "Package trigger",
+  "Growth trigger",
+  "Pro trigger",
   "No payment link is required to begin",
   "billing name and billing email",
   "/checkout?package=website-completion",
@@ -136,7 +143,7 @@ for (const phrase of [
   includes("geo locale", files.geoLocale, phrase);
 }
 
-for (const phrase of ["/products", "/checkout", "/website-completion-package", "languageParams", "alternates:", "hi", "uk", "bg", "?lang=${locale}"]) {
+for (const phrase of ["/products", "/checkout", "/response-overload", "/website-completion-package", "languageParams", "alternates:", "hi", "uk", "bg", "?lang=${locale}"]) {
   includes("sitemap", files.sitemap, phrase);
 }
 
@@ -185,7 +192,7 @@ for (const phrase of [
   includes("mragent", files.mragent, phrase);
 }
 
-for (const phrase of ["Contact form", "Ask MRagent first", "info@mind-reply.com", "/api/package-request"]) {
+for (const phrase of ["Assisted close", "Ask MRagent first", "info@mind-reply.com", "PackageRequestForm"]) {
   includes("contact page", files.contact, phrase);
 }
 
@@ -216,6 +223,19 @@ for (const phrase of [
   "Invoice option always visible",
 ]) {
   includes("products page", files.products, phrase);
+}
+
+for (const phrase of [
+  "Response Overload Rescue | MindReply",
+  "response-overload",
+  "Turn the message pile into one clear next move",
+  "Start with one free MRagent read",
+  "Use credits when several messages need quick pressure reads",
+  "GBP 600 Website Completion Package",
+  "Growth or Pro",
+  "Raw private text is not used as public proof",
+]) {
+  includes("response overload page", files.responseOverload, phrase);
 }
 
 for (const phrase of [
