@@ -16,6 +16,7 @@ body {
 body {
   background: hsl(40 20% 96%);
   color: hsl(220 45% 13%);
+  top: 0 !important;
 }
 
 @theme {
@@ -39,6 +40,21 @@ body {
 
 .locale-assist-copy {
   text-wrap: balance;
+}
+
+#mindreply-google-translate,
+.goog-te-banner-frame,
+.goog-te-gadget,
+.goog-logo-link,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.skiptranslate iframe {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.skiptranslate {
+  display: none !important;
 }
 
 @media (max-width: 640px) {
