@@ -147,3 +147,15 @@ Required output:
 ## Shared Rule
 
 If the input carries legal, safety, regulatory, clinical, or relationship risk, the recommended action becomes `escalate`.
+
+## Reporting And Slack Handoff
+
+Agents may report that owner Slack DM onboarding context is available, but they must not store, repeat, or publish the raw Slack invite URL. Slack delivery is real only when a Slack webhook secret or authorized connector send path exists. If neither exists, report `Slack blocked: webhook or connector destination missing` and keep the owner update in email, workflow logs, and artifacts.
+
+Broadcast rules:
+
+- Owner reports are owner-only and redacted.
+- Never repeat raw Slack invite links, Slack webhook URLs, Slack field IDs, Slack tokens, or private channel content.
+- Send only through an authorized Slack connector or webhook secret.
+- If the connector, webhook, channel, or DM destination is missing, mark Slack as blocked and use email plus workflow artifacts.
+- Do not turn internal agent/workflow status into public website copy.

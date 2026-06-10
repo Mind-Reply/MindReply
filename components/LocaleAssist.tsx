@@ -17,7 +17,7 @@ type GeoLocaleResponse = {
   country?: string;
   recommendedLocale?: string;
   priorityMarkets?: string[];
-  marketProfiles?: Array<{ country: string; locale: string; priority: number }>;
+  marketProfiles?: Array<{ country: string; locale: string; priority?: number }>;
 };
 
 const localeCopy: Record<LocaleCode, LocaleCopy> = {
@@ -183,8 +183,8 @@ export default function LocaleAssist() {
           : countryLocale[detectedCountry] || initialLocale;
         const nextLocale = manualLocale || geoLocale;
 
-        setLocale(nextLocale);
         setMarketCount(data?.marketProfiles?.length || data?.priorityMarkets?.length || 11);
+        setLocale(nextLocale);
         publishLocale(nextLocale);
       })
       .catch(() => undefined);

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
@@ -18,6 +18,39 @@ const workflow = readRequired(".github/workflows/hourly-owner-report.yml");
 const prompt = readRequired("docs/hourly_owner_goal_prompt.md");
 const sender = readRequired("scripts/send-hourly-owner-report.ts");
 const generator = readRequired("scripts/hourly-owner-report.ts");
+const slackOps = readRequired("docs/ops/slack-email-reporting.md");
+const slackApi = readRequired("site/automation/slack-api.yml");
+const reportSchema = readRequired("site/automation/report-schema.yml");
+
+const scanSkipDirs = new Set([".git", ".next", "node_modules", "reports", ".vercel"]);
+const scanTextExts = new Set([".md", ".ts", ".tsx", ".js", ".mjs", ".json", ".yml", ".yaml", ".txt"]);
+const forbiddenSlackPatterns = [
+  /join\.slack\.com/i,
+  /slack\.com\/join/i,
+  /slack\.com\/invite/i,
+  /shareDM\/zt-/i,
+  /hooks\.slack\.com\/services/i,
+  /xox[baprs]-[A-Za-z0-9-]+/i,
+];
+
+function scanTextFiles(dir = root) {
+  const matches: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (scanSkipDirs.has(entry.name)) continue;
+    const fullPath = path.join(dir, entry.name);
+    const relativePath = path.relative(root, fullPath).replace(/\\/g, "/");
+
+    if (entry.isDirectory()) {
+      matches.push(...scanTextFiles(fullPath));
+      continue;
+    }
+
+    if (!entry.isFile() || !scanTextExts.has(path.extname(entry.name).toLowerCase())) continue;
+    const content = readFileSync(fullPath, "utf8");
+    if (forbiddenSlackPatterns.some((pattern) => pattern.test(content))) matches.push(relativePath);
+  }
+  return matches;
+}
 
 const requiredScripts = ["report:check", "launch:report", "audit:blueprint", "report:send", "verify:live-revenue"];
 for (const script of requiredScripts) {
@@ -48,13 +81,16 @@ assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_TO"), "Workflow must expose 
 assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_FROM"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_FROM.");
 assert(workflow.includes("MINDREPLY_PACKAGE_REQUEST_DRY_RUN"), "Workflow must expose MINDREPLY_PACKAGE_REQUEST_DRY_RUN.");
 assert(workflow.includes("MINDREPLY_SLACK_WEBHOOK_URL") || workflow.includes("SLACK_WEBHOOK_URL"), "Workflow must expose a Slack webhook path.");
+assert(workflow.includes("MINDREPLY_SLACK_DM_INVITE_AVAILABLE"), "Workflow must expose the non-secret Slack DM invite availability flag.");
 assert(workflow.includes("NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL"), "Workflow must expose the package payment URL variable.");
 assert(workflow.includes("actions/upload-artifact"), "Workflow must upload report artifacts.");
 
-const publicConfigText = [workflow, prompt].join("\n");
+const publicConfigText = [workflow, prompt, slackOps, slackApi, reportSchema].join("\n");
 assert(!/gmail\.com/i.test(publicConfigText), "Do not hardcode personal Gmail addresses in public workflow or docs.");
+assert(!/join\.slack\.com/i.test(publicConfigText), "Do not commit private Slack invite URLs in workflow or docs.");
+assert(scanTextFiles().length === 0, "Committed text files must not contain Slack invite links, webhook URLs, or Slack tokens.");
 
-const contractText = [prompt, sender, generator, workflow].join("\n");
+const contractText = [prompt, sender, generator, workflow, slackOps, slackApi, reportSchema].join("\n");
 for (const phrase of [
   "Website Completion Package",
   "revenue system",
@@ -67,6 +103,8 @@ for (const phrase of [
   "invoice",
   "defensive security boundary",
   "Slack",
+  "Slack DM invite",
+  "MINDREPLY_SLACK_DM_INVITE_AVAILABLE",
   "email",
   "Live Production Revenue Surface",
 ]) {
@@ -81,5 +119,10 @@ assert(generator.includes("RESEND_API_KEY"), "Hourly generator must inspect pack
 assert(sender.includes("readLiveRevenueProof"), "Sender must attach live revenue proof when available.");
 assert(sender.includes("MINDREPLY_REPORT_REQUIRE_LIVE_PROOF"), "Sender must be able to block delivery when live proof is missing.");
 assert(sender.includes("liveRevenueSurface"), "Delivery receipt must include live revenue surface status.");
+assert(sender.includes("redactSensitiveTransportText"), "Sender must redact private Slack routing before email or Slack delivery.");
+assert(sender.includes("sensitiveTransportRedaction"), "Delivery receipt must include sensitive transport redaction status.");
+assert(generator.includes("dmInviteAvailable"), "Hourly receipt must include Slack DM invite availability status.");
+assert(generator.includes("scanForSlackSecrets"), "Hourly generator must scan text files before claiming Slack invite/webhook exposure state.");
+assert(generator.includes("inviteUrlCommitted"), "Hourly receipt must include measured Slack invite/webhook exposure status.");
 
 console.log("Hourly owner report automation contract verified.");

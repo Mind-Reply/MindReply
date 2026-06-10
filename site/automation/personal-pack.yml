@@ -1,7 +1,7 @@
 pack: MRagent personal pack
 owner: angel
 external_routing:
-  field_id: Xf0B6WHC2SBH
+  field_id_ref: owner_supplied_private_field_id
   purpose: Attach future reports and handoffs to the user's personal pack field when a compatible external system is available.
   safety: No credentials, invite URLs, or private channel content are stored here.
 purpose: Keep each pass useful, visible, and tied to the platform state.
