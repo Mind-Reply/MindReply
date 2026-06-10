@@ -81,6 +81,28 @@ const unsafeProviderTerms = [
   "hidden instruction",
 ];
 
+const fallbackCopy: Record<
+  LocaleCode,
+  {
+    read: string;
+    move: string;
+    receipt: string;
+    risk: string;
+  }
+> = {
+  en: { read: "Clean read", move: "Next move", receipt: "Receipt", risk: "Risk" },
+  es: { read: "Lectura clara", move: "Siguiente paso", receipt: "Recibo", risk: "Riesgo" },
+  fr: { read: "Lecture claire", move: "Prochaine action", receipt: "Reçu", risk: "Risque" },
+  de: { read: "Klare Lesart", move: "Nächster Schritt", receipt: "Beleg", risk: "Risiko" },
+  pt: { read: "Leitura clara", move: "Próximo passo", receipt: "Recibo", risk: "Risco" },
+  ar: { read: "قراءة واضحة", move: "الخطوة التالية", receipt: "الإيصال", risk: "الخطر" },
+  hi: { read: "साफ पढ़ाई", move: "अगला कदम", receipt: "रसीद", risk: "जोखिम" },
+  ja: { read: "明確な読み取り", move: "次の一手", receipt: "記録", risk: "リスク" },
+  zh: { read: "清晰判断", move: "下一步", receipt: "回执", risk: "风险" },
+  uk: { read: "Чітке прочитання", move: "Наступний крок", receipt: "Квитанція", risk: "Ризик" },
+  bg: { read: "Ясен прочит", move: "Следваща стъпка", receipt: "Разписка", risk: "Риск" },
+};
+
 function normalizeSource(source: unknown): IntakeSource {
   return typeof source === "string" && sources.includes(source as IntakeSource) ? (source as IntakeSource) : "manual";
 }
@@ -165,7 +187,17 @@ function compactReply(reply: string) {
 export function fallbackReply(decision: DecisionResponse) {
   const style = styleMode(decision);
   const action = actionLine(decision);
-  const receiptLine = `Receipt: ${decision.receipt.id}. Risk: ${decision.risk.level}.`;
+  const copy = fallbackCopy[decision.locale];
+  const receiptLine = `${copy.receipt}: ${decision.receipt.id}. ${copy.risk}: ${decision.risk.level}.`;
+
+  if (decision.locale !== "en") {
+    return [
+      `${copy.read}: ${decision.synthesis}`,
+      decision.mindRead.reallyAbout,
+      `${copy.move}: ${decision.recommendedAction.label}. ${action}`,
+      `${decision.mindRead.calmerMove} ${receiptLine}`,
+    ].join("\n\n");
+  }
 
   const templates: Record<typeof fallbackStyles[number], string[]> = {
     composed: [
