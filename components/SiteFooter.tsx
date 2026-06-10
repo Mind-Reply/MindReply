@@ -18,21 +18,21 @@ const demandLanes = [
 
 const priorityMarkets = [
   "UK",
-  "US",
+  "India",
   "UAE",
   "Saudi Arabia",
+  "US",
   "Germany",
-  "France",
   "Japan",
   "Brazil",
+  "France",
   "Spain",
-  "India",
 ];
 
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-[#122033]/10 bg-[#0d1729] px-4 py-10 text-[#f8f5f0] md:px-8">
-      <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+    <footer className="border-t border-[#122033]/10 bg-[#0d1729] px-4 py-8 text-[#f8f5f0] md:px-8 md:py-10">
+      <div className="mx-auto grid max-w-7xl gap-7 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <Link href="/" className="inline-flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#e2b757] font-serif text-lg font-bold text-[#122033]">M</span>
@@ -48,18 +48,18 @@ export default function SiteFooter() {
               </div>
             ))}
           </div>
-          <section className="mt-5 rounded-lg border border-white/10 bg-white/[0.035] p-4">
+          <section className="mt-5 rounded-lg border border-white/10 bg-white/[0.028] p-4">
             <div className="flex items-center gap-2 text-[#91d2c8]">
               <Languages aria-hidden className="h-4 w-4" />
-              <p className="text-xs font-bold uppercase tracking-[0.18em]">Auto language and priority markets</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">Quiet language assist</p>
             </div>
             <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
-              Country signal first, browser language second, manual selector always available. Priority SEO lanes: {priorityMarkets.join(" / ")}.
+              Auto country signal first, browser language second, manual selector always available. Priority demand lanes: {priorityMarkets.join(" / ")}.
             </p>
           </section>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
           <section className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
             <div className="flex items-center gap-2 text-[#91d2c8]">
               <ShieldCheck aria-hidden className="h-4 w-4" />
@@ -84,7 +84,7 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="mx-auto mt-8 flex max-w-7xl flex-col gap-4 border-t border-white/10 pt-6 text-xs text-[#9fb0bd] md:flex-row md:items-center md:justify-between">
+      <div className="mx-auto mt-7 flex max-w-7xl flex-col gap-4 border-t border-white/10 pt-6 text-xs text-[#9fb0bd] md:flex-row md:items-center md:justify-between">
         <p>© {new Date().getFullYear()} MindReply. Pressure in. One clear move out.</p>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2">
           {footerLinks.map((link) => (
