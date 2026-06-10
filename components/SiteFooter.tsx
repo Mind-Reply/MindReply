@@ -66,7 +66,7 @@ export default function SiteFooter() {
               <p className="text-xs font-bold uppercase tracking-[0.18em]">Evidence rule</p>
             </div>
             <p className="mt-4 text-sm leading-7 text-[#cdd8df]">
-              Public copy stays measured. Delivery, revenue, automation, and security claims are only stated when the files, workflow, endpoint, or connector proof exists.
+              Public copy stays measured. Delivery, revenue, security, and service claims are only stated when file, workflow, endpoint, or connector proof exists.
             </p>
           </section>
 
