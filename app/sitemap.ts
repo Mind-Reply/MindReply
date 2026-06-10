@@ -7,8 +7,10 @@ const languageParams = ["es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
 const routes = [
   { path: "/", priority: 1, changeFrequency: "daily" as const, localized: true },
   { path: "/agent", priority: 0.95, changeFrequency: "daily" as const, localized: true },
+  { path: "/products", priority: 0.94, changeFrequency: "daily" as const, localized: true },
   { path: "/website-completion-package", priority: 0.92, changeFrequency: "daily" as const, localized: true },
-  { path: "/pricing", priority: 0.9, changeFrequency: "weekly" as const, localized: true },
+  { path: "/checkout", priority: 0.9, changeFrequency: "weekly" as const, localized: true },
+  { path: "/pricing", priority: 0.88, changeFrequency: "weekly" as const, localized: true },
   { path: "/capabilities", priority: 0.75, changeFrequency: "weekly" as const, localized: true },
   { path: "/contact", priority: 0.55, changeFrequency: "monthly" as const, localized: true },
   { path: "/privacy", priority: 0.5, changeFrequency: "monthly" as const, localized: false },
