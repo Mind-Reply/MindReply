@@ -10,7 +10,9 @@ export default function robots(): MetadataRoute.Robots {
         allow: [
           "/",
           "/agent",
+          "/products",
           "/website-completion-package",
+          "/checkout",
           "/pricing",
           "/contact",
           "/capabilities",
