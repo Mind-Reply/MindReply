@@ -80,6 +80,14 @@ const trust = [
   "Revenue and conversion claims stay tied to verified sources only.",
 ];
 
+const buyerProofChecklist = [
+  "The buyer can inspect the GBP 600 price before sending private context.",
+  "The buyer can choose invoice-first when a direct payment link is not configured.",
+  "The buyer can see what is processed: messaging, offer, trust, and path to pay.",
+  "The buyer can see what is returned: ranked queue, send-ready copy, and receipt.",
+  "The buyer can see what is protected: raw sensitive text stays out of public proof.",
+];
+
 const assets = [
   "LinkedIn opener: Your site already has the product. The leak is the buying path. I can turn the current page into a ranked action queue and send-ready close copy.",
   "Cold email opener: I noticed the offer is doing more explaining than closing. MindReply can compress the next buying step into a Website Completion Package.",
@@ -196,6 +204,26 @@ export default function WebsiteCompletionPackagePage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#122033]/10 bg-[#fbfaf6] px-4 py-12 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.74fr_1.26fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Buyer proof checklist</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The package must feel inspectable before payment.</h2>
+            <p className="mt-5 text-sm leading-7 text-[#59687b]">
+              This is the credibility layer for the GBP 600 offer: clear price, clear route, clear output, and a clean privacy boundary.
+            </p>
+          </div>
+          <div className="grid gap-3">
+            {buyerProofChecklist.map((item) => (
+              <div key={item} className="flex gap-3 rounded-lg border border-[#122033]/10 bg-white p-4 text-sm leading-6 text-[#59687b] shadow-sm shadow-[#122033]/5">
+                <CheckCircle2 aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#2f6f72]" />
+                <span>{item}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>

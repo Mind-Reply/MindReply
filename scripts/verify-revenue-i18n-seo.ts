@@ -204,6 +204,10 @@ for (const phrase of [
   "No payment link is required to begin",
   "billing name and billing email",
   "Scope first, invoice/payment before delivery",
+  "Buyer proof checklist",
+  "The package must feel inspectable before payment",
+  "clear price, clear route, clear output, and a clean privacy boundary",
+  "The buyer can inspect the GBP 600 price before sending private context",
   "paymentPath",
   "invoice-first unless a configured direct payment link is present",
 ]) {
