@@ -62,13 +62,14 @@ function includes(text, phrase) {
 }
 
 const generatedAt = new Date().toISOString();
-const [home, contact, packagePage, responseOverload, products, checkout, version, health, packageRequest, robots, sitemap, geoLocale] = await Promise.all([
+const [home, contact, packagePage, responseOverload, products, checkout, trust, version, health, packageRequest, robots, sitemap, geoLocale] = await Promise.all([
   request("/"),
   request("/contact"),
   request("/website-completion-package"),
   request("/response-overload"),
   request("/products"),
   request("/checkout"),
+  request("/trust"),
   request("/api/version"),
   request("/api/health"),
   request("/api/package-request", {
@@ -81,7 +82,7 @@ const [home, contact, packagePage, responseOverload, products, checkout, version
   request("/api/geo-locale"),
 ]);
 
-const publicText = `${home.text}\n${contact.text}\n${packagePage.text}\n${responseOverload.text}\n${products.text}\n${checkout.text}`;
+const publicText = `${home.text}\n${contact.text}\n${packagePage.text}\n${responseOverload.text}\n${products.text}\n${checkout.text}\n${trust.text}`;
 const checks = [];
 const liveSha = version.json?.deployment?.commitSha || "";
 const renderedDeploymentIds = [
@@ -92,6 +93,7 @@ const renderedDeploymentIds = [
     ...responseOverload.deploymentIds,
     ...products.deploymentIds,
     ...checkout.deploymentIds,
+    ...trust.deploymentIds,
   ]),
 ];
 
@@ -101,6 +103,7 @@ check(checks, "package-page-reachable", packagePage.status === 200, `Package pag
 check(checks, "response-overload-reachable", responseOverload.status === 200, `Response overload status ${responseOverload.status}.`);
 check(checks, "products-reachable", products.status === 200, `Products status ${products.status}.`);
 check(checks, "checkout-reachable", checkout.status === 200, `Checkout status ${checkout.status}.`);
+check(checks, "trust-reachable", trust.status === 200, `Trust status ${trust.status}.`);
 check(checks, "version-current", version.status === 200 && version.json?.status === "ok" && version.json?.deployment, `Version status ${version.status}; retired/stale production returns 410.`);
 check(
   checks,
@@ -146,6 +149,7 @@ check(checks, "checkout-invoice-path", includes(checkout.text, "Website Completi
 check(checks, "homepage-authority-depth", includes(home.text, "20+ professional lexicons") && includes(home.text, "10 refinement tools"), "Homepage must show premium authority depth above generic productivity copy.");
 check(checks, "homepage-first-session-conversion", includes(home.text, "First-session conversion logic") && includes(home.text, "Credit trigger") && includes(home.text, "Growth trigger") && includes(home.text, "Pro trigger"), "Homepage must show first-session conversion triggers.");
 check(checks, "homepage-data-handling-proof", includes(home.text, "Data handling proof") && includes(home.text, "Raw text stays out of public proof") && includes(home.text, "Integrations are consent-gated"), "Homepage must show concrete data-handling trust proof.");
+check(checks, "trust-proof-page", includes(trust.text, "Trust and Data Handling") && includes(trust.text, "Raw private text is not public proof") && includes(trust.text, "No borrowed trust badges") && includes(trust.text, "info@mind-reply.com"), "Trust page must expose concrete data handling proof without invented claims.");
 check(checks, "response-overload-ad-page", includes(responseOverload.text, "Response overload rescue") && includes(responseOverload.text, "Turn the message pile into one clear next move") && includes(responseOverload.text, "Try MindReply Free"), "Response overload ad landing page must expose high-intent ad copy with the clear free CTA.");
 check(checks, "response-overload-paid-path", includes(responseOverload.text, "Credits") && includes(responseOverload.text, "GBP 600 package") && includes(responseOverload.text, "Growth or Pro"), "Response overload page must show the free-to-paid path.");
 check(checks, "footer-market-strip", includes(home.text, "Language and market fit") || includes(home.text, "Full-site translation uses Google Translate"), "Live footer must expose the quiet language and market strip, not noisy auto placeholders.");
@@ -166,13 +170,18 @@ check(checks, "geo-locale-brazil", includes(geoLocale.text, "Brazil") && include
     robots.status === 200 && !allowsRetiredRobotsPath && /disallow:\s*\/agents(?:$|\s)/im.test(robots.text) && /disallow:\s*\/pack(?:$|\s)/im.test(robots.text),
     "Robots must disallow retired /agents and /pack surfaces without confusing /agent for /agents.",
   );
-check(checks, "robots-commercial-routes", robots.status === 200 && includes(robots.text, "/products") && includes(robots.text, "/checkout"), "Robots must allow the product and checkout surfaces.");
+check(checks, "robots-commercial-routes", robots.status === 200 && includes(robots.text, "/products") && includes(robots.text, "/checkout") && includes(robots.text, "/trust"), "Robots must allow the product, checkout, and trust surfaces.");
 check(checks, "sitemap-no-stale-public-routes", sitemap.status === 200 && !sitemap.text.includes("<loc>https://www.mind-reply.com/agents</loc>") && !sitemap.text.includes("<loc>https://www.mind-reply.com/pack</loc>"), "Sitemap must not index retired /agents or /pack routes.");
 check(
   checks,
   "sitemap-commercial-routes",
-  sitemap.status === 200 && includes(sitemap.text, "/products") && includes(sitemap.text, "/checkout") && includes(sitemap.text, "/response-overload") && !includes(sitemap.text, "lang=bg"),
-  "Sitemap must include products, checkout, response-overload, and avoid Bulgarian-specific language alternates.",
+  sitemap.status === 200 &&
+    includes(sitemap.text, "/products") &&
+    includes(sitemap.text, "/checkout") &&
+    includes(sitemap.text, "/response-overload") &&
+    includes(sitemap.text, "/trust") &&
+    !includes(sitemap.text, "lang=bg"),
+  "Sitemap must include products, checkout, response-overload, trust, and avoid Bulgarian-specific language alternates.",
 );
 
 const failed = checks.filter((item) => !item.pass && item.severity === "error");
@@ -190,7 +199,7 @@ const report = {
   failed: failed.map((item) => item.id),
   warnings: warnings.map((item) => item.id),
   checks,
-  surfaces: [home, contact, packagePage, responseOverload, products, checkout, version, health, packageRequest, robots, sitemap, geoLocale].map(({ path, url, ok, status, contentType, latencyMs, json, deploymentIds, error }) => ({
+  surfaces: [home, contact, packagePage, responseOverload, products, checkout, trust, version, health, packageRequest, robots, sitemap, geoLocale].map(({ path, url, ok, status, contentType, latencyMs, json, deploymentIds, error }) => ({
     path,
     url,
     ok,

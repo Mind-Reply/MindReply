@@ -24,6 +24,7 @@ const routes = [
   { path: "/checkout", priority: 0.9, changeFrequency: "weekly" as const, localized: true },
   { path: "/pricing", priority: 0.88, changeFrequency: "weekly" as const, localized: true },
   { path: "/capabilities", priority: 0.75, changeFrequency: "weekly" as const, localized: true },
+  { path: "/trust", priority: 0.72, changeFrequency: "weekly" as const, localized: true },
   { path: "/contact", priority: 0.55, changeFrequency: "monthly" as const, localized: true },
   { path: "/privacy", priority: 0.5, changeFrequency: "monthly" as const, localized: false },
 ];

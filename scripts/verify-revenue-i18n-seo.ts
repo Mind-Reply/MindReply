@@ -37,6 +37,7 @@ const files = {
   products: read("app/products/page.tsx"),
   checkout: read("app/checkout/page.tsx"),
   capabilities: read("app/capabilities/page.tsx"),
+  trust: read("app/trust/page.tsx"),
   agents: read("app/agents/page.tsx"),
   legacyPack: read("app/pack/page.tsx"),
   mragent: read("lib/mragent.ts"),
@@ -148,12 +149,12 @@ for (const forbidden of ["BG: \"bg\"", "Bulgaria", "locale: \"bg\"", "priority: 
   excludes("geo locale", files.geoLocale, forbidden);
 }
 
-for (const phrase of ["/products", "/checkout", "/response-overload", "/website-completion-package", "languageParams", "alternates:", "hi", "uk", "?lang=${locale}"]) {
+for (const phrase of ["/products", "/checkout", "/response-overload", "/website-completion-package", "/trust", "languageParams", "alternates:", "hi", "uk", "?lang=${locale}"]) {
   includes("sitemap", files.sitemap, phrase);
 }
 excludes("sitemap", files.sitemap, "\"bg\"");
 
-for (const phrase of ["/products", "/checkout", "/website-completion-package", "disallow: [\"/api/\", \"/mcp\", \"/agents\", \"/pack\"]"]) {
+for (const phrase of ["/products", "/checkout", "/website-completion-package", "/trust", "disallow: [\"/api/\", \"/mcp\", \"/agents\", \"/pack\"]"]) {
   includes("robots", files.robots, phrase);
 }
 
@@ -171,6 +172,7 @@ for (const phrase of [
 for (const phrase of [
   "Products",
   "Checkout",
+  "Trust",
   "/checkout?package=website-completion",
   "Language and market fit",
   "Full-site translation uses Google Translate",
@@ -279,6 +281,21 @@ for (const forbidden of ["11 priority languages", "Bulgarian support", "Bulgaria
 }
 
 for (const phrase of [
+  "Trust and Data Handling | MindReply",
+  "Raw private text is not public proof",
+  "Receipts are narrow on purpose",
+  "Memory requires explicit approval",
+  "Human handoff uses the public route",
+  "No borrowed trust badges. No invented proof.",
+  "No customer count, revenue, staff, compliance badge, payment status, or integration status is stated without evidence.",
+  "info@mind-reply.com",
+  "Website Completion Package",
+  "Try MindReply Free",
+]) {
+  includes("trust page", files.trust, phrase);
+}
+
+for (const phrase of [
   "Website Completion Package first",
   "Layer 1: immediate operational relief through MRagent",
   "Layer 2: premium authority",
@@ -302,6 +319,7 @@ const publicSurface = [
   files.products,
   files.checkout,
   files.capabilities,
+  files.trust,
 ].join("\n");
 
 excludes("public surface", publicSurface, /ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i);
