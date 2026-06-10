@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: "%s | MindReply",
   },
   description:
-    "MindReply turns website buying friction, client follow-up pressure, and response overload into one clear next move, a ranked action queue, and privacy-safe assisted close for priority UK, US, Gulf, German, French, Japanese, Brazilian, Spanish, Indian, Chinese, and Ukrainian readers.",
+    "MindReply turns website buying friction, client follow-up pressure, and response overload into one clear next move, a ranked action queue, and privacy-safe assisted close for priority UK, India, Gulf, US, German, Japanese, Brazilian, French, Spanish, Chinese, and Ukrainian readers.",
   alternates: {
     canonical: "/",
     languages: {
@@ -60,18 +60,19 @@ export const metadata: Metadata = {
     "multilingual business communication support",
     "executive communication infrastructure",
     "United Kingdom website completion",
-    "United States founder response overload",
+    "India business response overload",
     "UAE executive communication support",
     "Saudi Arabia Arabic business communication support",
+    "United States founder response overload",
     "Germany professional reply support",
-    "France client follow up rescue",
     "Japan executive communication support",
     "Brazil Portuguese business communication support",
+    "France client follow up rescue",
     "Spain website conversion copy",
-    "India business response overload",
     "China business communication support",
     "Ukraine founder communication support",
     "Arabic executive communication support",
+    "Hindi founder communication support",
     "German risk aware professional replies",
     "Japanese business reply refinement",
     "Portuguese website completion Brazil",
@@ -85,7 +86,7 @@ export const metadata: Metadata = {
     siteName: "MindReply",
     type: "website",
     locale: "en_GB",
-    alternateLocale: ["es_ES", "fr_FR", "de_DE", "pt_BR", "ar_AE", "hi_IN", "ja_JP", "zh_CN", "uk_UA"],
+    alternateLocale: ["hi_IN", "ar_AE", "ar_SA", "en_US", "de_DE", "ja_JP", "pt_BR", "fr_FR", "es_ES", "zh_CN", "uk_UA"],
     images: [
       {
         url: "/opengraph-image",
@@ -103,10 +104,10 @@ export const metadata: Metadata = {
   },
   other: {
     "content-language": "en, es, fr, de, pt, ar, hi, ja, zh, uk",
-    "geo.placename": "United Kingdom, United States, United Arab Emirates, Saudi Arabia, Germany, France, Japan, Brazil, Spain, India",
-    "target-market": "UK, US, AE, SA, DE, FR, JP, BR, ES, IN",
-    "target-market-priority": "UK > US > UAE > Saudi Arabia > Germany > France > Japan > Brazil > Spain > India",
-    "localization-priority": "English, Arabic, German, French, Japanese, Portuguese, Spanish, Hindi, Chinese, Ukrainian",
+    "geo.placename": "United Kingdom, India, United Arab Emirates, Saudi Arabia, United States, Germany, Japan, Brazil, France, Spain",
+    "target-market": "GB, IN, AE, SA, US, DE, JP, BR, FR, ES",
+    "target-market-priority": "UK > India > UAE > Saudi Arabia > US > Germany > Japan > Brazil > France > Spain",
+    "localization-priority": "English, Hindi, Arabic, German, Japanese, Portuguese, French, Spanish, Chinese, Ukrainian",
   },
 };
 
