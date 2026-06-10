@@ -2,61 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { Globe2 } from "lucide-react";
-
-type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk";
-
-type LocaleCopy = {
-  label: string;
-};
+import { defaultLocale, localeMeta, localizedPath, supportedLocales, type LocaleCode } from "@/lib/locales";
 
 type GeoLocaleResponse = {
   country?: string;
   recommendedLocale?: string;
 };
 
-const localeCopy: Record<LocaleCode, LocaleCopy> = {
-  en: { label: "English" },
-  es: { label: "Español" },
-  fr: { label: "Français" },
-  de: { label: "Deutsch" },
-  pt: { label: "Português" },
-  ar: { label: "العربية" },
-  hi: { label: "हिन्दी" },
-  ja: { label: "日本語" },
-  zh: { label: "中文" },
-  uk: { label: "Українська" },
-};
-
-const localeCodes = Object.keys(localeCopy) as LocaleCode[];
-const rtlLocales = new Set<LocaleCode>(["ar"]);
-
-const countryLocale: Record<string, LocaleCode> = {
-  US: "en",
-  GB: "en",
-  SG: "en",
-  ES: "es",
-  MX: "es",
-  AR: "es",
-  CO: "es",
-  FR: "fr",
-  BE: "fr",
-  CH: "fr",
-  DE: "de",
-  AT: "de",
-  BR: "pt",
-  PT: "pt",
-  AE: "ar",
-  SA: "ar",
-  KW: "ar",
-  QA: "ar",
-  OM: "ar",
-  IN: "hi",
-  JP: "ja",
-  CN: "zh",
-  HK: "zh",
-  TW: "zh",
-  UA: "uk",
-};
+const localeCodes = [...supportedLocales];
+const rtlLocales = new Set<LocaleCode>(localeCodes.filter((code) => localeMeta[code].dir === "rtl"));
 
 function isLocale(value: string): value is LocaleCode {
   return localeCodes.includes(value as LocaleCode);
@@ -75,11 +29,11 @@ function localeFromPath() {
 
 function localeFromBrowser() {
   const browserLocale = navigator.language.split("-")[0];
-  return isLocale(browserLocale) ? browserLocale : "en";
+  return isLocale(browserLocale) ? browserLocale : defaultLocale;
 }
 
 function publishLocale(nextLocale: LocaleCode) {
-  document.documentElement.lang = nextLocale;
+  document.documentElement.lang = localeMeta[nextLocale].htmlLang;
   document.documentElement.dir = rtlLocales.has(nextLocale) ? "rtl" : "ltr";
   window.dispatchEvent(new CustomEvent("mindreply:locale-change", { detail: { locale: nextLocale } }));
 }
@@ -97,18 +51,6 @@ function resolveManualLocale() {
   return null;
 }
 
-function pathWithoutLocale(pathname: string) {
-  const parts = pathname.split("/").filter(Boolean);
-  if (parts.length > 0 && isLocale(parts[0])) parts.shift();
-  return `/${parts.join("/")}`.replace(/\/$/, "") || "/";
-}
-
-function localizedPath(pathname: string, nextLocale: LocaleCode) {
-  const cleanPath = pathWithoutLocale(pathname);
-  if (nextLocale === "en") return cleanPath;
-  return cleanPath === "/" ? `/${nextLocale}` : `/${nextLocale}${cleanPath}`;
-}
-
 function navigateToLocale(nextLocale: LocaleCode) {
   window.localStorage.setItem("mindreply-locale", nextLocale);
   publishLocale(nextLocale);
@@ -120,7 +62,7 @@ function navigateToLocale(nextLocale: LocaleCode) {
 }
 
 export default function LocaleAssist() {
-  const [locale, setLocale] = useState<LocaleCode>("en");
+  const [locale, setLocale] = useState<LocaleCode>(defaultLocale);
 
   useEffect(() => {
     const manualLocale = resolveManualLocale();
@@ -131,11 +73,8 @@ export default function LocaleAssist() {
     fetch("/api/geo-locale", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : null))
       .then((data: GeoLocaleResponse | null) => {
-        const detectedCountry = data?.country || "US";
-        const geoLocale = data?.recommendedLocale && isLocale(data.recommendedLocale)
-          ? data.recommendedLocale
-          : countryLocale[detectedCountry] || initialLocale;
-        const nextLocale = manualLocale || geoLocale;
+        const detectedLocale = data?.recommendedLocale || "";
+        const nextLocale = manualLocale || (isLocale(detectedLocale) ? detectedLocale : initialLocale);
 
         setLocale(nextLocale);
         publishLocale(nextLocale);
@@ -157,11 +96,10 @@ export default function LocaleAssist() {
         <label className="flex items-center gap-2 font-semibold uppercase tracking-[0.14em] text-[#91d2c8]" htmlFor="mindreply-locale">
           <Globe2 aria-hidden className="h-3.5 w-3.5" />
           <span>Language</span>
-          <span className="sr-only">Try MindReply Free first</span>
           <span className="sr-only">IP/browser matched</span>
           <span className="sr-only">Country signal matched</span>
           <span className="sr-only">Browser language matched</span>
-          <span className="sr-only">Full-site translation uses Google Translate</span>
+          <span className="sr-only">Full-site translation uses selected locale</span>
         </label>
         <select
           id="mindreply-locale"
@@ -177,7 +115,7 @@ export default function LocaleAssist() {
         >
           {localeCodes.map((code) => (
             <option key={code} value={code}>
-              {localeCopy[code].label}
+              {localeMeta[code].nativeLabel}
             </option>
           ))}
         </select>
