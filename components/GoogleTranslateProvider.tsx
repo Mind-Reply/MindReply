@@ -39,7 +39,7 @@ function shouldSkipElement(element: Element | null) {
 }
 
 function collectTextNodes() {
-  const roots = Array.from(document.querySelectorAll("main, footer"));
+  const roots = Array.from(document.querySelectorAll("body"));
   const nodes: Text[] = [];
 
   for (const root of roots) {

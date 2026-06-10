@@ -42,6 +42,9 @@ export default function SiteFooter() {
           <p className="mt-5 max-w-2xl rounded-lg border border-white/10 bg-white/[0.028] p-4 text-xs font-semibold leading-6 text-[#cdd8df]">
             Public contact: <a href={`mailto:${supportEmail}`} className="font-bold text-[#e2b757] hover:underline">{supportEmail}</a>. For package scope, use the checkout or contact form first.
           </p>
+          <p className="mt-3 max-w-2xl rounded-lg border border-white/10 bg-white/[0.028] p-4 text-xs font-semibold leading-6 text-[#cdd8df]">
+            Language and market fit: Bulgarian and 10 other priority languages are routed by Google Translate or the visitor's browser, with Bulgaria included in the public market map.
+          </p>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">

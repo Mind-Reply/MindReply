@@ -20,6 +20,7 @@ const layout = read("app/layout.tsx");
 const footer = read("components/SiteFooter.tsx");
 const localeAssist = read("components/LocaleAssist.tsx");
 const googleTranslate = read("components/GoogleTranslateProvider.tsx");
+const translateApi = read("app/api/translate/route.ts");
 const geoLocale = read("app/api/geo-locale/route.ts");
 const sitemap = read("app/sitemap.ts");
 const robots = read("app/robots.ts");
@@ -90,16 +91,26 @@ assert(!localeAssist.includes("Auto country signal first"), "locale assist must 
 assert(!localeAssist.includes("Auto {country}"), "locale assist must not show raw Auto country label.");
 
 for (const phrase of [
-  "translate.google.com/translate_a/element.js",
-  "googtrans",
-  "googleTranslateElementInit",
-  "mindreply-google-translate",
+  "document.querySelectorAll(\"body\")",
+  "fetch(\"/api/translate\"",
   "mindreply:locale-change",
+  "data-no-translate",
+  "collectTextNodes",
+  "\"bg\"",
+]) {
+  includes("google translate provider", googleTranslate, phrase);
+}
+
+for (const phrase of [
+  "GOOGLE_TRANSLATE_API_KEY",
+  "GOOGLE_CLOUD_TRANSLATE_API_KEY",
+  "translation.googleapis.com/language/translate/v2",
+  "google-cloud-translate",
   "zh-CN",
   "bg: \"bg\"",
   "\"bg\"",
 ]) {
-  includes("google translate provider", googleTranslate, phrase);
+  includes("translate api", translateApi, phrase);
 }
 
 for (const phrase of [
