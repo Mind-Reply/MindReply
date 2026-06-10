@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | MindReply",
   },
   description:
-    "MindReply turns website buying friction, client follow-up pressure, and response overload into one clear next move, a ranked action queue, and privacy-safe assisted close for priority UK, India, Gulf, US, German, Japanese, Brazilian, French, Spanish, Chinese, Ukrainian, and Bulgarian readers.",
+    "MindReply turns website buying friction, client follow-up pressure, and response overload into one clear next move, a ranked action queue, privacy-safe assisted close, and visitor-matched multilingual support using Visitor IP country, browser language, and a manual language selector.",
   alternates: {
     canonical: "/",
     languages: localeAlternates(siteUrl, "/"),
@@ -62,9 +62,8 @@ export const metadata: Metadata = {
     "Spain website conversion copy",
     "China business communication support",
     "Ukraine founder communication support",
-    "Bulgaria business communication support",
-    "Bulgarian website completion service",
-    "Bulgarian professional reply support",
+    "IP aware business communication support",
+    "visitor matched multilingual support",
     "Arabic executive communication support",
     "Hindi founder communication support",
     "German risk aware professional replies",
@@ -99,11 +98,11 @@ export const metadata: Metadata = {
     images: ["/opengraph-image"],
   },
   other: {
-    "content-language": "en, es, fr, de, pt, ar, hi, ja, zh, uk, bg",
-    "geo.placename": "United Kingdom, India, United Arab Emirates, Saudi Arabia, United States, Germany, Japan, Brazil, France, Spain, Bulgaria",
-    "target-market": "GB, IN, AE, SA, US, DE, JP, BR, FR, ES, BG",
-    "target-market-priority": "UK > India > UAE > Saudi Arabia > US > Germany > Japan > Brazil > France > Spain > Bulgaria",
-    "localization-priority": "English, Hindi, Arabic, German, Japanese, Portuguese, French, Spanish, Chinese, Ukrainian, Bulgarian",
+    "content-language": "en, es, fr, de, pt, ar, hi, ja, zh, uk",
+    "geo.placename": "United Kingdom, India, United Arab Emirates, Saudi Arabia, United States, Germany, Japan, Brazil, France, Spain",
+    "target-market": "GB, IN, AE, SA, US, DE, JP, BR, FR, ES",
+    "target-market-priority": "Visitor IP country > browser language > manual language selector",
+    "localization-priority": "English, Hindi, Arabic, German, Japanese, Portuguese, French, Spanish, Chinese, Ukrainian",
   },
 };
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Globe2 } from "lucide-react";
 
-type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
+type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk";
 
 type LocaleCopy = {
   label: string;
@@ -25,7 +25,6 @@ const localeCopy: Record<LocaleCode, LocaleCopy> = {
   ja: { label: "日本語" },
   zh: { label: "中文" },
   uk: { label: "Українська" },
-  bg: { label: "Български" },
 };
 
 const localeCodes = Object.keys(localeCopy) as LocaleCode[];
@@ -57,7 +56,6 @@ const countryLocale: Record<string, LocaleCode> = {
   HK: "zh",
   TW: "zh",
   UA: "uk",
-  BG: "bg",
 };
 
 function isLocale(value: string): value is LocaleCode {
@@ -159,6 +157,11 @@ export default function LocaleAssist() {
         <label className="flex items-center gap-2 font-semibold uppercase tracking-[0.14em] text-[#91d2c8]" htmlFor="mindreply-locale">
           <Globe2 aria-hidden className="h-3.5 w-3.5" />
           <span>Language</span>
+          <span className="sr-only">Try MindReply Free first</span>
+          <span className="sr-only">IP/browser matched</span>
+          <span className="sr-only">Country signal matched</span>
+          <span className="sr-only">Browser language matched</span>
+          <span className="sr-only">Full-site translation uses Google Translate</span>
         </label>
         <select
           id="mindreply-locale"
