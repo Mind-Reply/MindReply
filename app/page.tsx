@@ -147,6 +147,25 @@ const proofItems = [
   "Revenue, deployment, and integration claims stay tied to real sources instead of optimistic wording.",
 ];
 
+const dataHandlingProof = [
+  {
+    title: "Raw text stays out of public proof",
+    copy: "Reports and website copy use receipt markers, route status, and redacted summaries instead of exposing private messages.",
+  },
+  {
+    title: "Memory requires approval",
+    copy: "Growth and Pro can describe memory as a controlled lane only after the user approves the context that should persist.",
+  },
+  {
+    title: "Integrations are consent-gated",
+    copy: "Slack, email, and workflow connections are not claimed as active until credentials and channel permissions are configured.",
+  },
+  {
+    title: "Payment path stays inspectable",
+    copy: "The GBP 600 package uses a fixed-price checkout when configured, with invoice-first fallback when direct payment is not ready.",
+  },
+];
+
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -424,6 +443,25 @@ export default function Home() {
                 <CheckCircle2 aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#2f6f72]" />
                 <span>{item}</span>
               </div>
+            ))}
+          </div>
+        </div>
+        <div className="mx-auto mt-8 max-w-7xl rounded-lg border border-[#122033]/10 bg-white p-5 shadow-sm shadow-[#122033]/5">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Data handling proof</p>
+              <h3 className="mt-3 font-serif text-3xl font-bold leading-tight">Trust is shown through boundaries the buyer can inspect.</h3>
+            </div>
+            <p className="max-w-md text-sm leading-7 text-[#59687b]">
+              These are operational boundaries, not borrowed compliance claims. They make the privacy promise specific without overstating certification.
+            </p>
+          </div>
+          <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {dataHandlingProof.map((item) => (
+              <article key={item.title} className="rounded-lg border border-[#122033]/10 bg-[#f7f4ed] p-4">
+                <h4 className="font-serif text-xl font-bold leading-tight">{item.title}</h4>
+                <p className="mt-3 text-sm leading-6 text-[#59687b]">{item.copy}</p>
+              </article>
             ))}
           </div>
         </div>
