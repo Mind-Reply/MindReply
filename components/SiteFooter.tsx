@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Languages, Mail, ShieldCheck, ShoppingBag } from "lucide-react";
+import { ArrowRight, Mail, ShieldCheck, ShoppingBag } from "lucide-react";
 
 const footerLinks = [
   { label: "MRagent", href: "/agent" },
@@ -18,20 +18,6 @@ const demandLanes = [
   "Client follow-up compression",
   "Founder response overload",
   "Privacy-safe assisted close",
-];
-
-const priorityMarkets = [
-  "UK",
-  "India",
-  "UAE",
-  "Saudi Arabia",
-  "US",
-  "Germany",
-  "Japan",
-  "Brazil",
-  "France",
-  "Spain",
-  "Bulgaria",
 ];
 
 export default function SiteFooter() {
@@ -53,18 +39,9 @@ export default function SiteFooter() {
               </div>
             ))}
           </div>
-          <section className="mt-5 rounded-lg border border-white/10 bg-white/[0.028] p-4">
-            <div className="flex items-center gap-2 text-[#91d2c8]">
-              <Languages aria-hidden className="h-4 w-4" />
-              <p className="text-xs font-bold uppercase tracking-[0.18em]">Language and market fit</p>
-            </div>
-            <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
-              Region and browser language only guide the first suggestion. The manual selector stays available, and Google Translate or the visitor's browser can handle full-page translation when needed. High-demand regions: {priorityMarkets.join(" / ")}.
-            </p>
-            <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
-              Public contact: <a href={`mailto:${supportEmail}`} className="font-bold text-[#e2b757] hover:underline">{supportEmail}</a>. For package scope, use the contact form or checkout path first.
-            </p>
-          </section>
+          <p className="mt-5 max-w-2xl rounded-lg border border-white/10 bg-white/[0.028] p-4 text-xs font-semibold leading-6 text-[#cdd8df]">
+            Public contact: <a href={`mailto:${supportEmail}`} className="font-bold text-[#e2b757] hover:underline">{supportEmail}</a>. For package scope, use the checkout or contact form first.
+          </p>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
