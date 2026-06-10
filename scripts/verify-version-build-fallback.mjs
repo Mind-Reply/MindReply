@@ -18,10 +18,7 @@ assert(route.includes('buildMetadata.commitSha'), "version route must fall back 
 assert(route.includes("metadataGeneratedAt"), "version route must expose metadata generation time.");
 
 assert(packageJson.includes('"version:metadata"'), "package.json must expose the version metadata generator.");
-assert(
-  packageJson.includes('"build": "node scripts/write-version-build-metadata.mjs && next build"'),
-  "package.json build must refresh version metadata before next build.",
-);
+assert(packageJson.includes('"prebuild": "npm run version:metadata"'), "npm build must generate fresh version metadata before Next.js builds.");
 assert(generator.includes("gitCandidates"), "metadata generator must support multiple git executable candidates.");
 assert(generator.includes("NEXT_PUBLIC_MINDREPLY_BUILD_COMMIT_SHA"), "metadata generator must read deploy-provided commit SHA.");
 assert(generator.includes("NEXT_PUBLIC_MINDREPLY_BUILD_BRANCH"), "metadata generator must read deploy-provided branch.");

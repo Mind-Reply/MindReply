@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/write-version-build-metadata.mjs && next build",
+    "prebuild": "npm run version:metadata",
+    "build": "next build",
     "start": "next start",
     "lint": "npm run typecheck",
     "typecheck": "next typegen && tsc --noEmit",
