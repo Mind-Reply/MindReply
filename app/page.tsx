@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
-  ArrowRight, 
-  BarChart3,
+  ArrowRight,
   Brain,
   CheckCircle2,
   ClipboardList,
@@ -11,9 +10,7 @@ import {
   Languages,
   Mail,
   ReceiptText,
-  Scale,
   ShieldCheck,
-  SlidersHorizontal,
   Sparkles,
   Target,
   Zap,
@@ -22,15 +19,17 @@ import MRAgentChat from "@/components/MRAgentChat";
 
 const supportEmail = "info@mind-reply.com";
 const packagePaymentUrl = process.env.NEXT_PUBLIC_WEBSITE_COMPLETION_PACKAGE_PAYMENT_URL || "";
-const packageCtaHref = packagePaymentUrl || "/contact?intent=website-completion";
-const packageCtaLabel = packagePaymentUrl ? "Pay for the GBP 600 package" : "Request GBP 600 package invoice";
-const packageRouteLabel = packagePaymentUrl ? "Direct payment enabled" : "Invoice-first route ready";
+const checkoutHref = "/checkout?package=website-completion";
+const packageCtaHref = packagePaymentUrl || checkoutHref;
+const packageCtaLabel = packagePaymentUrl ? "Pay GBP 600" : "Checkout or request invoice";
+const packageRouteLabel = packagePaymentUrl ? "Direct payment enabled" : "Checkout and invoice route ready";
 const packageRouteCopy = packagePaymentUrl
   ? "Scope is confirmed first, then the configured payment link is used before delivery."
   : "No payment link is required to begin. MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice before delivery.";
 
 const navItems = [
   { label: "Offer", href: "#offer" },
+  { label: "Products", href: "/products" },
   { label: "How it works", href: "#how" },
   { label: "Trust", href: "#proof" },
   { label: "Pricing", href: "/pricing" },
@@ -57,6 +56,24 @@ const packageRows = [
   },
 ];
 
+const toolRows = [
+  {
+    title: "Ops Overload Analyzer",
+    copy: "Turns scattered tasks, Slack notes, and page confusion into the next action queue.",
+    icon: Gauge,
+  },
+  {
+    title: "Prospect Reply Analyzer",
+    copy: "Reads buyer hesitation and produces the next reply without sounding needy or blunt.",
+    icon: Target,
+  },
+  {
+    title: "Email Polisher",
+    copy: "Tightens a sensitive draft into a clear, warm, send-ready message.",
+    icon: Mail,
+  },
+];
+
 const authoritySignals = [
   {
     title: "20+ professional lexicons",
@@ -71,61 +88,35 @@ const authoritySignals = [
   {
     title: "10 refinement tools",
     copy: "Clarity, brevity, warmth, firmness, risk reduction, empathy, structure, polish, de-escalation, and next-step framing support the final output.",
-    icon: Gauge,
-  },
-  {
-    title: "Sensitive-work restraint",
-    copy: "Private material stays redacted by default. Human handoff, memory, and integrations require consent and configuration before being claimed as active.",
-    icon: ShieldCheck,
-  },
-];
-
-const refinementRows = [
-  {
-    title: "Professional lexicon calibration",
-    copy: "Language is adjusted for the work in front of the buyer: founder updates, client delivery, legal-sensitive wording, finance pressure, or operator follow-up.",
     icon: Languages,
   },
   {
-    title: "Tone calibration",
-    copy: "The reply keeps warmth without surrendering authority, urgency without panic, and clarity without sounding blunt or automated.",
-    icon: SlidersHorizontal,
+    title: "Private by design",
+    copy: "Sensitive material stays redacted by default. Human handoff, memory, and integrations require consent and configuration before being claimed as active.",
+    icon: ShieldCheck,
   },
-  {
-    title: "Structure optimization",
-    copy: "The output is organized into what happened, what matters, what to do next, and what proof or consent should travel with it.",
-    icon: BarChart3,
-  },
-  {
-    title: "Boundary-aware persuasion",
-    copy: "MindReply helps a message become more convincing while staying inside risk, consent, and professional judgment boundaries.",
-    icon: Scale,
-  },
-];
-
-const proofItems = [
-  "Public contact uses info@mind-reply.com only.",
-  "MRagent is the first support route; contact is the assisted close when the question needs human follow-up.",
-  "Receipts are narrow by design and should not expose raw private pressure in public reports.",
-  "Professional refinement claims stay tied to lexicon, tone, structure, risk, confidence, and receipt fields buyers can inspect.",
-  "Revenue, deployment, and integration claims stay tied to real sources instead of optimistic wording.",
 ];
 
 const howSteps = [
   {
     step: "01",
-    title: "Paste the pressure",
+    title: "Paste what is stuck",
     copy: "Use MRagent with a page section, prospect reply, email, Slack note, objection, or follow-up that is slowing action.",
   },
   {
     step: "02",
     title: "Get one read",
-    copy: "MindReply returns the hidden friction, one recommended move, risk level, and a receipt marker without making you choose from a menu.",
+    copy: "MindReply returns the hidden friction, one recommended move, risk level, confidence, and a receipt marker without making you choose from a menu.",
   },
   {
     step: "03",
-    title: "Buy when the leak is bigger",
-    copy: "Use the free read for one moment. Request the GBP 600 package when the website, offer, or follow-up path needs a full rescue.",
+    title: "Act or buy",
+    copy: "Use the answer if it solves one moment. Use the GBP 600 Website Completion Package when the website, offer, or reply path needs a full rescue.",
+  },
+  {
+    step: "04",
+    title: "Upgrade only when repeated",
+    copy: "Choose Growth for weekly overload. Choose Pro for sensitive continuity, approved memory, receipt review, and integration planning.",
   },
 ];
 
@@ -144,8 +135,16 @@ const upgradeSteps = [
   },
   {
     title: "Pro",
-    copy: "For high-trust continuity, sensitive professional tone, approved memory, and integration lanes when credentials exist.",
+    copy: "For high-trust continuity, sensitive professional tone, approved memory, receipt review, and integration lanes when credentials exist.",
   },
+];
+
+const proofItems = [
+  "Public contact uses info@mind-reply.com only.",
+  "MRagent is the first support route; contact is the assisted close when the question needs human follow-up.",
+  "Receipts are narrow by design and should not expose raw private pressure in public reports.",
+  "Checkout is fixed-price when the payment URL is configured; invoice-first remains available when it is not.",
+  "Revenue, deployment, and integration claims stay tied to real sources instead of optimistic wording.",
 ];
 
 const structuredData = {
@@ -159,11 +158,13 @@ const structuredData = {
     "MindReply helps overloaded operators reclaim time through website buying-friction rescue, response overload support, and a Website Completion Package for overloaded websites, messages, and follow-up queues.",
   featureList: [
     "MRagent pressure read",
+    "Ops Overload Analyzer",
+    "Prospect Reply Analyzer",
+    "Email Polisher",
     "Website buying-friction rescue",
     "Website Completion Package",
     "20+ professional lexicons",
     "10 refinement tools",
-    "Tone and structure refinement",
     "Ranked action queue",
     "Send-ready copy",
     "Privacy-safe receipt",
@@ -175,7 +176,7 @@ const structuredData = {
     price: "600",
     priceCurrency: "GBP",
     availability: "https://schema.org/InStock",
-    url: "https://www.mind-reply.com/website-completion-package",
+    url: "https://www.mind-reply.com/checkout?package=website-completion",
   },
   brand: {
     "@type": "Brand",
@@ -187,6 +188,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#f8f4ec] text-[#122033]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+
       <header className="border-b border-[#122033]/10 bg-[#f8f4ec]/95 px-4 py-4 backdrop-blur md:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3">
@@ -203,12 +205,12 @@ export default function Home() {
                 <Link key={item.href} href={item.href} className="rounded-full px-4 py-2 text-sm font-semibold text-[#4d5c6f] transition hover:bg-white hover:text-[#122033]">
                   {item.label}
                 </Link>
-              )
+              ),
             )}
           </nav>
           <div className="flex items-center gap-2">
-            <Link href="/website-completion-package" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
-              See package
+            <Link href="/products" className="hidden rounded-full border border-[#122033]/15 px-4 py-2 text-sm font-semibold text-[#122033] transition hover:border-[#2f6f72] md:inline-flex">
+              Products
             </Link>
             <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
               Try MRagent
@@ -231,10 +233,13 @@ export default function Home() {
               Website buying-friction rescue
             </div>
             <h1 className="mt-7 max-w-3xl font-serif text-5xl font-bold leading-[0.94] md:text-7xl">
-              Reclaim 2+ hours daily when your page, inbox, or follow-up path is leaking decisions.
+              Reclaim 2+ hours daily within 24 hours.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[#d9e3e7] md:text-lg">
-              MindReply turns overloaded pages, replies, and client follow-ups into one ranked action queue or one send-ready message. Start with MRagent. Buy the GBP 600 Website Completion Package when the leak is bigger than one reply.
+              Reclaim 2+ hours daily when your page, inbox, or follow-up path is leaking decisions. MindReply turns overloaded pages, replies, and client follow-ups into one ranked action queue or one send-ready message.
+            </p>
+            <p className="mt-4 max-w-2xl text-sm font-semibold leading-7 text-[#91d2c8]">
+              Start with MRagent. Buy the GBP 600 Website Completion Package when the leak is bigger than one reply.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
@@ -308,16 +313,40 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="border-b border-[#122033]/10 bg-[#fbfaf6] px-4 py-14 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">First-session tools</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Use the tool that matches the leak.</h2>
+            <p className="mt-5 text-sm leading-7 text-[#59687b]">
+              Each tool exists to create the first useful output fast, then show whether the buyer should act, buy credits, request the package, or upgrade.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {toolRows.map((row) => {
+              const Icon = row.icon;
+              return (
+                <article key={row.title} className="rounded-lg border border-[#122033]/10 bg-white p-5 shadow-sm shadow-[#122033]/5">
+                  <Icon aria-hidden className="h-6 w-6 text-[#2f6f72]" />
+                  <h3 className="mt-4 font-serif text-2xl font-bold leading-tight">{row.title}</h3>
+                  <p className="mt-4 text-sm leading-6 text-[#59687b]">{row.copy}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       <section id="how" className="bg-[#103b39] px-4 py-14 text-[#f8f5f0] md:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.74fr_1.26fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#91d2c8]">How it works</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The commercial path is deliberately short.</h2>
             <p className="mt-5 text-sm leading-7 text-[#d3e5e2]">
-              The buyer should not decode a platform. They should feel the pressure loosen, see the next move, then know whether to buy the package or stay on the free read.
+              The buyer should not decode a platform. They should feel the pressure loosen, see the next move, then know whether to use checkout, request invoice, upgrade, or stay on the free read.
             </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {howSteps.map((item) => (
               <article key={item.step} className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
                 <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#e2b757]">{item.step}</span>
@@ -354,27 +383,6 @@ export default function Home() {
               );
             })}
           </div>
-          <div className="mt-8 grid gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
-            <div className="rounded-lg bg-[#122033] p-6 text-[#f8f5f0]">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#91d2c8]">Refinement engine</p>
-              <h3 className="mt-4 font-serif text-3xl font-bold leading-tight">Professional replies need more than speed. They need judgment.</h3>
-              <p className="mt-4 text-sm leading-7 text-[#d9e3e7]">
-                MindReply improves communication quality; it does not replace professional judgment or invent compliance claims.
-              </p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              {refinementRows.map((row) => {
-                const Icon = row.icon;
-                return (
-                  <article key={row.title} className="rounded-lg border border-[#122033]/10 bg-white p-5 shadow-sm shadow-[#122033]/5">
-                    <span className="grid h-11 w-11 place-items-center rounded-lg bg-[#f8f4ec] text-[#2f6f72]"><Icon aria-hidden className="h-5 w-5" /></span>
-                    <h3 className="mt-5 font-serif text-2xl font-bold leading-tight">{row.title}</h3>
-                    <p className="mt-4 text-sm leading-6 text-[#59687b]">{row.copy}</p>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </section>
 
@@ -407,7 +415,7 @@ export default function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">Trust proof</p>
             <h2 className="mt-4 max-w-2xl font-serif text-4xl font-bold leading-tight md:text-5xl">Private by design for sensitive professional communication.</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
-              Serious buyers do not need theatre. They need a believable promise, a clear payment or invoice route, and claims that survive inspection.
+              Serious buyers do not need theatre. They need a believable promise, a clear checkout or invoice route, and claims that survive inspection. Public support uses {supportEmail}.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
@@ -425,7 +433,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl flex-col gap-5 rounded-lg bg-[#122033] p-6 text-[#f8f5f0] md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#91d2c8]">Next revenue move</p>
-            <h2 className="mt-3 font-serif text-3xl font-bold leading-tight">Start with MRagent. Request the GBP 600 package when the buying path needs a full rescue.</h2>
+            <h2 className="mt-3 font-serif text-3xl font-bold leading-tight">Start with MRagent. Use checkout or request the GBP 600 invoice when the buying path needs a full rescue.</h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
