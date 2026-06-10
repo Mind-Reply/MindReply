@@ -1,4 +1,4 @@
-export const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"] as const;
+export const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"] as const;
 
 export type LocaleCode = (typeof supportedLocales)[number];
 
@@ -127,6 +127,17 @@ export const localeMeta: Record<LocaleCode, LocaleMeta> = {
     googleLocale: "uk",
     dir: "ltr",
   },
+  bg: {
+    code: "bg",
+    label: "Bulgarian",
+    nativeLabel: "\u0411\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438",
+    market: "Bulgaria",
+    line: "\u041d\u0430\u043f\u0440\u0435\u0436\u0435\u043d\u0438\u0435\u0442\u043e \u0441\u0442\u0430\u0432\u0430 \u0435\u0434\u043d\u0430 \u044f\u0441\u043d\u0430 \u0441\u043b\u0435\u0434\u0432\u0430\u0449\u0430 \u0441\u0442\u044a\u043f\u043a\u0430.",
+    htmlLang: "bg",
+    ogLocale: "bg_BG",
+    googleLocale: "bg",
+    dir: "ltr",
+  },
 };
 
 export const countryLocale: Record<string, LocaleCode> = {
@@ -135,6 +146,7 @@ export const countryLocale: Record<string, LocaleCode> = {
   AT: "de",
   AU: "en",
   BE: "fr",
+  BG: "bg",
   BR: "pt",
   CA: "en",
   CH: "de",
