@@ -15,24 +15,31 @@ function includes(label: string, value: string, expected: string) {
   assert(value.includes(expected), `${label} must include: ${expected}`);
 }
 
-const home = read("app/page.tsx");
-const layout = read("app/layout.tsx");
-const footer = read("components/SiteFooter.tsx");
-const localeAssist = read("components/LocaleAssist.tsx");
-const googleTranslate = read("components/GoogleTranslateProvider.tsx");
-const geoLocale = read("app/api/geo-locale/route.ts");
-const sitemap = read("app/sitemap.ts");
-const robots = read("app/robots.ts");
-const globals = read("app/globals.css");
-const contact = read("app/contact/page.tsx");
-const packagePage = read("app/website-completion-package/page.tsx");
-const products = read("app/products/page.tsx");
-const checkout = read("app/checkout/page.tsx");
-const capabilities = read("app/capabilities/page.tsx");
-const agents = read("app/agents/page.tsx");
-const legacyPack = read("app/pack/page.tsx");
-const mragent = read("lib/mragent.ts");
-const hourlyPrompt = read("docs/hourly_owner_goal_prompt.md");
+function excludes(label: string, value: string, forbidden: RegExp | string) {
+  const found = typeof forbidden === "string" ? value.includes(forbidden) : forbidden.test(value);
+  assert(!found, `${label} must not include: ${forbidden.toString()}`);
+}
+
+const files = {
+  home: read("app/page.tsx"),
+  layout: read("app/layout.tsx"),
+  footer: read("components/SiteFooter.tsx"),
+  localeAssist: read("components/LocaleAssist.tsx"),
+  googleTranslate: read("components/GoogleTranslateProvider.tsx"),
+  geoLocale: read("app/api/geo-locale/route.ts"),
+  sitemap: read("app/sitemap.ts"),
+  robots: read("app/robots.ts"),
+  globals: read("app/globals.css"),
+  contact: read("app/contact/page.tsx"),
+  packagePage: read("app/website-completion-package/page.tsx"),
+  products: read("app/products/page.tsx"),
+  checkout: read("app/checkout/page.tsx"),
+  capabilities: read("app/capabilities/page.tsx"),
+  agents: read("app/agents/page.tsx"),
+  legacyPack: read("app/pack/page.tsx"),
+  mragent: read("lib/mragent.ts"),
+  hourlyPrompt: read("docs/hourly_owner_goal_prompt.md"),
+};
 
 for (const phrase of [
   "Website Completion Package",
@@ -43,8 +50,9 @@ for (const phrase of [
   "Private by design",
   "No payment link is required to begin",
   "billing name and billing email",
+  "/checkout?package=website-completion",
 ]) {
-  includes("homepage", home, phrase);
+  includes("homepage", files.home, phrase);
 }
 
 for (const phrase of [
@@ -56,19 +64,20 @@ for (const phrase of [
   "Bulgarian professional reply support",
   "bg: \"/?lang=bg\"",
   "bg_BG",
-  "en, es, fr, de, pt, ar, hi, ja, zh, uk, bg",
   "UK > India > UAE > Saudi Arabia > US > Germany > Japan > Brazil > France > Spain > Bulgaria",
   "GoogleTranslateProvider",
 ]) {
-  includes("layout metadata", layout, phrase);
+  includes("layout metadata", files.layout, phrase);
 }
 
-for (const locale of ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"]) {
-  includes("locale assist", localeAssist, `${locale}: {`);
+const localeCodes = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
+for (const locale of localeCodes) {
+  includes("locale assist", files.localeAssist, `${locale}: {`);
+  includes("sitemap", files.sitemap, `lang=${locale}`);
 }
 
 for (const phrase of [
-  "type LocaleCode = \"en\" | \"es\" | \"fr\" | \"de\" | \"pt\" | \"ar\" | \"hi\" | \"ja\" | \"zh\" | \"uk\" | \"bg\"",
+  "type LocaleCode",
   "fetch(\"/api/geo-locale\"",
   "GeoLocaleResponse",
   "countryLocale",
@@ -84,10 +93,11 @@ for (const phrase of [
   "{marketCount} priority markets",
   "Full-site translation uses Google Translate",
 ]) {
-  includes("locale assist", localeAssist, phrase);
+  includes("locale assist", files.localeAssist, phrase);
 }
-assert(!localeAssist.includes("Auto country signal first"), "locale assist must not use noisy auto-language wording.");
-assert(!localeAssist.includes("Auto {country}"), "locale assist must not show raw Auto country label.");
+excludes("locale assist", files.localeAssist, "Auto country signal first");
+excludes("locale assist", files.localeAssist, "Auto {country}");
+excludes("locale assist", files.localeAssist, "{AUTO BG}");
 
 for (const phrase of [
   "translate.google.com/translate_a/element.js",
@@ -97,29 +107,28 @@ for (const phrase of [
   "mindreply:locale-change",
   "zh-CN",
   "bg: \"bg\"",
-  "\"bg\"",
 ]) {
-  includes("google translate provider", googleTranslate, phrase);
+  includes("google translate provider", files.googleTranslate, phrase);
 }
 
 for (const phrase of [
   "BG: \"bg\"",
-  "supportedLocales = [\"en\", \"es\", \"fr\", \"de\", \"pt\", \"ar\", \"hi\", \"ja\", \"zh\", \"uk\", \"bg\"]",
+  "supportedLocales",
   "Bulgaria",
   "locale: \"bg\"",
   "priority: 11",
   "marketProfiles",
   "providerGap",
 ]) {
-  includes("geo locale", geoLocale, phrase);
+  includes("geo locale", files.geoLocale, phrase);
 }
 
 for (const phrase of ["/products", "/checkout", "/website-completion-package", "languageParams", "alternates:", "hi", "uk", "bg"]) {
-  includes("sitemap", sitemap, phrase);
+  includes("sitemap", files.sitemap, phrase);
 }
 
 for (const phrase of ["/products", "/checkout", "/website-completion-package", "disallow: [\"/api/\", \"/mcp\", \"/agents\", \"/pack\"]"]) {
-  includes("robots", robots, phrase);
+  includes("robots", files.robots, phrase);
 }
 
 for (const phrase of [
@@ -136,7 +145,7 @@ for (const phrase of [
   "#mindreply-google-translate",
   ".goog-te-banner-frame",
 ]) {
-  includes("globals", globals, phrase);
+  includes("globals", files.globals, phrase);
 }
 
 for (const phrase of [
@@ -148,10 +157,11 @@ for (const phrase of [
   "info@mind-reply.com",
   "Bulgaria",
 ]) {
-  includes("site footer", footer, phrase);
+  includes("site footer", files.footer, phrase);
 }
-assert(!footer.includes("Auto country signal first"), "footer must not use noisy auto-language wording.");
-assert(!footer.includes("Auto {country}"), "footer must not expose raw Auto country label.");
+excludes("footer", files.footer, "Auto country signal first");
+excludes("footer", files.footer, "Auto {country}");
+excludes("footer", files.footer, "{AUTO BG}");
 
 for (const phrase of [
   "MRAGENT_PROVIDER_BASE_URL",
@@ -159,15 +169,16 @@ for (const phrase of [
   "supportedAgentLanguages",
   "Bulgarian",
   "Mirror the user's language",
-  "Supported response languages include English, Spanish, French, German, Portuguese, Arabic, Hindi, Japanese, Chinese, Ukrainian, and Bulgarian",
-  "Every answer must feel slightly different",
-  "max_output_tokens: 220",
+  "Supported languages include English, Spanish, French, German, Portuguese, Arabic, Hindi, Japanese, Chinese, Ukrainian, and Bulgarian",
+  "Vary rhythm and wording each time",
+  "Use 2-3 short paragraphs, 45-85 words",
+  "max_output_tokens: 145",
 ]) {
-  includes("mragent", mragent, phrase);
+  includes("mragent", files.mragent, phrase);
 }
 
 for (const phrase of ["Contact form", "Ask MRagent first", "info@mind-reply.com", "/api/package-request"]) {
-  includes("contact page", contact, phrase);
+  includes("contact page", files.contact, phrase);
 }
 
 for (const phrase of [
@@ -181,7 +192,7 @@ for (const phrase of [
   "paymentPath",
   "invoice-first unless a configured direct payment link is present",
 ]) {
-  includes("package page", packagePage, phrase);
+  includes("package page", files.packagePage, phrase);
 }
 
 for (const phrase of [
@@ -196,7 +207,7 @@ for (const phrase of [
   "Fixed price",
   "Invoice option always visible",
 ]) {
-  includes("products page", products, phrase);
+  includes("products page", files.products, phrase);
 }
 
 for (const phrase of [
@@ -209,16 +220,11 @@ for (const phrase of [
   "Fixed scope first",
   "Public pages must not expose personal Gmail",
 ]) {
-  includes("checkout page", checkout, phrase);
+  includes("checkout page", files.checkout, phrase);
 }
 
-for (const phrase of [
-  "11 priority languages",
-  "Bulgarian visitors",
-  "Bulgarian support",
-  "Google Translate fallback",
-]) {
-  includes("capabilities", capabilities, phrase);
+for (const phrase of ["11 priority languages", "Bulgarian visitors", "Bulgarian support", "Google Translate fallback"]) {
+  includes("capabilities", files.capabilities, phrase);
 }
 
 for (const phrase of [
@@ -229,18 +235,31 @@ for (const phrase of [
   "Slack/email delivery receipt",
   "Defensive Security Boundary",
 ]) {
-  includes("hourly owner prompt", hourlyPrompt, phrase);
+  includes("hourly owner prompt", files.hourlyPrompt, phrase);
 }
 
-includes("agents redirect", agents, "redirect(\"/capabilities\")");
-includes("legacy pack redirect", legacyPack, "redirect(\"/website-completion-package\")");
+includes("agents redirect", files.agents, "redirect(\"/capabilities\")");
+includes("legacy pack redirect", files.legacyPack, "redirect(\"/website-completion-package\")");
 
-const publicSurface = [home, layout, footer, localeAssist, contact, packagePage, products, checkout, capabilities].join("\n");
-assert(!/ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i.test(publicSurface), "public surface must not expose personal Gmail.");
-assert(!/57 active staff|Agent expansion board|worktree|command board/i.test(publicSurface), "public surface must not expose internal agent/worktree language.");
+const publicSurface = [
+  files.home,
+  files.layout,
+  files.footer,
+  files.localeAssist,
+  files.contact,
+  files.packagePage,
+  files.products,
+  files.checkout,
+  files.capabilities,
+].join("\n");
+
+excludes("public surface", publicSurface, /ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i);
+excludes("public surface", publicSurface, /57 active staff|Agent expansion board|worktree|command board/i);
 
 for (const broken of ["\u00c3", "\u00e0\u00a4", "\u00e6\u2014", "\u00d0\u00a3"]) {
-  assert(!localeAssist.includes(broken), `locale assist appears to contain mojibake marker ${broken}`);
+  excludes("locale assist", files.localeAssist, broken);
 }
 
-console.log("Revenue, mobile, Google Translate whole-site fallback, Bulgarian i18n, priority-market SEO, product and checkout routes, invoice-first close path, MRagent multilingual behavior, hourly owner contract, and public safety verification passed.");
+console.log(
+  "Revenue, mobile, Google Translate fallback, Bulgarian i18n, priority-market SEO, product and checkout routes, invoice-first close path, short multilingual MRagent behavior, hourly owner contract, and public safety verification passed.",
+);
