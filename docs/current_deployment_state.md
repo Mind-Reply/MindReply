@@ -4,33 +4,33 @@ Checked: 2026-06-10
 
 ## Public Production
 
-Live production is still behind GitHub `main`.
+Live production is serving the revenue and privacy surface, but deployment provenance is still incomplete.
 
 Verified live behavior:
 
-- `https://www.mind-reply.com/`: `200 OK`.
-- `https://www.mind-reply.com/contact`: `200 OK`.
-- `https://www.mind-reply.com/products`: `404 Not Found`.
-- `https://www.mind-reply.com/checkout`: `404 Not Found`.
-- `https://www.mind-reply.com/api/version`: `200 OK`, reporting commit `0957a3c7233801286c27b4edea4fb934bb2833de`.
-- `https://www.mind-reply.com/api/geo-locale`: `200 OK`, still showing supported locales `en, es, fr, de, pt, ar, hi, ja, zh, uk` without deployed `bg` support.
+- `https://www.mind-reply.com/`: `200 OK`, no Gmail exposed, public mailbox present.
+- `https://www.mind-reply.com/contact`: `200 OK`, no Gmail exposed, public mailbox present.
+- `https://www.mind-reply.com/products`: `200 OK`, no Gmail exposed, public mailbox present.
+- `https://www.mind-reply.com/checkout`: `200 OK`, no Gmail exposed, public mailbox present.
+- `https://www.mind-reply.com/api/health`: `200 OK`.
+- `https://www.mind-reply.com/api/version`: `200 OK`, but deployment metadata is `null`.
+- `https://www.mind-reply.com/api/geo-locale`: `200 OK`, recommends `bg` from Bulgaria and lists 11 supported locales: `en`, `es`, `fr`, `de`, `pt`, `ar`, `hi`, `ja`, `zh`, `uk`, `bg`.
 
-Homepage and contact samples do not expose Gmail, but the live footer still contains the stale auto-language signal that was already removed in source.
+Urgent privacy result: sampled public pages do not expose a personal Gmail address. Public contact remains `info@mind-reply.com`.
 
 ## GitHub Source
 
-`main` is ahead of the live production commit by 72 commits when compared against live commit `0957a3c7233801286c27b4edea4fb934bb2833de`.
+- Repository: `Mind-Reply/MindReply`
+- Default branch: `main`
+- Latest inspected `main` commit: `282a2406286200c7fdabeed9a703b6ea89b0947a`
+- Latest inspected `main` message: `Fix live robots verifier path boundary`
 
-Source changes present on `main` but not yet live include:
+The report-delivery fallbacks in GitHub Actions now use `angellllkr@gmail.com` for owner-only reporting:
 
-- Shorter, calmer, more varied MRagent behavior in `lib/mragent.ts`.
-- Google-backed translation route in `app/api/translate/route.ts`.
-- Updated locale/market handling with Bulgarian support in source.
-- Cleaned footer copy in `components/SiteFooter.tsx`.
-- Product surface at `app/products/page.tsx`.
-- Checkout surface at `app/checkout/page.tsx`.
-- Fixed `GBP 600` Website Completion Package path and invoice option.
-- Manual production deployment workflow at `.github/workflows/manual-vercel-production.yml`.
+- `.github/workflows/hourly-owner-report.yml`
+- `.github/workflows/manual-vercel-production.yml`
+
+Local historical outbox reports were also corrected from the wrong uppercase/missing-letter Gmail variants to `angellllkr@gmail.com`.
 
 ## Vercel Project
 
@@ -39,27 +39,21 @@ Canonical production project:
 - Project: `mindreply`
 - Team: `team_0plIJmQLgZC1wVv9zI2eVf3B`
 - Project ID: `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`
-- Latest inspected ready production deployment: `dpl_2rTwzQUoxBPAi2pNp3QDixhKFpuj`
-- Latest ready production deployment URL: `mindreply-qid6qqljd-angellllkr-engs-projects.vercel.app`
-- Latest ready production deployment commit: `0957a3c7233801286c27b4edea4fb934bb2833de`
+- Latest inspected ready production deployment: `dpl_BohRakPiHHtXdahTb1JPy3pTxn4q`
+- Latest ready production deployment URL: `mindreply-cqy6b56j7-angellllkr-engs-projects.vercel.app`
+- Deployment metadata branch: `codex/deploy-ready-bulgarian`
+- Deployment metadata commit: `37a347eb43adccc4260a3b16cde88d9018c1cbc7`
 
-The project metadata still points to the old ready deployment. No newer ready production deployment was visible in the Vercel deployment list at this check.
+The live domain has the needed revenue routes, Bulgarian locale support, and public-mailbox privacy fix. It should not be called fully proven until `/api/version` reports non-null deployment metadata and the expected production branch/commit can be matched.
 
 ## Pro Account Note
 
-The account may now be Pro, but the inspected Vercel project has not yet produced a new ready production deployment from current `main`. Pro status alone does not update production; the fixed manual workflow still needs to run once.
-
-If the Pro upgrade is active, the next deploy attempt should no longer fail on the previous build-rate limit.
+The connector confirms the Vercel project is accessible and has a fresh ready production deployment. It does not expose billing-tier proof, so Pro status is not verified from this session. If Pro is active, the higher deployment allowance should help avoid the earlier deployment-rate bottleneck, but it does not replace live verification.
 
 ## Next Production Action
 
-Run the canonical manual workflow:
-
-1. Open GitHub Actions for `Mind-Reply/MindReply`.
-2. Select `MindReply Manual Vercel Production Deploy`.
-3. Run workflow on `main`.
-4. Enter the confirmation exactly: `deploy-production`.
-5. Confirm the workflow aliases `www.mind-reply.com` and `mind-reply.com`.
-6. Confirm live checks pass for `/`, `/contact`, `/products`, `/checkout`, `/api/version`, `/api/health`, and `/api/geo-locale`.
-
-Production should not be called fixed until `/api/version` reports the new `main` deployment and `/products` plus `/checkout` return `200 OK`.
+1. Fix or configure `/api/version` so production reports commit, branch, environment, URL, and project production URL.
+2. Run the canonical manual workflow on `main`: `MindReply Manual Vercel Production Deploy`.
+3. Confirm the workflow aliases `www.mind-reply.com` and `mind-reply.com`.
+4. Rerun live checks for `/`, `/contact`, `/products`, `/checkout`, `/api/version`, `/api/health`, and `/api/geo-locale`.
+5. Treat production as clean only after `/api/version` reports non-null metadata and public routes remain free of Gmail.
