@@ -1,13 +1,7 @@
 import type { MetadataRoute } from "next";
-import { defaultLocale, localeAlternates, supportedLocales } from "@/lib/locales";
+import { defaultLocale, localeAlternates, localizedPath, supportedLocales } from "@/lib/locales";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.mind-reply.com";
-const languageParams = ["es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"] as const;
-
-function sitemapPath(path: string, locale: string) {
-  if (locale === defaultLocale) return path;
-  return `${path}?lang=${locale}`;
-}
 
 const routes = [
   { path: "/", priority: 1, changeFrequency: "daily" as const, localized: true },
@@ -28,14 +22,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return routes.flatMap((route) => {
     const alternates = route.localized ? { languages: localeAlternates(siteUrl, route.path) } : undefined;
-    const locales = route.localized ? supportedLocales.filter((locale) => locale === defaultLocale || languageParams.includes(locale as (typeof languageParams)[number])) : [defaultLocale];
+    const locales = route.localized ? supportedLocales : [defaultLocale];
 
     return locales.map((locale) => ({
-      url: `${siteUrl}${sitemapPath(route.path, locale)}`,
+      url: `${siteUrl}${localizedPath(route.path, locale)}`,
       lastModified,
       changeFrequency: route.changeFrequency,
-      priority: locale === "en" ? route.priority : Math.max(route.priority - 0.03, 0.45),
-      alternates: alternates,
+      priority: locale === defaultLocale ? route.priority : Math.max(route.priority - 0.03, 0.45),
+      alternates,
     }));
   });
 }
