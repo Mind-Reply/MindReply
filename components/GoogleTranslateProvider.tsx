@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk";
+type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
 
 type TranslateResponse = {
   configured?: boolean;
@@ -10,22 +10,17 @@ type TranslateResponse = {
   translations?: string[];
 };
 
-const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk"];
+const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
 const originalText = new WeakMap<Text, string>();
-const googleTranslateCompatibility = {
-  script: "translate.google.com/translate_a/element.js",
-  cookie: "googtrans",
-  init: "googleTranslateElementInit",
-  container: "mindreply-google-translate",
-  zh: "zh-CN",
-};
-void googleTranslateCompatibility;
 
 function isLocale(value: string): value is LocaleCode {
   return supportedLocales.includes(value as LocaleCode);
 }
 
 function currentLocale() {
+  const pathLocale = window.location.pathname.split("/").filter(Boolean)[0] || "";
+  if (isLocale(pathLocale)) return pathLocale;
+
   const query = new URLSearchParams(window.location.search).get("lang") || "";
   if (isLocale(query)) return query;
 
@@ -47,7 +42,7 @@ function shouldSkipElement(element: Element | null) {
 }
 
 function collectTextNodes() {
-  const roots = Array.from(document.querySelectorAll("body"));
+  const roots = Array.from(document.querySelectorAll("main, footer"));
   const nodes: Text[] = [];
 
   for (const root of roots) {
