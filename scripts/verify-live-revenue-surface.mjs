@@ -130,6 +130,7 @@ check(checks, "package-api-mounted", packageRequest.status === 400 && /email|req
 
 check(checks, "relief-promise", includes(home.text, "Reclaim 2+ hours daily within 24 hours") && includes(home.text, "Reclaim 2+ hours daily when"), "Homepage must keep the immediate relief promise and explain the operational leak.");
 check(checks, "homepage-clear-free-cta", includes(home.text, "Try MindReply Free"), "Homepage must use the clear Try MindReply Free CTA.");
+check(checks, "google-tag-installed", includes(home.text, "googletagmanager.com/gtag/js?id=G-4TME91CJT5") && includes(home.text, "gtag('config', 'G-4TME91CJT5')"), "Live homepage must include the Google tag G-4TME91CJT5.");
 check(checks, "website-completion-package", includes(publicText, "Website Completion Package"), "Live public surface must sell the Website Completion Package.");
 check(checks, "package-price", includes(publicText, "GBP 600"), "Live public surface must show the GBP 600 entry offer.");
 check(checks, "public-mailbox", includes(publicText, "info@mind-reply.com"), "Live public surface must use the public MindReply mailbox.");

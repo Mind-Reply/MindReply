@@ -76,6 +76,9 @@ for (const phrase of [
   "Bulgarian professional reply support",
   "content-language\": \"en, es, fr, de, pt, ar, hi, ja, zh, uk, bg",
   "GoogleTranslateProvider",
+  "googletagmanager.com/gtag/js?id=${googleTagId}",
+  "G-4TME91CJT5",
+  "gtag('config', '${googleTagId}')",
 ]) {
   includes("layout metadata", files.layout, phrase);
 }

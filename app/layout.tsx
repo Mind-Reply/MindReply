@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import GoogleTranslateProvider from "@/components/GoogleTranslateProvider";
 import LocaleAssist from "@/components/LocaleAssist";
@@ -11,6 +12,7 @@ const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" }
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.mind-reply.com";
+const googleTagId = "G-4TME91CJT5";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -113,6 +115,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} scroll-smooth`}>
       <body className="bg-[#081121] text-[#f8f5f0] antialiased" style={{ fontFamily: "var(--font-inter)" }}>
+        <Script async src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`} strategy="afterInteractive" />
+        <Script id="mindreply-google-tag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${googleTagId}');
+          `}
+        </Script>
         {children}
         <SiteFooter />
         <LocaleAssist />
