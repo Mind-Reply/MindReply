@@ -44,6 +44,25 @@ const files = {
   mragent: read("lib/mragent.ts"),
   hourlyPrompt: read("docs/hourly_owner_goal_prompt.md"),
 };
+const home = read("app/page.tsx");
+const layout = read("app/layout.tsx");
+const footer = read("components/SiteFooter.tsx");
+const localeAssist = read("components/LocaleAssist.tsx");
+const googleTranslate = read("components/GoogleTranslateProvider.tsx");
+const translateApi = read("app/api/translate/route.ts");
+const geoLocale = read("app/api/geo-locale/route.ts");
+const sitemap = read("app/sitemap.ts");
+const robots = read("app/robots.ts");
+const globals = read("app/globals.css");
+const contact = read("app/contact/page.tsx");
+const packagePage = read("app/website-completion-package/page.tsx");
+const products = read("app/products/page.tsx");
+const checkout = read("app/checkout/page.tsx");
+const capabilities = read("app/capabilities/page.tsx");
+const agents = read("app/agents/page.tsx");
+const legacyPack = read("app/pack/page.tsx");
+const mragent = read("lib/mragent.ts");
+const hourlyPrompt = read("docs/hourly_owner_goal_prompt.md");
 
 for (const phrase of [
   "Website Completion Package",
@@ -126,6 +145,14 @@ for (const phrase of [
   "target: locale",
 ]) {
   includes("google translate provider", files.googleTranslate, phrase);
+  "document.querySelectorAll(\"body\")",
+  "fetch(\"/api/translate\"",
+  "mindreply:locale-change",
+  "data-no-translate",
+  "collectTextNodes",
+  "\"bg\"",
+]) {
+  includes("google translate provider", googleTranslate, phrase);
 }
 
 for (const phrase of [
@@ -137,6 +164,7 @@ for (const phrase of [
   "zh-CN",
 ]) {
   includes("google translate route", files.translateRoute, phrase);
+  includes("translate api", translateApi, phrase);
 }
 excludes("google translate route", files.translateRoute, /"bg"|bg:\s*"bg"/);
 

@@ -1,12 +1,10 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Globe2 } from "lucide-react";
-import { countryLocale, defaultLocale, localeMeta, localizedPath, supportedLocales, type LocaleCode } from "@/lib/locales";
+ll-site-i18n
 
 type GeoLocaleResponse = {
   country?: string;
   recommendedLocale?: string;
+  priorityMarkets?: string[];
+  marketProfiles?: Array<{ country: string; locale: string }>;
 };
 
 const localeCodes = supportedLocales;
@@ -77,6 +75,7 @@ export default function LocaleAssist() {
         const countryFallback = data?.country ? countryLocale[data.country] : undefined;
         const nextLocale = manualLocale || (isLocale(detectedLocale) ? detectedLocale : countryFallback || initialLocale);
 
+        setMarketCount(data?.marketProfiles?.length || data?.priorityMarkets?.length || 11);
         setLocale(nextLocale);
         publishLocale(nextLocale);
       })
