@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-
-type LocaleCode = "en" | "es" | "fr" | "de" | "pt" | "ar" | "hi" | "ja" | "zh" | "uk" | "bg";
+import { defaultLocale, supportedLocales, type LocaleCode } from "@/lib/locales";
 
 type TranslateResponse = {
   configured?: boolean;
@@ -10,7 +9,6 @@ type TranslateResponse = {
   translations?: string[];
 };
 
-const supportedLocales: LocaleCode[] = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
 const originalText = new WeakMap<Text, string>();
 
 function isLocale(value: string): value is LocaleCode {
@@ -18,17 +16,20 @@ function isLocale(value: string): value is LocaleCode {
 }
 
 function currentLocale() {
+  const pathLocale = window.location.pathname.split("/").filter(Boolean)[0] || "";
+  if (isLocale(pathLocale)) return pathLocale;
+
   const query = new URLSearchParams(window.location.search).get("lang") || "";
   if (isLocale(query)) return query;
 
   const saved = window.localStorage.getItem("mindreply-locale") || "";
   if (isLocale(saved)) return saved;
 
-  const htmlLocale = document.documentElement.lang || "";
+  const htmlLocale = document.documentElement.lang.split("-")[0] || "";
   if (isLocale(htmlLocale)) return htmlLocale;
 
   const browserLocale = navigator.language.split("-")[0] || "";
-  return isLocale(browserLocale) ? browserLocale : "en";
+  return isLocale(browserLocale) ? browserLocale : defaultLocale;
 }
 
 function shouldSkipElement(element: Element | null) {
@@ -78,7 +79,7 @@ async function translateVisibleText(locale: LocaleCode) {
   }
 
   restoreOriginal(nodes);
-  if (locale === "en") return;
+  if (locale === defaultLocale) return;
 
   const originals = nodes.map((node) => originalText.get(node) || "");
   const unique = Array.from(new Set(originals.map((text) => text.trim()).filter(Boolean)));

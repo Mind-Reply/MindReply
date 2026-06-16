@@ -75,6 +75,6 @@ for (const expected of [
 }
 
 const publicSurface = [contact, pricing, packagePage, packageForm, packageRoute].join("\n");
-assert(!/ANGELLLKR@GMAIL\.COM|angelllkr@gmail\.com/i.test(publicSurface), "invoice-first close surface must not expose personal Gmail.");
+assert(!/ANGELLLLKR@GMAIL\.COM|angellllkr@gmail\.com/i.test(publicSurface), "invoice-first close surface must not expose personal Gmail.");
 
 console.log("Invoice-first close route verification passed.");

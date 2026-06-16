@@ -1,0 +1,6 @@
+{
+  "extName": { "message": "MindReply Decision Layer" },
+  "extDescription": { "message": "Inline intake, one recommended action, and quiet memory update." },
+  "extActionTitle": { "message": "MindReply" },
+  "contextClarifyNextMove": { "message": "MindReply: clarify next move" }
+}

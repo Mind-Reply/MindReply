@@ -4,15 +4,15 @@
 
 MindReply now protects the Vercel deployment quota with three controls:
 
-1. Guarded Vercel Git deployments are allowed for `main` so urgent public-site fixes can ship.
-2. `scripts/vercel-ignore-build.mjs` skips preview deployments, non-main branches, duplicate Vercel projects, docs-only changes, and report-only changes.
+1. `vercel.json` disables Vercel Git auto-deployments so duplicate connected projects stop creating deployment attempts.
+2. `scripts/vercel-ignore-build.mjs` remains as a secondary guard if Git deployments are later re-enabled.
 3. Manual production deployment remains available through CircleCI approval or `MindReply Manual Vercel Production Deploy` when a deliberate owner-approved deploy is needed.
 
 The hourly owner report workflow does not deploy. It only checks state, writes private artifacts, and sends the owner report when delivery secrets exist.
 
 ## What Code Can Do
 
-- Stop low-value deploy loops.
+- Stop low-value and duplicate Git-triggered deploy loops.
 - Keep urgent `main` app/config fixes deployable.
 - Require deliberate owner action for manual production deploys.
 - Verify the Vercel project id and team id before manual deployment.
@@ -32,16 +32,15 @@ Source code cannot make the account Pro from code, remove a provider billing lim
    - `VERCEL_ORG_ID`
    - `VERCEL_PROJECT_ID`
 4. Run one intentional deployment through either:
-   - Guarded Git deploy: push an app/config change to `main` and let Vercel build it.
    - CircleCI: approve `hold_production_deploy`.
    - GitHub Actions: run `MindReply Manual Vercel Production Deploy` and type `deploy-production`.
 
 ## Operating Rule
 
-Do not fully disable Git deployments while the public site is behind urgent revenue or privacy fixes. Keep the ignore-build guard strict, and only suppress low-value deployments that do not change the public app.
+Keep Vercel Git auto-deployments disabled until only the canonical `mindreply` project is connected to GitHub. Use the manual deploy workflow for production so one verified build spends one deployment.
 
 ## Source Check
 
-Vercel's published limits list `Deployments Created per Day` as `100` on Hobby and `6000` on Pro. This is why the repo suppresses previews, non-main branches, docs-only changes, and report-only changes while still allowing urgent `main` app/config fixes to deploy.
+Vercel's published limits list `Deployments Created per Day` as `100` on Hobby and `6000` on Pro. This is why the repo disables duplicate Git-triggered deployments and keeps urgent `main` app/config fixes behind one manual canonical deploy.
 
 Reference: `https://vercel.com/docs/limits/overview`

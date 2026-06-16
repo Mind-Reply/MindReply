@@ -86,7 +86,7 @@ Subcopy:
 Paste the message, page, objection, or follow-up that is slowing work down. MindReply returns one clear read, one ranked next move, and a send-ready output with no long setup.
 
 Primary CTA:
-Try MRagent free
+Try MindReply Free
 
 Secondary CTA:
 Request the GBP 600 Website Completion Package invoice

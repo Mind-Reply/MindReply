@@ -1,0 +1,83 @@
+name: MindReply Production Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_ORG_ID: ${{ vars.VERCEL_TEAM_ID || vars.VERCEL_ORG_ID || 'team_0plIJmQLgZC1wVv9zI2eVf3B' }}
+  VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID || 'prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3' }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN || secrets.VERCEL_API_TOKEN }}
+  NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://www.mind-reply.com' }}
+
+jobs:
+  deploy:
+    name: Build and deploy production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: mindreply-production-deploy-legacy
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build locally
+        run: npm run build
+
+      - name: Guard Vercel token
+        shell: bash
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "Vercel token missing. Add VERCEL_TOKEN, VERCEL_ACCESS_TOKEN, or VERCEL_API_TOKEN in GitHub Actions secrets."
+            exit 1
+          fi
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest --no-audit --no-fund
+
+      - name: Pull Vercel production environment
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build Vercel production artifact
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy to Vercel production
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOYMENT_URL="$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")"
+          echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          echo "Deployment URL: $DEPLOYMENT_URL"
+
+      - name: Smoke check deployment URL
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEPLOYMENT_URL="${{ steps.deploy.outputs.deployment_url }}"
+          test -n "$DEPLOYMENT_URL"
+          curl --fail --silent --show-error "$DEPLOYMENT_URL/" >/dev/null
+          curl --fail --silent --show-error "$DEPLOYMENT_URL/agent" >/dev/null
+          curl --fail --silent --show-error "$DEPLOYMENT_URL/api/health" >/dev/null
+
+      - name: Smoke check production domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error "$NEXT_PUBLIC_SITE_URL/" >/dev/null
+          curl --fail --silent --show-error "$NEXT_PUBLIC_SITE_URL/agent" >/dev/null
+          curl --fail --silent --show-error "$NEXT_PUBLIC_SITE_URL/api/health" >/dev/null

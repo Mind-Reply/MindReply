@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Mail, ShieldCheck, ShoppingBag } from "lucide-react";
+import { ArrowRight, Languages, Mail, ShieldCheck, ShoppingBag } from "lucide-react";
 
 const footerLinks = [
   { label: "MRagent", href: "/agent" },
@@ -7,6 +7,7 @@ const footerLinks = [
   { label: "Website Completion Package", href: "/website-completion-package" },
   { label: "Checkout", href: "/checkout?package=website-completion" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Trust", href: "/trust" },
   { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/privacy" },
 ];
@@ -18,6 +19,19 @@ const demandLanes = [
   "Client follow-up compression",
   "Founder response overload",
   "Privacy-safe assisted close",
+];
+
+const targetMarkets = [
+  "UK",
+  "India",
+  "UAE",
+  "Saudi Arabia",
+  "US",
+  "Germany",
+  "Japan",
+  "Brazil",
+  "France",
+  "Spain",
 ];
 
 export default function SiteFooter() {
@@ -39,12 +53,18 @@ export default function SiteFooter() {
               </div>
             ))}
           </div>
-          <p className="mt-5 max-w-2xl rounded-lg border border-white/10 bg-white/[0.028] p-4 text-xs font-semibold leading-6 text-[#cdd8df]">
-            Public contact: <a href={`mailto:${supportEmail}`} className="font-bold text-[#e2b757] hover:underline">{supportEmail}</a>. For package scope, use the checkout or contact form first.
-          </p>
-          <p className="mt-3 max-w-2xl rounded-lg border border-white/10 bg-white/[0.028] p-4 text-xs font-semibold leading-6 text-[#cdd8df]">
-            Language and market fit: Bulgarian and 10 other priority languages are routed by Google Translate or the visitor's browser, with Bulgaria included in the public market map.
-          </p>
+          <section className="mt-5 rounded-lg border border-white/10 bg-white/[0.028] p-4">
+            <div className="flex items-center gap-2 text-[#91d2c8]">
+              <Languages aria-hidden className="h-4 w-4" />
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">Quiet language assist</p>
+            </div>
+            <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
+                Language and market fit stays quiet. Visitor IP country guides the first suggestion, then browser language refines it. The manual selector stays available, and Google Translate or the visitor's browser can handle full-page translation when needed. High-demand regions: {targetMarkets.join(" / ")}.
+            </p>
+            <p className="mt-3 text-xs font-semibold leading-6 text-[#cdd8df]">
+                Public contact uses {supportEmail}. For package scope, use the contact form or checkout path first.
+            </p>
+          </section>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
@@ -59,10 +79,23 @@ export default function SiteFooter() {
           </section>
 
           <section className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
+            <div className="flex items-center gap-2 text-[#e2b757]">
+              <Languages aria-hidden className="h-4 w-4" />
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">Language and market fit</p>
+            </div>
+            <p className="mt-4 text-sm leading-7 text-[#cdd8df]">
+              Visitor IP and browser language guide the first suggestion. Full-site translation uses Google Translate, and Google Translate or the visitor's browser can handle the whole website when needed.
+            </p>
+            <p className="mt-3 text-xs font-semibold leading-6 text-[#9fb0bd]">
+              Priority markets: {targetMarkets.slice(0, 6).join(" / ")}. Wider coverage: {targetMarkets.slice(6).join(" / ")}.
+            </p>
+          </section>
+
+          <section className="rounded-lg border border-white/10 bg-white/[0.045] p-5">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#e2b757]">Next step</p>
             <div className="mt-4 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-4 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-                Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
+                Try MindReply Free <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
               <Link href="/checkout?package=website-completion" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
                 Checkout <ShoppingBag aria-hidden className="h-4 w-4" />

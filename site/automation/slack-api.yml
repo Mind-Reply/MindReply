@@ -1,8 +1,13 @@
 surface: Slack API handoff
 workspace: mind-reply
-field_id: Xf0B6WHC2SBH
+field_id_ref: owner_supplied_private_field_id
 status: configured_without_secret
 purpose: Route MRagent monitor summaries and personal-pack handoffs to Slack when a channel and connector access are available.
+owner_dm_invite:
+  status: provided_out_of_band
+  storage_rule: do_not_commit_raw_invite_url
+  workflow_flag: MINDREPLY_SLACK_DM_INVITE_AVAILABLE
+  send_rule: invite link is onboarding context only; persistent delivery requires MINDREPLY_SLACK_WEBHOOK_URL or SLACK_WEBHOOK_URL
 safety:
   - do not store Slack bot tokens in the repo
   - do not commit invite URLs
@@ -11,10 +16,11 @@ safety:
 required_before_send:
   - connected Slack workspace
   - destination channel id or DM id
+  - Slack webhook secret or authorized connector send capability
   - explicit user request to send, post, draft, or triage
 report_payload:
   source: mragent-monitor-status.json
-  field_id: Xf0B6WHC2SBH
+  field_id_ref: owner_supplied_private_field_id
   title: MRagent 15-minute report
   include:
     - generatedAt

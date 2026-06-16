@@ -1,45 +1,58 @@
 # Current Deployment State
 
-Checked: 2026-06-09
+Checked: 2026-06-10
 
-## Live Domain
+## Public Production
 
-- `https://www.mind-reply.com/`: reachable.
-- `https://www.mind-reply.com/api/health`: `200 OK` on the last live check.
-- `https://www.mind-reply.com/api/version`: `410 Gone` on the last live check.
+Live production is serving the revenue, privacy, response-overload, and visitor-matched multilingual surfaces from `main`.
 
-The `410 Gone` version endpoint means production is still behind the repo state that includes `app/api/version/route.ts`.
+Verified live behavior:
+
+- `https://www.mind-reply.com/`: `200 OK`, no Gmail exposed, public mailbox present.
+- `https://www.mind-reply.com/pricing`: `200 OK`.
+- `https://www.mind-reply.com/website-completion-package`: `200 OK`.
+- `https://www.mind-reply.com/products`: `200 OK`, no Gmail exposed, public mailbox present.
+- `https://www.mind-reply.com/checkout`: `200 OK`, no Gmail exposed, public mailbox present.
+- `https://www.mind-reply.com/contact`: `200 OK`, no Gmail exposed, public mailbox present.
+- `https://www.mind-reply.com/response-overload`: `200 OK`.
+- `https://www.mind-reply.com/api/health`: `200 OK`.
+- `https://www.mind-reply.com/api/version`: `200 OK`, but deployment metadata is `null`.
+- `https://www.mind-reply.com/api/geo-locale`: `200 OK`, recommends language from visitor IP country first and browser language second.
+
+Urgent privacy result: sampled public pages do not expose a personal Gmail address. Public contact remains `info@mind-reply.com`.
+
+## GitHub Source
+
+- Repository: `Mind-Reply/MindReply`
+- Default branch: `main`
+- Latest inspected `main` commit: `24d285318d7c6259758940a659640c91dbc10c08`
+- Latest inspected `main` message: `Refresh deployment evidence after version fallback`
+
+The report-delivery fallbacks in GitHub Actions now use `angellllkr@gmail.com` for owner-only reporting:
+
+- `.github/workflows/hourly-owner-report.yml`
+- `.github/workflows/manual-vercel-production.yml`
+
+Local historical outbox reports were also corrected from the wrong uppercase/missing-letter Gmail variants to `angellllkr@gmail.com`.
+
+Source now includes a build-time `/api/version` metadata fallback for manual prebuilt Vercel deployments. The next successful canonical deploy should report non-null commit, branch, environment, URL, and project production URL even when Vercel runtime Git variables are absent.
 
 ## Vercel Project
+
+Canonical production project:
 
 - Project: `mindreply`
 - Team: `team_0plIJmQLgZC1wVv9zI2eVf3B`
 - Project ID: `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`
+- Latest inspected ready production deployment: `dpl_E5akAEp6WuJ2LH7uLVWXRbJMmrNA`
+- Latest ready production deployment URL: `mindreply-187pumxyn-angellllkr-engs-projects.vercel.app`
 
-The latest inspected ready production deployment was created from `main` at commit `0e612d39f58cb6f07094aa464e10a62da1879828`.
+The deployment has production aliases for `mind-reply.com`, `www.mind-reply.com`, `mr.mind-reply.com`, `v.mind-reply.com`, and the canonical Vercel app domains.
 
-Recent Vercel history also showed multiple automatic, errored, or canceled deployments. The repo now uses a guarded Git deployment path instead of fully disabling Git deployments, because production must be able to receive urgent public-site fixes.
+## Current Risk
 
-## Current GitHub Controls
-
-- `vercel.json` allows Git deployments again.
-- `scripts/vercel-ignore-build.mjs` skips preview deployments, non-main branches, duplicate Vercel projects, docs-only changes, and report-only changes.
-- App changes on `main` are allowed to build the canonical production project.
-- `MindReply Manual Vercel Production Deploy` remains available as a `workflow_dispatch` fallback.
-- The manual deploy requires the exact confirmation phrase `deploy-production`.
-- The manual deploy verifies the Vercel team id, project id, app contract, and live `/api/version` endpoint.
+The live domain has the needed revenue routes, response-overload landing page, visitor-matched multilingual layer, `/trust` surface, and public-mailbox privacy fix. It should not be called source-current until this branch is merged, the canonical production deploy completes, and `/api/version` plus live surface checks pass.
 
 ## Next Production Action
 
-1. Let the guarded Vercel Git deployment attempt the latest `main` app/config change.
-2. If Vercel still reports a quota or billing limit, confirm GitHub Actions secrets:
-   - `VERCEL_TOKEN`
-   - `VERCEL_ORG_ID`
-   - `VERCEL_PROJECT_ID`
-3. Run `MindReply Manual Vercel Production Deploy` on `main`.
-4. Type `deploy-production`.
-5. Confirm the workflow live checks pass and `/api/version` returns `200`.
-
-## Limit Position
-
-Vercel's public limits list `Deployments Created per Day` as `100` on Hobby and `6000` on Pro. Source code cannot upgrade the account. The repo can only suppress low-value deployments and make production deployment intentional when quota is constrained.
+After the visitor-matched multilingual SEO update is merged, run one canonical production deploy from project `prj_EuO1lFvbwoFSdDxBlezNyXG8eVV3`, then rerun `node scripts/verify-live-revenue-surface.mjs`.

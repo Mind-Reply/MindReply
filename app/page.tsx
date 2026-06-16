@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BarChart3,
   Brain,
   CheckCircle2,
   ClipboardList,
@@ -25,7 +26,7 @@ const packageCtaLabel = packagePaymentUrl ? "Pay GBP 600" : "Checkout or request
 const packageRouteLabel = packagePaymentUrl ? "Direct payment enabled" : "Checkout and invoice route ready";
 const packageRouteCopy = packagePaymentUrl
   ? "Scope is confirmed first, then the configured payment link is used before delivery."
-  : "No payment link is required to begin. MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice before delivery.";
+  : "No payment link is required to begin. MindReply confirms scope, collects billing name and billing email, then routes the GBP 600 invoice before delivery so the invoice-first route works for B2B buyers.";
 
 const navItems = [
   { label: "Offer", href: "#offer" },
@@ -76,12 +77,12 @@ const toolRows = [
 
 const authoritySignals = [
   {
-    title: "20+ professional lexicons",
+    title: "Discipline-specific language",
     copy: "Founder updates, client delivery, legal-sensitive wording, finance pressure, clinical tone, recruiting replies, and executive messages each need different restraint.",
     icon: FileText,
   },
   {
-    title: "Behavioral communication read",
+    title: "Behavioral expression read",
     copy: "MRagent names the protected feeling, the likely friction, and the next move without turning the answer into a long essay.",
     icon: HeartHandshake,
   },
@@ -131,11 +132,42 @@ const upgradeSteps = [
   },
   {
     title: "Growth",
-    copy: "For recurring weekly overload across inboxes, client replies, follow-ups, and small team message queues.",
+    copy: "For repeated daily overload: customer responses, follow-ups, sales messages, task threads, and small-team communication rhythm.",
   },
   {
     title: "Pro",
-    copy: "For high-trust continuity, sensitive professional tone, approved memory, receipt review, and integration lanes when credentials exist.",
+    copy: "For sensitive client, sales, hiring, legal-adjacent, founder, finance, and reputation-critical communication that needs deeper refinement and control.",
+  },
+];
+
+const firstSessionPath = [
+  {
+    label: "First user action",
+    copy: "Paste one tense reply, overloaded page section, client follow-up, or objection into MRagent.",
+  },
+  {
+    label: "First output",
+    copy: "Get one direct read: hidden friction, next move, confidence, risk, and a narrow receipt marker.",
+  },
+  {
+    label: "Aha moment",
+    copy: "The buyer sees the message or page does not need more wording; it needs a cleaner decision path.",
+  },
+  {
+    label: "Credit trigger",
+    copy: "Buy credits when several replies need the same quick polish but the website offer is not leaking buyers.",
+  },
+  {
+    label: "Package trigger",
+    copy: "Buy the GBP 600 package when the homepage, pricing, contact route, or offer copy needs repair.",
+  },
+  {
+    label: "Growth trigger",
+    copy: "Move to Growth when the same overload repeats every week across inbox, clients, or small team work.",
+  },
+  {
+    label: "Pro trigger",
+    copy: "Move to Pro when approved memory, receipt review, integration planning, or sensitive continuity is required.",
   },
 ];
 
@@ -145,6 +177,25 @@ const proofItems = [
   "Receipts are narrow by design and should not expose raw private pressure in public reports.",
   "Checkout is fixed-price when the payment URL is configured; invoice-first remains available when it is not.",
   "Revenue, deployment, and integration claims stay tied to real sources instead of optimistic wording.",
+];
+
+const dataHandlingProof = [
+  {
+    title: "Raw text stays out of public proof",
+    copy: "Reports and website copy use receipt markers, route status, and redacted summaries instead of exposing private messages.",
+  },
+  {
+    title: "Memory requires approval",
+    copy: "Growth and Pro can describe memory as a controlled lane only after the user approves the context that should persist.",
+  },
+  {
+    title: "Integrations are consent-gated",
+    copy: "Slack, email, and workflow connections are not claimed as active until credentials and channel permissions are configured.",
+  },
+  {
+    title: "Payment path stays inspectable",
+    copy: "The GBP 600 package uses a fixed-price checkout when configured, with invoice-first fallback when direct payment is not ready.",
+  },
 ];
 
 const structuredData = {
@@ -213,7 +264,7 @@ export default function Home() {
               Products
             </Link>
             <Link href="/agent" className="rounded-full bg-[#122033] px-4 py-2 text-sm font-semibold text-[#f8f5f0] transition hover:bg-[#1c3150]">
-              Try MRagent
+              Try MindReply Free
             </Link>
           </div>
         </div>
@@ -243,7 +294,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-                Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
+                Try MindReply Free <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
               <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
                 {packageCtaLabel} <Target aria-hidden className="h-4 w-4" />
@@ -409,6 +460,26 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="border-b border-[#122033]/10 bg-[#103b39] px-4 py-14 text-[#f8f5f0] md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#91d2c8]">First-session conversion logic</p>
+            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">The first session should make the next purchase obvious.</h2>
+            <p className="mt-5 text-sm leading-7 text-[#d3e5e2]">
+              MindReply does not need a long demo to sell. It needs one useful read, one visible next move, and a clear trigger for credits, the package, Growth, or Pro.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {firstSessionPath.map((item) => (
+              <article key={item.label} className="rounded-lg border border-white/10 bg-white/[0.06] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#e2b757]">{item.label}</p>
+                <p className="mt-3 text-sm leading-6 text-[#d3e5e2]">{item.copy}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="proof" className="border-b border-[#122033]/10 bg-[#fbfaf6] px-4 py-14 md:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
           <div>
@@ -427,6 +498,25 @@ export default function Home() {
             ))}
           </div>
         </div>
+        <div className="mx-auto mt-8 max-w-7xl rounded-lg border border-[#122033]/10 bg-white p-5 shadow-sm shadow-[#122033]/5">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Data handling proof</p>
+              <h3 className="mt-3 font-serif text-3xl font-bold leading-tight">Trust is shown through boundaries the buyer can inspect.</h3>
+            </div>
+            <p className="max-w-md text-sm leading-7 text-[#59687b]">
+              These are operational boundaries, not borrowed compliance claims. They make the privacy promise specific without overstating certification.
+            </p>
+          </div>
+          <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {dataHandlingProof.map((item) => (
+              <article key={item.title} className="rounded-lg border border-[#122033]/10 bg-[#f7f4ed] p-4">
+                <h4 className="font-serif text-xl font-bold leading-tight">{item.title}</h4>
+                <p className="mt-3 text-sm leading-6 text-[#59687b]">{item.copy}</p>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="px-4 py-10 md:px-8">
@@ -437,7 +527,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-              Try MRagent <Zap aria-hidden className="h-4 w-4" />
+              Try MindReply Free <Zap aria-hidden className="h-4 w-4" />
             </Link>
             <a href={packageCtaHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
               {packageCtaLabel} <Mail aria-hidden className="h-4 w-4" />

@@ -29,10 +29,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Verify report state
         run: npm run report:check
@@ -42,6 +41,9 @@ jobs:
 
       - name: Verify revenue blueprint
         run: npm run audit:blueprint
+
+      - name: Verify language and SEO positioning
+        run: npm run seo:i18n:verify
 
       - name: Verify app contract
         run: npm run verify:all

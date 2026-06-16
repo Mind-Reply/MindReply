@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "MindReply Decision Layer",
+  "name": "__MSG_extName__",
   "version": "0.1.0",
-  "description": "Inline intake, one recommended action, and quiet memory update.",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
   "permissions": ["activeTab", "scripting", "storage", "contextMenus"],
   "host_permissions": ["https://www.mind-reply.com/*", "https://*.vercel.app/*"],
   "background": {
@@ -16,6 +17,6 @@
     }
   ],
   "action": {
-    "default_title": "MindReply"
+    "default_title": "__MSG_extActionTitle__"
   }
 }

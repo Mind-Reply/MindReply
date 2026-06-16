@@ -1,0 +1,6 @@
+{
+  "extName": { "message": "Camada de decisão MindReply" },
+  "extDescription": { "message": "Entrada em linha, uma ação recomendada e atualização discreta de memória." },
+  "extActionTitle": { "message": "MindReply" },
+  "contextClarifyNextMove": { "message": "MindReply: esclarecer o próximo passo" }
+}

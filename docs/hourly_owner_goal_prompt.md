@@ -70,6 +70,12 @@ Treat agents as internal lanes, not public claims:
 - Product Lead: first 3-minute value, upgrade trigger.
 - Reporting Lead: email/Slack delivery receipt.
 
+## Slack DM Handoff
+
+If the owner provides a Slack direct-message invite in chat, treat it as out-of-band onboarding context for connector setup. Do not paste the raw invite URL into source, workflow YAML, reports, public pages, or artifacts.
+
+Persistent Slack delivery still requires `MINDREPLY_SLACK_WEBHOOK_URL` or `SLACK_WEBHOOK_URL`. The non-secret `MINDREPLY_SLACK_DM_INVITE_AVAILABLE` flag may report whether owner DM onboarding context exists, but it is not a credential and cannot send messages by itself.
+
 ## Hourly Report Fields
 
 Every hourly report must include:
@@ -84,6 +90,7 @@ Every hourly report must include:
 - package request API, recipient, sender, provider, dry-run, receipt, and fallback email status;
 - Vercel deploy status;
 - Slack/email delivery receipt.
+- Slack DM invite availability without the raw invite URL.
 
 ## Defensive Security Boundary
 

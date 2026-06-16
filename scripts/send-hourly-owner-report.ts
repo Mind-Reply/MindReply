@@ -60,6 +60,28 @@ function summarizeReport(report: string) {
   return `${report.slice(0, 3500)}\n\n[Report truncated for Slack. Full markdown is attached as a workflow artifact.]`;
 }
 
+const sensitiveTransportPatterns = [
+  /https?:\/\/join\.slack\.com\/\S+/gi,
+  /https?:\/\/[^\s)]+\.slack\.com\/(?:join|invite)\/\S+/gi,
+  /shareDM\/zt-[A-Za-z0-9~_-]+/gi,
+  /https?:\/\/hooks\.slack\.com\/services\/\S+/gi,
+  /xox[baprs]-[A-Za-z0-9-]+/gi,
+];
+
+function redactSensitiveTransportText(value: string) {
+  let redacted = value;
+  let count = 0;
+
+  for (const pattern of sensitiveTransportPatterns) {
+    redacted = redacted.replace(pattern, () => {
+      count += 1;
+      return "[redacted-private-slack-routing]";
+    });
+  }
+
+  return { text: redacted, count };
+}
+
 async function readReceipt(): Promise<Receipt> {
   if (!existsSync(latestReceiptPath)) return {};
   return JSON.parse(await readFile(latestReceiptPath, "utf8")) as Receipt;
@@ -149,8 +171,11 @@ async function main() {
 
   if (liveProof && !report.includes("## Live Production Revenue Surface")) {
     report = `${report}${liveProofSection(liveProof)}`;
-    await writeFile(latestReportPath, report, "utf8");
   }
+
+  const transportRedaction = redactSensitiveTransportText(report);
+  if (transportRedaction.count > 0) report = transportRedaction.text;
+  await writeFile(latestReportPath, report, "utf8");
 
   const delivery: Record<string, Record<string, unknown>> = receipt.delivery || {};
   const liveProofAttached = Boolean(liveProof && report.includes("## Live Production Revenue Surface"));
@@ -186,6 +211,10 @@ async function main() {
           failed: liveProof.failed || [],
         }
       : { attached: false, path: liveRevenuePath, status: "missing" },
+    sensitiveTransportRedaction: {
+      applied: transportRedaction.count > 0,
+      count: transportRedaction.count,
+    },
     delivery,
   };
 

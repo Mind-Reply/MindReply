@@ -1,0 +1,6 @@
+{
+  "extName": { "message": "طبقة القرار MindReply" },
+  "extDescription": { "message": "إدخال مباشر، إجراء واحد موصى به، وتحديث ذاكرة هادئ." },
+  "extActionTitle": { "message": "MindReply" },
+  "contextClarifyNextMove": { "message": "MindReply: وضّح الخطوة التالية" }
+}

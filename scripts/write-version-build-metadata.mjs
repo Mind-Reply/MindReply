@@ -1,0 +1,66 @@
+import { execFileSync } from "node:child_process";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+
+const gitCandidates = [
+  process.env.GIT_EXE,
+  "git",
+  "C:\\Users\\angel\\AppData\\Local\\GitHubDesktop\\app-3.5.12\\resources\\app\\git\\cmd\\git.exe",
+].filter(Boolean);
+
+function git(args, fallback = "") {
+  for (const candidate of gitCandidates) {
+    try {
+      return execFileSync(candidate, args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    } catch {
+      // Try the next candidate.
+    }
+  }
+  return fallback;
+}
+
+function existingMetadata(target) {
+  try {
+    const text = readFileSync(target, "utf8");
+    const commitSha = text.match(/"commitSha":\s*"([^"]+)"/)?.[1];
+    const branch = text.match(/"branch":\s*"([^"]+)"/)?.[1];
+    return { commitSha, branch };
+  } catch {
+    return {};
+  }
+}
+
+const target = join(process.cwd(), "lib", "build-metadata.ts");
+const existing = existingMetadata(target);
+const commitSha =
+  process.env.GITHUB_SHA ||
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  process.env.NEXT_PUBLIC_MINDREPLY_BUILD_COMMIT_SHA ||
+  git(["rev-parse", "HEAD"], "") ||
+  existing.commitSha ||
+  "unknown";
+const branch =
+  process.env.GITHUB_REF_NAME ||
+  process.env.VERCEL_GIT_COMMIT_REF ||
+  process.env.NEXT_PUBLIC_MINDREPLY_BUILD_BRANCH ||
+  git(["rev-parse", "--abbrev-ref", "HEAD"], "") ||
+  existing.branch ||
+  "main";
+
+const metadata = {
+  commitSha,
+  branch,
+  environment: process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_MINDREPLY_BUILD_ENVIRONMENT || "production",
+  url: process.env.NEXT_PUBLIC_MINDREPLY_BUILD_URL || "https://www.mind-reply.com",
+  projectProductionUrl: process.env.NEXT_PUBLIC_MINDREPLY_PROJECT_PRODUCTION_URL || "https://www.mind-reply.com",
+  generatedAt: new Date().toISOString(),
+};
+
+mkdirSync(dirname(target), { recursive: true });
+writeFileSync(
+  target,
+  `export const buildMetadata = ${JSON.stringify(metadata, null, 2)} as const;\n`,
+  "utf8",
+);
+
+console.log(`Wrote ${target} for ${metadata.commitSha.slice(0, 12)} on ${metadata.branch}.`);

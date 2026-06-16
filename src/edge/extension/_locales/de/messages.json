@@ -1,0 +1,6 @@
+{
+  "extName": { "message": "MindReply Entscheidungsebene" },
+  "extDescription": { "message": "Inline-Erfassung, eine empfohlene Aktion und stille Speicheraktualisierung." },
+  "extActionTitle": { "message": "MindReply" },
+  "contextClarifyNextMove": { "message": "MindReply: nächsten Schritt klären" }
+}

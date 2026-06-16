@@ -172,8 +172,10 @@ verification:
   rule: Verification runs in GitHub Actions and is separate from Vercel publishing.
 slack_handoff:
   config: site/automation/slack-api.yml
-  field_id: Xf0B6WHC2SBH
-  rule: Use only after Slack connector access and a destination channel or DM are available.
+  field_id_ref: owner_supplied_private_field_id
+  dm_invite_status_env: MINDREPLY_SLACK_DM_INVITE_AVAILABLE
+  raw_invite_url_rule: never commit, print, or attach private Slack invite URLs in repo files, reports, workflow YAML, or artifacts.
+  rule: Use only after Slack connector access and a destination channel or DM are available; DM invite context is onboarding-only and cannot send messages.
 vercel_handoff:
   runbook: site/automation/vercel-build-limit-runbook.yml
   rule: Treat upgradeToPro=build-rate-limit as account quota until build logs prove a code failure.
@@ -181,7 +183,7 @@ uses:
   - GitHub Actions summary
   - private owner email report after live proof is attached
   - Slack webhook report after live proof is attached
-  - future Slack report handoff after workspace channel is connected
+  - future Slack report handoff after workspace channel or owner DM is connected
   - future Outlook digest handoff after mailbox target is named
   - personal pack status checks
   - manual preview capture artifacts from MRagent Preview Capture

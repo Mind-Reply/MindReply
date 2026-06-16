@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isRedirectedPublicPath } from "@/lib/decision-layer";
+import { localeFromPath, stripLocaleFromPath } from "@/lib/locales";
 
 const allowedApiPaths = new Set([
   "/api/health",
@@ -19,6 +20,30 @@ export default function middleware(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.hostname = "www.mind-reply.com";
     return NextResponse.redirect(url, 308);
+  }
+
+  const prefixedLocale = localeFromPath(req.nextUrl.pathname);
+  if (prefixedLocale) {
+    const strippedPath = stripLocaleFromPath(req.nextUrl.pathname);
+    if (isRedirectedPublicPath(strippedPath)) {
+      const url = req.nextUrl.clone();
+      url.pathname = prefixedLocale === "en" ? "/" : `/${prefixedLocale}`;
+      url.search = "";
+      return NextResponse.redirect(url, 307);
+    }
+
+    const rewriteUrl = req.nextUrl.clone();
+    rewriteUrl.pathname = strippedPath;
+    rewriteUrl.searchParams.set("lang", prefixedLocale);
+    const response = NextResponse.rewrite(rewriteUrl);
+    response.headers.set("x-mindreply-locale", prefixedLocale);
+    response.cookies.set("mindreply-locale", prefixedLocale, {
+      path: "/",
+      sameSite: "lax",
+      secure: true,
+      maxAge: 60 * 60 * 24 * 365,
+    });
+    return response;
   }
 
   if (isRedirectedPublicPath(req.nextUrl.pathname)) {

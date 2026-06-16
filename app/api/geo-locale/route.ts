@@ -1,42 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const countryLocale: Record<string, string> = {
-  AE: "ar",
-  AR: "es",
-  AT: "de",
-  AU: "en",
-  BE: "fr",
-  BG: "bg",
-  BR: "pt",
-  CA: "en",
-  CH: "de",
-  CL: "es",
-  CN: "zh",
-  CO: "es",
-  DE: "de",
-  ES: "es",
-  FR: "fr",
-  GB: "en",
-  HK: "zh",
-  IE: "en",
-  IN: "hi",
-  JP: "ja",
-  KW: "ar",
-  MX: "es",
-  MY: "en",
-  NZ: "en",
-  OM: "ar",
-  PT: "pt",
-  QA: "ar",
-  SA: "ar",
-  SG: "en",
-  TW: "zh",
-  UA: "uk",
-  UK: "en",
-  US: "en",
-};
-
-const supportedLocales = ["en", "es", "fr", "de", "pt", "ar", "hi", "ja", "zh", "uk", "bg"];
+import { countryLocale, normalizeLocale, supportedLocales } from "@/lib/locales";
 
 const priorityMarkets = [
   "United Kingdom",
@@ -49,6 +12,7 @@ const priorityMarkets = [
   "Brazil",
   "France",
   "Spain",
+  "Ukraine",
   "Bulgaria",
 ];
 
@@ -124,19 +88,20 @@ const marketProfiles = [
     providerGap: "clear entry into Spanish-speaking markets without overbuilding every route first",
   },
   {
+    country: "Ukraine",
+    locale: "uk",
+    priority: 10.5,
+    demand: "operator-heavy market where bilingual communication pressure is common",
+    providerGap: "trust-first Ukrainian communication support remains under-supplied",
+  },
+  {
     country: "Bulgaria",
     locale: "bg",
-    priority: 11,
-    demand: "Bulgarian professional-services, founders, and client-facing operators needing precise business communication support",
-    providerGap: "localized Bulgarian decision-support and website-completion positioning is less crowded than broad English AI writing tools",
+    priority: 10.75,
+    demand: "EU operator market with bilingual client communication and founder-led service pressure",
+    providerGap: "Bulgarian-first professional reply and decision-support coverage remains thin",
   },
 ];
-
-function normalizeLocale(value: string | null) {
-  if (!value) return "en";
-  const locale = value.split(",")[0]?.trim().toLowerCase().split("-")[0] || "en";
-  return supportedLocales.includes(locale) ? locale : "en";
-}
 
 export function GET(req: NextRequest) {
   const country =
@@ -146,15 +111,16 @@ export function GET(req: NextRequest) {
     "US";
   const countryCode = country.toUpperCase();
   const browserLocale = normalizeLocale(req.headers.get("accept-language"));
-  const recommendedLocale = countryLocale[countryCode] || browserLocale;
+  const mappedLocale = countryLocale[countryCode] || null;
+  const recommendedLocale = mappedLocale || browserLocale;
 
   return NextResponse.json({
-    country: countryCode,
+    country: mappedLocale ? countryCode : "GLOBAL",
     recommendedLocale,
     browserLocale,
     supportedLocales,
     priorityMarkets,
     marketProfiles,
-    source: countryLocale[countryCode] ? "country" : "browser",
+    source: mappedLocale ? "country" : "browser",
   });
 }

@@ -1,0 +1,6 @@
+{
+  "extName": { "message": "MindReply 意思決定レイヤー" },
+  "extDescription": { "message": "インライン入力、ひとつの推奨アクション、静かな記憶更新。" },
+  "extActionTitle": { "message": "MindReply" },
+  "contextClarifyNextMove": { "message": "MindReply: 次の一手を明確にする" }
+}

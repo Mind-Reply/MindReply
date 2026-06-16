@@ -4,7 +4,7 @@ import {
   CheckCircle2,
   ClipboardList,
   LockKeyhole,
-  Mail, 
+  Mail,
   MessageCircle,
   ReceiptText,
   ShieldCheck,
@@ -91,7 +91,7 @@ export default function ContactPage() {
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link href="/agent" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2b757] px-5 py-3 text-sm font-bold text-[#122033] transition hover:bg-[#f0cf7a]">
-                Try MRagent <ArrowRight aria-hidden className="h-4 w-4" />
+                Try MindReply Free <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
               <a href={mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-bold text-[#f8f5f0] transition hover:border-[#e2b757] hover:text-[#e2b757]">
                 Fallback email <Mail aria-hidden className="h-4 w-4" />
@@ -101,13 +101,13 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="px-4 py-12 md:px-8">
+      <section className="px-4 py-12 md:px-8" data-package-request-route="/api/package-request">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.72fr_1.28fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2f6f72]">When to contact</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Use this page for buying friction, not vague browsing.</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
-              The clean route is simple: MRagent resolves the pressure when it can. Contact handles package requests, billing, security owner decisions, and anything that needs a human answer.
+              The clean route is simple: MRagent resolves the pressure when it can. Contact form handles package requests, billing, security owner decisions, and anything that needs a human answer.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
@@ -127,7 +127,7 @@ export default function ContactPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#9b7430]">Contact form</p>
             <h2 className="mt-4 font-serif text-4xl font-bold leading-tight md:text-5xl">Website Completion Package, GBP 600.</h2>
             <p className="mt-5 text-sm leading-7 text-[#59687b]">
-              The package turns overloaded website messaging, scattered launch notes, or reply pressure into a ranked action queue and send-ready copy.
+              The package turns overloaded website messaging, scattered launch notes, or reply pressure into a ranked action queue and send-ready copy. The secure contact form posts through /api/package-request.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
