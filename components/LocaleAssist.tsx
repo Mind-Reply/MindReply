@@ -5,7 +5,7 @@ type GeoLocaleResponse = {
   recommendedLocale?: string;
   priorityMarkets?: string[];
   marketProfiles?: Array<{ country: string; locale: string }>;
-};
+}; 
 
 const localeCodes = supportedLocales;
 const rtlLocales = new Set<LocaleCode>(localeCodes.filter((code) => localeMeta[code].dir === "rtl"));
