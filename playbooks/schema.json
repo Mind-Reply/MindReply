@@ -45,8 +45,8 @@
       "required": ["risk_gate", "receipt_required"],
       "additionalProperties": false,
       "properties": {
-        "risk_gate": { "type": "boolean" },
-        "receipt_required": { "type": "boolean" }
+        "risk_gate": { "type": "owner" },
+        "receipt_required": { "type": "owner" }
       }
     }
   }
