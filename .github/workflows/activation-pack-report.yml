@@ -13,7 +13,7 @@ on:
         default: "true"
       require_delivery:
         description: "Fail unless Slack or email actually sends"
-        required: false
+        required: 
         default: "false"
   schedule:
     - cron: "*/30 * * * *"
