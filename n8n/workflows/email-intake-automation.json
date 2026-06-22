@@ -1,0 +1,124 @@
+{
+  "id": "email-intake-automation",
+  "name": "Email Intake & Analysis Automation",
+  "description": "Automatically sync Gmail, analyze emails with AI, create approval queue",
+  "nodes": [
+    {
+      "parameters": {
+        "event": "webhook",
+        "path": "email-intake",
+        "method": "POST"
+      },
+      "name": "Webhook - Email Received",
+      "type": "webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:3001/api/messages/sync",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "Authorization": "Bearer {{ $env.BACKEND_API_KEY }}"
+        },
+        "jsonParameters": {
+          "agencyId": "{{ $json.agencyId }}",
+          "emailFrom": "{{ $json.from }}"
+        }
+      },
+      "name": "Call Backend - Queue Sync",
+      "type": "httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "prompt": "Analyze this email:\nSubject: {{ $json.subject }}\nBody: {{ $json.body }}\n\nProvide: summary, sentiment, key questions, and draft reply",
+        "model": "gpt-4-turbo"
+      },
+      "name": "OpenAI - Analyze Email",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:3001/api/approvals",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "Authorization": "Bearer {{ $env.BACKEND_API_KEY }}"
+        },
+        "jsonParameters": {
+          "messageId": "{{ $json.messageId }}",
+          "suggestedReply": "{{ $json.body.suggestedReply }}",
+          "sentiment": "{{ $json.body.sentiment }}",
+          "priority": "{{ $json.body.sentiment === 'negative' ? 'high' : 'normal' }}"
+        }
+      },
+      "name": "Call Backend - Create Approval",
+      "type": "httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "channels": "#mindreply-approvals",
+        "text": ":mailbox_with_mail: New email from {{ $json.from }}\n\n*Subject:* {{ $json.subject }}\n*Sentiment:* {{ $json.body.sentiment }}\n\nReview in dashboard: <http://dashboard:5000/approvals|Approval Queue>"
+      },
+      "name": "Slack - Notify Team",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Webhook - Email Received": {
+      "main": [
+        [
+          {
+            "node": "Call Backend - Queue Sync",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Backend - Queue Sync": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Analyze Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Analyze Email": {
+      "main": [
+        [
+          {
+            "node": "Call Backend - Create Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Backend - Create Approval": {
+      "main": [
+        [
+          {
+            "node": "Slack - Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {}
+}

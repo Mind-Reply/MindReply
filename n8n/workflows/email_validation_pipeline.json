@@ -1,0 +1,12 @@
+{
+  "name": "MindReply - Email Validation & Hygiene Pipeline",
+  "description": "Automated email validation - verifies addresses, removes bounces, checks spam",
+  "active": true,
+  "nodes": [
+    {"id": "start", "type": "n8n-nodes-base.start", "position": [50, 50], "typeVersion": 1},
+    {"id": "email_webhook", "type": "n8n-nodes-base.webhook", "position": [250, 50], "typeVersion": 1, "parameters": {"httpMethod": "POST", "path": "validate-email"}},
+    {"id": "check_email_validity", "type": "n8n-nodes-base.httpRequest", "position": [450, 50], "typeVersion": 1, "parameters": {"url": "https://api.zerobounce.net/v2/validate", "requestMethod": "GET", "qs": {"email": "={{$json.email}}", "api_key": "{{$env.ZEROBOUNCE_API_KEY}}"}}},
+    {"id": "store_validation", "type": "n8n-nodes-base.postgres", "position": [650, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "{{$env.DB_NAME}}", "user": "{{$env.DB_USER}}", "password": "{{$env.DB_PASSWORD}}", "query": "INSERT INTO email_validation (email, status, is_valid) VALUES ('={{$json.email}}', '={{$json.status}}', {{$json.status === 'valid'}})"}}
+  ],
+  "connections": {"start": {"main": [[{"node": "email_webhook", "type": "main", "index": 0}]]}, "email_webhook": {"main": [[{"node": "check_email_validity", "type": "main", "index": 0}]]}, "check_email_validity": {"main": [[{"node": "store_validation", "type": "main", "index": 0}]]}}
+}

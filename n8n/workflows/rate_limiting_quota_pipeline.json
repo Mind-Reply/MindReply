@@ -1,0 +1,98 @@
+{
+  "name": "MindReply - Rate Limiting & Quota Pipeline",
+  "description": "Automated rate limiting and quota management - controls API usage, enforces tier limits, manages overages",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "api_request_webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rate-limit-check"
+      }
+    },
+    {
+      "id": "get_user_quota",
+      "type": "n8n-nodes-base.postgres",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "SELECT * FROM user_quotas WHERE user_id = '={{$json.user_id}}' AND month = DATE_TRUNC('month', CURRENT_DATE)"
+      }
+    },
+    {
+      "id": "check_limit",
+      "type": "n8n-nodes-base.code",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const quota = $json[0] || {};\nconst limit = $json.plan_limit || 1000;\nconst current = quota.usage_count || 0;\nconst remaining = limit - current;\nconst allowed = remaining > 0;\nreturn { allowed, remaining, limit, current, overage: current > limit };"
+      }
+    },
+    {
+      "id": "allow_request",
+      "type": "n8n-nodes-base.postgres",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "UPDATE user_quotas SET usage_count = usage_count + 1 WHERE user_id = '={{$json.user_id}}' RETURNING usage_count, limit - usage_count as remaining"
+      }
+    },
+    {
+      "id": "deny_request",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [850, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify({status: 'rate_limit_exceeded', message: 'Monthly quota exceeded. Upgrade plan or wait for reset.', remaining: 0})}}"
+      }
+    },
+    {
+      "id": "return_allowed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify({status: 'allowed', remaining: $json.remaining, limit: $json.usage_count + $json.remaining})}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "api_request_webhook", "type": "main", "index": 0}]]
+    },
+    "api_request_webhook": {
+      "main": [[{"node": "get_user_quota", "type": "main", "index": 0}]]
+    },
+    "get_user_quota": {
+      "main": [[{"node": "check_limit", "type": "main", "index": 0}]]
+    },
+    "check_limit": {
+      "main": [[{"node": "allow_request", "type": "main", "index": 0}], [{"node": "deny_request", "type": "main", "index": 0}]]
+    },
+    "allow_request": {
+      "main": [[{"node": "return_allowed", "type": "main", "index": 0}]]
+    }
+  }
+}

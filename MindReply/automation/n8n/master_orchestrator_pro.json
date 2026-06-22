@@ -1,0 +1,17 @@
+{
+  "name": "MR Master Orchestrator PRO",
+  "active": true,
+  "nodes": [
+    { "parameters": {}, "name": "Start", "type": "n8n-nodes-base.start", "typeVersion": 1, "position": [200,200] },
+    { "parameters": { "requestMethod": "GET", "url": "http://mindreply_db:5432/healthz" }, "name": "Check Backend Health", "type": "n8n-nodes-base.httpRequest", "typeVersion": 1, "position": [420,200] },
+    { "parameters": { "conditions": { "number": [ { "value1": "={{$json[\"statusCode\"]}}", "operation": "equal", "value2": 200 } ] } }, "name": "IF Healthy", "type": "n8n-nodes-base.if", "typeVersion": 1, "position": [900,200] },
+    { "parameters": { "url": "http://127.0.0.1:4000", "requestMethod": "POST", "bodyParametersJson": "{\"time\": \"={{new Date().toISOString()}}\", \"status\": \"ok\", \"sites\": 5, \"agents\": 890, \"workflows\": 5000}" }, "name": "Update Dashboard", "type": "n8n-nodes-base.httpRequest", "typeVersion": 1, "position": [1140,140] },
+    { "parameters": { "url": "http://127.0.0.1:8000/deploy-trigger", "requestMethod": "POST", "bodyParametersJson": "{\"site\": \"site_1\"}" }, "name": "Trigger Deploy", "type": "n8n-nodes-base.httpRequest", "typeVersion": 1, "position": [1140,260] },
+    { "parameters": { "fromEmail": "director@mind-reply.com", "toEmail": "director@mind-reply.com", "subject": "MR: System Status Update", "text": "Director: system is operational. All agents ready. Workflows loaded." }, "name": "Notify Director", "type": "n8n-nodes-base.emailSend", "typeVersion": 1, "position": [1380,200] }
+  ],
+  "connections": {
+    "Start": { "main": [[{ "node": "Check Backend Health", "type": "main", "index": 0 }]] },
+    "Check Backend Health": { "main": [[{ "node": "IF Healthy", "type": "main", "index": 0 }]] },
+    "IF Healthy": { "main": [[{ "node": "Update Dashboard", "type": "main", "index": 0 }, { "node": "Trigger Deploy", "type": "main", "index": 0 }], [{ "node": "Notify Director", "type": "main", "index": 0 }]] }
+  }
+}

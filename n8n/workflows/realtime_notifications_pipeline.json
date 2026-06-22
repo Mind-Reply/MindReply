@@ -1,0 +1,109 @@
+{
+  "name": "MindReply - Real-Time Notifications Pipeline",
+  "description": "Real-time event notifications with WebSocket - live updates for payments, signups, errors",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "event_webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "realtime-event"
+      }
+    },
+    {
+      "id": "get_subscribed_clients",
+      "type": "n8n-nodes-base.postgres",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "SELECT client_id, websocket_id FROM active_connections WHERE event_type = '={{$json.event_type}}' AND connected_at > NOW() - INTERVAL '5 minutes'"
+      }
+    },
+    {
+      "id": "broadcast_event",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "http://localhost:3004/broadcast",
+        "requestMethod": "POST",
+        "body": {
+          "event_type": "={{$json.event_type}}",
+          "data": "={{$json.data}}",
+          "connections": "={{$json}}"
+        }
+      }
+    },
+    {
+      "id": "cache_event",
+      "type": "n8n-nodes-base.redis",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "operation": "set",
+        "key": "event:{{$json.event_type}}:{{Date.now()}}",
+        "value": "={{JSON.stringify($json.data)}}",
+        "ttl": 3600
+      }
+    },
+    {
+      "id": "log_event",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO realtime_events (event_type, data, subscribers, broadcast_at) VALUES ('={{$json.event_type}}', '={{JSON.stringify($json.data)}}', {{$json.length}}, NOW())"
+      }
+    },
+    {
+      "id": "return_broadcast",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify({status: 'broadcasted', subscribers: $json.length, event: $json.event_type})}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "event_webhook", "type": "main", "index": 0}]]
+    },
+    "event_webhook": {
+      "main": [[{"node": "get_subscribed_clients", "type": "main", "index": 0}]]
+    },
+    "get_subscribed_clients": {
+      "main": [[{"node": "broadcast_event", "type": "main", "index": 0}]]
+    },
+    "broadcast_event": {
+      "main": [[{"node": "cache_event", "type": "main", "index": 0}]]
+    },
+    "cache_event": {
+      "main": [[{"node": "log_event", "type": "main", "index": 0}]]
+    },
+    "log_event": {
+      "main": [[{"node": "return_broadcast", "type": "main", "index": 0}]]
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "name": "MindReply - User Activity Tracking Pipeline",
+  "description": "Comprehensive user activity tracking - pageviews, clicks, features used, session tracking, retention",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "activity_webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "track-activity"
+      }
+    },
+    {
+      "id": "get_or_create_session",
+      "type": "n8n-nodes-base.postgres",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO user_sessions (user_id, session_token, started_at) VALUES ('={{$json.user_id}}', '={{$json.session_token}}', NOW()) ON CONFLICT (session_token) DO UPDATE SET last_activity = NOW() RETURNING id, duration_minutes"
+      }
+    },
+    {
+      "id": "log_activity",
+      "type": "n8n-nodes-base.postgres",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO user_activity (user_id, activity_type, page, feature, action, metadata, timestamp) VALUES ('={{$json.user_id}}', '={{$json.activity_type}}', '={{$json.page}}', '={{$json.feature}}', '={{$json.action}}', '={{JSON.stringify($json.metadata)}}', NOW())"
+      }
+    },
+    {
+      "id": "aggregate_metrics",
+      "type": "n8n-nodes-base.code",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const activityType = $json.activity_type;\nconst metrics = {\n  pageviews: activityType === 'pageview' ? 1 : 0,\n  clicks: activityType === 'click' ? 1 : 0,\n  features_used: activityType === 'feature_use' ? 1 : 0,\n  time_on_page: $json.metadata?.duration || 0\n};\nreturn metrics;"
+      }
+    },
+    {
+      "id": "update_user_stats",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "UPDATE user_stats SET pageviews = pageviews + {{$json.pageviews}}, clicks = clicks + {{$json.clicks}}, features_used = features_used + {{$json.features_used}}, total_session_time = total_session_time + {{$json.time_on_page}}, last_active = NOW() WHERE user_id = '={{$json.user_id}}'"
+      }
+    },
+    {
+      "id": "check_retention",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "SELECT user_id, days_since_signup, last_active, (SELECT COUNT(*) FROM user_activity WHERE user_id = u.user_id AND DATE(timestamp) = CURRENT_DATE) as today_activities FROM users u WHERE u.user_id = '={{$json.user_id}}'"
+      }
+    },
+    {
+      "id": "return_tracking",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify({status: 'tracked', metrics: $json})}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "activity_webhook", "type": "main", "index": 0}]]
+    },
+    "activity_webhook": {
+      "main": [[{"node": "get_or_create_session", "type": "main", "index": 0}]]
+    },
+    "get_or_create_session": {
+      "main": [[{"node": "log_activity", "type": "main", "index": 0}]]
+    },
+    "log_activity": {
+      "main": [[{"node": "aggregate_metrics", "type": "main", "index": 0}]]
+    },
+    "aggregate_metrics": {
+      "main": [[{"node": "update_user_stats", "type": "main", "index": 0}]]
+    },
+    "update_user_stats": {
+      "main": [[{"node": "check_retention", "type": "main", "index": 0}]]
+    },
+    "check_retention": {
+      "main": [[{"node": "return_tracking", "type": "main", "index": 0}]]
+    }
+  }
+}

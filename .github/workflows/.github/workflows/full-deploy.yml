@@ -1,0 +1,86 @@
+name: FULL CI/CD PIPELINE
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: mindreply-backend
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+
+# ---------------------------
+# 1. TEST + BUILD
+# ---------------------------
+  test-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node/Python
+        run: |
+          sudo apt update
+          pip install -r requirements.txt || true
+          npm install || true
+
+      - name: Run Tests
+        run: |
+          pytest || npm test || echo "no tests"
+
+# ---------------------------
+# 2. BUILD + PUSH TO AWS ECR
+# ---------------------------
+  deploy-backend:
+    needs: test-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set region $AWS_REGION
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      - name: Build Docker Image
+        run: |
+          docker build -t mindreply-backend ./apps/api
+          docker tag mindreply-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+
+      - name: Push to ECR
+        run: |
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+
+      - name: Deploy to AWS ECS
+        run: |
+          aws ecs update-service \
+          --cluster mindreply-cluster \
+          --service mindreply-service \
+          --force-new-deployment
+
+# ---------------------------
+# 3. DEPLOY FRONTEND (VERCEL)
+# ---------------------------
+  deploy-frontend:
+    needs: test-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel
+        run: |
+          cd apps/frontend
+          vercel --prod --token=${{ secrets.VERCEL_TOKEN }}

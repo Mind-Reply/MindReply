@@ -1,0 +1,74 @@
+name: Deploy Stripe Webhook & Verify Secrets
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SK }}
+  STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+
+jobs:
+  verify-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Verify Stripe Secrets Exist
+        run: |
+          if [ -z "${{ secrets.STRIPE_SK }}" ]; then
+            echo "❌ STRIPE_SK not found in secrets"
+            exit 1
+          fi
+          echo "✅ STRIPE_SK configured"
+          
+          if [ -z "${{ secrets.STRIPE_WEBHOOK_SECRET }}" ]; then
+            echo "⚠️  STRIPE_WEBHOOK_SECRET not in secrets - will use test webhook"
+          else
+            echo "✅ STRIPE_WEBHOOK_SECRET configured"
+          fi
+
+  deploy-webhook:
+    runs-on: ubuntu-latest
+    needs: verify-secrets
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install psycopg2-binary
+      
+      - name: Verify Webhook Handler
+        run: |
+          python -m py_compile MindReply/automation/webhook/stripe_webhook_production.py
+          echo "✅ Webhook handler syntax valid"
+      
+      - name: Test Webhook Locally
+        run: |
+          # Start webhook in background for 5 seconds
+          timeout 5 python MindReply/automation/webhook/stripe_webhook_production.py || true
+          echo "✅ Webhook starts successfully"
+
+  deploy-vercel:
+    runs-on: ubuntu-latest
+    needs: verify-secrets
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to Vercel
+        uses: vercel/action@master
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        env:
+          STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SK }}

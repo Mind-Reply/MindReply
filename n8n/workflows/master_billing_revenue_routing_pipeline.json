@@ -1,0 +1,186 @@
+{
+  "name": "MindReply - Master Billing & Revenue Routing Pipeline",
+  "description": "Automated payment routing - routes revenue to Stripe, PayPal, Wise, Monzo based on amount and rules",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "payment_received",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "payment-received"
+      }
+    },
+    {
+      "id": "validate_amount",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const amount = $json.amount; const limits = { stripe: { min: 20000, max: 20000 }, paypal: { min: 20000, max: 20000 }, wise: { min: 20000, max: 20000 }, monzo: { min: 20000, max: 20000 } }; const routes = []; if (amount >= limits.stripe.min && amount <= limits.stripe.max) routes.push('stripe'); if (amount >= limits.paypal.min && amount <= limits.paypal.max) routes.push('paypal'); if (amount >= limits.wise.min && amount <= limits.wise.max) routes.push('wise'); if (amount >= limits.monzo.min && amount <= limits.monzo.max) routes.push('monzo'); return { amount, routes, primary: routes[0] || 'stripe' };"
+      }
+    },
+    {
+      "id": "route_stripe",
+      "type": "n8n-nodes-base.stripe",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "operation": "createPayoutFromBalance",
+        "amount": "={{$json.amount}}"
+      }
+    },
+    {
+      "id": "route_monzo",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://api.monzo.com/accounts/08425895/payment",
+        "requestMethod": "POST",
+        "headers": {
+          "Authorization": "Bearer {{$env.MONZO_API_TOKEN}}"
+        },
+        "body": {
+          "amount": "={{$json.amount}}",
+          "sort_code": "04-00-04",
+          "account_number": "08425895"
+        }
+      }
+    },
+    {
+      "id": "route_paypal",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 250],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://api.sandbox.paypal.com/v1/payments/payouts",
+        "requestMethod": "POST",
+        "headers": {
+          "Authorization": "Bearer {{$env.PAYPAL_ACCESS_TOKEN}}"
+        },
+        "body": {
+          "sender_batch_header": {
+            "sender_batch_id": "{{Date.now()}}",
+            "email_subject": "MindReply Payout"
+          },
+          "items": [
+            {
+              "recipient_type": "EMAIL",
+              "amount": {
+                "value": "={{($json.amount / 100).toFixed(2)}}",
+                "currency": "GBP"
+              },
+              "description": "MindReply Revenue",
+              "receiver": "alicelynnt@paypal.me"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "route_wise",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 350],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://api.wise.com/v1/transfers",
+        "requestMethod": "POST",
+        "headers": {
+          "Authorization": "Bearer {{$env.WISE_API_TOKEN}}"
+        },
+        "body": {
+          "targetAccount": "{{$env.WISE_ACCOUNT_ID}}",
+          "quote": "{{$env.WISE_QUOTE_ID}}",
+          "customerTransactionId": "{{Date.now()}}"
+        }
+      }
+    },
+    {
+      "id": "log_transaction",
+      "type": "n8n-nodes-base.postgres",
+      "position": [850, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "{{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO revenue_logs (customer_id, amount, payment_method, routing_destination, status, processed_at) VALUES ('={{$json.customer_id}}', {{$json.amount}}, '={{$json.payment_method}}', '={{$json.primary}}', 'processed', NOW())"
+      }
+    },
+    {
+      "id": "send_notification",
+      "type": "n8n-nodes-base.slack",
+      "position": [1050, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "text": "💰 REVENUE RECEIVED\nAmount: £{{$json.amount / 100}}\nCustomer: {{$json.customer_id}}\nMethod: {{$json.payment_method}}\nRouted to: {{$json.primary}}\nTime: {{new Date().toISOString()}}"
+      }
+    },
+    {
+      "id": "send_email_confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [1050, 250],
+      "typeVersion": 1,
+      "parameters": {
+        "toEmail": "angellllkr@gmail.com",
+        "subject": "Revenue Routed - £{{$json.amount / 100}}",
+        "text": "Payment received from {{$json.customer_id}}. Amount: £{{$json.amount / 100}}. Routed to {{$json.primary}}. Status: Processed"
+      }
+    },
+    {
+      "id": "return_status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1250, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify({status: 'routed', amount: $json.amount, destination: $json.primary, timestamp: new Date().toISOString()})}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "payment_received", "type": "main", "index": 0}]]
+    },
+    "payment_received": {
+      "main": [[{"node": "validate_amount", "type": "main", "index": 0}]]
+    },
+    "validate_amount": {
+      "main": [[{"node": "route_stripe", "type": "main", "index": 0}, {"node": "route_monzo", "type": "main", "index": 0}, {"node": "route_paypal", "type": "main", "index": 0}, {"node": "route_wise", "type": "main", "index": 0}]]
+    },
+    "route_stripe": {
+      "main": [[{"node": "log_transaction", "type": "main", "index": 0}]]
+    },
+    "route_monzo": {
+      "main": [[{"node": "log_transaction", "type": "main", "index": 0}]]
+    },
+    "route_paypal": {
+      "main": [[{"node": "log_transaction", "type": "main", "index": 0}]]
+    },
+    "route_wise": {
+      "main": [[{"node": "log_transaction", "type": "main", "index": 0}]]
+    },
+    "log_transaction": {
+      "main": [[{"node": "send_notification", "type": "main", "index": 0}]]
+    },
+    "send_notification": {
+      "main": [[{"node": "send_email_confirmation", "type": "main", "index": 0}]]
+    },
+    "send_email_confirmation": {
+      "main": [[{"node": "return_status", "type": "main", "index": 0}]]
+    }
+  }
+}

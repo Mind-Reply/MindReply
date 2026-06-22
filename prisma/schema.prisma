@@ -1,0 +1,353 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User & Organization Models
+model User {
+  id                    String      @id @default(cuid())
+  email                 String      @unique
+  name                  String
+  avatarUrl             String?
+  authProvider          String      @default("email") // email, google, microsoft, clerk
+  authProviderId        String?
+  passwordHash          String?
+  emailVerified         DateTime?
+  agencyId              String
+  agency                Agency      @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  role                  String      @default("member") // admin, lead, member
+  status                String      @default("active") // active, suspended, archived
+  
+  // Relations
+  subscription          Subscription?
+  approvalQueueItems    ApprovalQueue[]
+  sentMessages          SentMessage[]
+  messageAnalyses       MessageAnalysis[]
+  followUps             FollowUp[]
+  activityLog           ActivityLog[]
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([agencyId])
+  @@index([email])
+}
+
+model Agency {
+  id                    String      @id @default(cuid())
+  name                  String
+  website               String?
+  logo                  String?
+  stripeCustomerId      String?
+  subscriptionTier      String      @default("free") // free, pro, agency, enterprise
+  subscriptionStatus    String      @default("active") // active, trialing, past_due, cancelled
+  
+  // Settings
+  settings              Json        @default("{}")
+  emailIntegrations     Json        @default("{}")
+  automationRules       Json        @default("{}")
+  
+  users                 User[]
+  incomingMessages      IncomingMessage[]
+  approvalQueues        ApprovalQueue[]
+  followUps             FollowUp[]
+  analytics             Analytics[]
+  usageMetrics          UsageMetrics[]
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([stripeCustomerId])
+}
+
+// Email Message Models
+model IncomingMessage {
+  id                    String      @id @default(cuid())
+  agencyId              String
+  agency                Agency      @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  
+  gmailMessageId        String      @unique
+  from                  String      // sender email
+  subject               String
+  body                  String      @db.Text
+  bodyText              String      @db.Text
+  receivedAt            DateTime
+  ingestedAt            DateTime    @default(now())
+  
+  status                String      @default("new") // new, processing, processed, archived
+  priority              String      @default("normal") // low, normal, high, urgent
+  
+  threadId              String?     // Gmail thread ID for grouping
+  isReply               Boolean     @default(false)
+  parentMessageId       String?     // References another IncomingMessage if it's a reply
+  
+  // Relations
+  analysis              MessageAnalysis?
+  approvalQueue         ApprovalQueue?
+  sentMessage           SentMessage?
+  followUps             FollowUp[]
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([agencyId])
+  @@index([gmailMessageId])
+  @@index([status])
+  @@index([receivedAt])
+}
+
+model MessageAnalysis {
+  id                    String      @id @default(cuid())
+  messageId             String      @unique
+  message               IncomingMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  summary               String      @db.Text
+  sentiment             String      // positive, neutral, negative
+  extractedQuestions    String[]
+  suggestedReplyDraft   String      @db.Text
+  confidenceScore       Float       @default(0.0)
+  analysisMethod        String      @default("gpt4") // gpt4, anthropic, fallback
+  
+  keyTopics             String[]
+  actionItems           String[]
+  requiresEscalation    Boolean     @default(false)
+  escalationReason      String?
+  
+  analysisModel         String?     // gpt-4-turbo, claude-3-sonnet, etc
+  tokenUsage            Int?
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([messageId])
+}
+
+model ApprovalQueue {
+  id                    String      @id @default(cuid())
+  agencyId              String
+  agency                Agency      @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  
+  messageId             String      @unique
+  message               IncomingMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  suggestedReply        String      @db.Text
+  humanEdits            String?     @db.Text
+  
+  status                String      @default("pending") // pending, reviewing, approved, rejected, escalated, sent
+  priority              String      @default("normal")
+  
+  reviewedBy            String?
+  reviewedByUser        User?       @relation(fields: [reviewedBy], references: [id])
+  reviewedAt            DateTime?
+  reviewNotes           String?
+  
+  escalatedTo           String?
+  escalationReason      String?
+  escalatedAt           DateTime?
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([agencyId])
+  @@index([status])
+  @@index([messageId])
+  @@index([reviewedBy])
+}
+
+model SentMessage {
+  id                    String      @id @default(cuid())
+  messageId             String      @unique
+  message               IncomingMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  approvalId            String      @unique
+  approvalQueue         ApprovalQueue @relation(fields: [approvalId], references: [id], onDelete: Cascade)
+  
+  gmailMessageId        String?     @unique
+  toEmail               String
+  subject               String
+  content               String      @db.Text
+  
+  deliveryStatus        String      @default("sent") // sent, bounced, failed, read
+  deliveredAt           DateTime    @default(now())
+  readAt                DateTime?
+  
+  retryCount            Int         @default(0)
+  lastError             String?
+  
+  sentBy                String?
+  sentByUser            User?       @relation(fields: [sentBy], references: [id])
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([gmailMessageId])
+  @@index([deliveryStatus])
+}
+
+// Follow-up Models
+model FollowUp {
+  id                    String      @id @default(cuid())
+  agencyId              String
+  agency                Agency      @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  
+  messageId             String?
+  message               IncomingMessage? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  
+  createdBy             String
+  createdByUser         User        @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  
+  taskType              String      // reminder, nudge, escalation, callback
+  description           String
+  scheduledFor          DateTime
+  
+  status                String      @default("scheduled") // scheduled, triggered, completed, cancelled, snoozed
+  completedAt           DateTime?
+  completedBy           String?
+  
+  notificationChannels  String[]    @default(["email"]) // email, slack, sms, in_app
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([agencyId])
+  @@index([status])
+  @@index([scheduledFor])
+}
+
+// Subscription & Billing
+model Subscription {
+  id                    String      @id @default(cuid())
+  userId                String      @unique
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  tier                  String      @default("free")
+  status                String      @default("active")
+  
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  stripePriceId         String?
+  
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  cancelAt              DateTime?
+  cancelAtPeriodEnd     Boolean     @default(false)
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([stripeCustomerId])
+}
+
+// Analytics & Metrics
+model Analytics {
+  id                    String      @id @default(cuid())
+  agencyId              String
+  agency                Agency      @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  
+  date                  DateTime
+  
+  messagesReceived      Int         @default(0)
+  messagesProcessed     Int         @default(0)
+  repliesApproved       Int         @default(0)
+  repliesRejected       Int         @default(0)
+  escalations           Int         @default(0)
+  
+  estimatedHoursSaved   Float       @default(0.0)
+  avgResponseTime       Float       @default(0.0)
+  approvalRate          Float       @default(0.0)
+  
+  createdAt             DateTime    @default(now())
+
+  @@unique([agencyId, date])
+  @@index([agencyId])
+  @@index([date])
+}
+
+model UsageMetrics {
+  id                    String      @id @default(cuid())
+  agencyId              String
+  agency                Agency      @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  
+  month                 DateTime
+  
+  emailsProcessed       Int         @default(0)
+  apiBriefsGenerated    Int         @default(0)
+  storageUsedGb         Float       @default(0.0)
+  aiTokensUsed          Int         @default(0)
+  
+  createdAt             DateTime    @default(now())
+
+  @@unique([agencyId, month])
+  @@index([agencyId])
+}
+
+// Activity Logging
+model ActivityLog {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  action                String      // message_received, draft_generated, draft_approved, email_sent, etc
+  resourceType          String      // message, draft, approval, etc
+  resourceId            String?
+  
+  details               Json        @default("{}")
+  ipAddress             String?
+  userAgent             String?
+  
+  createdAt             DateTime    @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// n8n Integration Models
+model N8nWorkflow {
+  id                    String      @id @default(cuid())
+  agencyId              String
+  
+  n8nWorkflowId         String      @unique
+  name                  String
+  description           String?
+  
+  type                  String      // email_intake, approval_notification, follow_up, etc
+  status                String      @default("active")
+  
+  triggerType           String      // webhook, cron, manual
+  triggerConfig         Json        @default("{}")
+  
+  lastRun               DateTime?
+  lastRunStatus         String?     // success, failed, partial
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([agencyId])
+  @@index([type])
+}
+
+model N8nExecution {
+  id                    String      @id @default(cuid())
+  workflowId            String
+  
+  n8nExecutionId        String      @unique
+  status                String      // running, success, error, crashed
+  
+  inputData             Json?
+  outputData            Json?
+  errorMessage          String?
+  
+  startedAt             DateTime
+  completedAt           DateTime?
+  executionTime         Int?        // milliseconds
+  
+  createdAt             DateTime    @default(now())
+
+  @@index([workflowId])
+  @@index([status])
+}

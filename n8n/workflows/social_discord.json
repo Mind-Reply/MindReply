@@ -1,0 +1,10 @@
+{
+  "name": "MindReply - Discord Community Automation",
+  "active": true,
+  "nodes": [
+    {"id": "start", "type": "n8n-nodes-base.start", "position": [50, 50], "typeVersion": 1},
+    {"id": "discord_webhook", "type": "n8n-nodes-base.webhook", "position": [250, 50], "typeVersion": 1, "parameters": {"httpMethod": "POST", "path": "social-discord"}},
+    {"id": "post_discord", "type": "n8n-nodes-base.discord", "position": [450, 50], "typeVersion": 1, "parameters": {"text": "{{$json.message}}"}}
+  ],
+  "connections": {"start": {"main": [[{"node": "discord_webhook", "type": "main", "index": 0}]]}, "discord_webhook": {"main": [[{"node": "post_discord", "type": "main", "index": 0}]]}}
+}

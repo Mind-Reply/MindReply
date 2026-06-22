@@ -1,0 +1,98 @@
+{
+  "name": "MindReply - Email Service Pipeline",
+  "description": "Automated email service integration with SendGrid - sends transactional and marketing emails",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "trigger_email_event",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "email-service"
+      }
+    },
+    {
+      "id": "parse_email_data",
+      "type": "n8n-nodes-base.itemLists",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "mode": "combine",
+        "destinationFieldName": "email_batch"
+      }
+    },
+    {
+      "id": "sendgrid_send",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://api.sendgrid.com/v3/mail/send",
+        "requestMethod": "POST",
+        "headers": {
+          "Authorization": "Bearer {{$env.SENDGRID_API_KEY}}"
+        },
+        "body": {
+          "personalizations": [
+            {
+              "to": [{"email": "={{$json.to_email}}"}],
+              "subject": "={{$json.subject}}"
+            }
+          ],
+          "from": {"email": "noreply@mindreply.com"},
+          "content": [{"type": "text/html", "value": "={{$json.html_content}}"}]
+        }
+      }
+    },
+    {
+      "id": "log_email_sent",
+      "type": "n8n-nodes-base.postgres",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "{{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO email_logs (to_email, subject, status, sent_at) VALUES ('={{$json.to_email}}', '={{$json.subject}}', 'sent', NOW())"
+      }
+    },
+    {
+      "id": "notify_slack",
+      "type": "n8n-nodes-base.slack",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "text": "📧 Email sent to {{$json.to_email}} - Subject: {{$json.subject}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "trigger_email_event", "type": "main", "index": 0}]]
+    },
+    "trigger_email_event": {
+      "main": [[{"node": "parse_email_data", "type": "main", "index": 0}]]
+    },
+    "parse_email_data": {
+      "main": [[{"node": "sendgrid_send", "type": "main", "index": 0}]]
+    },
+    "sendgrid_send": {
+      "main": [[{"node": "log_email_sent", "type": "main", "index": 0}]]
+    },
+    "log_email_sent": {
+      "main": [[{"node": "notify_slack", "type": "main", "index": 0}]]
+    }
+  }
+}

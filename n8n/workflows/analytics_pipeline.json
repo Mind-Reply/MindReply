@@ -1,0 +1,101 @@
+{
+  "name": "MindReply - Analytics Pipeline",
+  "description": "Automated analytics collection and reporting with PostHog - tracks user behavior, revenue, retention",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "collect_metrics",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "analytics-collect"
+      }
+    },
+    {
+      "id": "posthog_capture",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://app.posthog.com/capture/",
+        "requestMethod": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "api_key": "{{$env.POSTHOG_API_KEY}}",
+          "event": "={{$json.event_name}}",
+          "properties": {
+            "user_id": "={{$json.user_id}}",
+            "plan": "={{$json.plan}}",
+            "revenue": "={{$json.revenue}}",
+            "action": "={{$json.action}}"
+          },
+          "timestamp": "={{new Date().toISOString()}}"
+        }
+      }
+    },
+    {
+      "id": "aggregate_daily",
+      "type": "n8n-nodes-base.postgres",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "{{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO daily_metrics (date, total_events, total_revenue, active_users) SELECT CURRENT_DATE, COUNT(*), SUM(revenue), COUNT(DISTINCT user_id) FROM events WHERE DATE(created_at) = CURRENT_DATE ON CONFLICT (date) DO UPDATE SET total_events=EXCLUDED.total_events, total_revenue=EXCLUDED.total_revenue, active_users=EXCLUDED.active_users"
+      }
+    },
+    {
+      "id": "generate_report",
+      "type": "n8n-nodes-base.code",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const metrics = $input.all();\nconst totalRevenue = metrics.reduce((sum, m) => sum + (m.total_revenue || 0), 0);\nconst totalEvents = metrics.reduce((sum, m) => sum + (m.total_events || 0), 0);\nconst avgRevenue = totalRevenue / metrics.length;\nreturn { totalRevenue, totalEvents, avgRevenue, metricsCount: metrics.length };"
+      }
+    },
+    {
+      "id": "send_daily_report",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "toEmail": "{{$env.REPORT_EMAIL}}",
+        "subject": "Daily Analytics Report - {{$json.totalRevenue | number: '1.2-2'}} revenue",
+        "text": "Daily Metrics:\n- Total Revenue: ${{$json.totalRevenue}}\n- Total Events: {{$json.totalEvents}}\n- Avg Revenue: ${{$json.avgRevenue}}\n- Report Time: {{now()}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "collect_metrics", "type": "main", "index": 0}]]
+    },
+    "collect_metrics": {
+      "main": [[{"node": "posthog_capture", "type": "main", "index": 0}]]
+    },
+    "posthog_capture": {
+      "main": [[{"node": "aggregate_daily", "type": "main", "index": 0}]]
+    },
+    "aggregate_daily": {
+      "main": [[{"node": "generate_report", "type": "main", "index": 0}]]
+    },
+    "generate_report": {
+      "main": [[{"node": "send_daily_report", "type": "main", "index": 0}]]
+    }
+  }
+}

@@ -1,0 +1,7 @@
+FROM dhi.io/node:22-alpine3.24-dev
+
+WORKDIR /test
+
+RUN npm --version && node --version
+
+CMD ["echo", "DHI migration successful"]

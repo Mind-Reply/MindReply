@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # Existing services
+  postgres:
+    image: postgres:15-alpine
+    container_name: mindreply_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mindreply
+      POSTGRES_PASSWORD: devpass123
+      POSTGRES_DB: mindreply
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "mindreply"]
+      interval: 10s
+      retries: 3
+
+  n8n:
+    image: n8nio/n8n:1.45.0
+    container_name: mindreply_n8n
+    restart: unless-stopped
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: mindreply
+      DB_POSTGRESDB_USER: mindreply
+      DB_POSTGRESDB_PASSWORD: devpass123
+      N8N_HOST: 0.0.0.0
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      N8N_ENCRYPTION_KEY: dev_key_32_chars_minimum_xxxxxxx
+      N8N_PERSONALIZATION_ENABLED: "false"
+    ports:
+      - "5678:5678"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5678/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  # NEW: Stripe Webhook Handler
+  stripe-webhook:
+    build:
+      context: ./MindReply/automation/webhook
+      dockerfile: Dockerfile.webhook
+    container_name: mindreply_stripe_webhook
+    restart: unless-stopped
+    environment:
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_test}
+      N8N_WEBHOOK_URL: http://n8n:5678/webhook/stripe
+      DB_HOST: postgres
+      DB_USER: mindreply
+      DB_PASS: devpass123
+      DB_NAME: mindreply
+    ports:
+      - "9000:9000"
+    depends_on:
+      - postgres
+      - n8n
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local

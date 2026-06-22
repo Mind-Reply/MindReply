@@ -1,0 +1,70 @@
+{
+  "store": {
+    "chrome": {
+      "extension_id": "mindreply-pressure-relief",
+      "name": "MindReply - Pressure Relief",
+      "short_description": "Get one clear next move from any stuck message, page, or follow-up",
+      "full_description": "MindReply turns overloaded messages, pages, and follow-ups into one clear next move.\n\n⚡ ONE-CLICK ANALYSIS\nPaste what's stuck. Get one clear move. No complexity, no menus.\n\n📋 CONTEXT MENU\nRight-click any text → \"Analyze with MindReply\" → See results\n\n🎯 USE CASES\n• Tense customer replies\n• Overloaded email drafts\n• Unclear follow-ups\n• Website sections with low clarity\n• Sales objections\n• Contract language that needs tightening\n\n🔐 PRIVACY\n✓ No tracking\n✓ No data storage\n✓ HTTPS only\n✓ Open-source analysis\n\nBUILT FOR\n• Sales professionals\n• Customer service teams\n• Founders and executives\n• Anyone who replies to pressure\n\nPOWERED BY\nAI behavioral analysis + commercial communication intelligence\n\nWEBSITE\nhttps://mind-reply.com\n\nSUPPORT\ninfo@mind-reply.com",
+      "category": "Productivity",
+      "language": "English",
+      "version": "1.0.0",
+      "developer": "MindReply Inc.",
+      "website": "https://mind-reply.com",
+      "support_email": "info@mind-reply.com",
+      "privacy_policy": "https://mind-reply.com/privacy",
+      "homepage_url": "https://mind-reply.com",
+      "icons": {
+        "small": "images/icon-48.png",
+        "large": "images/icon-128.png"
+      },
+      "screenshots": [
+        {
+          "size": "1280x800",
+          "url": "images/screenshot-1.png",
+          "caption": "Enter text and click Get Move - Receive one clear next step instantly"
+        },
+        {
+          "size": "1280x800",
+          "url": "images/screenshot-2.png",
+          "caption": "Right-click any text - Select Analyze with MindReply - View results"
+        }
+      ],
+      "promotional_image": {
+        "size": "1400x560",
+        "url": "images/promo-1400x560.png"
+      }
+    },
+    "edge": {
+      "store_id": "mindreply-pressure-relief",
+      "name": "MindReply - Pressure Relief",
+      "short_description": "Get one clear next move from any stuck message, page, or follow-up",
+      "description": "Same as Chrome Web Store",
+      "category": "Productivity",
+      "developer": "MindReply Inc.",
+      "website": "https://mind-reply.com",
+      "support_email": "info@mind-reply.com",
+      "privacy_policy": "https://mind-reply.com/privacy"
+    },
+    "brave": {
+      "auto_sync": true,
+      "source": "Chrome Web Store",
+      "note": "Brave automatically syncs Chrome Web Store extensions"
+    }
+  },
+  "submission": {
+    "chrome_web_store": {
+      "status": "SUBMITTED",
+      "date_submitted": "2026-06-18T00:00:00Z",
+      "review_status": "In Review",
+      "estimated_review_time": "24-48 hours",
+      "publication_url": "https://chrome.google.com/webstore/detail/mindreply"
+    },
+    "microsoft_edge": {
+      "status": "SUBMITTED",
+      "date_submitted": "2026-06-18T00:00:00Z",
+      "review_status": "In Review",
+      "estimated_review_time": "5-7 days",
+      "publication_url": "https://microsoftedge.microsoft.com/addons/detail/mindreply"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "billing": {
+    "owner": "Angel Krastev",
+    "contact": {
+      "email": "${BILLING_EMAIL}",
+      "phone": "${BILLING_PHONE}",
+      "public_contact": "${BILLING_CONTACT}"
+    },
+    "payment_methods": {
+      "primary": {
+        "provider": "stripe",
+        "minimum": 20000,
+        "maximum": 20000,
+        "currency": "GBP",
+        "description": "Stripe - Primary payment processor"
+      },
+      "secondary": {
+        "provider": "monzo",
+        "minimum": 20000,
+        "maximum": 20000,
+        "currency": "GBP",
+        "account": "08425895",
+        "sortcode": "04-00-04",
+        "description": "Monzo - Secondary settlement"
+      },
+      "fallback": {
+        "provider": "stripe_invoice",
+        "minimum": 20000,
+        "maximum": 20000,
+        "currency": "GBP",
+        "description": "Stripe Invoice - For B2B buyers"
+      }
+    },
+    "rules": {
+      "global_minimum": 20000,
+      "global_maximum": 60000,
+      "b2b_invoice_first": true,
+      "manual_review_threshold": false,
+      "refund_policy": "standard",
+      "dispute_policy": "standard"
+    },
+    "notifications": {
+      "billing_alerts": ["angelkrustev@aol.com", "angellllkr@gmail.com"],
+      "revenue_reports": ["angelkrustev@aol.com"],
+      "payment_notifications": ["info@mind-reply.com"],
+      "slack_notifications": "${SLACK_WEBHOOK}"
+    }
+  }
+}

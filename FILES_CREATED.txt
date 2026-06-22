@@ -1,0 +1,47 @@
+app/pricing/page.tsx
+app/dashboard/page.tsx
+app/revenue/page.tsx
+app/api/checkout/route.ts
+app/api/subscription/route.ts
+app/api/webhooks/stripe/route.ts
+app/api/customer-portal/route.ts
+.env.local (UPDATE WITH STRIPE KEYS)
+BILLING_SETUP.md
+scripts/deploy-production.sh
+
+FILES CREATED AND READY TO USE.
+
+NEXT STEPS:
+
+1. GET STRIPE KEYS
+   → Go to: https://dashboard.stripe.com
+   → Create account (FREE)
+   → Get Publishable Key (pk_live_...)
+   → Get Secret Key (sk_live_...)
+   → Get Webhook Secret (whsec_...)
+
+2. UPDATE .env.local WITH KEYS
+   → Edit: .env.local
+   → Paste your Stripe keys
+   → Save
+
+3. INSTALL DEPENDENCIES
+   npm install --legacy-peer-deps
+
+4. RUN DEVELOPMENT
+   npm run dev
+
+5. TEST LIVE PAYMENTS
+   → Go to: http://localhost:3000/pricing
+   → Click any plan
+   → Use test card: 4242 4242 4242 4242
+   → See payment work
+
+6. MONITOR PAYMENTS
+   → https://dashboard.stripe.com
+
+7. DEPLOY TO PRODUCTION
+   npm run build
+   Deploy to Vercel/AWS
+
+REVENUE READY.

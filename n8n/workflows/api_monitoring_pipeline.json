@@ -1,0 +1,13 @@
+{
+  "name": "MindReply - API Usage Monitoring Pipeline",
+  "description": "Real-time API monitoring - tracks calls, latency, errors, sends alerts on thresholds",
+  "active": true,
+  "nodes": [
+    {"id": "start", "type": "n8n-nodes-base.start", "position": [50, 50], "typeVersion": 1},
+    {"id": "api_metric_webhook", "type": "n8n-nodes-base.webhook", "position": [250, 50], "typeVersion": 1, "parameters": {"httpMethod": "POST", "path": "api-metric"}},
+    {"id": "log_metric", "type": "n8n-nodes-base.postgres", "position": [450, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "{{$env.DB_NAME}}", "user": "{{$env.DB_USER}}", "password": "{{$env.DB_PASSWORD}}", "query": "INSERT INTO api_metrics (endpoint, status_code, latency_ms, user_id, timestamp) VALUES ('={{$json.endpoint}}', {{$json.status}}, {{$json.latency}}, '={{$json.user_id}}', NOW())"}},
+    {"id": "check_thresholds", "type": "n8n-nodes-base.code", "position": [650, 50], "typeVersion": 1, "parameters": {"language": "javascript", "jsCode": "const latency = $json.latency; const status = $json.status; const alert = latency > 1000 || status >= 500; return { alert, severity: status >= 500 ? 'critical' : 'warning', message: `${status} response - ${latency}ms latency` };"}},
+    {"id": "send_alert", "type": "n8n-nodes-base.slack", "position": [850, 50], "typeVersion": 1, "parameters": {"text": "⚠️ API ALERT\nEndpoint: {{$json.endpoint}}\nStatus: {{$json.status}}\nLatency: {{$json.latency}}ms\nSeverity: {{$json.severity}}"}}
+  ],
+  "connections": {"start": {"main": [[{"node": "api_metric_webhook", "type": "main", "index": 0}]]}, "api_metric_webhook": {"main": [[{"node": "log_metric", "type": "main", "index": 0}]]}, "log_metric": {"main": [[{"node": "check_thresholds", "type": "main", "index": 0}]]}, "check_thresholds": {"main": [[{"node": "send_alert", "type": "main", "index": 0}]]}}
+}

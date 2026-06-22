@@ -1,0 +1,13 @@
+{
+  "name": "MindReply - Affiliate & Referral Pipeline",
+  "description": "Automated referral tracking - tracks referrals, manages commissions, sends payouts",
+  "active": true,
+  "nodes": [
+    {"id": "start", "type": "n8n-nodes-base.start", "position": [50, 50], "typeVersion": 1},
+    {"id": "ref_webhook", "type": "n8n-nodes-base.webhook", "position": [250, 50], "typeVersion": 1, "parameters": {"httpMethod": "POST", "path": "referral-track"}},
+    {"id": "track_referral", "type": "n8n-nodes-base.postgres", "position": [450, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "{{$env.DB_NAME}}", "user": "{{$env.DB_USER}}", "password": "{{$env.DB_PASSWORD}}", "query": "INSERT INTO referrals (referrer_id, referred_customer_id, commission_amount, status) VALUES ('={{$json.referrer_id}}', '={{$json.customer_id}}', {{$json.subscription_value * 0.2}}, 'pending') RETURNING commission_amount"}},
+    {"id": "notify_referrer", "type": "n8n-nodes-base.emailSend", "position": [650, 50], "typeVersion": 1, "parameters": {"toEmail": "={{$json.referrer_email}}", "subject": "Referral Commission Earned!", "text": "You earned ${{$json.commission_amount}} from your referral!"}},
+    {"id": "update_commission", "type": "n8n-nodes-base.postgres", "position": [850, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "={{$env.DB_NAME}}", "user": "={{$env.DB_USER}}", "password": "={{$env.DB_PASSWORD}}", "query": "UPDATE affiliates SET total_commissions = total_commissions + {{$json.commission_amount}} WHERE user_id = '={{$json.referrer_id}}'"}}
+  ],
+  "connections": {"start": {"main": [[{"node": "ref_webhook", "type": "main", "index": 0}]]}, "ref_webhook": {"main": [[{"node": "track_referral", "type": "main", "index": 0}]]}, "track_referral": {"main": [[{"node": "notify_referrer", "type": "main", "index": 0}]]}, "notify_referrer": {"main": [[{"node": "update_commission", "type": "main", "index": 0}]]}}
+}

@@ -1,0 +1,25 @@
+FROM dhi.io/node:22-alpine3.24-dev as builder
+
+WORKDIR /app
+
+COPY apps/admin-dashboard/package*.json ./apps/admin-dashboard/
+RUN cd apps/admin-dashboard && npm ci
+
+COPY apps/admin-dashboard ./apps/admin-dashboard/
+RUN cd apps/admin-dashboard && npm run build
+
+FROM dhi.io/node:22-alpine3.24
+
+WORKDIR /app
+
+COPY --from=builder /app/apps/admin-dashboard/.next ./apps/admin-dashboard/.next
+COPY --from=builder /app/apps/admin-dashboard/public ./apps/admin-dashboard/public
+COPY --from=builder /app/apps/admin-dashboard/package.json ./apps/admin-dashboard/
+
+ENV NODE_ENV=production
+ENV NEXT_PUBLIC_API_URL=http://backend:3001
+
+EXPOSE 3002
+
+WORKDIR /app/apps/admin-dashboard
+CMD ["npm", "start"]

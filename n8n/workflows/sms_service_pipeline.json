@@ -1,0 +1,100 @@
+{
+  "name": "MindReply - SMS Service Pipeline",
+  "description": "Automated SMS service with Twilio - sends SMS notifications and verifications",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "trigger_sms_event",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sms-service"
+      }
+    },
+    {
+      "id": "validate_phone",
+      "type": "n8n-nodes-base.if",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "conditions": {
+          "string": [{
+            "value1": "={{$json.phone_number}}",
+            "operation": "regex",
+            "value2": "^\\+?[0-9]{10,15}$"
+          }]
+        }
+      }
+    },
+    {
+      "id": "twilio_send",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://api.twilio.com/2010-04-01/Accounts/{{$env.TWILIO_ACCOUNT_SID}}/Messages.json",
+        "requestMethod": "POST",
+        "headers": {
+          "Authorization": "Basic {{$env.TWILIO_AUTH_TOKEN_B64}}"
+        },
+        "body": {
+          "To": "={{$json.phone_number}}",
+          "From": "{{$env.TWILIO_PHONE_NUMBER}}",
+          "Body": "={{$json.message}}"
+        }
+      }
+    },
+    {
+      "id": "log_sms_sent",
+      "type": "n8n-nodes-base.postgres",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "{{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO sms_logs (phone_number, message, status, sent_at) VALUES ('={{$json.phone_number}}', '={{$json.message}}', 'sent', NOW())"
+      }
+    },
+    {
+      "id": "error_invalid_phone",
+      "type": "n8n-nodes-base.postgres",
+      "position": [650, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "{{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO sms_errors (phone_number, error, logged_at) VALUES ('={{$json.phone_number}}', 'Invalid phone number', NOW())"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "trigger_sms_event", "type": "main", "index": 0}]]
+    },
+    "trigger_sms_event": {
+      "main": [[{"node": "validate_phone", "type": "main", "index": 0}]]
+    },
+    "validate_phone": {
+      "main": [[{"node": "twilio_send", "type": "main", "index": 0}], [{"node": "error_invalid_phone", "type": "main", "index": 0}]]
+    },
+    "twilio_send": {
+      "main": [[{"node": "log_sms_sent", "type": "main", "index": 0}]]
+    }
+  }
+}

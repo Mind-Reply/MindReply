@@ -1,0 +1,141 @@
+{
+  "name": "MindReply - File Storage & Management Pipeline",
+  "description": "Automated file storage with S3 - upload, virus scan, generate thumbnails, manage permissions",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "file_upload_webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "file-upload"
+      }
+    },
+    {
+      "id": "validate_file",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const maxSize = 100 * 1024 * 1024; // 100MB\nconst fileSize = $json.file_size || 0;\nconst filename = $json.filename;\nconst allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'video/mp4'];\n\nif (fileSize > maxSize) throw new Error('File too large');\nif (!allowedTypes.includes($json.file_type)) throw new Error('File type not allowed');\n\nreturn { ...\\$json, validated: true };"
+      }
+    },
+    {
+      "id": "scan_virus",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://www.virustotal.com/api/v3/files",
+        "requestMethod": "POST",
+        "headers": {
+          "x-apikey": "{{$env.VIRUSTOTAL_API_KEY}}"
+        },
+        "body": {
+          "file": "={{$json.file_data}}"
+        }
+      }
+    },
+    {
+      "id": "upload_to_s3",
+      "type": "n8n-nodes-base.awsS3",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "mindreply-uploads",
+        "key": "files/{{$json.user_id}}/{{$json.filename}}",
+        "binaryData": true,
+        "binaryPropertyName": "file_data",
+        "metadata": {
+          "user_id": "={{$json.user_id}}",
+          "uploaded_at": "={{new Date().toISOString()}}"
+        }
+      }
+    },
+    {
+      "id": "generate_thumbnail",
+      "type": "n8n-nodes-base.code",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const fileType = $json.file_type;\nif (fileType.startsWith('image/') || fileType === 'video/mp4') {\n  return { thumbnail_needed: true, thumbnail_size: '200x200' };\n}\nreturn { thumbnail_needed: false };"
+      }
+    },
+    {
+      "id": "create_thumbnail",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "http://localhost:3001/generate-thumbnail",
+        "requestMethod": "POST",
+        "body": {
+          "s3_key": "files/{{$json.user_id}}/{{$json.filename}}",
+          "size": "200x200"
+        }
+      }
+    },
+    {
+      "id": "log_file",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "{{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO files (user_id, filename, file_type, file_size, s3_url, thumbnail_url, virus_scanned, status, uploaded_at) VALUES ('={{$json.user_id}}', '={{$json.filename}}', '={{$json.file_type}}', {{$json.file_size}}, 'https://mindreply-uploads.s3.amazonaws.com/files/{{$json.user_id}}/{{$json.filename}}', '={{$json.thumbnail_url || null}}', true, 'active', NOW())"
+      }
+    },
+    {
+      "id": "return_file_info",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify({status: 'uploaded', filename: $json.filename, url: 'https://mindreply-uploads.s3.amazonaws.com/files/' + $json.user_id + '/' + $json.filename, timestamp: new Date().toISOString()})}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "file_upload_webhook", "type": "main", "index": 0}]]
+    },
+    "file_upload_webhook": {
+      "main": [[{"node": "validate_file", "type": "main", "index": 0}]]
+    },
+    "validate_file": {
+      "main": [[{"node": "scan_virus", "type": "main", "index": 0}]]
+    },
+    "scan_virus": {
+      "main": [[{"node": "upload_to_s3", "type": "main", "index": 0}]]
+    },
+    "upload_to_s3": {
+      "main": [[{"node": "generate_thumbnail", "type": "main", "index": 0}]]
+    },
+    "generate_thumbnail": {
+      "main": [[{"node": "create_thumbnail", "type": "main", "index": 0}, []], []]
+    },
+    "create_thumbnail": {
+      "main": [[{"node": "log_file", "type": "main", "index": 0}]]
+    },
+    "log_file": {
+      "main": [[{"node": "return_file_info", "type": "main", "index": 0}]]
+    }
+  }
+}

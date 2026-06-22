@@ -1,0 +1,99 @@
+model AdminSession {
+  id                String      @id @default(cuid())
+  adminEmail        String      @unique
+  adminPasswordHash String
+  jwtSecret         String      @unique
+  
+  // Security
+  ipWhitelist       String[]    @default([])
+  lastLogin         DateTime?
+  loginAttempts     Int         @default(0)
+  locked            Boolean     @default(false)
+  lockUntil         DateTime?
+  
+  // Settings
+  settings          Json        @default("{}")
+  
+  // Relations
+  chatSessions      AdminChatSession[]
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model AdminChatSession {
+  id                String      @id @default(cuid())
+  adminSessionId    String
+  adminSession      AdminSession @relation(fields: [adminSessionId], references: [id], onDelete: Cascade)
+  
+  title             String
+  status            String      @default("active") // active, archived, deleted
+  model             String      @default("gpt-4-turbo") // gpt-4-turbo, claude-3-sonnet
+  
+  messages          AdminChatMessage[]
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([adminSessionId])
+}
+
+model AdminChatMessage {
+  id                String      @id @default(cuid())
+  chatSessionId     String
+  chatSession       AdminChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+  
+  role              String      // user, assistant
+  content           String      @db.Text
+  
+  // Metadata
+  tokensUsed        Int         @default(0)
+  model             String?
+  thinking          String?     @db.Text
+  
+  // Connectors used in response
+  connectorsUsed    String[]    @default([]) // gmail, stripe, n8n, messages, etc
+  
+  createdAt         DateTime    @default(now())
+
+  @@index([chatSessionId])
+  @@index([createdAt])
+}
+
+model AdminChatConnector {
+  id                String      @id @default(cuid())
+  
+  type              String      // gmail, stripe, n8n, messages, approvals, etc
+  name              String
+  status            String      @default("active")
+  
+  // Connection details (encrypted)
+  credentials       String      @db.Text // encrypted JSON
+  lastSync          DateTime?
+  nextSync          DateTime?
+  
+  // Rate limits
+  requestsThisHour  Int         @default(0)
+  rateLimitMax      Int         @default(100)
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@unique([type, name])
+}
+
+model AdminAuditLog {
+  id                String      @id @default(cuid())
+  
+  action            String      // chat_created, connector_called, settings_changed
+  adminEmail        String
+  details           Json
+  ipAddress         String
+  userAgent         String?
+  
+  createdAt         DateTime    @default(now())
+
+  @@index([adminEmail])
+  @@index([action])
+  @@index([createdAt])
+}

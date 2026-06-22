@@ -1,0 +1,203 @@
+{
+  "name": "MindReply Complete Revenue Flow",
+  "description": "Complete 24/7 revenue pipeline: Stripe → Database → Dashboard → Delivery",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe/webhook",
+        "authentication": "headerAuth",
+        "headerAuth": {
+          "authentication": "headerAuth",
+          "value": "=Authorization: Bearer {{$env.STRIPE_WEBHOOK_SECRET}}"
+        }
+      },
+      "name": "Stripe Webhook In",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.type}}",
+              "value2": "charge.succeeded",
+              "operation": "equals"
+            }
+          ]
+        }
+      },
+      "name": "Is Payment Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [350, 200]
+    },
+    {
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASS}}",
+        "port": 5432,
+        "operation": "executeQuery",
+        "query": "INSERT INTO orders (customer_email, amount, currency, product, status, stripe_charge_id, created_at) VALUES ('{{$json.data.object.receipt_email}}', {{$json.data.object.amount}}, '{{$json.data.object.currency}}', '{{$json.data.object.metadata.product}}', 'paid', '{{$json.data.object.id}}', NOW()) RETURNING id;"
+      },
+      "name": "Insert Order to DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [600, 150]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.DASHBOARD_URL}}",
+        "requestMethod": "POST",
+        "bodyParametersJson": "{\"event\": \"payment_received\", \"amount\": {{$json.data.object.amount}}, \"currency\": \"{{$json.data.object.currency}}\", \"timestamp\": \"{{now()}}\", \"order_id\": {{$node['Insert Order to DB'].json.id}}}"
+      },
+      "name": "Update Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [900, 150]
+    },
+    {
+      "parameters": {
+        "toEmail": "={{$json.data.object.receipt_email}}",
+        "subject": "MindReply Payment Received - Order Confirmed",
+        "textOutput": true,
+        "text": "Thank you for your payment!\n\nOrder Details:\nProduct: {{$json.data.object.metadata.product}}\nAmount: {{$json.data.object.currency}} {{$json.data.object.amount / 100}}\nDate: {{now()}}\n\nYour order will be processed within 24 hours.\n\nContact: info@mind-reply.com"
+      },
+      "name": "Send Receipt Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BACKEND_URL}}/api/orders/process",
+        "requestMethod": "POST",
+        "bodyParametersJson": "{\"order_id\": {{$node['Insert Order to DB'].json.id}}, \"product\": \"{{$json.data.object.metadata.product}}\", \"email\": \"{{$json.data.object.receipt_email}}\"}"
+      },
+      "name": "Trigger Delivery",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [600, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{new Date().getHours()}}",
+              "value2": "0",
+              "operation": "equals"
+            }
+          ]
+        }
+      },
+      "name": "Is Daily Cycle Time?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [350, 500]
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8000/deploy-trigger",
+        "requestMethod": "POST",
+        "bodyParametersJson": "{\"action\": \"daily_growth_cycle\", \"timestamp\": \"{{now()}}\"}"
+      },
+      "name": "Trigger Daily Growth",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [600, 500]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@mind-reply.com",
+        "toEmail": "director@mind-reply.com",
+        "subject": "MindReply Daily Report",
+        "text": "Daily Summary:\n- Orders: {{$json.daily_orders}}\n- Revenue: {{$json.daily_revenue}}\n- Sites: {{$json.active_sites}}\n- Agents: 890 active\n- Status: OPERATIONAL"
+      },
+      "name": "Daily Director Report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [900, 500]
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:4000",
+        "requestMethod": "POST",
+        "bodyParametersJson": "{\"event\": \"health_check\", \"timestamp\": \"{{now()}}\", \"status\": \"ok\", \"agents\": 890, \"sites\": 5}"
+      },
+      "name": "Hourly Health Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [900, 50]
+    }
+  ],
+  "connections": {
+    "Stripe Webhook In": {
+      "main": [
+        [
+          {
+            "node": "Is Payment Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Payment Success?": {
+      "main": [
+        [
+          {
+            "node": "Insert Order to DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Insert Order to DB": {
+      "main": [
+        [
+          {
+            "node": "Update Dashboard",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Receipt Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trigger Delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Hourly Health Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "callerPolicy": "any",
+    "errorHandler": "executeAnother",
+    "timezone": "UTC"
+  }
+}

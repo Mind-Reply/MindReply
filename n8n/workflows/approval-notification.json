@@ -1,0 +1,110 @@
+{
+  "id": "approval-notification-workflow",
+  "name": "Approval Notification & Escalation",
+  "description": "Notify team members of pending approvals, escalate urgent items",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerType": "cron",
+        "cronExpression": "*/5 * * * *"
+      },
+      "name": "Trigger - Every 5 Minutes",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:3001/api/approvals/pending",
+        "method": "GET",
+        "sendHeaders": true,
+        "headerParameters": {
+          "Authorization": "Bearer {{ $env.BACKEND_API_KEY }}"
+        },
+        "options": {}
+      },
+      "name": "Fetch Pending Approvals",
+      "type": "httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "loopProperty": "body.approvals"
+      },
+      "name": "Loop - Each Approval",
+      "type": "n8n-nodes-base.loop",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "channels": "#mindreply-urgent",
+        "text": ":warning: *URGENT APPROVAL NEEDED*\n\n*From:* {{ $json.message.from }}\n*Subject:* {{ $json.message.subject }}\n*Priority:* {{ $json.priority }}\n\n<http://dashboard:5000/approvals/${{ $json.id }}|Review Now>"
+      },
+      "name": "Slack - Alert High Priority",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [850, 200],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "http://backend:3001/api/approvals/{{ $json.id }}/escalate",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "Authorization": "Bearer {{ $env.BACKEND_API_KEY }}"
+        },
+        "jsonParameters": {
+          "reason": "Auto-escalated: Approval pending for > 2 hours"
+        }
+      },
+      "name": "Auto-Escalate Old Approvals",
+      "type": "httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 400]
+    }
+  ],
+  "connections": {
+    "Trigger - Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Fetch Pending Approvals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Pending Approvals": {
+      "main": [
+        [
+          {
+            "node": "Loop - Each Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop - Each Approval": {
+      "main": [
+        [
+          {
+            "node": "Slack - Alert High Priority",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Auto-Escalate Old Approvals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true
+}

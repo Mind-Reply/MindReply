@@ -1,0 +1,7 @@
+FROM dhi.io/node:22-alpine3.24
+
+WORKDIR /test
+
+COPY --from=dhi.io/node:22-alpine3.24-dev /usr/local/bin/node /usr/local/bin/node
+
+CMD ["/usr/local/bin/node", "--version"]

@@ -1,0 +1,14 @@
+{
+  "name": "MindReply - Customer Churn Prevention Pipeline",
+  "description": "Automated churn prediction - identifies at-risk customers, triggers retention campaigns",
+  "active": true,
+  "nodes": [
+    {"id": "start", "type": "n8n-nodes-base.start", "position": [50, 50], "typeVersion": 1},
+    {"id": "daily_check", "type": "n8n-nodes-base.cron", "position": [250, 50], "typeVersion": 1, "parameters": {"triggerTimes": {"item": [{"time": "00:00"}]}}},
+    {"id": "identify_at_risk", "type": "n8n-nodes-base.postgres", "position": [450, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "={{$env.DB_NAME}}", "user": "={{$env.DB_USER}}", "password": "={{$env.DB_PASSWORD}}", "query": "SELECT user_id, email, plan FROM users WHERE last_activity < NOW() - INTERVAL '7 days' AND status = 'active'"}},
+    {"id": "send_engagement", "type": "n8n-nodes-base.emailSend", "position": [650, 50], "typeVersion": 1, "parameters": {"toEmail": "={{$json.email}}", "subject": "We miss you! Special offer inside", "text": "We noticed you haven't used MindReply lately. Here's 50% off your next month."}},
+    {"id": "offer_retention", "type": "n8n-nodes-base.code", "position": [850, 50], "typeVersion": 1, "parameters": {"language": "javascript", "jsCode": "if ($json.plan === 'pro') { return { offer: '3 months for $200', discount: '33%' }; } else { return { offer: '1 month free', discount: '100%' }; }"}},
+    {"id": "log_retention", "type": "n8n-nodes-base.postgres", "position": [1050, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "={{$env.DB_NAME}}", "user": "={{$env.DB_USER}}", "password": "={{$env.DB_PASSWORD}}", "query": "INSERT INTO retention_campaigns (user_id, offer, sent_at) VALUES ('={{$json.user_id}}', '={{$json.offer}}', NOW())"}}
+  ],
+  "connections": {"start": {"main": [[{"node": "daily_check", "type": "main", "index": 0}]]}, "daily_check": {"main": [[{"node": "identify_at_risk", "type": "main", "index": 0}]]}, "identify_at_risk": {"main": [[{"node": "send_engagement", "type": "main", "index": 0}]]}, "send_engagement": {"main": [[{"node": "offer_retention", "type": "main", "index": 0}]]}, "offer_retention": {"main": [[{"node": "log_retention", "type": "main", "index": 0}]]}}
+}

@@ -1,0 +1,126 @@
+{
+  "name": "MindReply - Webhook Management Pipeline",
+  "description": "Automated webhook routing and management - routes events to GitHub, Slack, Discord, Teams",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "webhook_receiver",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook-router"
+      }
+    },
+    {
+      "id": "parse_event",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const eventType = $json.event_type || 'unknown';\nconst destinations = $json.destinations || [];\nconst payload = $json.payload || {};\n\nreturn { eventType, destinations, payload, routedAt: new Date().toISOString() };"
+      }
+    },
+    {
+      "id": "route_slack",
+      "type": "n8n-nodes-base.slack",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "text": "🔔 Event: {{$json.eventType}}\\n```{{JSON.stringify($json.payload, null, 2)}}```"
+      }
+    },
+    {
+      "id": "route_discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "{{$env.DISCORD_WEBHOOK_URL}}",
+        "requestMethod": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "content": "Event: {{$json.eventType}}",
+          "embeds": [
+            {
+              "title": "{{$json.eventType}}",
+              "description": "```json\\n{{JSON.stringify($json.payload, null, 2)}}\\n```",
+              "color": 3447003
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "route_github",
+      "type": "n8n-nodes-base.github",
+      "position": [650, 250],
+      "typeVersion": 1,
+      "parameters": {
+        "operation": "createIssue",
+        "owner": "Mind-Reply",
+        "repository": "MindReply",
+        "title": "Event: {{$json.eventType}}",
+        "body": "```json\\n{{JSON.stringify($json.payload, null, 2)}}\\n```"
+      }
+    },
+    {
+      "id": "log_routing",
+      "type": "n8n-nodes-base.postgres",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "{{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO webhook_logs (event_type, destinations, status, routed_at) VALUES ('={{$json.eventType}}', '={{$json.destinations.join(\",\")}}', 'routed', NOW())"
+      }
+    },
+    {
+      "id": "return_ack",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify({status: 'routed', event: $json.eventType, timestamp: new Date().toISOString()})}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "webhook_receiver", "type": "main", "index": 0}]]
+    },
+    "webhook_receiver": {
+      "main": [[{"node": "parse_event", "type": "main", "index": 0}]]
+    },
+    "parse_event": {
+      "main": [[{"node": "route_slack", "type": "main", "index": 0}, {"node": "route_discord", "type": "main", "index": 0}, {"node": "route_github", "type": "main", "index": 0}]]
+    },
+    "route_slack": {
+      "main": [[{"node": "log_routing", "type": "main", "index": 0}]]
+    },
+    "route_discord": {
+      "main": [[{"node": "log_routing", "type": "main", "index": 0}]]
+    },
+    "route_github": {
+      "main": [[{"node": "log_routing", "type": "main", "index": 0}]]
+    },
+    "log_routing": {
+      "main": [[{"node": "return_ack", "type": "main", "index": 0}]]
+    }
+  }
+}

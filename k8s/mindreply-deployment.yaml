@@ -1,0 +1,354 @@
+# Kubernetes manifests for MindReply
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mindreply
+  labels:
+    name: mindreply
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mindreply-config
+  namespace: mindreply
+data:
+  NODE_ENV: "production"
+  NEXT_PUBLIC_API_URL: "http://mindreply-backend:3001"
+  NEXT_PUBLIC_API_ENDPOINT: "http://mindreply-backend:3001"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mindreply-secrets
+  namespace: mindreply
+type: Opaque
+stringData:
+  DATABASE_URL: "postgresql://mindreply:password@postgres:5432/mindreply"
+  REDIS_URL: "redis://redis:6379"
+  JWT_SECRET: "your-secret-key-min-32-chars-long"
+  OPENAI_API_KEY: "sk-your-key"
+  GMAIL_CLIENT_ID: "your-client-id"
+  GMAIL_CLIENT_SECRET: "your-client-secret"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindreply-postgres
+  namespace: mindreply
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: mindreply
+        - name: POSTGRES_USER
+          value: mindreply
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mindreply-secrets
+              key: DATABASE_URL
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - pg_isready -U mindreply
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: postgres-storage
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: mindreply
+spec:
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindreply-redis
+  namespace: mindreply
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 10
+          periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: mindreply
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindreply-backend
+  namespace: mindreply
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mindreply-backend
+  template:
+    metadata:
+      labels:
+        app: mindreply-backend
+    spec:
+      containers:
+      - name: backend
+        image: docker.io/mindreply/backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3001
+        envFrom:
+        - configMapRef:
+            name: mindreply-config
+        - secretRef:
+            name: mindreply-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      imagePullSecrets:
+      - name: docker-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mindreply-backend
+  namespace: mindreply
+spec:
+  selector:
+    app: mindreply-backend
+  ports:
+  - port: 3001
+    targetPort: 3001
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindreply-frontend
+  namespace: mindreply
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mindreply-frontend
+  template:
+    metadata:
+      labels:
+        app: mindreply-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: docker.io/mindreply/frontend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: mindreply-config
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      imagePullSecrets:
+      - name: docker-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mindreply-frontend
+  namespace: mindreply
+spec:
+  selector:
+    app: mindreply-frontend
+  ports:
+  - port: 3000
+    targetPort: 3000
+  type: LoadBalancer
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mindreply-backend-hpa
+  namespace: mindreply
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mindreply-backend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mindreply-frontend-hpa
+  namespace: mindreply
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mindreply-frontend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mindreply-ingress
+  namespace: mindreply
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - mindreply.com
+    - api.mindreply.com
+    secretName: mindreply-tls
+  rules:
+  - host: mindreply.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mindreply-frontend
+            port:
+              number: 3000
+  - host: api.mindreply.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mindreply-backend
+            port:
+              number: 3001

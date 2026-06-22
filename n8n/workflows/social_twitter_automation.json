@@ -1,0 +1,14 @@
+{
+  "name": "MindReply - Twitter/X Automation Pipeline",
+  "description": "Automated Twitter/X posting - AI-generated tweets, scheduling, engagement tracking, analytics",
+  "active": true,
+  "nodes": [
+    {"id": "start", "type": "n8n-nodes-base.start", "position": [50, 50], "typeVersion": 1},
+    {"id": "twitter_webhook", "type": "n8n-nodes-base.webhook", "position": [250, 50], "typeVersion": 1, "parameters": {"httpMethod": "POST", "path": "social-twitter-post"}},
+    {"id": "generate_tweet", "type": "n8n-nodes-base.httpRequest", "position": [450, 50], "typeVersion": 1, "parameters": {"url": "https://api.anthropic.com/v1/messages", "requestMethod": "POST", "headers": {"x-api-key": "{{$env.ANTHROPIC_API_KEY}}"}, "body": {"model": "claude-3-opus-20240229", "max_tokens": 200, "messages": [{"role": "user", "content": "Write a viral, engaging tweet about: {{$json.topic}}. Max 280 chars. Make it punchy."}]}}},
+    {"id": "post_twitter", "type": "n8n-nodes-base.twitter", "position": [650, 50], "typeVersion": 1, "parameters": {"operation": "post", "text": "={{$json.content[0].text}}"}},
+    {"id": "track_engagement", "type": "n8n-nodes-base.postgres", "position": [850, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "{{$env.DB_NAME}}", "user": "{{$env.DB_USER}}", "password": "{{$env.DB_PASSWORD}}", "query": "INSERT INTO social_posts (platform, content, post_id, engagement) VALUES ('twitter', '={{$json.content[0].text}}', '={{$json.id}}', 0)"}},
+    {"id": "return_post", "type": "n8n-nodes-base.respondToWebhook", "position": [1050, 50], "typeVersion": 1, "parameters": {"body": "={{JSON.stringify({status: 'posted', platform: 'twitter', url: 'https://twitter.com/MindReply/status/' + $json.id})}}"}}
+  ],
+  "connections": {"start": {"main": [[{"node": "twitter_webhook", "type": "main", "index": 0}]]}, "twitter_webhook": {"main": [[{"node": "generate_tweet", "type": "main", "index": 0}]]}, "generate_tweet": {"main": [[{"node": "post_twitter", "type": "main", "index": 0}]]}, "post_twitter": {"main": [[{"node": "track_engagement", "type": "main", "index": 0}]]}, "track_engagement": {"main": [[{"node": "return_post", "type": "main", "index": 0}]]}}
+}

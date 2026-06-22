@@ -1,0 +1,117 @@
+{
+  "id": "followup-scheduler-workflow",
+  "name": "Follow-up Task Scheduler",
+  "description": "Generate and schedule follow-up tasks based on email analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerType": "cron",
+        "cronExpression": "0 */1 * * *"
+      },
+      "name": "Trigger - Hourly",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:3001/api/messages?status=processed&limit=50",
+        "method": "GET",
+        "sendHeaders": true,
+        "headerParameters": {
+          "Authorization": "Bearer {{ $env.BACKEND_API_KEY }}"
+        }
+      },
+      "name": "Get Recently Processed Messages",
+      "type": "httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "loopProperty": "body.data"
+      },
+      "name": "Loop - Each Message",
+      "type": "n8n-nodes-base.loop",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "prompt": "Given this email analysis, suggest follow-up timing (in days):\n\nSentiment: {{ $json.analysis.sentiment }}\nSummary: {{ $json.analysis.summary }}\n\nResponse: { \"daysToFollowUp\": number, \"type\": \"reminder|nudge|escalation\" }",
+        "model": "gpt-4-turbo"
+      },
+      "name": "AI - Suggest Follow-up Schedule",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:3001/api/followups",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "Authorization": "Bearer {{ $env.BACKEND_API_KEY }}"
+        },
+        "jsonParameters": {
+          "messageId": "{{ $json.id }}",
+          "taskType": "{{ $json.body.type }}",
+          "scheduledFor": "{{ new Date(Date.now() + $json.body.daysToFollowUp * 24 * 60 * 60 * 1000).toISOString() }}",
+          "description": "Follow up on: {{ $json.subject }}"
+        }
+      },
+      "name": "Create Follow-up Task",
+      "type": "httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Trigger - Hourly": {
+      "main": [
+        [
+          {
+            "node": "Get Recently Processed Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recently Processed Messages": {
+      "main": [
+        [
+          {
+            "node": "Loop - Each Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop - Each Message": {
+      "main": [
+        [
+          {
+            "node": "AI - Suggest Follow-up Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Suggest Follow-up Schedule": {
+      "main": [
+        [
+          {
+            "node": "Create Follow-up Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true
+}

@@ -1,0 +1,12 @@
+{
+  "name": "MindReply - LinkedIn Auto-Post Pipeline",
+  "active": true,
+  "nodes": [
+    {"id": "start", "type": "n8n-nodes-base.start", "position": [50, 50], "typeVersion": 1},
+    {"id": "linkedin_webhook", "type": "n8n-nodes-base.webhook", "position": [250, 50], "typeVersion": 1, "parameters": {"httpMethod": "POST", "path": "social-linkedin"}},
+    {"id": "gen_linkedin", "type": "n8n-nodes-base.code", "position": [450, 50], "typeVersion": 1, "parameters": {"language": "javascript", "jsCode": "const topic = $json.topic; const content = `📈 ${topic}\\n\\nTrending now on MindReply. What are your thoughts?\\n\\n#AI #SaaS #Growth`; return { content };"}},
+    {"id": "post_linkedin", "type": "n8n-nodes-base.httpRequest", "position": [650, 50], "typeVersion": 1, "parameters": {"url": "https://api.linkedin.com/v2/ugcPosts", "requestMethod": "POST", "headers": {"Authorization": "Bearer {{$env.LINKEDIN_ACCESS_TOKEN}}"}, "body": {"commentary": {"text": "={{$json.content}}"}}}},
+    {"id": "log_post", "type": "n8n-nodes-base.postgres", "position": [850, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "={{$env.DB_NAME}}", "user": "={{$env.DB_USER}}", "password": "={{$env.DB_PASSWORD}}", "query": "INSERT INTO social_posts (platform, content) VALUES ('linkedin', '={{$json.content}}')"}}
+  ],
+  "connections": {"start": {"main": [[{"node": "linkedin_webhook", "type": "main", "index": 0}]]}, "linkedin_webhook": {"main": [[{"node": "gen_linkedin", "type": "main", "index": 0}]]}, "gen_linkedin": {"main": [[{"node": "post_linkedin", "type": "main", "index": 0}]]}, "post_linkedin": {"main": [[{"node": "log_post", "type": "main", "index": 0}]]}}
+}

@@ -1,0 +1,34 @@
+# Frontend - Next.js
+FROM dhi.io/node:22-alpine3.24-dev AS frontend-builder
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY apps/frontend/package*.json ./apps/frontend/
+
+RUN npm install
+RUN cd apps/frontend && npm install
+
+COPY apps/frontend/src ./apps/frontend/src
+COPY apps/frontend/public ./apps/frontend/public
+COPY apps/frontend/next.config.js ./apps/frontend/
+COPY apps/frontend/tsconfig.json ./apps/frontend/
+
+RUN cd apps/frontend && npm run build
+
+# Frontend runtime
+FROM dhi.io/node:22-alpine3.24
+
+WORKDIR /app
+
+COPY --from=frontend-builder /app/node_modules ./node_modules
+COPY --from=frontend-builder /app/apps/frontend/node_modules ./apps/frontend/node_modules
+COPY --from=frontend-builder /app/apps/frontend/.next ./apps/frontend/.next
+COPY --from=frontend-builder /app/apps/frontend/public ./apps/frontend/public
+COPY apps/frontend/package.json ./apps/frontend/
+
+EXPOSE 3000
+
+WORKDIR /app/apps/frontend
+
+CMD ["npm", "run", "start"]

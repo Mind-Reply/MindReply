@@ -1,0 +1,14 @@
+{
+  "name": "MindReply - Data Export & Backup Pipeline",
+  "description": "Automated data export - CSV, JSON, archives, scheduled backups to S3",
+  "active": true,
+  "nodes": [
+    {"id": "start", "type": "n8n-nodes-base.start", "position": [50, 50], "typeVersion": 1},
+    {"id": "export_webhook", "type": "n8n-nodes-base.webhook", "position": [250, 50], "typeVersion": 1, "parameters": {"httpMethod": "POST", "path": "export-data"}},
+    {"id": "fetch_user_data", "type": "n8n-nodes-base.postgres", "position": [450, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "{{$env.DB_NAME}}", "user": "{{$env.DB_USER}}", "password": "{{$env.DB_PASSWORD}}", "query": "SELECT * FROM user_data WHERE user_id = '={{$json.user_id}}'"}},
+    {"id": "convert_to_format", "type": "n8n-nodes-base.code", "position": [650, 50], "typeVersion": 1, "parameters": {"language": "javascript", "jsCode": "const format = $json.format || 'csv'; let output; if (format === 'csv') { output = Object.keys($json[0]).join(',') + '\\n' + $json.map(r => Object.values(r).join(',')).join('\\n'); } else { output = JSON.stringify($json, null, 2); } return { content: output, format, filename: `export_${Date.now()}.${format}` };"}},
+    {"id": "upload_to_s3", "type": "n8n-nodes-base.awsS3", "position": [850, 50], "typeVersion": 1, "parameters": {"operation": "upload", "bucketName": "mindreply-exports", "key": "{{$json.filename}}", "binaryData": true}},
+    {"id": "send_download_link", "type": "n8n-nodes-base.emailSend", "position": [1050, 50], "typeVersion": 1, "parameters": {"toEmail": "={{$json.user_email}}", "subject": "Your Data Export", "text": "Download your data: https://s3.amazonaws.com/mindreply-exports/{{$json.filename}}"}}
+  ],
+  "connections": {"start": {"main": [[{"node": "export_webhook", "type": "main", "index": 0}]]}, "export_webhook": {"main": [[{"node": "fetch_user_data", "type": "main", "index": 0}]]}, "fetch_user_data": {"main": [[{"node": "convert_to_format", "type": "main", "index": 0}]]}, "convert_to_format": {"main": [[{"node": "upload_to_s3", "type": "main", "index": 0}]]}, "upload_to_s3": {"main": [[{"node": "send_download_link", "type": "main", "index": 0}]]}}
+}

@@ -1,0 +1,152 @@
+{
+  "name": "MindReply - Customer Support Automation Pipeline",
+  "description": "Automated customer support - ticket creation, AI triage, routing, escalation, knowledge base search",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "support_webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "support-ticket"
+      }
+    },
+    {
+      "id": "create_ticket",
+      "type": "n8n-nodes-base.postgres",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO support_tickets (customer_id, subject, description, status, priority, created_at) VALUES ('={{$json.customer_id}}', '={{$json.subject}}', '={{$json.description}}', 'new', 'medium', NOW()) RETURNING id"
+      }
+    },
+    {
+      "id": "ai_triage",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "requestMethod": "POST",
+        "headers": {
+          "x-api-key": "{{$env.ANTHROPIC_API_KEY}}",
+          "anthropic-version": "2023-06-01"
+        },
+        "body": {
+          "model": "claude-3-opus-20240229",
+          "max_tokens": 500,
+          "messages": [
+            {
+              "role": "user",
+              "content": "Categorize this support ticket: {{$json.subject}} - {{$json.description}}. Respond with JSON: {category, priority, suggested_response}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "search_kb",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "http://localhost:9200/mindreply-kb/_search",
+        "requestMethod": "POST",
+        "body": {
+          "query": {
+            "multi_match": {
+              "query": "={{$json.subject}} {{$json.description}}",
+              "fields": ["title", "content"]
+            }
+          },
+          "size": 5
+        }
+      }
+    },
+    {
+      "id": "route_ticket",
+      "type": "n8n-nodes-base.code",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const kbResults = $json.hits?.hits || [];\nconst hasSolution = kbResults.length > 0 && kbResults[0]._score > 0.7;\nconst assignTo = hasSolution ? 'kb_response' : 'support_team';\nreturn { assignTo, kb_results: kbResults.slice(0, 3), needs_human: !hasSolution };"
+      }
+    },
+    {
+      "id": "send_kb_response",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [1250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "toEmail": "={{$json.customer_email}}",
+        "subject": "Auto-Response: {{$json.subject}}",
+        "text": "We found similar articles that may help:\n\n{{$json.kb_results.map(r => '- ' + r._source.title).join('\\n')}}\n\nIf this doesn't help, our support team will assist you shortly."
+      }
+    },
+    {
+      "id": "escalate_to_team",
+      "type": "n8n-nodes-base.slack",
+      "position": [1250, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "text": "🎫 New Support Ticket #{{$json.ticket_id}}\n*{{$json.subject}}*\nFrom: {{$json.customer_name}}\nPriority: {{$json.priority}}\n{{$json.description}}"
+      }
+    },
+    {
+      "id": "update_ticket",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1450, 100],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "UPDATE support_tickets SET assigned_to = '={{$json.assignTo}}', status = '={{$json.needs_human ? \"assigned\" : \"auto_response_sent\"}}', updated_at = NOW() WHERE id = '={{$json.ticket_id}}'"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "support_webhook", "type": "main", "index": 0}]]
+    },
+    "support_webhook": {
+      "main": [[{"node": "create_ticket", "type": "main", "index": 0}]]
+    },
+    "create_ticket": {
+      "main": [[{"node": "ai_triage", "type": "main", "index": 0}]]
+    },
+    "ai_triage": {
+      "main": [[{"node": "search_kb", "type": "main", "index": 0}]]
+    },
+    "search_kb": {
+      "main": [[{"node": "route_ticket", "type": "main", "index": 0}]]
+    },
+    "route_ticket": {
+      "main": [[{"node": "send_kb_response", "type": "main", "index": 0}, {"node": "escalate_to_team", "type": "main", "index": 0}]]
+    },
+    "send_kb_response": {
+      "main": [[{"node": "update_ticket", "type": "main", "index": 0}]]
+    },
+    "escalate_to_team": {
+      "main": [[{"node": "update_ticket", "type": "main", "index": 0}]]
+    }
+  }
+}

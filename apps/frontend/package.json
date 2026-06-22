@@ -1,0 +1,32 @@
+{
+  "name": "@mindreply/frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 5000",
+    "build": "next build",
+    "start": "next start -p 5000",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "@clerk/nextjs": "^6.0.0",
+    "@stripe/stripe-js": "^5.0.0",
+    "@vercel/analytics": "^1.0.0",
+    "@vercel/speed-insights": "^1.0.0",
+    "recharts": "^2.13.0",
+    "axios": "^1.6.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0"
+  }
+}

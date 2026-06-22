@@ -1,0 +1,107 @@
+{
+  "name": "MindReply - Document Generation Pipeline",
+  "description": "Automated document generation - invoices, receipts, contracts using PDFKit",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "trigger_doc_request",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "document-generate"
+      }
+    },
+    {
+      "id": "prepare_doc_data",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const docType = $json.doc_type || 'invoice';\nconst data = $json.data || {};\nconst filename = `${docType}_${data.id}_${Date.now()}.pdf`;\nreturn { docType, data, filename };"
+      }
+    },
+    {
+      "id": "generate_pdf",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "http://localhost:3001/generate-pdf",
+        "requestMethod": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "={{$json}}"
+      }
+    },
+    {
+      "id": "upload_to_s3",
+      "type": "n8n-nodes-base.awsS3",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "mindreply-documents",
+        "key": "={{$json.filename}}",
+        "binaryData": true,
+        "binaryPropertyName": "pdf_data"
+      }
+    },
+    {
+      "id": "log_document",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "{{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO documents (doc_type, customer_id, filename, s3_url, created_at) VALUES ('={{$json.docType}}', '={{$json.data.customer_id}}', '={{$json.filename}}', 'https://mindreply-documents.s3.amazonaws.com/{{$json.filename}}', NOW())"
+      }
+    },
+    {
+      "id": "send_document",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [1250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "toEmail": "={{$json.data.customer_email}}",
+        "subject": "Your {{$json.docType | uppercase}} - {{$json.data.id}}",
+        "text": "Your document has been generated and is attached. Download: https://mindreply-documents.s3.amazonaws.com/{{$json.filename}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "trigger_doc_request", "type": "main", "index": 0}]]
+    },
+    "trigger_doc_request": {
+      "main": [[{"node": "prepare_doc_data", "type": "main", "index": 0}]]
+    },
+    "prepare_doc_data": {
+      "main": [[{"node": "generate_pdf", "type": "main", "index": 0}]]
+    },
+    "generate_pdf": {
+      "main": [[{"node": "upload_to_s3", "type": "main", "index": 0}]]
+    },
+    "upload_to_s3": {
+      "main": [[{"node": "log_document", "type": "main", "index": 0}]]
+    },
+    "log_document": {
+      "main": [[{"node": "send_document", "type": "main", "index": 0}]]
+    }
+  }
+}

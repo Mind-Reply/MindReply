@@ -1,0 +1,16 @@
+{
+  "name": "MindReply - Lead Scoring & Qualification Pipeline",
+  "description": "Automated lead scoring with ML - qualifies prospects, assigns scores, routes to sales",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {"id": "start", "type": "n8n-nodes-base.start", "position": [50, 50], "typeVersion": 1, "parameters": {}},
+    {"id": "lead_webhook", "type": "n8n-nodes-base.webhook", "position": [250, 50], "typeVersion": 1, "parameters": {"httpMethod": "POST", "path": "lead-score"}},
+    {"id": "extract_features", "type": "n8n-nodes-base.code", "position": [450, 50], "typeVersion": 1, "parameters": {"language": "javascript", "jsCode": "const lead = $json; const score = (lead.budget >= 5000 ? 10 : 0) + (lead.timeline === 'urgent' ? 15 : 0) + (lead.company_size > 100 ? 10 : 0) + (lead.industry === 'tech' ? 10 : 0); const qualified = score >= 30; return { ...lead, score, qualified, qualification_level: score > 50 ? 'hot' : score > 30 ? 'warm' : 'cold' };"}},
+    {"id": "store_lead", "type": "n8n-nodes-base.postgres", "position": [650, 50], "typeVersion": 1, "parameters": {"host": "={{$env.DB_HOST}}", "port": 5432, "database": "{{$env.DB_NAME}}", "user": "{{$env.DB_USER}}", "password": "{{$env.DB_PASSWORD}}", "query": "INSERT INTO leads (email, company, score, qualified, qualification_level, created_at) VALUES ('={{$json.email}}', '={{$json.company}}', {{$json.score}}, {{$json.qualified}}, '={{$json.qualification_level}}', NOW())"}},
+    {"id": "route_to_sales", "type": "n8n-nodes-base.slack", "position": [850, 50], "typeVersion": 1, "parameters": {"text": "🎯 {{$json.qualification_level | uppercase}} LEAD\nCompany: {{$json.company}}\nScore: {{$json.score}}\nBudget: ${{$json.budget}}\nTimeline: {{$json.timeline}}"}},
+    {"id": "return_score", "type": "n8n-nodes-base.respondToWebhook", "position": [1050, 50], "typeVersion": 1, "parameters": {"body": "={{JSON.stringify({status: 'scored', score: $json.score, qualified: $json.qualified, level: $json.qualification_level})}}"}}
+  ],
+  "connections": {"start": {"main": [[{"node": "lead_webhook", "type": "main", "index": 0}]]}, "lead_webhook": {"main": [[{"node": "extract_features", "type": "main", "index": 0}]]}, "extract_features": {"main": [[{"node": "store_lead", "type": "main", "index": 0}]]}, "store_lead": {"main": [[{"node": "route_to_sales", "type": "main", "index": 0}]]}, "route_to_sales": {"main": [[{"node": "return_score", "type": "main", "index": 0}]]}},
+  "active": true
+}

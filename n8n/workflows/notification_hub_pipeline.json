@@ -1,0 +1,139 @@
+{
+  "name": "MindReply - Notification Hub Pipeline",
+  "description": "Unified notification system - sends across Email, SMS, Push, In-app, Slack - multi-channel with preferences",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "notification_webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notify"
+      }
+    },
+    {
+      "id": "get_preferences",
+      "type": "n8n-nodes-base.postgres",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "SELECT * FROM notification_preferences WHERE user_id = '={{$json.user_id}}'"
+      }
+    },
+    {
+      "id": "send_email_if_enabled",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "toEmail": "={{$json.email}}",
+        "subject": "={{$json.title}}",
+        "text": "={{$json.message}}"
+      }
+    },
+    {
+      "id": "send_sms_if_enabled",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://api.twilio.com/2010-04-01/Accounts/{{$env.TWILIO_ACCOUNT_SID}}/Messages.json",
+        "requestMethod": "POST",
+        "body": {
+          "To": "={{$json.phone}}",
+          "From": "{{$env.TWILIO_PHONE_NUMBER}}",
+          "Body": "={{$json.message}}"
+        }
+      }
+    },
+    {
+      "id": "send_push_if_enabled",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 250],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "http://localhost:3003/push-notification",
+        "requestMethod": "POST",
+        "body": {
+          "user_id": "={{$json.user_id}}",
+          "title": "={{$json.title}}",
+          "body": "={{$json.message}}",
+          "data": "={{$json.data}}"
+        }
+      }
+    },
+    {
+      "id": "send_slack_if_enabled",
+      "type": "n8n-nodes-base.slack",
+      "position": [650, 350],
+      "typeVersion": 1,
+      "parameters": {
+        "text": "🔔 {{$json.title}}\n{{$json.message}}"
+      }
+    },
+    {
+      "id": "log_notification",
+      "type": "n8n-nodes-base.postgres",
+      "position": [850, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO notifications (user_id, title, message, channels, sent_at) VALUES ('={{$json.user_id}}', '={{$json.title}}', '={{$json.message}}', '={{$json.channels.join(\",\")}}', NOW())"
+      }
+    },
+    {
+      "id": "return_sent",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1050, 150],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify({status: 'sent', channels: $json.channels, timestamp: new Date().toISOString()})}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "notification_webhook", "type": "main", "index": 0}]]
+    },
+    "notification_webhook": {
+      "main": [[{"node": "get_preferences", "type": "main", "index": 0}]]
+    },
+    "get_preferences": {
+      "main": [[{"node": "send_email_if_enabled", "type": "main", "index": 0}, {"node": "send_sms_if_enabled", "type": "main", "index": 0}, {"node": "send_push_if_enabled", "type": "main", "index": 0}, {"node": "send_slack_if_enabled", "type": "main", "index": 0}]]
+    },
+    "send_email_if_enabled": {
+      "main": [[{"node": "log_notification", "type": "main", "index": 0}]]
+    },
+    "send_sms_if_enabled": {
+      "main": [[{"node": "log_notification", "type": "main", "index": 0}]]
+    },
+    "send_push_if_enabled": {
+      "main": [[{"node": "log_notification", "type": "main", "index": 0}]]
+    },
+    "send_slack_if_enabled": {
+      "main": [[{"node": "log_notification", "type": "main", "index": 0}]]
+    },
+    "log_notification": {
+      "main": [[{"node": "return_sent", "type": "main", "index": 0}]]
+    }
+  }
+}

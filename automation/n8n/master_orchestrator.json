@@ -1,0 +1,241 @@
+{
+  "name": "MindReply Master Brain - Revenue & Growth Orchestrator",
+  "version": "1.0",
+  "active": true,
+  "description": "24/7 self-running system: captures payments, deploys sites, tracks revenue",
+  "workflows": [
+    {
+      "id": "payment_webhook",
+      "name": "Payment Received - Stripe Webhook Handler",
+      "trigger": "webhook_post /webhook/stripe/charge.succeeded",
+      "steps": [
+        {
+          "id": "parse_payment",
+          "node": "webhook",
+          "config": {
+            "method": "POST",
+            "path": "/webhook/stripe/charge.succeeded"
+          }
+        },
+        {
+          "id": "extract_customer",
+          "node": "extract",
+          "config": {
+            "source": "{{ $json.data.object }}",
+            "fields": ["customer_email", "amount", "currency", "metadata"]
+          }
+        },
+        {
+          "id": "create_order",
+          "node": "postgres",
+          "config": {
+            "query": "INSERT INTO orders (customer_email, amount, product, status, created_at) VALUES ('{{ $json.customer_email }}', {{ $json.amount }}, '{{ $json.metadata.product }}', 'paid', NOW()) RETURNING id"
+          }
+        },
+        {
+          "id": "trigger_delivery",
+          "node": "http",
+          "config": {
+            "method": "POST",
+            "url": "http://backend:3000/api/orders/{{ $node.create_order.json.id }}/process",
+            "body": {
+              "order_id": "{{ $node.create_order.json.id }}",
+              "customer_email": "{{ $json.customer_email }}",
+              "product": "{{ $json.metadata.product }}"
+            }
+          }
+        },
+        {
+          "id": "send_receipt",
+          "node": "email",
+          "config": {
+            "to": "{{ $json.customer_email }}",
+            "subject": "MindReply Package - Delivery Commencing",
+            "template": "order_receipt",
+            "variables": {
+              "order_id": "{{ $node.create_order.json.id }}",
+              "amount": "{{ $json.amount }}",
+              "product": "{{ $json.metadata.product }}"
+            }
+          }
+        },
+        {
+          "id": "update_dashboard",
+          "node": "http",
+          "config": {
+            "method": "POST",
+            "url": "http://dashboard:5000/api/metrics/revenue",
+            "body": {
+              "timestamp": "{{ now() }}",
+              "amount": "{{ $json.amount }}",
+              "currency": "{{ $json.currency }}",
+              "product": "{{ $json.metadata.product }}",
+              "status": "received"
+            }
+          }
+        }
+      ],
+      "error_handling": "escalate_to_director"
+    },
+    {
+      "id": "daily_growth_cycle",
+      "name": "Daily Growth Cycle - Deploy New Sites",
+      "trigger": "cron 0 0 * * *",
+      "steps": [
+        {
+          "id": "check_sales",
+          "node": "postgres",
+          "config": {
+            "query": "SELECT COUNT(*) as new_orders FROM orders WHERE created_at >= NOW() - INTERVAL '24 hours' AND status='paid'"
+          }
+        },
+        {
+          "id": "calculate_new_sites",
+          "node": "function",
+          "config": {
+            "script": "return Math.ceil($json.new_orders.count / 5)"
+          }
+        },
+        {
+          "id": "deploy_sites_loop",
+          "node": "loop",
+          "config": {
+            "items": "{{ $json.sites_to_deploy }}",
+            "max": 20,
+            "steps": [
+              {
+                "id": "create_site",
+                "node": "http",
+                "config": {
+                  "method": "POST",
+                  "url": "http://backend:3000/api/sites",
+                  "body": {
+                    "site_name": "site_{{ $json.index }}",
+                    "label": "MR{{ $json.index }}",
+                    "domain": "mr{{ $json.index }}.mind-reply.com",
+                    "stripe_product_id": "prod_mr_{{ $json.index }}"
+                  }
+                }
+              },
+              {
+                "id": "activate_stripe",
+                "node": "http",
+                "config": {
+                  "method": "POST",
+                  "url": "https://api.stripe.com/v1/products",
+                  "headers": {
+                    "Authorization": "Bearer {{ $env.STRIPE_SECRET_KEY }}"
+                  },
+                  "body": {
+                    "name": "MindReply MR{{ $json.index }} Site",
+                    "active": true
+                  }
+                }
+              },
+              {
+                "id": "deploy_docker",
+                "node": "shell",
+                "config": {
+                  "command": "docker run -d --name mindreply-site-{{ $json.index }} -e SITE_ID=site_{{ $json.index }} -e STRIPE_PRODUCT={{ $node.activate_stripe.json.id }} mindreply-web:latest"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "generate_daily_report",
+          "node": "http",
+          "config": {
+            "method": "POST",
+            "url": "http://dashboard:5000/api/reports/daily",
+            "body": {
+              "date": "{{ now().toISOString().split('T')[0] }}",
+              "sites_deployed": "{{ $json.sites_to_deploy.length }}",
+              "revenue_today": "{{ $json.revenue_total }}",
+              "active_sites": "{{ $json.total_sites }}"
+            }
+          }
+        },
+        {
+          "id": "send_daily_email",
+          "node": "email",
+          "config": {
+            "to": "director@mind-reply.com",
+            "subject": "MindReply Daily Report - {{ now().toLocaleDateString() }}",
+            "template": "daily_report",
+            "variables": {
+              "sites_deployed": "{{ $json.sites_to_deploy.length }}",
+              "revenue": "{{ $json.revenue_total }}",
+              "active_sites": "{{ $json.total_sites }}"
+            }
+          }
+        }
+      ],
+      "schedule": "0 0 * * *"
+    },
+    {
+      "id": "hourly_health_check",
+      "name": "Hourly Health Check & Monitoring",
+      "trigger": "cron 0 * * * *",
+      "steps": [
+        {
+          "id": "check_postgres",
+          "node": "http",
+          "config": {
+            "method": "GET",
+            "url": "http://mindreply_db:5432/health",
+            "timeout": 5000
+          }
+        },
+        {
+          "id": "check_all_sites",
+          "node": "postgres",
+          "config": {
+            "query": "SELECT COUNT(*) as total, SUM(CASE WHEN status='online' THEN 1 ELSE 0 END) as online FROM sites"
+          }
+        },
+        {
+          "id": "check_revenue",
+          "node": "postgres",
+          "config": {
+            "query": "SELECT SUM(amount) as total_revenue FROM orders WHERE status='paid' AND created_at >= NOW() - INTERVAL '24 hours'"
+          }
+        },
+        {
+          "id": "update_metrics",
+          "node": "http",
+          "config": {
+            "method": "POST",
+            "url": "http://dashboard:5000/api/metrics/update",
+            "body": {
+              "timestamp": "{{ now() }}",
+              "database_status": "{{ $node.check_postgres.json.status }}",
+              "sites_total": "{{ $node.check_all_sites.json.total }}",
+              "sites_online": "{{ $node.check_all_sites.json.online }}",
+              "revenue_24h": "{{ $node.check_revenue.json.total_revenue }}"
+            }
+          }
+        },
+        {
+          "id": "escalate_if_issues",
+          "node": "condition",
+          "config": {
+            "if": "{{ $node.check_postgres.json.status !== 'healthy' || $node.check_all_sites.json.online < $node.check_all_sites.json.total }}",
+            "then": [
+              {
+                "id": "send_alert",
+                "node": "email",
+                "config": {
+                  "to": "director@mind-reply.com",
+                  "subject": "🚨 MindReply System Alert",
+                  "body": "Database: {{ $node.check_postgres.json.status }}\nSites Online: {{ $node.check_all_sites.json.online }}/{{ $node.check_all_sites.json.total }}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "schedule": "0 * * * *"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+app-name = "mindreply-backend"
+primary_region = "us-west"
+
+[build]
+builder = "dockerfile"
+dockerfile_path = "Dockerfile.backend"
+
+[env]
+DATABASE_URL = { required = true }
+REDIS_URL = { required = true }
+JWT_SECRET = { required = true }
+OPENAI_API_KEY = { required = true }
+ANTHROPIC_API_KEY = { required = true }
+GMAIL_CLIENT_ID = { required = true }
+GMAIL_CLIENT_SECRET = { required = true }
+STRIPE_SECRET_KEY = { required = true }
+SENTRY_DSN = { required = false }
+N8N_ENCRYPTION_KEY = { required = true }
+NODE_ENV = "production"
+LOG_LEVEL = "info"
+
+[checks]
+tcp = { port = 3001, interval = 30000, timeout = 5000, grace_period = 5000 }
+
+[services.backend]
+internal_port = 3001
+auto_start = true
+cmd = "npm start"

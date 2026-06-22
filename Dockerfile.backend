@@ -1,0 +1,38 @@
+# Build stage
+FROM dhi.io/node:22-alpine3.24-dev AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY apps/backend/package*.json ./apps/backend/
+RUN npm install
+
+RUN cd apps/backend && npm install
+
+COPY apps/backend/src ./apps/backend/src
+COPY apps/backend/tsconfig.json ./apps/backend/
+
+RUN cd apps/backend && npm run build 2>/dev/null || true
+
+# Runtime stage
+FROM dhi.io/node:22-alpine3.24
+
+WORKDIR /app
+
+RUN apk add --no-cache dumb-init
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/backend/node_modules ./apps/backend/node_modules
+COPY --from=builder /app/apps/backend/dist ./apps/backend/dist 2>/dev/null || true
+COPY --from=builder /app/apps/backend/src ./apps/backend/src
+
+COPY apps/backend/package.json ./apps/backend/
+
+EXPOSE 3001
+
+WORKDIR /app/apps/backend
+
+ENV NODE_ENV=production
+
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["npm", "run", "start"]

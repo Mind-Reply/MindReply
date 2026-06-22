@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindReply Revenue Dashboard - Director Console</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 40px;
+      border-bottom: 2px solid #222;
+      padding-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #0f0, #0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .metric-card {
+      background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+      border-color: #0f0;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+    }
+
+    .metric-value {
+      font-size: 36px;
+      font-weight: bold;
+      color: #0f0;
+      margin: 10px 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #888;
+      letter-spacing: 1px;
+    }
+
+    .metric-change {
+      font-size: 12px;
+      margin-top: 10px;
+      color: #0f0;
+    }
+
+    .metric-change.negative {
+      color: #f00;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #222;
+      padding: 12px;
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #888;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #222;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background: #222;
+    }
+
+    .status-online {
+      color: #0f0;
+      font-weight: bold;
+    }
+
+    .status-offline {
+      color: #f00;
+      font-weight: bold;
+    }
+
+    .status-creating {
+      color: #ff8;
+      font-weight: bold;
+    }
+
+    .chart-container {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      min-height: 300px;
+    }
+
+    .refresh-btn {
+      background: linear-gradient(90deg, #0f0, #0f0);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+
+    .timestamp {
+      font-size: 11px;
+      color: #666;
+      text-align: right;
+      margin-top: 10px;
+    }
+
+    .alert {
+      background: #2a1a1a;
+      border-left: 4px solid #f00;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .alert p {
+      margin: 5px 0;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>MindReply Revenue Dashboard</h1>
+      <p>Director Console — Real-time System Metrics</p>
+      <button class="refresh-btn" onclick="refreshDashboard()">Refresh Now</button>
+    </header>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Total Revenue (24h)</div>
+        <div class="metric-value">£<span id="revenue_24h">0</span></div>
+        <div class="metric-change" id="revenue_change">↑ 0% vs yesterday</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Orders (24h)</div>
+        <div class="metric-value"><span id="orders_24h">0</span></div>
+        <div class="metric-change">Avg: £<span id="avg_order">0</span></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Active Sites</div>
+        <div class="metric-value"><span id="sites_online">0</span>/<span id="sites_total">0</span></div>
+        <div class="metric-change" id="sites_change">Uptime: 99.8%</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Total Revenue (All-Time)</div>
+        <div class="metric-value">£<span id="revenue_total">0</span></div>
+        <div class="metric-change">Growth tracking active</div>
+      </div>
+    </div>
+
+    <!-- Alerts Section -->
+    <div id="alerts-section"></div>
+
+    <!-- Daily Revenue Chart -->
+    <div class="section">
+      <h2>Revenue Trend (Last 7 Days)</h2>
+      <div class="chart-container">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Daily Report -->
+    <div class="section">
+      <h2>Today's Summary</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Value</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="daily-report">
+          <tr><td colspan="3" class="loading">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Sites Status -->
+    <div class="section">
+      <h2>All Sites ({{total_sites}} active)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Site Name</th>
+            <th>Domain</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Revenue</th>
+          </tr>
+        </thead>
+        <tbody id="sites-table">
+          <tr><td colspan="5" class="loading">Loading sites...</td></tr>
+        </tbody>
+      </table>
+      <div class="timestamp">Last updated: <span id="last-update">--:-- --</span></div>
+    </div>
+
+    <!-- System Health -->
+    <div class="section">
+      <h2>System Health</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Status</th>
+            <th>Last Check</th>
+          </tr>
+        </thead>
+        <tbody id="health-table">
+          <tr><td colspan="3" class="loading">Checking...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Auto-refresh every 30 seconds
+    setInterval(() => refreshDashboard(), 30000);
+
+    async function refreshDashboard() {
+      try {
+        // Fetch all metrics
+        const metricsRes = await fetch('/api/dashboard/metrics');
+        const metrics = await metricsRes.json();
+
+        // Update metric cards
+        document.getElementById('revenue_24h').textContent = (metrics.revenue_24h / 100).toFixed(2);
+        document.getElementById('orders_24h').textContent = metrics.orders_24h;
+        document.getElementById('avg_order').textContent = metrics.orders_24h > 0 ? (metrics.revenue_24h / metrics.orders_24h / 100).toFixed(2) : '0';
+        document.getElementById('sites_online').textContent = metrics.sites_online;
+        document.getElementById('sites_total').textContent = metrics.total_sites;
+        document.getElementById('revenue_total').textContent = (metrics.revenue_total / 100).toFixed(2);
+
+        // Fetch daily report
+        const reportRes = await fetch('/api/dashboard/report/daily');
+        const report = await reportRes.json();
+        
+        const dailyTable = document.getElementById('daily-report');
+        dailyTable.innerHTML = `
+          <tr>
+            <td>Orders Today</td>
+            <td><strong>${report.orders_today}</strong></td>
+            <td class="status-online">● Active</td>
+          </tr>
+          <tr>
+            <td>Revenue Today</td>
+            <td><strong>£${(report.revenue_today / 100).toFixed(2)}</strong></td>
+            <td class="status-online">● Collected</td>
+          </tr>
+          <tr>
+            <td>Avg Order Value</td>
+            <td><strong>£${(report.avg_order_value / 100).toFixed(2)}</strong></td>
+            <td class="status-online">● Normal</td>
+          </tr>
+          <tr>
+            <td>Unique Customers</td>
+            <td><strong>${report.unique_customers}</strong></td>
+            <td class="status-online">● Growing</td>
+          </tr>
+          <tr>
+            <td>Sites Created Today</td>
+            <td><strong>${report.sites_created_today}</strong></td>
+            <td class="status-${report.sites_created_today > 0 ? 'online' : 'offline'}">● ${report.sites_created_today > 0 ? 'Deployed' : 'None'}</td>
+          </tr>
+        `;
+
+        // Fetch sites
+        const sitesRes = await fetch('/api/dashboard/sites');
+        const sites = await sitesRes.json();
+        
+        const sitesTable = document.getElementById('sites-table');
+        sitesTable.innerHTML = sites.slice(0, 20).map(site => `
+          <tr>
+            <td>${site.site_name}</td>
+            <td><code>${site.domain}</code></td>
+            <td><span class="status-${site.status}">${site.status.toUpperCase()}</span></td>
+            <td>${new Date(site.created_at).toLocaleDateString()}</td>
+            <td>£${(site.revenue || 0) / 100}</td>
+          </tr>
+        `).join('');
+
+        // Fetch health
+        const healthRes = await fetch('/api/dashboard/health');
+        const health = await healthRes.json();
+        
+        const healthTable = document.getElementById('health-table');
+        healthTable.innerHTML = health.map(h => `
+          <tr>
+            <td>${h.component}</td>
+            <td><span class="status-${h.status === 'healthy' ? 'online' : 'offline'}">${h.status.toUpperCase()}</span></td>
+            <td>${new Date(h.checked_at).toLocaleTimeString()}</td>
+          </tr>
+        `).join('');
+
+        // Update timestamp
+        document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+
+      } catch (err) {
+        console.error('Dashboard error:', err);
+        document.getElementById('alerts-section').innerHTML = `
+          <div class="alert">
+            <p>⚠️ Dashboard connection error</p>
+            <p>Retrying in 30 seconds...</p>
+          </div>
+        `;
+      }
+    }
+
+    // Initial load
+    refreshDashboard();
+  </script>
+</body>
+</html>

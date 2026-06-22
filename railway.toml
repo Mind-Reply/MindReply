@@ -1,0 +1,29 @@
+runtime: node20
+
+env:
+  static: []
+  dynamic:
+    - DATABASE_URL
+    - REDIS_URL
+    - JWT_SECRET
+    - OPENAI_API_KEY
+    - ANTHROPIC_API_KEY
+    - GMAIL_CLIENT_ID
+    - GMAIL_CLIENT_SECRET
+    - STRIPE_SECRET_KEY
+    - SENTRY_DSN
+
+build:
+  packages:
+    - openssl
+  commands:
+    - npm ci
+    - npm run build
+
+processes:
+  api:
+    commands:
+      - npm start
+    memory: 512
+    cpu: 1
+    concurrency: 1

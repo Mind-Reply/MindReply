@@ -1,0 +1,112 @@
+{
+  "name": "MindReply - AI Content Generation Pipeline",
+  "description": "Automated AI content generation with Claude API - generates email content, product descriptions, marketing copy",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "trigger_content_request",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-content-generate"
+      }
+    },
+    {
+      "id": "prepare_prompt",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const contentType = $json.content_type || 'email';\nconst topic = $json.topic;\nconst style = $json.style || 'professional';\n\nconst prompts = {\n  'email': `Write a professional ${style} email about: ${topic}`,\n  'product': `Write a compelling product description for: ${topic} in ${style} tone`,\n  'marketing': `Write marketing copy for: ${topic} in ${style} style`,\n  'social': `Write 3 social media posts about: ${topic} in ${style} voice`\n};\n\nreturn { prompt: prompts[contentType] || prompts['email'] };"
+      }
+    },
+    {
+      "id": "claude_generate",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "requestMethod": "POST",
+        "headers": {
+          "x-api-key": "{{$env.ANTHROPIC_API_KEY}}",
+          "anthropic-version": "2023-06-01"
+        },
+        "body": {
+          "model": "claude-3-opus-20240229",
+          "max_tokens": 1024,
+          "messages": [
+            {
+              "role": "user",
+              "content": "={{$json.prompt}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "extract_content",
+      "type": "n8n-nodes-base.code",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const response = $json.content[0].text;\nreturn { generated_content: response, generated_at: new Date().toISOString(), token_usage: $json.usage };"
+      }
+    },
+    {
+      "id": "store_generated",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "{{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "{{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO generated_content (content_type, original_prompt, generated_text, tokens_used, created_at) VALUES ('={{$json.content_type}}', '={{$json.prompt}}', '={{$json.generated_content}}', '={{$json.token_usage.output_tokens}}', NOW())"
+      }
+    },
+    {
+      "id": "return_content",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{$json.generated_content}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "trigger_content_request", "type": "main", "index": 0}]]
+    },
+    "trigger_content_request": {
+      "main": [[{"node": "prepare_prompt", "type": "main", "index": 0}]]
+    },
+    "prepare_prompt": {
+      "main": [[{"node": "claude_generate", "type": "main", "index": 0}]]
+    },
+    "claude_generate": {
+      "main": [[{"node": "extract_content", "type": "main", "index": 0}]]
+    },
+    "extract_content": {
+      "main": [[{"node": "store_generated", "type": "main", "index": 0}]]
+    },
+    "store_generated": {
+      "main": [[{"node": "return_content", "type": "main", "index": 0}]]
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "name": "MindReply - Real-Time Collaboration Pipeline",
+  "description": "Automated real-time collaboration - WebSocket sync, presence awareness, comments, change history",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "collab_webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "collaboration-sync"
+      }
+    },
+    {
+      "id": "parse_change",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const changeType = $json.type || 'edit';\nconst docId = $json.doc_id;\nconst userId = $json.user_id;\nconst content = $json.content;\nconst timestamp = new Date().toISOString();\nreturn { changeType, docId, userId, content, timestamp, version: Date.now() };"
+      }
+    },
+    {
+      "id": "store_change",
+      "type": "n8n-nodes-base.postgres",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO collaboration_changes (doc_id, user_id, change_type, content, change_order, created_at) VALUES ('={{$json.docId}}', '={{$json.userId}}', '={{$json.changeType}}', '={{$json.content}}', (SELECT COALESCE(MAX(change_order), 0) + 1 FROM collaboration_changes WHERE doc_id = '={{$json.docId}}'), NOW())"
+      }
+    },
+    {
+      "id": "broadcast_to_active_users",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "http://localhost:3002/broadcast",
+        "requestMethod": "POST",
+        "body": {
+          "doc_id": "={{$json.docId}}",
+          "event": "document_changed",
+          "change": "={{$json}}",
+          "exclude_user": "={{$json.userId}}"
+        }
+      }
+    },
+    {
+      "id": "update_user_presence",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "={{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO user_presence (doc_id, user_id, last_seen) VALUES ('={{$json.docId}}', '={{$json.userId}}', NOW()) ON CONFLICT (doc_id, user_id) DO UPDATE SET last_seen = NOW()"
+      }
+    },
+    {
+      "id": "return_sync",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify({status: 'synced', change_id: $json.docId, version: $json.version, timestamp: $json.timestamp})}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "collab_webhook", "type": "main", "index": 0}]]
+    },
+    "collab_webhook": {
+      "main": [[{"node": "parse_change", "type": "main", "index": 0}]]
+    },
+    "parse_change": {
+      "main": [[{"node": "store_change", "type": "main", "index": 0}]]
+    },
+    "store_change": {
+      "main": [[{"node": "broadcast_to_active_users", "type": "main", "index": 0}]]
+    },
+    "broadcast_to_active_users": {
+      "main": [[{"node": "update_user_presence", "type": "main", "index": 0}]]
+    },
+    "update_user_presence": {
+      "main": [[{"node": "return_sync", "type": "main", "index": 0}]]
+    }
+  }
+}

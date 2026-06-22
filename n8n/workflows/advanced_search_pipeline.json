@@ -1,0 +1,139 @@
+{
+  "name": "MindReply - Advanced Search Pipeline",
+  "description": "Automated full-text search with Elasticsearch - faceted search, autocomplete, spell correction, relevance tuning",
+  "version": 1,
+  "active": true,
+  "nodes": [
+    {
+      "id": "start",
+      "type": "n8n-nodes-base.start",
+      "position": [50, 50],
+      "typeVersion": 1,
+      "parameters": {}
+    },
+    {
+      "id": "search_webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "search-query"
+      }
+    },
+    {
+      "id": "index_document",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "http://localhost:9200/mindreply-index/_search",
+        "requestMethod": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "multi_match": {
+                    "query": "={{$json.q}}",
+                    "fields": ["title", "content", "description", "tags"]
+                  }
+                }
+              ],
+              "filter": [
+                {
+                  "term": {"status": "published"}
+                }
+              ]
+            }
+          },
+          "highlight": {
+            "fields": {"content": {}, "description": {}}
+          },
+          "facets": {
+            "category": {"terms": {"field": "category"}},
+            "author": {"terms": {"field": "author"}},
+            "date": {"date_histogram": {"field": "created_at", "interval": "month"}}
+          }
+        }
+      }
+    },
+    {
+      "id": "autocomplete",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "url": "http://localhost:9200/mindreply-suggestions/_search",
+        "requestMethod": "POST",
+        "body": {
+          "suggest": {
+            "text": "={{$json.q}}",
+            "suggestions": {
+              "completion": {
+                "field": "suggest",
+                "size": 10
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "rank_results",
+      "type": "n8n-nodes-base.code",
+      "position": [850, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "language": "javascript",
+        "jsCode": "const results = $json.hits?.hits || [];\nconst suggestions = $json.suggest?.suggestions?.[0]?.options || [];\n\nconst ranked = results\n  .sort((a, b) => b._score - a._score)\n  .slice(0, 20)\n  .map((hit, i) => ({\n    rank: i + 1,\n    score: hit._score,\n    id: hit._id,\n    ...hit._source,\n    highlight: hit.highlight\n  }));\n\nreturn { results: ranked, suggestions, total: results.length };"
+      }
+    },
+    {
+      "id": "log_search",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1050, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "host": "={{$env.DB_HOST}}",
+        "port": 5432,
+        "database": "={{$env.DB_NAME}}",
+        "user": "{{$env.DB_USER}}",
+        "password": "={{$env.DB_PASSWORD}}",
+        "query": "INSERT INTO search_logs (query, results_count, user_id, searched_at) VALUES ('={{$json.q}}', {{$json.total}}, '={{$json.user_id}}', NOW())"
+      }
+    },
+    {
+      "id": "return_results",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1250, 50],
+      "typeVersion": 1,
+      "parameters": {
+        "body": "={{JSON.stringify($json)}}"
+      }
+    }
+  ],
+  "connections": {
+    "start": {
+      "main": [[{"node": "search_webhook", "type": "main", "index": 0}]]
+    },
+    "search_webhook": {
+      "main": [[{"node": "index_document", "type": "main", "index": 0}]]
+    },
+    "index_document": {
+      "main": [[{"node": "autocomplete", "type": "main", "index": 0}]]
+    },
+    "autocomplete": {
+      "main": [[{"node": "rank_results", "type": "main", "index": 0}]]
+    },
+    "rank_results": {
+      "main": [[{"node": "log_search", "type": "main", "index": 0}]]
+    },
+    "log_search": {
+      "main": [[{"node": "return_results", "type": "main", "index": 0}]]
+    }
+  }
+}
