@@ -1,0 +1,6 @@
+{
+  "endpoint": "/repos/github-copilot/pro",
+  "repo": "github-copilot/pro",
+  "task": "Get repository information",
+  "userQuery": "Get the repository details for github-copilot/pro"
+}
