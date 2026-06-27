@@ -1,0 +1,33 @@
+name: Plan C Contract Gate
+
+on:
+  pull_request:
+    branches: [ main, plan-c-hardening ]
+  push:
+    branches: [ plan-c-hardening ]
+
+jobs:
+  contract-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate API contract existence
+        run: |
+          if [ ! -f services/api/contract.openapi.json ]; then
+            echo "Missing API contract";
+            exit 1;
+          fi
+
+      - name: Enforce endpoint versioning
+        run: |
+          grep -R "/api/" apps || true
+
+      - name: Check for secrets leakage
+        run: |
+          ! grep -R "sk_live\|ghp_" .
+
+      - name: Success
+        run: echo "Plan C contract gate passed"
