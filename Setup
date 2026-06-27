@@ -1,0 +1,474 @@
+# =========================
+# REPO STRUCTURE (ADD/ADAPT)
+# =========================
+# Place under root of mind-reply/mindreply
+
+infra/
+  terraform/
+    main.tf
+    variables.tf
+    outputs.tf
+
+helm/
+  mindreply/
+    Chart.yaml
+    values.yaml
+    templates/
+      api-deployment.yaml
+      api-service.yaml
+      otel-collector.yaml
+      clickhouse.yaml
+      kafka.yaml
+
+ops/
+  contracts/
+    api-contracts.json
+    validate-contracts.js
+
+observability/
+  otel/
+    tracing.js
+  clickhouse/
+    init.sql
+    kafka-consumer.js
+
+.github/
+  workflows/
+    ci-contracts.yml
+    ci-tests.yml
+
+# =========================
+# infra/terraform/main.tf
+# =========================
+# Minimal AWS EKS skeleton (adjust to your real infra later)
+
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.region
+}
+
+resource "aws_eks_cluster" "mindreply" {
+  name     = "mindreply-cluster"
+  role_arn = var.eks_role_arn
+
+  vpc_config {
+    subnet_ids = var.private_subnets
+  }
+}
+
+# =========================
+# infra/terraform/variables.tf
+# =========================
+variable "region" {
+  type    = string
+  default = "eu-central-1"
+}
+
+variable "eks_role_arn" {
+  type = string
+}
+
+variable "private_subnets" {
+  type = list(string)
+}
+
+# =========================
+# infra/terraform/outputs.tf
+# =========================
+output "cluster_name" {
+  value = aws_eks_cluster.mindreply.name
+}
+
+# =========================
+# helm/mindreply/Chart.yaml
+# =========================
+apiVersion: v2
+name: mindreply
+version: 0.1.0
+
+# =========================
+# helm/mindreply/values.yaml
+# =========================
+global:
+  environment: production
+
+api:
+  image: "ghcr.io/mind-reply/mindreply-api:latest"
+  replicas: 2
+
+otel:
+  enabled: true
+
+clickhouse:
+  enabled: true
+
+kafka:
+  enabled: true
+
+# =========================
+# helm/mindreply/templates/api-deployment.yaml
+# =========================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindreply-api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: mindreply-api
+  template:
+    metadata:
+      labels:
+        app: mindreply-api
+    spec:
+      containers:
+        - name: api
+          image: {{ .Values.api.image }}
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"
+
+# =========================
+# helm/mindreply/templates/api-service.yaml
+# =========================
+apiVersion: v1
+kind: Service
+metadata:
+  name: mindreply-api
+spec:
+  selector:
+    app: mindreply-api
+  ports:
+    - port: 80
+      targetPort: 3000
+
+# =========================
+# helm/mindreply/templates/otel-collector.yaml
+# =========================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+data:
+  collector.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+
+    processors:
+      batch:
+
+    exporters:
+      logging:
+        loglevel: info
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+    spec:
+      containers:
+        - name: otel-collector
+          image: otel/opentelemetry-collector
+          args:
+            - "--config=/etc/otel/collector.yaml"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otel
+      volumes:
+        - name: config
+          configMap:
+            name: otel-collector-config
+
+# =========================
+# helm/mindreply/templates/clickhouse.yaml
+# =========================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickhouse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+        - name: clickhouse
+          image: clickhouse/clickhouse-server:latest
+          ports:
+            - containerPort: 8123
+            - containerPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickhouse
+spec:
+  selector:
+    app: clickhouse
+  ports:
+    - name: http
+      port: 8123
+    - name: native
+      port: 9000
+
+# =========================
+# helm/mindreply/templates/kafka.yaml
+# =========================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: confluentinc/cp-kafka:7.5.0
+          ports:
+            - containerPort: 9092
+
+# =========================
+# ops/contracts/api-contracts.json
+# =========================
+{
+  "endpoints": [
+    {
+      "path": "/api/v1/messages",
+      "method": "POST",
+      "request": {
+        "contentType": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "userId": { "type": "string" },
+            "message": { "type": "string" }
+          },
+          "required": ["userId", "message"]
+        }
+      },
+      "response": {
+        "status": 200,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "createdAt": { "type": "string" },
+            "message": { "type": "string" }
+          },
+          "required": ["id", "createdAt", "message"]
+        }
+      }
+    }
+  ]
+}
+
+# =========================
+# ops/contracts/validate-contracts.js
+# =========================
+/**
+ * Run this in CI to ensure frontend & backend match the contract.
+ * Assumes:
+ *  - backend handlers live in src/backend/api
+ *  - frontend calls live in src/frontend/api
+ */
+
+const fs = require("fs");
+const path = require("path");
+
+const contracts = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "api-contracts.json"), "utf8")
+);
+
+function main() {
+  // Example: just assert the file exists for now.
+  const backendApiPath = path.join(process.cwd(), "src", "backend", "api");
+  const frontendApiPath = path.join(process.cwd(), "src", "frontend", "api");
+
+  if (!fs.existsSync(backendApiPath)) {
+    console.error("Missing backend API folder:", backendApiPath);
+    process.exit(1);
+  }
+
+  if (!fs.existsSync(frontendApiPath)) {
+    console.error("Missing frontend API folder:", frontendApiPath);
+    process.exit(1);
+  }
+
+  console.log("Contracts loaded:", contracts.endpoints.length);
+  console.log("Backend & frontend API folders exist. Extend this script to do deep schema checks.");
+}
+
+main();
+
+# =========================
+# observability/otel/tracing.js
+# =========================
+const { NodeSDK } = require("@opentelemetry/sdk-node");
+const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
+
+const sdk = new NodeSDK({
+  instrumentations: [getNodeAutoInstrumentations()]
+});
+
+sdk.start().then(() => {
+  console.log("OpenTelemetry tracing enabled for MindReply API");
+});
+
+# =========================
+# observability/clickhouse/init.sql
+# =========================
+CREATE TABLE IF NOT EXISTS traces (
+  timestamp     DateTime,
+  service       String,
+  trace_id      String,
+  span_id       String,
+  duration_ms   Float64,
+  status_code   Int32
+) ENGINE = MergeTree()
+ORDER BY timestamp;
+
+# =========================
+# observability/clickhouse/kafka-consumer.js
+# =========================
+const { Kafka } = require("kafkajs");
+const { createClient } = require("@clickhouse/client");
+
+const kafka = new Kafka({
+  clientId: "otel-processor",
+  brokers: [process.env.KAFKA_BROKER || "kafka:9092"]
+});
+
+const consumer = kafka.consumer({ groupId: "otel-group" });
+
+const clickhouse = createClient({
+  host: process.env.CLICKHOUSE_URL || "http://clickhouse:8123"
+});
+
+async function run() {
+  await consumer.connect();
+  await consumer.subscribe({ topic: "otel-traces" });
+
+  await consumer.run({
+    eachMessage: async ({ message }) => {
+      try {
+        const trace = JSON.parse(message.value.toString());
+
+        await clickhouse.insert({
+          table: "traces",
+          values: [
+            {
+              timestamp: new Date(),
+              service: trace.service || "mindreply",
+              trace_id: trace.traceId || "",
+              span_id: trace.spanId || "",
+              duration_ms: trace.duration || 0,
+              status_code: trace.status || 200
+            }
+          ]
+        });
+      } catch (err) {
+        console.error("Failed to process trace:", err);
+      }
+    }
+  });
+}
+
+run().catch(err => {
+  console.error("Kafka consumer failed:", err);
+  process.exit(1);
+});
+
+# =========================
+# .github/workflows/ci-contracts.yml
+# =========================
+name: API Contract Check
+
+on:
+  push:
+    branches: [ main, ops/* ]
+  pull_request:
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm install
+
+      - name: Validate contracts
+        run: node ops/contracts/validate-contracts.js
+
+# =========================
+# .github/workflows/ci-tests.yml
+# =========================
+name: CI Tests
+
+on:
+  push:
+    branches: [ main, ops/* ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm install
+
+      - name: Run tests
+        run: npm test
