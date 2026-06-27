@@ -145,7 +145,7 @@
 ---
 
 ## 💰 TOTAL REVENUE TARGETS
-
+ 
 ```
 MIN:     £85,000/month    (£1.02M/year)
 MAX:     £425,000/month   (£5.1M/year)
