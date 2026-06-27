@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
+import { apiClient } from '@/lib/api-client';
 import { MetricsCard } from '@/components/MetricsCard';
 import { ApprovalQueue } from '@/components/ApprovalQueue';
 
 export default function DashboardPage() {
-  const [metrics, setMetrics] = useState(null);
-  const [queue, setQueue] = useState([]);
+  const [metrics, setMetrics] = useState<any>(null);
+  const [queue, setQueue] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,8 +17,9 @@ export default function DashboardPage() {
           apiClient.get('/analytics'),
           apiClient.get('/queue'),
         ]);
-        setMetrics(metricsRes.data);
-        setQueue(queueRes.data.data);
+
+        setMetrics(metricsRes);
+        setQueue(queueRes);
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
       } finally {
@@ -33,31 +34,13 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Metrics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <MetricsCard
-          label="Messages Handled"
-          value={metrics?.messagesProcessed || 0}
-          trend="+12%"
-        />
-        <MetricsCard
-          label="Replies Approved"
-          value={metrics?.repliesApproved || 0}
-          trend="+8%"
-        />
-        <MetricsCard
-          label="Follow-ups Sent"
-          value={metrics?.followUpsSent || 0}
-          trend="+15%"
-        />
-        <MetricsCard
-          label="Hours Saved"
-          value={`${(metrics?.estimatedHoursSaved || 0).toFixed(1)}h`}
-          trend="+22%"
-        />
+        <MetricsCard label="Messages Handled" value={metrics?.messagesProcessed || 0} trend="+12%" />
+        <MetricsCard label="Replies Approved" value={metrics?.repliesApproved || 0} trend="+8%" />
+        <MetricsCard label="Follow-ups Sent" value={metrics?.followUpsSent || 0} trend="+15%" />
+        <MetricsCard label="Hours Saved" value={`${(metrics?.estimatedHoursSaved || 0).toFixed(1)}h`} trend="+22%" />
       </div>
 
-      {/* Approval Queue */}
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-bold mb-4">Pending Approvals</h2>
         <ApprovalQueue items={queue} />
