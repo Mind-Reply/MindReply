@@ -1,8 +1,56 @@
 name: Autonomous Ops
+
 on:
+  push:
+    branches: ["main"]
+  pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo ok
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Validate root manifest
+        run: node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"
+
+      - name: Build frontend
+        working-directory: apps/frontend
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+          npm run build
+
+      - name: Build backend
+        working-directory: apps/backend
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+          npm run build
+
+      - name: Run contract check
+        run: node scripts/contract-check.js
+
+      - name: Build frontend container
+        run: docker build -f Dockerfile.frontend .
+
+      - name: Build backend container
+        run: docker build -f Dockerfile.backend .
