@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BRANCH="ops/fix-deploy"
+MSG="chore: fix package.json workplace key and Docker base image to resolve deploy failures"
+
+# 1. Backup package.json
+if [ -f package.json ]; then
+  cp package.json package.json.bak
+  echo "Backed up package.json -> package.json.bak"
+fi
+
+# 2. Remove top-level 'workplace' key safely using jq if available, else fallback
+if command -v jq >/dev/null 2>&1; then
+  jq 'del(.workplace)' package.json > package.json.tmp && mv package.json.tmp package.json
+  echo "Removed workplace key using jq"
+else
+  # crude fallback: remove lines between "workplace": { ... } (best-effort)
+  awk 'BEGIN{skip=0} /"workplace"[[:space:]]*:[[:space:]]*{/{skip=1; next} /}/{ if(skip==1){skip=0; next} } { if(skip==0) print }' package.json > package.json.tmp && mv package.json.tmp package.json || echo "jq not found; manual check recommended"
+  echo "Attempted to remove workplace key without jq"
+fi
+
+# 3. If you need to preserve original workplace content, move it under mindreplyWorkplace
+# (Optional: uncomment to enable)
+# if command -v jq >/dev/null 2>&1; then
+#   ORIG=$(jq '.workplace' package.json.bak)
+#   jq --argjson w "$ORIG" '.mindreplyWorkplace = $w | del(.workplace)' package.json > package.json.tmp && mv package.json.tmp package.json
+# fi
+
+# 4. Replace custom base image in Dockerfiles
+find . -type f -name Dockerfile -o -name '*Dockerfile*' | while read -r df; do
+  if grep -q "dhi.io/node" "$df"; then
+    sed -i.bak 's|FROM .*dhi.io/node:[^[:space:]]*|FROM node:22-alpine|g' "$df"
+    echo "Patched base image in $df"
+  fi
+done
+
+# 5. Create branch, commit, push, PR
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  git fetch origin || true
+  git checkout -B "$BRANCH"
+  git add package.json Dockerfile */Dockerfile || true
+  git commit -m "$MSG" || echo "No changes to commit"
+  git push -u origin "$BRANCH" || echo "Push failed; check permissions"
+  if command -v gh >/dev/null 2>&1; then
+    gh pr create --title "$MSG" --body "Auto-fix: remove workplace key and use official Node base image to resolve Render deploy failures" --base main || echo "gh pr create failed"
+  else
+    echo "gh CLI not found; create PR from branch $BRANCH to main in GitHub UI"
+  fi
+else
+  echo "Not a git repo. Please apply the file edits in GitHub web UI."
+fi
+
+echo "Done. Monitor CI and Render deploy logs."
