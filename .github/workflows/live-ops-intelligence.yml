@@ -1,0 +1,30 @@
+name: Live Ops Intelligence
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  intelligence:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate health score
+        run: node ops/monitor/health-score.js
+
+      - name: Run recovery signal check
+        run: node ops/agent/ops-agent.js || true
+
+      - name: Archive metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-ops-metrics
+          path: ops/reports
