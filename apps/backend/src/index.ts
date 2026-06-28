@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { requestLogger, errorHandler } from './utils/logger';
-import { authMiddleware, requireRole } from './middleware/auth';
+import { authMiddleware } from './middleware/auth';
 import { globalLimiter, apiLimiter } from './middleware/rateLimiter';
 
 // Route imports
@@ -20,10 +20,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || process.env.API_PORT || 3001;
 const prisma = new PrismaClient();
+const frontendOrigin = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5000',
+  origin: frontendOrigin,
   credentials: true,
 }));
 app.use(express.json());
@@ -57,12 +60,7 @@ app.use('/api/approvals', authMiddleware, apiLimiter, approvalRouter);
 app.use('/api/followups', authMiddleware, apiLimiter, followupsRouter);
 app.use('/api/analytics', authMiddleware, apiLimiter, analyticsRouter);
 app.use('/api/billing', authMiddleware, apiLimiter, billingRouter);
-
-// Admin routes (secure)
-const { adminRouter } = require('./routes/admin');
 app.use('/api/admin', adminRouter);
-
-
 
 // 404 handler
 app.use((req, res) => {
