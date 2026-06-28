@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global-traffic-policy
+  namespace: default
+data:
+  mode: active-active
+  routing: |
+    - name: primary
+      weight: 50
+    - name: secondary
+      weight: 50
+  strategy: latency-aware
+  failover: automatic
