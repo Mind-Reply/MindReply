@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mindreply-service
+  namespace: mindreply-prod
+spec:
+  selector:
+    app: mindreply
+  ports:
+    - port: 80
+      targetPort: 3000
+  type: ClusterIP
