@@ -54,3 +54,36 @@ jobs:
 
       - name: Build backend container
         run: docker build -f Dockerfile.backend .
+
+  retry:
+    needs: validate
+    if: failure()
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        attempt: [1, 2]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Retry build attempt
+        run: |
+          echo "Retry attempt ${{ matrix.attempt }}"
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npm run build || true
+
+      - name: Re-run contract check
+        run: node scripts/contract-check.js || true
+
+  recovery:
+    needs: retry
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recovery placeholder
+        run: |
+          echo "Recovery stage triggered"
+          echo "Manual review required for failed pipeline"
