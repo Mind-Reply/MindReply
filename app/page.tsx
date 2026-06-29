@@ -44,6 +44,7 @@ export default function KillerHomePage() {
             <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">MR</span>
           </div>
           <div className="flex gap-4 items-center text-sm">
+            <a href="/campaign-studio" className="hover:text-cyan-400 transition">Campaign Studio</a>
             <a href="#" className="hover:text-cyan-400 transition">Docs</a>
             <a href="https://chrome.google.com/webstore/detail/mindreply" className="px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 font-bold hover:shadow-lg hover:shadow-cyan-500/50 transition">
               Install Now
@@ -238,113 +239,4 @@ export default function KillerHomePage() {
               </button>
             </div>
 
-            {/* Credits */}
-            <div className="bg-gradient-to-br from-cyan-900 to-purple-900 p-6 rounded-lg border border-cyan-500 hover:border-purple-400 transition">
-              <h3 className="text-xl font-bold mb-2">Credits</h3>
-              <div className="text-4xl font-black mb-1">£29</div>
-              <div className="text-xs text-gray-300 mb-4">50 analyses</div>
-              <ul className="space-y-2 text-sm text-gray-200 mb-6">
-                <li>✓ 50 analyses</li>
-                <li>✓ Priority support</li>
-                <li>✓ Unlimited saves</li>
-              </ul>
-              <button className="w-full py-2 bg-cyan-500 text-black rounded font-bold hover:bg-cyan-400 transition">
-                Buy Credits
-              </button>
-            </div>
-
-            {/* Package - HERO */}
-            <div className="bg-gradient-to-br from-cyan-500 via-purple-600 to-pink-600 p-6 rounded-lg border-2 border-cyan-300 transform scale-110 shadow-2xl shadow-cyan-500/50">
-              <div className="inline-block px-3 py-1 bg-white text-purple-900 rounded text-xs font-black mb-3">★ MOST PICKED ★</div>
-              <h3 className="text-xl font-bold mb-2 text-white">Website Fix</h3>
-              <div className="text-4xl font-black mb-1 text-white">£600</div>
-              <div className="text-xs text-white/80 mb-4">One-time</div>
-              <ul className="space-y-2 text-sm text-white mb-6">
-                <li>✓ Full site audit</li>
-                <li>✓ 5 pages fixed</li>
-                <li>✓ Ranked by impact</li>
-                <li>✓ Send-ready copy</li>
-              </ul>
-              <button className="w-full py-2 bg-white text-purple-900 rounded font-black hover:bg-gray-100 transition">
-                Book Now
-              </button>
-            </div>
-
-            {/* Pro */}
-            <div className="bg-gray-900 p-6 rounded-lg border border-gray-700 hover:border-gray-500 transition">
-              <h3 className="text-xl font-bold mb-2">Pro</h3>
-              <div className="text-4xl font-black mb-1">£199</div>
-              <div className="text-xs text-gray-300 mb-4">/month</div>
-              <ul className="space-y-2 text-sm text-gray-300 mb-6">
-                <li>✓ Unlimited</li>
-                <li>✓ API access</li>
-                <li>✓ Approved memory</li>
-                <li>✓ 24/7 support</li>
-              </ul>
-              <button className="w-full py-2 border border-gray-600 rounded font-bold hover:bg-gray-800 transition">
-                Start Trial
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* MEGA CTA SECTION */}
-      <section className="py-24 px-4 bg-gradient-to-r from-cyan-950 via-purple-950 to-pink-950 relative overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
-        </div>
-
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-          <h2 className="text-5xl md:text-6xl font-black mb-6">
-            60,000 Using MindReply Today
-          </h2>
-          <p className="text-xl text-gray-200 mb-8">
-            Join thousands of founders and sales teams who've stopped wasting time on unclear communication.
-          </p>
-
-          {!submitted ? (
-            <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-3 max-w-xl mx-auto mb-6">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-4 py-4 bg-white/10 border border-cyan-500/50 rounded-lg text-white placeholder-gray-400 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition"
-              />
-              <button
-                type="submit"
-                className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg font-black text-white hover:shadow-xl hover:shadow-cyan-500/50 transition transform hover:scale-105 whitespace-nowrap"
-              >
-                Get Started Free
-              </button>
-            </form>
-          ) : (
-            <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-300 font-bold mb-6 max-w-xl mx-auto">
-              ✅ Check your email! We've sent you an instant access link.
-            </div>
-          )}
-
-          <p className="text-sm text-gray-400">
-            🔒 No credit card. No spam. Unsubscribe anytime. Free tier: 5 analyses/month.
-          </p>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-cyan-500/20 py-12 px-4 text-center text-gray-400 text-sm">
-        <p className="mb-4">© 2026 MindReply. Pressure in. One clear move out.</p>
-        <div className="flex justify-center gap-8 mb-6">
-          <a href="#" className="hover:text-cyan-400 transition">Privacy</a>
-          <a href="#" className="hover:text-cyan-400 transition">Terms</a>
-          <a href="mailto:info@mind-reply.com" className="hover:text-cyan-400 transition">Support</a>
-          <a href="https://twitter.com/mindreply" className="hover:text-cyan-400 transition">Twitter</a>
-        </div>
-        <div className="text-xs text-gray-500">
-          Built for founders who reply under pressure. Deployed on Vercel. Powered by AI.
-        </div>
-      </footer>
-    </div>
-  );
-}
+            {/*... (truncated)
