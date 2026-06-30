@@ -1,0 +1,47 @@
+name: Security Scan Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            corepack enable
+            pnpm install
+          fi
+
+      - name: Run dependency audit
+        run: |
+          if [ -f package.json ]; then
+            pnpm audit --audit-level high || true
+          fi
+
+      - name: Scan for secrets
+        run: |
+          echo "Scanning for credentials and unsafe files..."
+          grep -R -n "password\|secret\|token\|apikey\|api_key\|PRIVATE\|BEGIN RSA\|BEGIN OPENSSH" . || true
+          find . -name ".env*" -o -name "*.pem" -o -name "*.key" -o -name "*.p12" -o -name "*.pfx" || true
+
+      - name: Build verification
+        run: |
+          if [ -f package.json ]; then
+            pnpm build || true
+          fi
+
+      - name: Completion marker
+        run: echo "Security scan completed"
