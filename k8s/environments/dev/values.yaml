@@ -1,0 +1,8 @@
+environment: dev
+replicaCount:
+  frontend: 1
+  backend: 1
+images:
+  tag: dev-latest
+config:
+  logLevel: debug

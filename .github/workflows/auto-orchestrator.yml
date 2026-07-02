@@ -1,0 +1,36 @@
+name: Auto Orchestrator Runner
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run-orchestrator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Docker config
+        run: |
+          unset DOCKER_CONFIG || true
+          rm -rf ~/.docker/config.json || true
+          docker logout || true
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies for orchestrator
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run orchestrator once
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 auto_orchestrator_full.py --once

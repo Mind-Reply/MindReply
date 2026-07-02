@@ -1,0 +1,94 @@
+name: Live Adaptive Production System
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  adaptive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Load production signals
+        run: |
+          node -e "
+            const fs=require('fs');
+            let score=100;
+            let anomalies=[];
+
+            try {
+              const s=JSON.parse(fs.readFileSync('ops/reports/health-score.json','utf8'));
+              score=s.score||100;
+              anomalies=s.signals||[];
+            } catch(e) {
+              score=60;
+            }
+
+            const anomalyPenalty = anomalies.length * 10;
+            const adjusted = Math.max(0, score - anomalyPenalty);
+
+            let rollout='100%';
+            let mode='stable';
+
+            if (adjusted < 50) {
+              rollout='0%';
+              mode='rollback-ready';
+            } else if (adjusted < 70) {
+              rollout='10%';
+              mode='restricted';
+            } else if (adjusted < 85) {
+              rollout='50%';
+              mode='partial';
+            }
+
+            const out={
+              time:new Date().toISOString(),
+              score,
+              adjusted,
+              rollout,
+              mode,
+              anomalies
+            };
+
+            fs.mkdirSync('ops/reports',{recursive:true});
+            fs.writeFileSync('ops/reports/adaptive.json',JSON.stringify(out,null,2));
+            console.log(out);
+          "
+
+      - name: Evaluate deployment decision
+        run: |
+          node -e "
+            const fs=require('fs');
+            const d=JSON.parse(fs.readFileSync('ops/reports/adaptive.json','utf8'));
+            console.log('MODE=',d.mode);
+            if(d.mode==='rollback-ready') {
+              console.log('CRITICAL: rollback state detected');
+              process.exit(1);
+            }
+          "
+
+      - name: Simulated rollout execution
+        run: |
+          node -e "
+            const fs=require('fs');
+            const d=JSON.parse(fs.readFileSync('ops/reports/adaptive.json','utf8'));
+            console.log('Rolling out at:', d.rollout);
+            fs.writeFileSync('ops/reports/rollout.json',JSON.stringify({time:new Date().toISOString(),rollout:d.rollout,mode:d.mode},null,2));
+          "
+
+      - name: Archive adaptive metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: adaptive-production-metrics
+          path: ops/reports

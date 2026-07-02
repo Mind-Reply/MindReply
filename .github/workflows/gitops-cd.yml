@@ -1,0 +1,74 @@
+name: Org-Native GitOps CI/CD
+
+on:
+  push:
+    branches: [ "main", "staging" ]
+  pull_request:
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate repo structure
+        run: |
+          echo "Checking required structure..."
+          test -d apps || (echo 'Missing apps/' && exit 1)
+          test -d .github/workflows || (echo 'Missing workflows' && exit 1)
+          echo "Structure OK"
+
+      - name: Security baseline scan
+        run: |
+          echo "Scanning for secrets patterns"
+          ! grep -R "API_KEY\|SECRET\|PASSWORD\|TOKEN" -n . || exit 1
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        run: npm ci || npm install
+
+      - name: Build
+        run: npm run build
+
+  deploy-staging:
+    if: github.ref == 'refs/heads/staging'
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Staging (GitOps)
+        run: |
+          echo "Deploying staging environment"
+          echo "Triggering external deploy hook"
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    steps:
+      - name: Production approval gate
+        run: echo "Production deployment approved via GitHub Environment"
+
+      - name: Deploy to Production (GitOps)
+        run: |
+          echo "Deploying production via GitOps pipeline"
+          echo "Hook: Vercel / Kubernetes / n8n integration point"

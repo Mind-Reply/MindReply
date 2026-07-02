@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global-failover-policy
+  namespace: default
+data:
+  failover: enabled
+  healthCheckInterval: 10s
+  thresholds: |
+    errorRate: 0.05
+    latencyMs: 800
+  actions: |
+    - onFailure: reroute
+    - onCritical: drain-cluster

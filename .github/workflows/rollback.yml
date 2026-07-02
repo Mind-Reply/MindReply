@@ -1,0 +1,34 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: 'Commit SHA to rollback to'
+        required: true
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rollback Git state
+        run: |
+          git fetch --all
+          git checkout ${{ github.event.inputs.target_sha }}
+
+      - name: Rebuild frontend
+        run: npm install && npm run build --workspace apps/frontend
+
+      - name: Rebuild backend
+        run: npm run build --workspace apps/backend || true
+
+      - name: Tag rollback
+        run: |
+          git tag rollback-${{ github.event.inputs.target_sha }}
+          git push origin --tags || true
+
+      - name: Confirm rollback
+        run: echo "Rollback completed to ${{ github.event.inputs.target_sha }}"

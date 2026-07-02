@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: mindreply
+  namespace: argocd
+spec:
+  description: MindReply Autonomous GitOps Project
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: mindreply
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

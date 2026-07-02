@@ -1,0 +1,16 @@
+{
+  "system": "A11-K",
+  "mode": "multi-cloud-swarm",
+  "layers": {
+    "github": "genome",
+    "kubernetes": "execution",
+    "vercel": "frontend-scale",
+    "edge": "latency-routing"
+  },
+  "signals": ["load", "latency", "volatility", "fitness"],
+  "behavior": {
+    "spawn_repo": true,
+    "auto_scale": true,
+    "cross_repo_sync": true
+  }
+}

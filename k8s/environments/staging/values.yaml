@@ -1,0 +1,8 @@
+environment: staging
+replicaCount:
+  frontend: 2
+  backend: 2
+images:
+  tag: staging-latest
+config:
+  logLevel: info

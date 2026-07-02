@@ -1,0 +1,55 @@
+name: Production Intelligence
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prod-intel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Simulate production health evaluation
+        run: |
+          echo "Collecting production signals..."
+          node -e "
+            const fs=require('fs');
+            let score=100;
+            try{
+              const s=JSON.parse(fs.readFileSync('ops/reports/health-score.json','utf8'));
+              if(s.score<60) score-=40;
+              if((s.signals||[]).length) score-=20;
+            }catch(e){score-=30}
+            const out={time:new Date().toISOString(),score};
+            fs.mkdirSync('ops/reports',{recursive:true});
+            fs.writeFileSync('ops/reports/prod-intel.json',JSON.stringify(out,null,2));
+            console.log(out);
+          "
+
+      - name: Evaluate rollback condition
+        run: |
+          node -e "
+            const fs=require('fs');
+            let d={};
+            try{d=JSON.parse(fs.readFileSync('ops/reports/prod-intel.json','utf8'))}catch{}
+            const rollback=d.score<50;
+            console.log('rollback_required=',rollback);
+            fs.writeFileSync('ops/reports/rollback-signal.json',JSON.stringify({rollback},null,2));
+          "
+
+      - name: Archive production metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-intelligence
+          path: ops/reports

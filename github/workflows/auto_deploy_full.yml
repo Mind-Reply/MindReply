@@ -1,0 +1,200 @@
+name: MindReply Full Auto Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+env:
+  DEPLOY_DIR: Deploy
+  REPORT_DIR: report
+  ARTIFACT_NAME: deploy_report
+  COMPOSE_PROJECT_NAME: mindreply_ci
+
+jobs:
+  build-run-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare report directory
+        run: |
+          rm -rf ${{ env.REPORT_DIR }} || true
+          mkdir -p ${{ env.REPORT_DIR }}/logs
+          echo "Deploy run at $(date -u)" > ${{ env.REPORT_DIR }}/deploy_report.txt
+
+      - name: Show Deploy folder contents
+        run: |
+          echo "Listing ${{ env.DEPLOY_DIR }}"
+          ls -la ${{ env.DEPLOY_DIR }} || true
+          find ${{ env.DEPLOY_DIR }} -maxdepth 2 -type f -print || true
+          echo "----" >> ${{ env.REPORT_DIR }}/deploy_report.txt
+
+      - name: Validate docker-compose exists
+        run: |
+          if [ ! -f "${{ env.DEPLOY_DIR }}/docker-compose.yml" ]; then
+            echo "ERROR: docker-compose.yml not found in ${{ env.DEPLOY_DIR }}" | tee -a ${{ env.REPORT_DIR }}/deploy_report.txt
+            exit 2
+          fi
+          echo "Found docker-compose.yml" >> ${{ env.REPORT_DIR }}/deploy_report.txt
+
+      - name: Ensure docker compose plugin
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y docker-compose-plugin jq || true
+          docker --version >> ${{ env.REPORT_DIR }}/deploy_report.txt
+          docker compose version >> ${{ env.REPORT_DIR }}/deploy_report.txt
+
+      - name: Copy .env.example to .env if missing
+        run: |
+          if [ -f "${{ env.DEPLOY_DIR }}/.env.example" ] && [ ! -f "${{ env.DEPLOY_DIR }}/.env" ]; then
+            cp "${{ env.DEPLOY_DIR }}/.env.example" "${{ env.DEPLOY_DIR }}/.env"
+            echo "Copied .env.example to .env" >> ${{ env.REPORT_DIR }}/deploy_report.txt
+          else
+            echo ".env present or .env.example missing" >> ${{ env.REPORT_DIR }}/deploy_report.txt
+          fi
+
+      - name: Build Docker images
+        working-directory: ${{ env.DEPLOY_DIR }}
+        run: |
+          set -o pipefail
+          echo "Building images (no-cache)..." >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+          docker compose build --no-cache 2>&1 | tee $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/build_log.txt
+          echo "Build finished with exit code ${PIPESTATUS[0]}" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+        continue-on-error: true
+
+      - name: Start stack detached
+        working-directory: ${{ env.DEPLOY_DIR }}
+        run: |
+          set -o pipefail
+          docker compose up -d --remove-orphans 2>&1 | tee $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/up_log.txt
+          echo "Up exit code ${PIPESTATUS[0]}" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+        continue-on-error: true
+
+      - name: Wait for services to stabilize
+        run: |
+          sleep 10
+          for i in 1 2 3 4 5; do
+            docker compose ps --all > $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/ps.txt || true
+            if ! grep -qE "(exited|dead)" $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/ps.txt; then
+              echo "Containers appear running" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+              break
+            fi
+            echo "Detected exited containers, waiting ($i/5)" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+            sleep 8
+          done
+
+      - name: Run DB migrations if migration command exists
+        working-directory: ${{ env.DEPLOY_DIR }}
+        run: |
+          # Adjust these commands to match your project; safe defaults attempt common patterns
+          set +e
+          if docker compose ps --services | grep -q api; then
+            API_CID=$(docker compose ps -q api)
+            echo "API container id $API_CID" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+            # Try common migration commands; ignore failures
+            docker exec -T $API_CID sh -c "if command -v alembic >/dev/null 2>&1; then alembic upgrade head; fi" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt 2>&1 || true
+            docker exec -T $API_CID sh -c "if [ -f manage.py ]; then python manage.py migrate --noinput; fi" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt 2>&1 || true
+          else
+            echo "No api service detected; skipping migrations" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+          fi
+
+      - name: Import n8n workflow if present
+        working-directory: ${{ env.DEPLOY_DIR }}
+        run: |
+          set -e
+          if [ -f master_orchestrator.json ]; then
+            if docker compose ps --services | grep -q n8n; then
+              N8N_CID=$(docker compose ps -q n8n)
+              docker cp master_orchestrator.json $N8N_CID:/tmp/master_orchestrator.json || true
+              docker exec -u node $N8N_CID n8n import:workflow --input=/tmp/master_orchestrator.json >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/n8n_import.txt 2>&1 || echo "n8n import failed" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+              echo "n8n import attempted" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+            else
+              echo "n8n service not present; skipping import" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+            fi
+          else
+            echo "No master_orchestrator.json found; skipping n8n import" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+          fi
+        continue-on-error: true
+
+      - name: Collect logs and status
+        working-directory: ${{ env.DEPLOY_DIR }}
+        run: |
+          docker compose ps --all > $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/ps.txt || true
+          for svc in $(docker compose ps --services); do
+            docker compose logs --tail=200 $svc > $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/logs/${svc}.log || true
+            echo "Saved logs for $svc" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+          done
+          echo "Saved ps and logs" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+
+      - name: Run smoke checks
+        working-directory: ${{ env.DEPLOY_DIR }}
+        run: |
+          set -e
+          docker compose ps --all > $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/status.txt || true
+          cat $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/status.txt >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+          if grep -qE "(exited|dead)" $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/status.txt; then
+            echo "SMOKE FAILED: one or more containers exited" | tee -a $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+            exit 3
+          fi
+          echo "SMOKE OK" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+
+      - name: Optionally push images to GitHub Container Registry
+        if: ${{ secrets.PUSH_REGISTRY == 'true' }}
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          # Tag and push images found in compose (best-effort)
+          for svc in $(docker compose config --services); do
+            IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/mindreply-${svc}:ci-${{ github.run_id }}"
+            docker compose build $svc || true
+            docker tag $(docker compose images -q $svc 2>/dev/null || echo "") $IMAGE_NAME || true
+            docker push $IMAGE_NAME || true
+            echo "Pushed $IMAGE_NAME" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+          done
+
+      - name: Optional remote deploy to DigitalOcean
+        if: ${{ secrets.DO_DEPLOY == 'true' }}
+        env:
+          DO_TOKEN: ${{ secrets.DO_TOKEN }}
+          DO_DROPLET_IP: ${{ secrets.DO_DROPLET_IP }}
+        run: |
+          # This step requires DO_TOKEN and DO_DROPLET_IP secrets; it uses scp/ssh to copy a stable compose file and run remote docker compose.
+          echo "Attempting remote deploy to $DO_DROPLET_IP" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+          # Create a tar of Deploy folder
+          tar -czf /tmp/deploy_bundle.tar.gz -C $GITHUB_WORKSPACE ${{ env.DEPLOY_DIR }}
+          # Use ssh key from secret if provided (DO_SSH_KEY) - not included by default
+          if [ -n "${{ secrets.DO_SSH_KEY }}" ]; then
+            echo "${{ secrets.DO_SSH_KEY }}" > /tmp/do_ssh_key && chmod 600 /tmp/do_ssh_key
+            scp -o StrictHostKeyChecking=no -i /tmp/do_ssh_key /tmp/deploy_bundle.tar.gz root@${{ secrets.DO_DROPLET_IP }}:/root/ || echo "scp failed"
+            ssh -o StrictHostKeyChecking=no -i /tmp/do_ssh_key root@${{ secrets.DO_DROPLET_IP }} "tar -xzf /root/deploy_bundle.tar.gz -C /root && cd /root/${{ env.DEPLOY_DIR }} && docker compose pull && docker compose up -d --remove-orphans" || echo "remote deploy failed"
+            echo "Remote deploy attempted" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+          else
+            echo "DO_SSH_KEY not provided; skipping remote copy" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+          fi
+        continue-on-error: true
+
+      - name: Stop and cleanup stack on runner
+        if: always()
+        working-directory: ${{ env.DEPLOY_DIR }}
+        run: |
+          docker compose down --remove-orphans || true
+          echo "Runner stack stopped" >> $GITHUB_WORKSPACE/${{ env.REPORT_DIR }}/deploy_report.txt
+
+      - name: Zip report and logs
+        run: |
+          cd $GITHUB_WORKSPACE
+          zip -r ${{ env.REPORT_DIR }}.zip ${{ env.REPORT_DIR }} || true
+
+      - name: Upload deploy report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.REPORT_DIR }}.zip

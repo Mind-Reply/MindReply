@@ -15,11 +15,13 @@ export type AIResponse = {
 export async function runAI(req: AIRequest): Promise<AIResponse> {
   const model = req.model || "gpt-4.1-mini";
 
+  // NOTE: API key must come from environment variables only
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error("Missing OPENAI_API_KEY");
   }
 
+  // Placeholder safe execution layer (no direct SDK binding assumed)
   const timestamp = new Date().toISOString();
 
   return {

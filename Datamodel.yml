@@ -1,0 +1,2 @@
+- name: datamodel-code-generator
+  uses: koxudaxi/datamodel-code-generator@0.66.0

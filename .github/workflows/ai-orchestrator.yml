@@ -1,0 +1,38 @@
+name: AI Multi-Agent Orchestrator
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+
+jobs:
+  orchestrate:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Collect failure context
+        run: |
+          echo "Collecting logs + context..."
+          mkdir -p context
+          echo "${{ toJson(github.event) }}" > context/event.json
+
+      - name: Decide agent
+        run: |
+          echo "Routing failure..."
+          if grep -i "frontend|react|vue|ui" context/event.json; then
+            echo "frontend" > context/agent.txt
+          elif grep -i "api|server|backend|db" context/event.json; then
+            echo "backend" > context/agent.txt
+          elif grep -i "docker|deploy|ci|kubernetes" context/event.json; then
+            echo "devops" > context/agent.txt
+          else
+            echo "security" > context/agent.txt
+          fi
+
+      - name: Show selected agent
+        run: cat context/agent.txt

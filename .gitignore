@@ -1,4 +1,5 @@
-logs
+# Logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -9,8 +10,28 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-*.local
+out/
+.next/
+build
+# Dependencies and build outputs
+node_modules/
+dist/
+dist-ssr/
+build/
+out/
+.next/
+coverage/
+.nyc_output/
+.cache/
 
+# Local env files
+.env
+.env.*
+!.env.example
+*.local
+*.vars
+
+# System / editor files
 .vscode/*
 !.vscode/launch.json
 !.vscode/extensions.json
@@ -25,6 +46,12 @@ dist-ssr
 /.cache
 /build
 .env*
+!.env.example
 *.vars
 .wrangler
 _worker.bundle
+# Platform artifacts
+.wrangler
+_worker.bundle
+.vercel/
+.railway/

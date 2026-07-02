@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: mind-reply-web
+    env: node
+    plan: starter
+    root: app
+    buildCommand: ./build.sh
+    startCommand: ./start.sh
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+  - type: background
+    name: mind-reply-orchestrator
+    env: python
+    plan: starter
+    root: /
+    buildCommand: ""
+    startCommand: python3 auto_orchestrator_full.py
+    autoDeploy: true
+    envVars:
+      - key: RENDER_DEPLOY_HOOK
+        fromDatabase: false
+        value: ""
+      - key: GITHUB_TOKEN
+        fromDatabase: false
+        value: ""

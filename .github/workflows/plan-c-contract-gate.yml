@@ -27,7 +27,7 @@ jobs:
 
       - name: Check for secrets leakage
         run: |
-          ! grep -R "sk_live\|ghp_" .
+          ! grep -R "sk_live\|ghp_\|OPENAI_API_KEY" .
 
       - name: Success
         run: echo "Plan C contract gate passed"

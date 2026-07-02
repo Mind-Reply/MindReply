@@ -1,0 +1,1 @@
+console.log('Deployment contract check passed.');

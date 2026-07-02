@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: mindreply
+spec:
+  generators:
+    - list:
+        elements:
+          - env: dev
+            namespace: mindreply-dev
+            path: k8s/helm/mindreply
+          - env: staging
+            namespace: mindreply-staging
+            path: k8s/helm/mindreply
+          - env: prod
+            namespace: mindreply-prod
+            path: k8s/helm/mindreply
+  template:
+    metadata:
+      name: mindreply-{{env}}
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/Mind-Reply/MindReply
+        targetRevision: main
+        path: "{{path}}"
+        helm:
+          valueFiles:
+            - ../../environments/{{env}}/values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

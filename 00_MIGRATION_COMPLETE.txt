@@ -1,6 +1,6 @@
 # DOCKER HARDENED IMAGES MIGRATION - COMPLETE ✓
 
-## MindReply Project - DHI Migration Summary
+## MindReply Project - DHI Migration Summary 
 
 **Status: ✓ MIGRATION SUCCESSFUL**
 

@@ -1,0 +1,83 @@
+name: Production Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Commit SHA or tag to deploy
+        required: false
+        type: string
+      reason:
+        description: Reason for deploy or rollback
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Select release ref
+        id: release
+        run: |
+          REF_INPUT="${{ inputs.release_sha }}"
+          if [ -n "$REF_INPUT" ]; then
+            echo "ref=$REF_INPUT" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run ci
+
+      - name: Deploy through fallback hooks
+        env:
+          DEPLOY_HOOKS: ${{ secrets.DEPLOY_HOOKS }}
+          HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
+          DEPLOY_REASON: ${{ inputs.reason || 'production deploy' }}
+        run: npm run deploy:hooks
+
+      - name: Notify success
+        if: success()
+        env:
+          ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: npm run notify:deploy -- success
+
+      - name: Update stable tag
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f production-stable "$GITHUB_SHA"
+          git push -f origin production-stable
+
+      - name: Notify failure
+        if: failure()
+        env:
+          ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: npm run notify:deploy -- failure

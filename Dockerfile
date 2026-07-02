@@ -1,5 +1,5 @@
 # Build stage
-FROM dhi.io/node:22-alpine3.24-dev AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -7,15 +7,15 @@ COPY package*.json ./
 COPY apps/backend/package*.json ./apps/backend/
 COPY apps/backend/tsconfig.json ./apps/backend/
 
-RUN npm install
-RUN cd apps/backend && npm install
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+RUN cd apps/backend && if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 COPY apps/backend/src ./apps/backend/src
 
 RUN cd apps/backend && npm run build
 
 # Runtime stage
-FROM dhi.io/node:22-alpine3.24
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -28,5 +28,7 @@ COPY apps/backend/package.json ./apps/backend/
 EXPOSE 3001
 
 WORKDIR /app/apps/backend
+
+ENV NODE_ENV=production
 
 CMD ["npm", "run", "start"]
