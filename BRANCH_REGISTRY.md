@@ -17,6 +17,15 @@ Labels:
 
 All other branches have been deleted (see execution log).
 
+ Branch | Last commit | Open PR |
+|---|---|---|
+| `agent/owner-cockpit-pwa` | 2026-07-02 | #72 |
+
+As of the initial 2026-07-02 audit, six branches had open PRs (#59, #65, #66, #67, #69, #70). All were merged or closed later that day and their branches deleted; #66 was merged before it could be closed as a duplicate of #69.
+
+## 3. Merged — deleted 2026-07-02 (were 0 commits ahead of main)
+
+Sorted by last commit date, newest first. Historical record from the audit; all branches below are removed from the remote.
 ## 2. Deleted — merged into main (owner-approved 2026-07-02)
 
 No history was lost — all commits are in `main`.
