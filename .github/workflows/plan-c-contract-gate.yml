@@ -1,5 +1,5 @@
 name: Plan C Contract Gate
- 
+
 on:
   pull_request:
     branches: [ main, plan-c-hardening ]
