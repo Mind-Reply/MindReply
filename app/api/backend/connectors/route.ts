@@ -21,7 +21,7 @@ export async function GET() {
   } catch (error) {
     console.error("API error:", error);
     return NextResponse.json(
-      { status: "error", error: String(error) },
+      { status: "error", error: "Internal server error" },
       { status: 500 }
     );
   }
@@ -30,6 +30,14 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const { connector, action } = await req.json();
+
+    const allowedConnectors = ["stripe", "gmail", "youtube", "database", "claude", "all"];
+    if (typeof connector !== 'string' || !allowedConnectors.includes(connector)) {
+      return NextResponse.json(
+        { error: "Unknown connector" },
+        { status: 400 }
+      );
+    }
 
     let result;
 
@@ -52,18 +60,13 @@ export async function POST(req: Request) {
       case "all":
         result = await getAllData();
         break;
-      default:
-        return NextResponse.json(
-          { error: "Unknown connector" },
-          { status: 400 }
-        );
     }
 
     return NextResponse.json(result);
   } catch (error) {
     console.error("API error:", error);
     return NextResponse.json(
-      { status: "error", error: String(error) },
+      { status: "error", error: "Internal server error" },
       { status: 500 }
     );
   }
