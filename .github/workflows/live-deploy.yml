@@ -16,6 +16,12 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      BILLING_EMAIL: ${{ secrets.BILLING_EMAIL }}
+      BILLING_PHONE: ${{ secrets.BILLING_PHONE }}
+      BILLING_CONTACT: ${{ secrets.BILLING_CONTACT }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
