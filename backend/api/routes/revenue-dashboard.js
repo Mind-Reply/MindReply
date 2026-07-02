@@ -44,6 +44,7 @@ router.get('/revenue/daily', async (req, res) => {
     
     res.json(daily.rows);
   } catch (err) {
+    console.error('Daily revenue error:', err);
     res.status(500).json({ error: 'Failed to fetch daily revenue' });
   }
 });
@@ -67,6 +68,7 @@ router.get('/sites', async (req, res) => {
     
     res.json(sites.rows);
   } catch (err) {
+    console.error('Sites fetch error:', err);
     res.status(500).json({ error: 'Failed to fetch sites' });
   }
 });
@@ -83,6 +85,7 @@ router.post('/metrics/revenue', async (req, res) => {
     
     res.json({ success: true });
   } catch (err) {
+    console.error('Record revenue error:', err);
     res.status(500).json({ error: 'Failed to record revenue' });
   }
 });
@@ -103,6 +106,7 @@ router.get('/report/daily', async (req, res) => {
     
     res.json(report.rows[0]);
   } catch (err) {
+    console.error('Report generation error:', err);
     res.status(500).json({ error: 'Failed to generate report' });
   }
 });
@@ -126,6 +130,7 @@ router.get('/health', async (req, res) => {
     
     res.json(health.rows);
   } catch (err) {
+    console.error('Health check error:', err);
     res.status(500).json({ error: 'Health check failed' });
   }
 });
@@ -142,6 +147,7 @@ router.post('/sites', async (req, res) => {
     
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Create site error:', err);
     res.status(500).json({ error: 'Failed to create site' });
   }
 });

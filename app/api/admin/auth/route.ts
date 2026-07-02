@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ token, success: true });
   } catch (error) {
+    console.error('Admin auth error:', error);
     return NextResponse.json({ error: 'Authentication failed' }, { status: 500 });
   }
 }

@@ -79,8 +79,9 @@ export default function AdminDashboard() {
       });
 
       setSessions(response.data.data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to load sessions:', err);
+      alert(`Failed to load sessions: ${err.response?.data?.error || err.message}`);
     }
   };
 
@@ -105,8 +106,9 @@ export default function AdminDashboard() {
       setSessions([newSession, ...sessions]);
       setCurrentSession(newSession);
       setNewSessionTitle('');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create session:', err);
+      alert(`Failed to create session: ${err.response?.data?.error || err.message}`);
     } finally {
       setLoading(false);
     }
@@ -164,8 +166,9 @@ export default function AdminDashboard() {
       if (currentSession?.id === sessionId) {
         setCurrentSession(null);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to delete session:', err);
+      alert(`Failed to delete session: ${err.response?.data?.error || err.message}`);
     }
   };
 

@@ -65,6 +65,7 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
     const { email, password } = req.body;
     res.json({ status: 'login_endpoint_active' });
   } catch (err) {
+    console.error('Login error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -74,6 +75,7 @@ app.post('/api/auth/signup', async (req: Request, res: Response) => {
     const { email, password, name } = req.body;
     res.json({ status: 'signup_endpoint_active' });
   } catch (err) {
+    console.error('Signup error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -97,6 +99,7 @@ app.post('/api/admin/init', async (req: Request, res: Response) => {
       message: 'Admin account ready - use /api/admin/login',
     });
   } catch (err) {
+    console.error('Admin init error:', err);
     res.status(500).json({ error: 'Initialization failed' });
   }
 });
@@ -113,6 +116,7 @@ app.post('/api/admin/login', async (req: Request, res: Response) => {
       message: 'Use the dedicated admin auth service for login',
     });
   } catch (err) {
+    console.error('Admin login error:', err);
     res.status(401).json({ error: 'Authentication failed' });
   }
 });
@@ -131,6 +135,7 @@ app.post('/api/admin/chat/session', async (req: Request, res: Response) => {
       status: 'active',
     });
   } catch (err) {
+    console.error('Create session error:', err);
     res.status(500).json({ error: 'Failed to create session' });
   }
 });
@@ -157,6 +162,7 @@ app.get('/api/admin/chat/sessions', async (req: Request, res: Response) => {
       ],
     });
   } catch (err) {
+    console.error('Load sessions error:', err);
     res.status(500).json({ error: 'Failed to load sessions' });
   }
 });
@@ -201,6 +207,7 @@ app.post('/api/admin/chat/:sessionId/message', async (req: Request, res: Respons
       },
     });
   } catch (err) {
+    console.error('Process message error:', err);
     res.status(500).json({ error: 'Failed to process message' });
   }
 });

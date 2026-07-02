@@ -137,6 +137,7 @@ export class ApprovalService {
       logger.info('Team notified of new approval', { approvalId });
     } catch (err) {
       logger.error('Failed to notify team:', err);
+      throw err;
     }
   }
 

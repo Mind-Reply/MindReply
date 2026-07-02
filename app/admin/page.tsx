@@ -44,12 +44,20 @@ export default function AdminPage() {
         body: JSON.stringify({ message: input }),
       });
 
+      if (!res.ok) {
+        throw new Error(`Server error (${res.status})`);
+      }
+
       const data = await res.json();
       if (data.message) {
         setMessages((prev) => [...prev, data.message]);
       }
     } catch (error) {
-      console.error(error);
+      console.error('Failed to send message:', error);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Failed to send message. Please try again.' },
+      ]);
     }
   };
 

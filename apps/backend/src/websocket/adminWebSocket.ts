@@ -122,10 +122,12 @@ export class AdminWebSocketServer {
         ws.send(JSON.stringify({ type: 'authenticated', adminId, email: decoded.email }));
         logger.info('Admin authenticated via WebSocket', { adminId });
       } catch (err) {
+        logger.warn('WebSocket token verification failed:', err);
         ws.send(JSON.stringify({ error: 'Invalid token' }));
       }
     } catch (err) {
       logger.error('Auth error:', err);
+      ws.send(JSON.stringify({ error: 'Authentication failed' }));
     }
   }
 
@@ -142,6 +144,7 @@ export class AdminWebSocketServer {
       logger.info('Chat message received via WS', { adminId: ws.adminId });
     } catch (err) {
       logger.error('Chat message error:', err);
+      ws.send(JSON.stringify({ error: 'Failed to process chat message' }));
     }
   }
 
