@@ -117,6 +117,30 @@ Legend for approval requirement:
 - **Approval requirement:** AUTO (this is the default operating mode).
 - **Evidence:** The evidence itself — links, hashes, screenshots, metrics, per task.
 
+## 14. "secure this chat"
+
+- **Raw intent:** Nothing about this operation gets lost or exposed; continuity across sessions.
+- **Safe execution translation:** Persist owner context, operating rules, and session state into private repo files. No secret values stored in files — secrets live in the secret manager only.
+- **Agent task:** Maintain `OWNER_CONTEXT_LOCK.md`, `SESSION_CHECKPOINT.md`, and companions; update checkpoints at session boundaries.
+- **Approval requirement:** AUTO.
+- **Evidence:** Updated checkpoint files with commit hashes; secret-scan pass.
+
+## 15. "make it premium"
+
+- **Raw intent:** Nothing generic. Every surface feels sharp, intentional, expensive.
+- **Safe execution translation:** Dark, sharp, non-generic visual identity: clean typography, purposeful whitespace, no stock-photo energy, no commodity SaaS aesthetics.
+- **Agent task:** Apply the brand system to every new surface; audit existing surfaces against it; reject generic output.
+- **Approval requirement:** AUTO for polish; OWNER-APPROVE for brand-system changes.
+- **Evidence:** Before/after screenshots; design-audit checklist per surface.
+
+## 16. "ship it"
+
+- **Raw intent:** Stop discussing, get it live now.
+- **Safe execution translation:** Open PR, pass build, run smoke test, deploy to preview first. Production deploy of anything customer-facing only after validation and owner approval.
+- **Agent task:** Execute the deploy pipeline end-to-end up to the production gate; queue the production release in the cockpit.
+- **Approval requirement:** AUTO through preview; OWNER-APPROVE for production.
+- **Evidence:** PR link, passing build, preview URL, smoke-test results.
+
 ---
 
 ## Adding new entries
