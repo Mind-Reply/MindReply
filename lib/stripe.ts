@@ -2,7 +2,7 @@ import 'server-only'
 
 import Stripe from 'stripe'
 
-export const STRIPE_API_VERSION = '2024-04-10' as const;
+export const STRIPE_API_VERSION = '2025-02-24.acacia' as const;
 
 let _stripe: Stripe | undefined;
 

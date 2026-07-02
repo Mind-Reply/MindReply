@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { anthropic } from "./clients/anthropic";
-import { gmail, youtube } from "./clients/google";
+import { gmail, youtube, youtubeAnalytics } from "./clients/google";
 import { getStripe } from "./stripe";
 
 const db = new Pool({
@@ -134,9 +134,9 @@ export async function getYoutubeData() {
         part: ["snippet"],
         forMine: true,
         maxResults: 50,
-        type: "video",
+        type: ["video"],
       }),
-      youtube.analytics.reports.query({
+      youtubeAnalytics.reports.query({
         ids: "channel==MINE",
         startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
           .toISOString()

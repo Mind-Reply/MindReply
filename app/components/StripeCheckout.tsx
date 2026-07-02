@@ -14,10 +14,13 @@ const stripePromise = loadStripe(
 )
 
 export default function StripeCheckout({ planId }: { planId: string }) {
-  const fetchClientSecret = useCallback(
-    () => startSubscriptionCheckout(planId),
-    [planId],
-  )
+  const fetchClientSecret = useCallback(async () => {
+    const clientSecret = await startSubscriptionCheckout(planId)
+    if (!clientSecret) {
+      throw new Error('Failed to start checkout session')
+    }
+    return clientSecret
+  }, [planId])
 
   return (
     <div id="checkout" className="w-full">

@@ -17,3 +17,11 @@
 - Hosting verification: not run
 - DNS verification: not run
 - Monitoring verification: not run
+
+## Owner Cockpit PWA (2026-07-02)
+
+- Branch: agent/owner-cockpit-pwa
+- PR: "Owner Cockpit PWA — private production control surface" (link recorded on PR creation)
+- Files: app/login, app/cockpit (layout, dashboard, chat, [section]), app/manifest.ts, public/cockpit-icon.svg, lib/cockpit/*
+- Gamma reference: 403 bot challenge (evidence: curl returned HTTP 403 "Just a moment" page)
+- Build/smoke results: see LIVE_CHECK_REPORT.md

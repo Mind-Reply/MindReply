@@ -50,3 +50,9 @@ Provide explicit access or credentials for:
 - Database + workflow systems
 
 Only after this can execution mode proceed beyond planning and file scaffolding.
+
+## Owner Cockpit PWA (2026-07-02)
+
+- Owner-only auth: no auth provider configured for cockpit routes. Needed: Clerk (already a dependency) or Supabase Auth credentials, plus an owner allowlist. Until then, `/cockpit/*` is a placeholder-protected surface and must not be treated as private.
+- Vercel: preview deployment relies on the repo's existing Vercel integration; account rate limits currently affect checks. Needed for production deploy: Vercel project access + owner approval.
+- DNS: mind-reply.com and subdomains — DNS ACCESS REQUIRED.

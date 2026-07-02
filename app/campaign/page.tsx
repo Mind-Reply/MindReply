@@ -27,7 +27,7 @@ export default function Campaign60KDashboard() {
         signups: prev.signups + Math.floor(Math.random() * 2),
         paidConversions: prev.paidConversions + (Math.random() > 0.95 ? 1 : 0),
         revenue: prev.revenue + (Math.random() > 0.95 ? 600 : 0),
-        conversionRate: (((prev.signups + Math.floor(Math.random() * 2)) / (prev.totalVisitors + 50)) * 100).toFixed(2)
+        conversionRate: Number((((prev.signups + Math.floor(Math.random() * 2)) / (prev.totalVisitors + 50)) * 100).toFixed(2))
       }));
 
       setLiveEvents(prev => [

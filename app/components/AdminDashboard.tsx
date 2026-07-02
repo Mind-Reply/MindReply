@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Message, Lock, Send, Loader } from 'lucide-react';
+import { MessageSquare, Lock, Send, Loader } from 'lucide-react';
 
 interface ChatMessage {
   id: string;
@@ -25,8 +25,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   // Get token from localStorage on mount
   useEffect(() => {
     const savedToken = localStorage.getItem('admin_token');
-    if (savedToken) setToken(savedToken);
-    loadChatHistory(savedToken);
+    if (savedToken) {
+      setToken(savedToken);
+      loadChatHistory(savedToken);
+    }
   }, []);
 
   // Auto-scroll to latest message
@@ -133,7 +135,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <Message className="w-16 h-16 text-slate-600 mb-4" />
+            <MessageSquare className="w-16 h-16 text-slate-600 mb-4" />
             <h2 className="text-2xl font-bold text-slate-200 mb-2">Welcome to Admin Chat</h2>
             <p className="text-slate-400 max-w-md">
               Start a conversation. You have unlimited access to all systems, data, and integrations.

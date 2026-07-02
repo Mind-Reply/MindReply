@@ -1,19 +1,19 @@
-import { NextResponse } from 'next/server';
-
 export async function GET() {
-  return NextResponse.stream(
-    async (controller) => {
-      const sendUpdate = (data: any) => {
-        controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      const sendUpdate = (data: unknown) => {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
       };
 
-      try {
-        // Send initial data
-        sendUpdate({ type: 'stripe', message: 'Connected' });
-        
-        // Simulate updates every 30 seconds
-        let count = 0;
-        const interval = setInterval(() => {
+      // Send initial data
+      sendUpdate({ type: 'stripe', message: 'Connected' });
+
+      // Simulate updates every 5 seconds
+      let count = 0;
+      const interval = setInterval(() => {
+        try {
           if (count < 100) {
             const updates = [
               { type: 'stripe', revenue: Math.random() * 10000 },
@@ -26,18 +26,19 @@ export async function GET() {
             clearInterval(interval);
             controller.close();
           }
-        }, 5000);
-      } catch (error) {
-        console.error('Stream error:', error);
-        controller.close();
-      }
+        } catch (error) {
+          console.error('Stream error:', error);
+          clearInterval(interval);
+        }
+      }, 5000);
     },
-    {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    }
-  );
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    },
+  });
 }

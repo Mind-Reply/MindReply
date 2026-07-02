@@ -19,3 +19,8 @@ export const youtube = google.youtube({
   version: 'v3',
   auth: googleAuth,
 });
+
+export const youtubeAnalytics = google.youtubeAnalytics({
+  version: 'v2',
+  auth: googleAuth,
+});
