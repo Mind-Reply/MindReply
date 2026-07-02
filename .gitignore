@@ -1,3 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+out/
+.next/
+coverage/
+.nyc_output/
+.cache/
+*.tsbuildinfo
+
+# Local env files
+.env
+.env.*
+!.env.example
+*.local
+*.vars
+
 # Logs
 logs/
 *.log
@@ -7,51 +28,27 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-out/
-.next/
-build
-# Dependencies and build outputs
-node_modules/
-dist/
-dist-ssr/
-build/
-out/
-.next/
-coverage/
-.nyc_output/
-.cache/
-
-# Local env files
-.env
-.env.*
-!.env.example
-*.local
-*.vars
-
 # System / editor files
 .vscode/*
 !.vscode/launch.json
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+Thumbs.db
 
-/.cache
-/build
-.env*
-!.env.example
-*.vars
-.wrangler
-_worker.bundle
 # Platform artifacts
-.wrangler
-_worker.bundle
 .vercel/
 .railway/
+.wrangler/
+_worker.bundle
+
+# Package manager locks (keep only one)
+# Uncomment the lock files you do NOT use:
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
