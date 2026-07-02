@@ -43,9 +43,16 @@ All agents (Devin, GitHub Actions, n8n workflows, scripts) operating on MindRepl
 
 - Every session must read owner context files first to restore continuity.
 - Every session must update SESSION_CHECKPOINT.md before ending.
+- Every action updates AGENT_ACTION_LOG.md.
+- Every live claim updates GLOBAL_EVIDENCE_REGISTRY.md.
+- Every blocker updates BLOCKERS.md.
+- Every ending session writes a resume prompt in DEVIN_RESUME_PROMPT.md.
 - If context files are missing, create them from the templates in this repo.
 - Do not delete or weaken owner context files.
 - Do not overwrite SESSION_CHECKPOINT.md without preserving the previous state.
+- No silent stopping — always checkpoint before ending.
+- No strategy-only updates — every response must include evidence or exact next action.
+- No direct main mutation unless explicitly safe and approved.
 
 ## Response Format
 

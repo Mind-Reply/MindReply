@@ -1,42 +1,62 @@
 # Session Checkpoint
 
-Last updated: 2026-07-02T12:15Z
+Last updated: 2026-07-02T15:14Z
 
 ## Current State
 
-- **Current goal:** Secure owner context and agent operating contract into repo for session continuity
+- **Owner goal:** Create a production-ready MindReply system with cleaned repos, real URLs, private Owner Cockpit PWA, live checks, evidence registry, and safe automation.
 - **Current repo:** Mind-Reply/MindReply
-- **Current branch:** agent/secure-owner-context
-- **Current PR:** Pending (this commit)
-- **Latest commit:** Pending
-- **Build result:** Compiles in 9.9s; type-check fails on pre-existing errors only (stream/route.ts, briefs.ts)
-- **Preview URL:** None
-- **Live URL:** Not verified
+- **Current branch:** agent/permanent-continuity-system
+- **Current PR:** Pending (this commit creates it)
+- **Latest commit hash:** 12f8937f2a402dddd2b189e71550e58cbdfc1574 (main)
+- **Build result:** Compiles in ~10s; type-check fails on pre-existing errors only (stream/route.ts, briefs.ts)
+- **Deployment/Preview URL:** None — Vercel returns 404
+- **Failed GitHub Actions run link:** TBD — Auto Orchestrator Runner failure needs inspection
+- **Current blocker:** Vercel deployment missing; Auto Orchestrator Runner failure undiagnosed
+- **Exact next action:** Inspect Auto Orchestrator Runner failure logs, document in FAILED_RUN_TRIAGE.md, fix
+- **Exact resume prompt:** See DEVIN_RESUME_PROMPT.md
+- **Timestamp:** 2026-07-02T15:14Z
 
-## Changed Files (This Session)
+## Files Changed (This Session)
 
-- OWNER_CONTEXT_LOCK.md — created
-- OWNER_COMMAND_STYLE.md — created
-- OWNER_INTENT_DICTIONARY.md — created
-- AGENT_OPERATING_CONTRACT.md — created
-- SESSION_CHECKPOINT.md — created (this file)
+- DEVIN_STATE.md — created
+- SESSION_CHECKPOINT.md — updated (this file)
+- DEVIN_RESUME_PROMPT.md — created
+- DEVIN_TASK_QUEUE.md — created
+- NEXT_ACTIONS.md — created
+- BLOCKERS.md — updated
+- AGENT_ACTION_LOG.md — updated
+- GLOBAL_EVIDENCE_REGISTRY.md — updated
+- FAILED_RUN_TRIAGE.md — created
+- OWNER_CONTEXT_LOCK.md — updated
+- AGENT_OPERATING_CONTRACT.md — updated
+
+## Commands Run
+
+- git checkout -b agent/permanent-continuity-system
+- Created/updated 11 continuity state files
+- git add + commit + push
+- PR created
 
 ## Previous Session Work
 
-- PR #61 (merged): Refactored duplicated code into shared utilities (lib/clients/google.ts, lib/clients/anthropic.ts, lib/stripe.ts, lib/ui/cx.ts, lib/ui/Panel.tsx)
-- PR #64 (open): agent/go-live-cleanup — removed .next/ from VCS, audited secrets, created SECURITY_ROTATION.md and GO_NO_GO_TABLE.md
+- PR #73 (merged): docs: update BRANCH_REGISTRY.md
+- PR #67 (merged): docs: add ACCESS_REQUEST.md
+- PR #59 (merged): fix: improve error handling
+- PR #64 (open): agent/go-live-cleanup — removed .next/ from VCS, audited secrets
 
 ## Blockers
 
-1. **Build type-check (pre-existing):** `app/api/integrations/stream/route.ts` uses `NextResponse.stream` (does not exist in Next.js 15); `apps/backend/src/routes/briefs.ts` has syntax errors
-2. **No test suite:** No comprehensive test script in package.json
-3. **Secret rotation unverified:** Owner must verify all secrets per SECURITY_ROTATION.md
-4. **50+ stale deployment docs at root:** Need archival to docs/archive/
+1. **Vercel deployment 404:** DEPLOYMENT_NOT_FOUND — owner must verify secrets/project
+2. **Auto Orchestrator Runner failure:** Needs log inspection and fix (TQ-001)
+3. **Pre-existing type-check errors:** stream/route.ts, briefs.ts (non-blocking)
+4. **No test suite:** No comprehensive test script in package.json
+5. **PR #64 awaiting merge:** Security cleanup blocked until owner merges
 
 ## Next Exact Action
 
-Owner reviews and merges PR #64 (go-live-cleanup), then reviews this PR (owner context). After both merge, next priority is fixing pre-existing build errors and archiving stale docs.
+Inspect Auto Orchestrator Runner failure in GitHub Actions. Document exact error. Fix and re-run.
 
 ## Resume Prompt
 
-> Continue MindReply production cleanup. Read OWNER_CONTEXT_LOCK.md, AGENT_OPERATING_CONTRACT.md, and SESSION_CHECKPOINT.md first. Check GO_NO_GO_TABLE.md for current status. Fix pre-existing build errors (stream/route.ts, briefs.ts), then archive stale deployment docs to docs/archive/.
+> Read DEVIN_STATE.md, DEVIN_RESUME_PROMPT.md, DEVIN_TASK_QUEUE.md, BLOCKERS.md, and SESSION_CHECKPOINT.md. Continue from task queue item TQ-001 (Fix Auto Orchestrator Runner). Do not start from scratch.

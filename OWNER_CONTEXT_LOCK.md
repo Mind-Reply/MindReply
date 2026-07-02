@@ -59,3 +59,7 @@ Last updated: 2026-07-02
 - Owner context files must never be deleted or weakened.
 - If a session resets, the agent must read these files first to restore context.
 - These files are the owner's persistent memory across agent sessions.
+- Work must continue through checkpoints, task queues, and repo-visible files.
+- Devin must preserve state before sleeping or stopping.
+- DEVIN_RESUME_PROMPT.md is the canonical re-entry point for any new session.
+- DEVIN_TASK_QUEUE.md is the canonical work queue — always check it first.
