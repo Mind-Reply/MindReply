@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Loader2, Sparkles, Wand2 } from 'lucide-react';
 import type { CampaignResponse } from '../../../lib/campaign-studio';
+import { cx } from '../../../lib/ui/cx';
+import { Panel } from '../../../lib/ui/Panel';
 
 const tones = ['Professional', 'Bold', 'Premium', 'Friendly', 'Playful', 'Minimal', 'Direct', 'Luxury'] as const;
 const channels = ['Meta Ads', 'LinkedIn', 'Email', 'Landing Page', 'Google Ads', 'TikTok', 'X', 'YouTube'] as const;
@@ -131,20 +133,20 @@ export function CampaignStudioFront() {
 
           <section className="space-y-6">
             {loading ? (
-              <Card title="Generating your campaign" subtitle={stages[stageIndex]}>
+              <Panel title="Generating your campaign" subtitle={stages[stageIndex]}>
                 <div className="h-24 animate-pulse rounded-2xl bg-white/5" />
-              </Card>
+              </Panel>
             ) : error ? (
-              <Card title="Generation failed" subtitle="Check the inputs or server environment variables and try again.">
+              <Panel title="Generation failed" subtitle="Check the inputs or server environment variables and try again.">
                 <p className="rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-red-100">{error}</p>
-              </Card>
+              </Panel>
             ) : result ? (
               <>
-                <Card title="Campaign concept" subtitle={`Text: ${result.models.text} · Visuals: ${result.models.image}`}>
+                <Panel title="Campaign concept" subtitle={`Text: ${result.models.text} · Visuals: ${result.models.image}`}>
                   <p className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 text-sm leading-6 text-white/90">{result.concept}</p>
-                </Card>
+                </Panel>
 
-                <Card title="Copy angles" subtitle="Five distinct headline/body combinations.">
+                <Panel title="Copy angles" subtitle="Five distinct headline/body combinations.">
                   <div className="grid gap-4">
                     {result.variants.map((variant, index) => (
                       <article key={`${variant.channel}-${index}`} className="rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -161,9 +163,9 @@ export function CampaignStudioFront() {
                       </article>
                     ))}
                   </div>
-                </Card>
+                </Panel>
 
-                <Card title="Launch checklist" subtitle="Use this to prepare the release.">
+                <Panel title="Launch checklist" subtitle="Use this to prepare the release.">
                   <ol className="space-y-3 text-sm text-white/75">
                     {result.launchChecklist.map((item, index) => (
                       <li key={`${item}-${index}`} className="flex gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
@@ -172,9 +174,9 @@ export function CampaignStudioFront() {
                       </li>
                     ))}
                   </ol>
-                </Card>
+                </Panel>
 
-                <Card title="Image prompts" subtitle="These prompts guide visual exploration.">
+                <Panel title="Image prompts" subtitle="These prompts guide visual exploration.">
                   <div className="space-y-3 text-sm text-white/75">
                     {result.imagePrompts.map((item, index) => (
                       <div key={`${item}-${index}`} className="rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -183,15 +185,15 @@ export function CampaignStudioFront() {
                       </div>
                     ))}
                   </div>
-                </Card>
+                </Panel>
               </>
             ) : (
-              <Card title="Nothing generated yet" subtitle="Fill in the brief and generate a concept, copy set, checklist, and image direction.">
+              <Panel title="Nothing generated yet" subtitle="Fill in the brief and generate a concept, copy set, checklist, and image direction.">
                 <div className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-8 text-center text-white/70">
                   <Sparkles className="mx-auto mb-3 h-8 w-8 text-cyan-300" />
                   <p className="text-lg font-medium text-white">Campaign output will appear here</p>
                 </div>
-              </Card>
+              </Panel>
             )}
           </section>
         </div>
@@ -222,22 +224,6 @@ function Field({
       />
     </div>
   );
-}
-
-function Card({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
-  return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/20 backdrop-blur">
-      <div className="mb-5">
-        <h2 className="text-xl font-semibold text-white">{title}</h2>
-        {subtitle ? <p className="mt-1 text-sm text-white/60">{subtitle}</p> : null}
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function cx(...items: Array<string | false | null | undefined>) {
-  return items.filter(Boolean).join(' ');
 }
 
 function channelChip(selected: boolean) {

@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Copy, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import type { CampaignResponse } from '../../../lib/campaign-studio';
+import { cx } from '../../../lib/ui/cx';
+import { Panel } from '../../../lib/ui/Panel';
 
 const toneOptions = ['Professional', 'Bold', 'Premium', 'Friendly', 'Playful', 'Minimal', 'Direct', 'Luxury'] as const;
 const channelOptions = ['Meta Ads', 'LinkedIn', 'Email', 'Landing Page', 'Google Ads', 'TikTok', 'X', 'YouTube'] as const;
@@ -18,30 +20,6 @@ const loadingStages = [
   'Building the launch checklist…',
   'Generating visual direction…',
 ];
-
-function cx(...items: Array<string | false | null | undefined>) {
-  return items.filter(Boolean).join(' ');
-}
-
-function Panel({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/20 backdrop-blur">
-      <div className="mb-5">
-        <h2 className="text-xl font-semibold text-white">{title}</h2>
-        {subtitle ? <p className="mt-1 text-sm text-white/60">{subtitle}</p> : null}
-      </div>
-      {children}
-    </section>
-  );
-}
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);

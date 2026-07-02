@@ -1,34 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
-import Stripe from "stripe";
-import { google } from "googleapis";
 import { Pool } from "pg";
-
-// Initialize all connectors
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-04-10",
-});
-
-const gmail = google.gmail({
-  version: "v1",
-  auth: new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-  ),
-});
-
-const youtube = google.youtube({
-  version: "v3",
-  auth: new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-  ),
-});
+import { anthropic } from "./clients/anthropic";
+import { gmail, youtube } from "./clients/google";
+import { getStripe } from "./stripe";
 
 const db = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -41,11 +14,11 @@ export async function getStripeData() {
   try {
     const [customers, charges, invoices, subscriptions, payouts] =
       await Promise.all([
-        stripe.customers.list({ limit: 100 }),
-        stripe.charges.list({ limit: 100 }),
-        stripe.invoices.list({ limit: 100 }),
-        stripe.subscriptions.list({ limit: 100 }),
-        stripe.payouts.list({ limit: 50 }),
+        getStripe().customers.list({ limit: 100 }),
+        getStripe().charges.list({ limit: 100 }),
+        getStripe().invoices.list({ limit: 100 }),
+        getStripe().subscriptions.list({ limit: 100 }),
+        getStripe().payouts.list({ limit: 50 }),
       ]);
 
     const totalRevenue = charges.data.reduce((sum, charge) => {

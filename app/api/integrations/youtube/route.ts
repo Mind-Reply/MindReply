@@ -1,14 +1,5 @@
 import { NextResponse } from 'next/server';
-import { google } from 'googleapis';
-
-const youtube = google.youtube({
-  version: 'v3',
-  auth: new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-  ),
-});
+import { youtube } from '../../../../lib/clients/google';
 
 export async function GET() {
   try {

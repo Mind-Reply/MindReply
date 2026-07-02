@@ -1,33 +1,6 @@
-import Anthropic from "@anthropic-ai/sdk";
-import Stripe from "stripe";
-import { google } from "googleapis";
-
-// Initialize connectors
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-04-10",
-});
-
-const gmail = google.gmail({
-  version: "v1",
-  auth: new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-  ),
-});
-
-const youtube = google.youtube({
-  version: "v3",
-  auth: new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-  ),
-});
+import { anthropic } from "../clients/anthropic";
+import { gmail, youtube } from "../clients/google";
+import { getStripe } from "../stripe";
 
 // Admin connector interface
 export interface AdminConnector {
@@ -42,10 +15,10 @@ export const stripeConnector: AdminConnector = {
   capabilities: ["payments", "customers", "subscriptions", "invoices"],
   fetch: async () => {
     const [customers, charges, invoices, subscriptions] = await Promise.all([
-      stripe.customers.list({ limit: 100 }),
-      stripe.charges.list({ limit: 50 }),
-      stripe.invoices.list({ limit: 50 }),
-      stripe.subscriptions.list({ limit: 100 }),
+      getStripe().customers.list({ limit: 100 }),
+      getStripe().charges.list({ limit: 50 }),
+      getStripe().invoices.list({ limit: 50 }),
+      getStripe().subscriptions.list({ limit: 100 }),
     ]);
 
     return {

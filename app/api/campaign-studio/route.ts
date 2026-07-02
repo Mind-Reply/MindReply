@@ -5,6 +5,7 @@ import {
   DEFAULT_IMAGE_MODEL,
   DEFAULT_TEXT_MODEL,
   extractResponseText,
+  imagePayloadToUrl,
   parseCampaignResult,
   validateCampaignInput,
 } from '../../../lib/campaign-studio';
@@ -29,23 +30,6 @@ async function postJson<T>(url: string, body: unknown, apiKey: string): Promise<
   }
 
   return response.json() as Promise<T>;
-}
-
-function imagePayloadToUrl(payload: unknown): string | null {
-  if (!payload || typeof payload !== 'object') {
-    return null;
-  }
-
-  const record = payload as Record<string, unknown>;
-  if (typeof record.b64_json === 'string' && record.b64_json.trim()) {
-    return `data:image/png;base64,${record.b64_json.trim()}`;
-  }
-
-  if (typeof record.url === 'string' && record.url.trim()) {
-    return record.url.trim();
-  }
-
-  return null;
 }
 
 export async function POST(request: Request) {

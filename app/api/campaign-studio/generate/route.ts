@@ -1,4 +1,12 @@
 import { NextResponse } from 'next/server';
+import {
+  normalizeText,
+  normalizeChannels,
+  extractResponseText,
+  imagePayloadToUrl,
+  DEFAULT_TEXT_MODEL,
+  DEFAULT_IMAGE_MODEL,
+} from '../../../../lib/campaign-studio';
 
 export const runtime = 'nodejs';
 
@@ -30,8 +38,6 @@ type GeneratedImage = {
   error?: string;
 };
 
-const TEXT_MODEL = process.env.OPENAI_TEXT_MODEL ?? 'gpt-5.5';
-const IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-2';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const campaignSchema = {
@@ -79,33 +85,6 @@ function jsonError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-function asString(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : '';
-}
-
-function asStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  return value.map((item) => asString(item)).filter(Boolean);
-}
-
-function extractTextFromResponsesPayload(payload: any): string {
-  if (typeof payload?.output_text === 'string' && payload.output_text.trim()) {
-    return payload.output_text.trim();
-  }
-
-  const fragments: string[] = [];
-  for (const item of payload?.output ?? []) {
-    if (item?.type === 'message' && Array.isArray(item.content)) {
-      for (const part of item.content) {
-        if (typeof part?.text === 'string') fragments.push(part.text);
-        if (typeof part?.content === 'string') fragments.push(part.content);
-      }
-    }
-    if (typeof item?.text === 'string') fragments.push(item.text);
-  }
-
-  return fragments.join('\n').trim();
-}
 
 function parseCampaignPayload(text: string): CampaignPayload {
   const parsed = JSON.parse(text) as CampaignPayload;
@@ -141,7 +120,7 @@ async function callResponsesApi(input: CampaignInput): Promise<CampaignPayload> 
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: TEXT_MODEL,
+      model: DEFAULT_TEXT_MODEL,
       input: [
         {
           role: 'developer',
@@ -175,7 +154,7 @@ async function callResponsesApi(input: CampaignInput): Promise<CampaignPayload> 
     throw new Error(data?.error?.message ?? 'OpenAI Responses API request failed.');
   }
 
-  const outputText = extractTextFromResponsesPayload(data);
+  const outputText = extractResponseText(data);
   if (!outputText) {
     throw new Error('OpenAI returned an empty campaign payload.');
   }
@@ -195,7 +174,7 @@ async function generateImage(prompt: string): Promise<string> {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: IMAGE_MODEL,
+      model: DEFAULT_IMAGE_MODEL,
       prompt,
       size: '1024x1024',
       n: 1,
@@ -208,25 +187,21 @@ async function generateImage(prompt: string): Promise<string> {
   }
 
   const first = data?.data?.[0] ?? {};
-  if (typeof first.url === 'string' && first.url) {
-    return first.url;
+  const url = imagePayloadToUrl(first);
+  if (!url) {
+    throw new Error('Image generation returned no usable asset.');
   }
-
-  if (typeof first.b64_json === 'string' && first.b64_json) {
-    return `data:image/png;base64,${first.b64_json}`;
-  }
-
-  throw new Error('Image generation returned no usable asset.');
+  return url;
 }
 
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as Partial<CampaignInput>;
-    const brief = asString(body.brief);
-    const audience = asString(body.audience);
-    const product = asString(body.product);
-    const tone = asString(body.tone) || 'Professional';
-    const channels = asStringArray(body.channels);
+    const brief = normalizeText(body.brief);
+    const audience = normalizeText(body.audience);
+    const product = normalizeText(body.product);
+    const tone = normalizeText(body.tone) || 'Professional';
+    const channels = normalizeChannels(body.channels);
 
     if (!brief || !audience || !product || channels.length === 0) {
       return jsonError('Brief, audience, product, and at least one channel are required.', 400);
@@ -260,8 +235,8 @@ export async function POST(request: Request) {
       campaign,
       generatedImages,
       meta: {
-        textModel: TEXT_MODEL,
-        imageModel: IMAGE_MODEL,
+        textModel: DEFAULT_TEXT_MODEL,
+        imageModel: DEFAULT_IMAGE_MODEL,
       },
     });
   } catch (error) {

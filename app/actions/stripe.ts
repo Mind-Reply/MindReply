@@ -1,6 +1,6 @@
 'use server'
 
-import { stripe } from '../../lib/stripe'
+import { getStripe } from '../../lib/stripe'
 import { getPlan } from '../../lib/plans'
 
 export async function startSubscriptionCheckout(planId: string) {
@@ -10,7 +10,7 @@ export async function startSubscriptionCheckout(planId: string) {
     throw new Error(`Plan with id "${planId}" not found`)
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     ui_mode: 'embedded',
     redirect_on_completion: 'never',
     mode: 'subscription',
@@ -34,7 +34,7 @@ export async function startSubscriptionCheckout(planId: string) {
 }
 
 export async function getCheckoutStatus(sessionId: string) {
-  const session = await stripe.checkout.sessions.retrieve(sessionId)
+  const session = await getStripe().checkout.sessions.retrieve(sessionId)
 
   return {
     status: session.status,

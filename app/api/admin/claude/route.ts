@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { callClaudeWithAllConnectors } from '@/lib/admin/connectors';
+import { callClaudeWithAllConnectors } from '../../../../lib/admin/connectors';
 
 export async function POST(req: NextRequest) {
   const adminToken = req.headers.get('x-admin-token');

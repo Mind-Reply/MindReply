@@ -6,7 +6,7 @@ import {
   processWithClaude,
   getDatabaseMetrics,
   getAllData,
-} from "@/lib/backend-connectors";
+} from "../../../../lib/backend-connectors";
 
 export async function GET() {
   try {
