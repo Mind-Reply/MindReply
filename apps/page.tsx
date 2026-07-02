@@ -9,10 +9,12 @@ export default function DashboardPage() {
   const [metrics, setMetrics] = useState<any>(null);
   const [queue, setQueue] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setError(null);
         const [metricsRes, queueRes] = await Promise.all([
           apiClient.get('/analytics'),
           apiClient.get('/queue'),
@@ -22,6 +24,7 @@ export default function DashboardPage() {
         setQueue(queueRes);
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
@@ -31,6 +34,7 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) return <div className="p-4">Loading...</div>;
+  if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
 
   return (
     <div className="space-y-6">

@@ -17,6 +17,7 @@ export default function PricingPage() {
   const [tiers, setTiers] = useState<Record<string, Tier>>({});
   const [currentTier, setCurrentTier] = useState<string>('free');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function PricingPage() {
         setCurrentTier(subRes.data.data.tier);
       } catch (err) {
         console.error('Failed to fetch pricing:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load pricing data');
       } finally {
         setLoading(false);
       }
@@ -54,6 +56,7 @@ export default function PricingPage() {
   };
 
   if (loading) return <div className="p-4">Loading...</div>;
+  if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
