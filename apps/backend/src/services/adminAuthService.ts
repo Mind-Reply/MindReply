@@ -183,7 +183,7 @@ export class AdminAuthService {
       });
     } catch (err) {
       logger.error('Failed to log action:', err);
-      throw err;
+      // Don't throw - audit logging should not break the main operation
     }
   }
 }

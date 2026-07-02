@@ -178,7 +178,8 @@ Respond in JSON: { "followUps": [{ "type": "...", "scheduledDays": 3, "descripti
       return JSON.parse(content);
     } catch (err) {
       logger.error('Failed to suggest follow-ups:', err);
-      throw err;
+      // Graceful degradation: return empty results rather than crashing the pipeline
+      return { followUps: [] };
     }
   }
 }

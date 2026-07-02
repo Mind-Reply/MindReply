@@ -37,64 +37,48 @@ export async function POST(request: Request) {
 }
 
 async function sendToAnalytics(data: any) {
-  const errors: Error[] = [];
+  // Best-effort: fire calls in parallel, log failures but don't block the caller
 
   // Send to Google Analytics
   if (process.env.GA_MEASUREMENT_ID) {
-    try {
-      const gaResponse = await fetch('https://www.google-analytics.com/mp/collect', {
-        method: 'POST',
-        body: JSON.stringify({
-          measurement_id: process.env.GA_MEASUREMENT_ID,
-          api_secret: process.env.GA_API_SECRET,
-          events: [{
-            name: data.event,
-            params: {
-              source: data.source,
-              user_id: data.userId,
-              session_id: data.data?.sessionId,
-              ...data.data
-            }
-          }]
-        })
-      });
-      if (!gaResponse.ok) {
-        console.error('GA request failed:', gaResponse.status, gaResponse.statusText);
-      }
-    } catch (err) {
-      console.error('GA error:', err);
-      errors.push(err instanceof Error ? err : new Error(String(err)));
-    }
+    fetch('https://www.google-analytics.com/mp/collect', {
+      method: 'POST',
+      body: JSON.stringify({
+        measurement_id: process.env.GA_MEASUREMENT_ID,
+        api_secret: process.env.GA_API_SECRET,
+        events: [{
+          name: data.event,
+          params: {
+            source: data.source,
+            user_id: data.userId,
+            session_id: data.data?.sessionId,
+            ...data.data
+          }
+        }]
+      })
+    }).then(res => {
+      if (!res.ok) console.error('GA request failed:', res.status, res.statusText);
+    }).catch(err => console.error('GA error:', err));
   }
 
   // Send to Slack for real-time monitoring
   if (process.env.SLACK_WEBHOOK) {
-    try {
-      const slackResponse = await fetch(process.env.SLACK_WEBHOOK, {
-        method: 'POST',
-        body: JSON.stringify({
-          text: `📊 ${data.event}: ${data.source} (${data.data?.value || '1'})`,
-          blocks: [
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*${data.event}*\n📍 ${data.source}\n⏰ ${data.timestamp.toLocaleString()}`
-              }
+    fetch(process.env.SLACK_WEBHOOK, {
+      method: 'POST',
+      body: JSON.stringify({
+        text: `📊 ${data.event}: ${data.source} (${data.data?.value || '1'})`,
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: `*${data.event}*\n📍 ${data.source}\n⏰ ${data.timestamp.toLocaleString()}`
             }
-          ]
-        })
-      });
-      if (!slackResponse.ok) {
-        console.error('Slack request failed:', slackResponse.status, slackResponse.statusText);
-      }
-    } catch (err) {
-      console.error('Slack error:', err);
-      errors.push(err instanceof Error ? err : new Error(String(err)));
-    }
-  }
-
-  if (errors.length > 0) {
-    throw new AggregateError(errors, 'One or more analytics providers failed');
+          }
+        ]
+      })
+    }).then(res => {
+      if (!res.ok) console.error('Slack request failed:', res.status, res.statusText);
+    }).catch(err => console.error('Slack error:', err));
   }
 }
