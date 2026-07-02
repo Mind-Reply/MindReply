@@ -47,25 +47,13 @@ app.get('/health', (req: Request, res: Response) => {
     status: 'ok',
     service: 'MindReply Backend',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-    uptime: process.uptime(),
-    database: process.env.DATABASE_URL ? 'configured' : 'not_configured',
   });
 });
 
 app.get('/', (req: Request, res: Response) => {
   res.json({
     name: 'MindReply Backend API',
-    version: '2.0.0',
     status: 'running',
-    endpoints: {
-      health: '/health',
-      auth: '/api/auth',
-      admin: '/api/admin',
-      messages: '/api/messages',
-      approvals: '/api/approvals',
-      billing: '/api/billing',
-    },
   });
 });
 
@@ -117,13 +105,12 @@ app.post('/api/admin/init', async (req: Request, res: Response) => {
 app.post('/api/admin/login', async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const token = Buffer.from(`${email}:${Date.now()}`).toString('base64');
-    
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' });
+    }
     res.json({
-      token,
-      adminId: 'admin-' + Date.now(),
-      email,
-      message: 'Admin authenticated - secure access granted',
+      status: 'login_endpoint_active',
+      message: 'Use the dedicated admin auth service for login',
     });
   } catch (err) {
     res.status(401).json({ error: 'Authentication failed' });
@@ -304,7 +291,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('Error:', err);
   res.status(500).json({
     error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Server error',
   });
 });
 
