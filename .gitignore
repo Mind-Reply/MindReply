@@ -12,6 +12,13 @@ coverage/
 .cache/
 *.tsbuildinfo
 
+# Local env files
+.env
+.env.*
+!.env.example
+*.local
+*.vars
+
 # Logs
 logs/
 *.log
@@ -20,14 +27,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-# Local env files
-.env
-.env.*
-!.env.example
-!.env.template
-*.local
-*.vars
 
 # System / editor files
 .vscode/*
@@ -43,11 +42,13 @@ lerna-debug.log*
 Thumbs.db
 
 # Platform artifacts
-.wrangler/
-_worker.bundle
 .vercel/
 .railway/
+.wrangler/
+_worker.bundle
 
-# Lock files (pnpm-based project)
-package-lock.json
-yarn.lock
+# Package manager locks (keep only one)
+# Uncomment the lock files you do NOT use:
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

@@ -1,41 +1,51 @@
 # GO / NO-GO Table
 
-Last updated: 2026-07-02 (agent/go-live-cleanup)
+Last updated: 2026-07-02
 
-## MindReply Repository
+## Repository: Mind-Reply/MindReply
 
-| # | Check | Status | Evidence | Blocker |
-|---|---|---|---|---|
-| 1 | GitHub write access | GO | Branch `agent/go-live-cleanup` created and pushed | — |
-| 2 | `.env` not committed | GO | `git ls-files .env .env.local .env.production .env.development` returns empty | — |
-| 3 | `.next/` not committed | GO | Removed from tracking via `git rm -r --cached .next/` (39 files) | — |
-| 4 | `tsconfig.tsbuildinfo` not committed | GO | Removed from tracking via `git rm --cached tsconfig.tsbuildinfo` | — |
-| 5 | `.gitignore` covers artifacts | GO | Updated — covers `.next/`, `*.tsbuildinfo`, `.env`, `node_modules/`, `dist/`, `build/`, logs | — |
-| 6 | No secrets in tracked files | GO | Grep for real key patterns (`sk_live_[A-Za-z0-9]{10,}` etc.) returns zero matches; only placeholder patterns (`sk_live_...`) in docs | — |
-| 7 | Secret rotation documented | GO | `SECURITY_ROTATION.md` created with full inventory | Owner must verify/rotate |
-| 8 | Build compiles | GO | `next build` — "Compiled successfully in 13.9s" | — |
-| 9 | Build type-check passes | NO-GO | Pre-existing errors: `app/api/integrations/stream/route.ts` uses non-existent `NextResponse.stream`; `apps/backend/src/routes/briefs.ts` has syntax errors | Owner must fix |
-| 10 | Tests exist | NO-GO | No test suite configured (`package.json` has no test script) | No tests to run |
-| 11 | HTTPS on live URL | NOT VERIFIED | No confirmed production URL to check | Owner must provide |
-| 12 | Smoke test | NOT VERIFIED | Cannot run without a deployed URL | Owner must deploy |
-| 13 | Monitoring configured | NOT VERIFIED | No monitoring config found in repo | Owner must configure |
-| 14 | Rollback path | NOT VERIFIED | Vercel provides automatic rollback if configured | Owner must verify |
-| 15 | Stripe webhook signature verification | NOT VERIFIED | Code references `STRIPE_WEBHOOK_SECRET` but cannot test without running instance | Owner must verify |
-| 16 | Contact/request form | NOT VERIFIED | Cannot test without running instance | Owner must verify |
-| 17 | Stale LIVE/READY/FINAL docs | PARTIAL | 50+ legacy deployment/status docs exist at repo root; should be moved to `docs/archive/` | Deferred to follow-up PR |
-| 18 | `tsconfig.json` path alias | NO-GO | `@/*` maps to `./src/*` but no `src/` directory exists; multiple imports broken | Fixed in PR #61 for affected files; others remain |
+| # | Check | Status | Evidence | Blocker / Next Action |
+|---|-------|--------|----------|-----------------------|
+| 1 | GitHub write access | GO | Branch `agent/go-live-cleanup` created, PRs opened (PR #60) | — |
+| 2 | `.env` removed from VCS | GO | `git rm --cached .env .env.template` — removed from tracking | — |
+| 3 | `.next/` removed from VCS | GO | 98 build artifacts removed via `git rm -r --cached` | — |
+| 4 | `tsconfig.tsbuildinfo` removed from VCS | GO | Removed from tracking; `*.tsbuildinfo` added to `.gitignore` | — |
+| 5 | `.gitignore` covers artifacts | GO | Cleaned and deduplicated — covers `.next/`, `*.tsbuildinfo`, `.env`, `node_modules/`, `dist/`, `build/`, logs | — |
+| 6 | No secrets in tracked files | GO | Grep for real key patterns (`sk_live_[A-Za-z0-9]{10,}` etc.) returns zero matches | — |
+| 7 | Hardcoded secrets in code | GO | Fixed in PR #60 — no fallback passwords, no insecure defaults | — |
+| 8 | Auth on admin endpoints | GO | Fixed in PR #60 — HMAC-signed tokens, middleware enforcement | — |
+| 9 | CORS configuration | GO | Fixed in PR #60 — restricted to `FRONTEND_URL` | — |
+| 10 | Error message leakage | GO | Fixed in PR #60 — generic errors returned to clients | — |
+| 11 | Secret rotation documented | GO | `SECURITY_ROTATION.md` created with full inventory | Owner must verify/rotate |
+| 12 | `ADMIN_PASSWORD` set | NO-GO | Not yet configured in hosting env | Owner must set in Vercel/GitHub Secrets |
+| 13 | `ADMIN_TOKEN_SECRET` set | NO-GO | Not yet configured in hosting env | Owner must generate (`openssl rand -hex 32`) and set |
+| 14 | `JWT_SECRET` set | NO-GO | Not yet configured in hosting env | Owner must generate (`openssl rand -hex 64`) and set |
+| 15 | Credential rotation | NO-GO | `.env` was committed; secrets may be in git history | See SECURITY_ROTATION.md |
+| 16 | Build compiles | GO | `next build` compiled successfully | — |
+| 17 | Build type-check | PARTIAL | `npx tsc --noEmit` passes for Next.js app; pre-existing errors in `apps/backend/src/routes/briefs.ts` | Fix backend TS errors |
+| 18 | CI/CD pipeline | PARTIAL | GitHub Actions (CodeQL) pass; Vercel deploys rate-limited | Vercel rate limit is account-level |
+| 19 | HTTPS on production URL | NOT VERIFIED | No verified live production URL | Verify after deployment |
+| 20 | Smoke test | NOT VERIFIED | No smoke test run | Run after deployment with secrets configured |
+| 21 | Monitoring | NO-GO | No uptime/error monitoring configured | Set up Sentry DSN, uptime checks |
+| 22 | Rollback path | NOT VERIFIED | Vercel supports instant rollback but not tested | Verify Vercel rollback works |
+| 23 | Stripe integration | NOT VERIFIED | Code exists but payment flow not smoke-tested | Verify with test keys after secrets are set |
+| 24 | Stale docs archived | GO | 51 historical docs moved to `docs/archive/` with warning | — |
+| 25 | Docs consolidated | GO | `START_HERE.md`, `DEPLOYMENT_RUNBOOK.md` updated | — |
+| 26 | Domain / DNS | NOT VERIFIED | `.env` references `mind-reply.com` | Verify DNS, HTTPS cert |
+| 27 | Social/ads readiness | NOT VERIFIED | No social launch plan exists | Create plan after site is verified live |
+| 28 | Privacy/terms pages | NOT VERIFIED | Not audited | Audit before public launch |
+| 29 | Copyright notices | NOT VERIFIED | Not audited | Add footer attribution before launch |
 
-## Overall Verdict
+## Overall Status
 
-**NO-GO for production** — build type-check fails on pre-existing errors, no test suite, no verified live URL, no monitoring. Repository hygiene improved (build artifacts removed, secrets audited, `.gitignore` fixed).
+**NO-GO** — Critical secrets (`ADMIN_PASSWORD`, `ADMIN_TOKEN_SECRET`, `JWT_SECRET`) must be set and credentials rotated before production launch. Repository hygiene improved (build artifacts removed, secrets audited, `.gitignore` fixed, stale docs archived).
 
 ## Required Owner Actions for GO
 
-1. Fix `app/api/integrations/stream/route.ts` — `NextResponse.stream` does not exist in Next.js 15
-2. Fix `apps/backend/src/routes/briefs.ts` — syntax errors (line 188+)
-3. Fix `tsconfig.json` paths — change `"@/*": ["./src/*"]` to `"@/*": ["./*"]` or move source files into `src/`
-4. Add a test suite or at minimum a smoke test script
-5. Provide and verify production URL
-6. Configure monitoring (uptime check, error tracking via Sentry DSN)
-7. Verify Stripe webhook + payment flow in a test environment
-8. Move stale root-level deployment docs to `docs/archive/`
+1. Set `ADMIN_PASSWORD`, `ADMIN_TOKEN_SECRET`, `JWT_SECRET` in Vercel/GitHub Secrets
+2. Rotate all credentials listed in SECURITY_ROTATION.md
+3. Fix `apps/backend/src/routes/briefs.ts` TS errors
+4. Verify production URL loads with HTTPS
+5. Run smoke test on homepage, admin login, API health, Stripe checkout
+6. Configure Sentry DSN for error monitoring
+7. Set up uptime monitoring
