@@ -4,7 +4,10 @@ import jwt from 'jsonwebtoken';
 import { logger } from '../utils/logger';
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'change_me';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable must be set');
+}
 
 export class AdminAuthService {
   /**
@@ -183,6 +186,7 @@ export class AdminAuthService {
       });
     } catch (err) {
       logger.error('Failed to log action:', err);
+      // Don't throw - audit logging should not break the main operation
     }
   }
 }

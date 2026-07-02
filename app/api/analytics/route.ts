@@ -37,6 +37,8 @@ export async function POST(request: Request) {
 }
 
 async function sendToAnalytics(data: any) {
+  // Best-effort: fire calls in parallel, log failures but don't block the caller
+
   // Send to Google Analytics
   if (process.env.GA_MEASUREMENT_ID) {
     fetch('https://www.google-analytics.com/mp/collect', {
@@ -54,6 +56,8 @@ async function sendToAnalytics(data: any) {
           }
         }]
       })
+    }).then(res => {
+      if (!res.ok) console.error('GA request failed:', res.status, res.statusText);
     }).catch(err => console.error('GA error:', err));
   }
 
@@ -73,6 +77,8 @@ async function sendToAnalytics(data: any) {
           }
         ]
       })
+    }).then(res => {
+      if (!res.ok) console.error('Slack request failed:', res.status, res.statusText);
     }).catch(err => console.error('Slack error:', err));
   }
 }

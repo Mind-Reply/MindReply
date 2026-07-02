@@ -29,6 +29,7 @@ export class UsageService {
       });
     } catch (err) {
       logger.error('Failed to track usage:', err);
+      // Don't throw - usage tracking is a non-critical side-effect
     }
   }
 
@@ -114,6 +115,7 @@ export class UsageService {
       return { allowed, remaining };
     } catch (err) {
       logger.error('Failed to check usage limits:', err);
+      // Fail-closed: deny access when limits can't be verified
       return { allowed: false, remaining: 0 };
     }
   }

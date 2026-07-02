@@ -8,7 +8,7 @@ function score() {
   const logs = safeRead('ops/reports/state.json');
 
   let parsed = {};
-  try { parsed = JSON.parse(logs || '{}'); } catch {}
+  try { parsed = JSON.parse(logs || '{}'); } catch (err) { console.warn('Failed to parse state.json:', err.message); }
 
   let score = 100;
   const signals = [];

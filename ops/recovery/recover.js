@@ -14,6 +14,7 @@ function safeExec(cmd) {
     execSync(cmd, { stdio: 'inherit' });
     return true;
   } catch (e) {
+    console.error(`Command failed: ${cmd}`, e.message);
     return false;
   }
 }

@@ -47,25 +47,13 @@ app.get('/health', (req: Request, res: Response) => {
     status: 'ok',
     service: 'MindReply Backend',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-    uptime: process.uptime(),
-    database: process.env.DATABASE_URL ? 'configured' : 'not_configured',
   });
 });
 
 app.get('/', (req: Request, res: Response) => {
   res.json({
     name: 'MindReply Backend API',
-    version: '2.0.0',
     status: 'running',
-    endpoints: {
-      health: '/health',
-      auth: '/api/auth',
-      admin: '/api/admin',
-      messages: '/api/messages',
-      approvals: '/api/approvals',
-      billing: '/api/billing',
-    },
   });
 });
 
@@ -77,6 +65,7 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
     const { email, password } = req.body;
     res.json({ status: 'login_endpoint_active' });
   } catch (err) {
+    console.error('Login error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -86,6 +75,7 @@ app.post('/api/auth/signup', async (req: Request, res: Response) => {
     const { email, password, name } = req.body;
     res.json({ status: 'signup_endpoint_active' });
   } catch (err) {
+    console.error('Signup error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -109,6 +99,7 @@ app.post('/api/admin/init', async (req: Request, res: Response) => {
       message: 'Admin account ready - use /api/admin/login',
     });
   } catch (err) {
+    console.error('Admin init error:', err);
     res.status(500).json({ error: 'Initialization failed' });
   }
 });
@@ -117,15 +108,15 @@ app.post('/api/admin/init', async (req: Request, res: Response) => {
 app.post('/api/admin/login', async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const token = Buffer.from(`${email}:${Date.now()}`).toString('base64');
-    
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' });
+    }
     res.json({
-      token,
-      adminId: 'admin-' + Date.now(),
-      email,
-      message: 'Admin authenticated - secure access granted',
+      status: 'login_endpoint_active',
+      message: 'Use the dedicated admin auth service for login',
     });
   } catch (err) {
+    console.error('Admin login error:', err);
     res.status(401).json({ error: 'Authentication failed' });
   }
 });
@@ -144,6 +135,7 @@ app.post('/api/admin/chat/session', async (req: Request, res: Response) => {
       status: 'active',
     });
   } catch (err) {
+    console.error('Create session error:', err);
     res.status(500).json({ error: 'Failed to create session' });
   }
 });
@@ -170,6 +162,7 @@ app.get('/api/admin/chat/sessions', async (req: Request, res: Response) => {
       ],
     });
   } catch (err) {
+    console.error('Load sessions error:', err);
     res.status(500).json({ error: 'Failed to load sessions' });
   }
 });
@@ -214,6 +207,7 @@ app.post('/api/admin/chat/:sessionId/message', async (req: Request, res: Respons
       },
     });
   } catch (err) {
+    console.error('Process message error:', err);
     res.status(500).json({ error: 'Failed to process message' });
   }
 });
@@ -304,7 +298,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('Error:', err);
   res.status(500).json({
     error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Server error',
   });
 });
 

@@ -8,6 +8,7 @@ export default function BillingDashboard() {
   const [usage, setUsage] = useState<any>(null);
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,6 +20,7 @@ export default function BillingDashboard() {
         setInvoices(invoicesRes.data.data);
       } catch (err) {
         console.error('Failed to fetch billing data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load billing data');
       } finally {
         setLoading(false);
       }
@@ -28,6 +30,7 @@ export default function BillingDashboard() {
   }, []);
 
   if (loading) return <div className="p-4">Loading...</div>;
+  if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6">

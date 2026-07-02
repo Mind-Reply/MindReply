@@ -10,9 +10,19 @@ export default function AdminPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin';
-    if (password === adminPassword) {
-      setAuthenticated(true);
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('admin_token', data.token);
+        setAuthenticated(true);
+      }
+    } catch (err) {
+      console.error('Login failed');
     }
   };
 
@@ -24,18 +34,30 @@ export default function AdminPage() {
     setInput('');
 
     try {
+      const token = localStorage.getItem('admin_token');
       const res = await fetch('/api/admin/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ message: input }),
       });
+
+      if (!res.ok) {
+        throw new Error(`Server error (${res.status})`);
+      }
 
       const data = await res.json();
       if (data.message) {
         setMessages((prev) => [...prev, data.message]);
       }
     } catch (error) {
-      console.error(error);
+      console.error('Failed to send message:', error);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Failed to send message. Please try again.' },
+      ]);
     }
   };
 
@@ -70,7 +92,10 @@ export default function AdminPage() {
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold text-white">Admin Dashboard</h1>
           <button
-            onClick={() => setAuthenticated(false)}
+            onClick={() => {
+              localStorage.removeItem('admin_token');
+              setAuthenticated(false);
+            }}
             className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded"
           >
             Logout

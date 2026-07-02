@@ -22,7 +22,7 @@ export async function GET() {
   } catch (error) {
     console.error('Stripe error:', error);
     return NextResponse.json(
-      { revenue: 0, customers: 0, transactions: 0, status: 'error', error: String(error) },
+      { revenue: 0, customers: 0, transactions: 0, status: 'error' },
       { status: 200 }
     );
   }
