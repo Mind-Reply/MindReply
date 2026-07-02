@@ -37,13 +37,10 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    return NextResponse.json({
-      message: {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: 'Error processing message',
-        timestamp: Date.now(),
-      },
-    });
+    console.error('Admin chat error:', error);
+    return NextResponse.json(
+      { error: 'Failed to process message' },
+      { status: 500 }
+    );
   }
 }

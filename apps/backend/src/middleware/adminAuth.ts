@@ -41,6 +41,7 @@ export const verifyAdminToken = async (req: any, res: any, next: any) => {
     req.adminIp = ipAddress;
     next();
   } catch (err) {
+    console.error('Admin auth middleware error:', err);
     res.status(401).json({ error: 'Auth failed' });
   }
 };

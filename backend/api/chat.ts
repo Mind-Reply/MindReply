@@ -24,7 +24,8 @@ export async function chatHandler(req: any, res: any) {
     });
 
   } catch (err: any) {
-    return res.json({
+    console.error('MCP backend error:', err);
+    return res.status(502).json({
       reply: "MCP backend error",
       error: String(err),
       status: "error"

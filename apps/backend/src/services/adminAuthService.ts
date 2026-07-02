@@ -183,6 +183,7 @@ export class AdminAuthService {
       });
     } catch (err) {
       logger.error('Failed to log action:', err);
+      throw err;
     }
   }
 }

@@ -35,7 +35,11 @@ export default function AdminPage() {
         setMessages((prev) => [...prev, data.message]);
       }
     } catch (error) {
-      console.error(error);
+      console.error('Failed to send message:', error);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Failed to send message. Please try again.' },
+      ]);
     }
   };
 

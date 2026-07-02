@@ -29,6 +29,7 @@ export class UsageService {
       });
     } catch (err) {
       logger.error('Failed to track usage:', err);
+      throw err;
     }
   }
 
@@ -114,7 +115,7 @@ export class UsageService {
       return { allowed, remaining };
     } catch (err) {
       logger.error('Failed to check usage limits:', err);
-      return { allowed: false, remaining: 0 };
+      throw err;
     }
   }
 
