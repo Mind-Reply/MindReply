@@ -1,20 +1,7 @@
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-out/
-.next/
-build
-# Dependencies and build outputs
+# Dependencies
 node_modules/
+
+# Build outputs
 dist/
 dist-ssr/
 build/
@@ -24,10 +11,20 @@ coverage/
 .nyc_output/
 .cache/
 
-# Local env files
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files
 .env
 .env.*
 !.env.example
+!.env.template
 *.local
 *.vars
 
@@ -43,13 +40,6 @@ coverage/
 *.sln
 *.sw?
 
-/.cache
-/build
-.env*
-!.env.example
-*.vars
-.wrangler
-_worker.bundle
 # Platform artifacts
 .wrangler
 _worker.bundle

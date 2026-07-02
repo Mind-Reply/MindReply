@@ -1,49 +1,93 @@
-# MindReply — Repository Execution Inventory
+# Repository Inventory
 
-## Confirmed repository
-- Repository: Mind-Reply/MindReply
-- Default branch: main
-- Branch under cleanup: go-live-cleanup
+## Project Structure
 
-## Current classification
-- Classification: Production web app
-- Basis: README describes a Next.js frontend, Express backend, campaign studio routes, deployment assets, and production validation flows.
+```
+MindReply/
+├── app/                    # Next.js App Router (root-level pages)
+│   ├── api/               # API routes (analytics, admin auth/chat, director)
+│   ├── admin/             # Admin page (simple chat UI)
+│   └── revenue/           # Revenue dashboard page
+├── apps/
+│   ├── backend/           # Express.js backend service
+│   │   └── src/
+│   │       ├── middleware/    # Auth middleware
+│   │       ├── routes/        # API route handlers
+│   │       ├── services/      # Business logic services
+│   │       ├── utils/         # Logger, helpers
+│   │       └── websocket/     # WebSocket handlers
+│   ├── frontend/          # Next.js frontend app
+│   │   └── src/app/
+│   │       ├── admin/         # Full admin dashboard
+│   │       ├── contentflow/   # Content brief management
+│   │       ├── dashboard/     # Billing dashboard
+│   │       └── pricing/       # Pricing page
+│   ├── admin-dashboard/   # Standalone admin dashboard app
+│   └── web/               # Marketing/landing page
+├── backend/
+│   └── api/               # Additional API endpoints (chat, revenue-dashboard)
+├── frontend/              # Legacy frontend
+├── ops/
+│   ├── monitor/           # Health scoring
+│   └── recovery/          # Auto-recovery scripts
+├── scripts/               # Deployment and monitoring scripts
+└── docs/                  # Documentation
+```
 
-## Current status
-- Security status: Needs verification
-- CI/CD status: Needs verification
-- Build/test status: Needs verification
-- Deployment status: Not verified
-- Live URL: Not confirmed
-- GO/NO-GO: HOLD
+## Services
 
-## Required next checks
-1. Secret scan
-2. Dependency audit
-3. Build and test validation
-4. Production smoke test
-5. Deployment and HTTPS verification
-6. Monitoring and rollback confirmation
+| Service | Path | Runtime | Port | Description |
+|---------|------|---------|------|-------------|
+| Main App | `/` | Next.js 15 | 3000 | Root application with App Router |
+| Backend API | `apps/backend/` | Express.js | 4000 | Core API: auth, briefs, billing, analytics |
+| Frontend | `apps/frontend/` | Next.js | 3001 | Primary user-facing frontend |
+| Admin Dashboard | `apps/admin-dashboard/` | Next.js | 3002 | Admin management UI |
+| Backend API (legacy) | `backend/` | Express.js | — | MCP chat proxy, revenue dashboard |
 
-## Evidence used for classification
-- README indicates Next.js frontend, Express backend, `/health`, analytics, Stripe, OpenAI, and deployment assets.
+## Key Dependencies
 
-## Notes
-- This inventory is the control record for the go-live cleanup phase.
-- No production claim should be made until validation evidence is collected.
-# Repo Inventory
+| Package | Version | Purpose |
+|---------|---------|---------|
+| next | ^15.0.0 | Frontend framework |
+| react | ^18.3.0 | UI library |
+| express | — | Backend HTTP framework |
+| prisma | — | Database ORM (backend) |
+| drizzle-orm | ^0.38.4 | Database ORM (root app) |
+| stripe | ^17.0.0 | Payment processing |
+| @sentry/nextjs | ^8.0.0 | Error tracking |
+| winston | — | Structured logging (backend) |
+| jsonwebtoken | — | JWT auth (backend) |
+| axios | — | HTTP client (frontend) |
 
-## Verified access
-- GitHub org: `Mind-Reply`
-- Target repo: `Mind-Reply/MindReply`
-- Default branch: `main`
-- Visibility: public
-- Archived: false
-- Permissions: admin, maintain, push, pull
+## Databases
 
-## Initial scope
-- Cleanup and GitOps hardening for MindReply
-- Org-native CI/CD and state-driven deployment controls
+| Database | Provider | Usage |
+|----------|----------|-------|
+| PostgreSQL | Neon (`@neondatabase/serverless`) | Primary data store |
+| PostgreSQL | Via Prisma | Backend service data |
 
-## Notes
-- This file is the starting inventory and will be expanded with branch, workflow, release, and deployment evidence.
+## External Integrations
+
+| Service | Purpose | Config Key |
+|---------|---------|------------|
+| Anthropic Claude | AI chat responses | `ANTHROPIC_API_KEY` |
+| Stripe | Payments & billing | `STRIPE_SECRET_KEY` |
+| Google Analytics | Event tracking | `GA_MEASUREMENT_ID`, `GA_API_SECRET` |
+| Slack | Notifications & monitoring | `SLACK_WEBHOOK` |
+| Sentry | Error monitoring | `SENTRY_DSN` |
+| Vercel | Hosting & deployment | Automatic |
+| Gmail | Email connector | Via backend service |
+
+## Build & Deploy
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server (port 3000) |
+| `npm run build` | Production build |
+| `npm run lint` | Lint (Next.js) |
+| `npm run type-check` | TypeScript check |
+| `npm run ci` | Type-check + build |
+
+## Node.js Requirement
+
+- Engine: Node.js ≥22
